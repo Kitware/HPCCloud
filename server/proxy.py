@@ -2,6 +2,7 @@ import cherrypy
 import json
 import dbm
 import urllib
+import constants
 from girder.api.rest import Resource
 from girder.api import access
 from girder.api.describe import Description
@@ -14,7 +15,8 @@ class Proxy(Resource):
     def __init__(self):
         self.resourceName = 'proxy'
         self.route('PATCH', (), self.add_entry)
-        self._proxy_file_path = '/tmp/proxy'
+        self._proxy_file_path = self.model('setting').get(
+            constants.PluginSettings.PROXY_FILE_PATH, '/tmp/proxy')
 
     @access.public
     def add_entry(self, params):
