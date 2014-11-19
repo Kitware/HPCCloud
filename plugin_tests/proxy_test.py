@@ -21,8 +21,9 @@ class ProxyTestCase(base.TestCase):
         super(ProxyTestCase, self).setUp()
 
         self._proxy_file_path = '/tmp/proxy'
-        if os.path.exists(self._proxy_file_path):
-            os.remove('%s.db' % self._proxy_file_path)
+        full_path = '%s.db' % self._proxy_file_path
+        if os.path.exists(full_path):
+            os.remove(full_path)
 
         users = ({
             'email': 'cumulus@email.com',
