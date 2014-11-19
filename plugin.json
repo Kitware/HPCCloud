@@ -1,0 +1,5 @@
+{
+"name": "ParaViewWeb proxy plugin",
+"description": "Exposes REST api to add entries to ParaViewWebs proxy file",
+"dependencies": ["cumulus"]
+}
