@@ -87,17 +87,14 @@ class Proxy(Resource):
             'body',
             'The proxy entry parameters.', dataType='ProxyEntry', paramType='body', required=True))
 
-    @access.user
+    @access.public
     def delete_entry(self, cluster_id, job_id, params):
-        user = self.getCurrentUser()
         # Check that the cluster and job exist
-        cluster = self.model('cluster', 'cumulus').load(cluster_id, user=user,
-                                                        level=AccessType.ADMIN)
+        cluster = self.model('cluster', 'cumulus').load(cluster_id, force=True)
         if not cluster:
             raise RestException('Invalid cluster_id', code=400)
 
-        job = self.model('job', 'cumulus').load(job_id, user=user,
-                                                level=AccessType.ADMIN)
+        job = self.model('job', 'cumulus').load(job_id, force=True)
         if not job:
             raise RestException('Invalid job_id', code=400)
 
