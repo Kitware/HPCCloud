@@ -14,7 +14,8 @@ from lockfile import LockFile
 class Proxy(Resource):
     def __init__(self):
         self.resourceName = 'proxy'
-        self.route('PATCH', (), self.add_entry)
+        self.route('POST', (), self.add_entry)
+        self.route('DELETE', (':cluster_id', ':job_id'), self.delete_entry)
         self._proxy_file_path = self.model('setting').get(
             constants.PluginSettings.PROXY_FILE_PATH, '/tmp/proxy')
 
@@ -86,3 +87,40 @@ class Proxy(Resource):
             'body',
             'The proxy entry parameters.', dataType='ProxyEntry', paramType='body', required=True))
 
+    @access.user
+    def delete_entry(self, cluster_id, job_id, params):
+        user = self.getCurrentUser()
+        # Check that the cluster and job exist
+        cluster = self.model('cluster', 'cumulus').load(cluster_id, user=user,
+                                                        level=AccessType.ADMIN)
+        if not cluster:
+            raise RestException('Invalid cluster_id', code=400)
+
+        job = self.model('job', 'cumulus').load(job_id, user=user,
+                                                level=AccessType.ADMIN)
+        if not job:
+            raise RestException('Invalid job_id', code=400)
+
+        with LockFile(self._proxy_file_path):
+            db = None
+            try:
+                db = dbm.open(self._proxy_file_path, 'c')
+                key = '%s/%s' % (cluster_id, job_id)
+                # Encode the slash
+                key =  urllib.quote_plus(key)
+                if key in db:
+                    del db[key]
+            finally:
+                if db:
+                    db.close()
+
+    delete_entry.description = (Description(
+            'Delete entry'
+        )
+        .param(
+            'cluster_id',
+            'The cluster the job was submitted to.', dataType='string',
+            paramType='path', required=True)
+        .param('job_id',
+            'The job the proxy entry was create for.', dataType='string',
+            paramType='path', required=True))
