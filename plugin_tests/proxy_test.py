@@ -122,7 +122,7 @@ class ProxyTestCase(base.TestCase):
 
         json_body = json.dumps(body)
 
-        r = self.request('/proxy', method='PATCH',
+        r = self.request('/proxy', method='POST',
                          type='application/json', body=json_body, user=self._user)
 
         self.assertStatusOk(r)
