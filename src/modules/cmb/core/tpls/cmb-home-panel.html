@@ -1,0 +1,18 @@
+<md-content class="md-padding">
+    <div layout="row">
+        <md-button
+            style="margin: 10px; width: 250px; text-transform: none;"
+            class="md-raised"
+            flex-order="{{ $index }}"
+            ng-repeat="collection in collections"
+            ui-sref="projects({ collectionID: collection._id })"
+            layout="column" layout-align="center center">
+            <div>
+                <img width="200" ng-src="{{ 'assets/wf/' + collection.name + '/thumbnail.png' }}" class="face" alt="{{collection.description}}" >
+            </div>
+            <div>
+                <b>{{collection.description}}</b>
+            </div>
+        </md-button>
+    </div>
+</md-content>

@@ -1,0 +1,15 @@
+<md-toolbar class="cmb-subheader">
+    <div class="md-toolbar-tools" layout="row" layout-align="space-between center">
+       <div>
+         <ol class="breadcrumb">
+           <li ui-sref="home"><span class='clickable fa fa-home'></span></li>
+           <li ng-if="getActiveCollection()" ui-sref="projects({ collectionID: getActiveCollection() })"><span class='clickable fa fa-share-alt'></span></li>
+           <li ng-if="getActiveProject()" ui-sref="project({ collectionID: getActiveCollection(), projectID: getActiveProject() })"><span class='clickable fa fa-tasks'></span></li>
+         </ol>
+       </div>
+       <div>{{ subTitle }}</div>
+       <div>
+         <input type="text" class="search-query" placeholder="Search" ng-model="query"/>
+       </div>
+    </div>
+</md-toolbar>

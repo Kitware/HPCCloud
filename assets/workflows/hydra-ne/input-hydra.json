@@ -1,0 +1,90 @@
+{
+   "defaults": {
+      "title": "Default input deck",
+      "material": {
+         "rho": 1.0,
+         "Tref": 0.0,
+         "beta": 0.0,
+         "velxyz": [0.0, 0.0, 0.0]
+      }
+   },
+   "views" : [
+      { "id": "mat",       "label" : "Materials",           "attributes": [ "Material" ] },
+      { "id": "source",    "label" : "Source Terms",        "attributes": [ "BodyForce" ] },
+      { "id": "exec",      "label" : "Execution",           "attributes": [ "LoadBalancer", "ExecutionControl", "Output", "StatusInformation" ] },
+      { "id": "pb",        "label" : "Problem Definition",  "attributes": [ "simulationtime", "solution_method", "time_integration", "BasicTurbulenceModel", "energy", "hydrostat", "InitialConditions" ] },
+      { "id": "solv",      "label" : "Solvers",             "attributes": [ "ppesolver", "momentumsolver", "transportsolver" ] },
+      { "id": "fo",        "label" : "Field Output",        "attributes": [ "VarOutput" ] },
+      { "id": "stat",      "label" : "Statistics",          "attributes": [ "TempStatVarStatistics", "TempStatVarOutput" ] },
+      { "id": "bonCond",   "label" : "Boundary Conditions", "attributes": [ "BoundaryCondition" ] },
+      { "id": "func",      "label" : "Functions",           "attributes": [ "PolyLinearFunction" ] }
+   ],
+   "definitions": {
+      "Material": {
+         "label": "Material",
+         "parameters": [
+            {"name": "Density", "label": "Density", "type": "double", "size": 1, "default": "1.0", "min": "0", "help": [ "(material::rho)" ], "id": "material.rho" },
+            {"name": "specificheattype", "label": "Specific Heat Type", "type": "enum", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Constant pressure", "value": "Cp" },
+                  { "label": "Constant Volume", "value": "Cv" }
+               ]},
+               "help": [ "(material::Cp or material::Cv type)" ], "id": "material.heat.type" },
+            {"name": "specificheatvalue", "label": "Specific Heat Value", "size": 1, "type": "double", "min": "0", "help": [ "(material::Cp or material::Cv value)" ], "id": "material.heat.value"},
+            {"name": "k", "label": "Thermal conductivity", "type": "double", "size": 6, "layout": "3x2", "help": [ "Symmetric thermal conductivity tensor (material::{k11,k12,k13,k22,k23,k33})" ], "id": "material.k" },
+            {"name": "mu", "label": "Mu", "size": 1, "type": "double", "min": 0, "help": ["Molecular viscosity (material::mu)"], "id": "material.mu" },
+            {"name": "beta", "label": "Beta", "size": 1, "type": "double", "default": "0.0", "help": ["Coefficient of thermal expansion (material::beta)"], "id": "material.beta" },
+            {"name": "Tref", "label": "Material Reference Temperature", "size": 1, "type": "double", "default": "0.0", "help": ["(material::Tref)"], "id": "material.Tref" },
+            {"name": "velxyz", "label": "Rigid body velocity", "size": 3, "type": "double", "default": "0.0", "help": ["(material::{velx,vely,velz})"], "id": "material.velxyz" }
+         ]
+         },
+      "BodyForce": { "label": "Body force", "sub-types": [ "GravityForce", "BoussinesqForce", "porous_drag", "HeatSource" ] },
+      "GravityForce": {
+         "label": "Gravity Force",
+         "parameters" : [
+            { "name" : "GravityForce", "label": "Load Curve", "size": 1, "type": "double", "help": ["(body_force::lcid)"], "id": "bodyforce.lcid" },
+            { "name": "Scale", "label": "Scale", "size": 3, "type": "double", "help": ["(body_force::{fx,fy,fz})"], "id": "bodyforce.fxyz"}
+         ]
+      },
+      "BoussinesqForce": {
+         "label": "Boussinesq Force",
+         "parameters" : [
+            { "name" : "BoussinesqForce", "label": "Load Curve", "size": 1, "type": "double", "help": ["(boussinesqforce::lcid)"], "id": "boussinesqforce.lcid" },
+            { "name": "Scale", "label": "Scale", "size": 3, "type": "double", "help": ["(boussinesqforce::{gx,gy,gz})"], "id": "boussinesqforce.gxyz" }
+         ]
+      },
+      "porous_drag": {
+         "label": "Porous Drag",
+         "parameters" : [
+            { "name" : "porous_drag", "label": "Load Curve", "size": 1, "type": "double", "help": ["(porous_drag::lcid)"], "id": "porous_drag.lcid" },
+            { "name": "Scale", "label": "Scale", "size": 1, "type": "double", "help": ["(porous_drag::amp)"], "id": "porous_drag.amp" }
+         ]
+      },
+      "HeatSource": {
+         "label": "Heat Source",
+         "parameters" : [
+            { "name" : "HeatSource", "label": "Load Curve", "size": 1, "type": "double", "help": ["(heat_source::lcid)"], "id": "heat_source.lcid" },
+            { "name": "Scale", "label": "Scale", "size": 1, "type": "double", "help": ["(heat_source::Q)"], "id": "heat_source.Q" }
+         ]
+      },
+      "LoadBalancer": { "label": "Body force..." },
+      "ExecutionControl": { "label": "Execution control..." },
+      "Output": { "label": "Output..." },
+      "StatusInformation": { "label": "Status info..." },
+      "simulationtime": { "label": "Simulation time..." },
+      "solution_method": { "label": "Solution method..." },
+      "time_integration": { "label": "Integration time..." },
+      "BasicTurbulenceModel": { "label": "Basic turbulence model..." },
+      "energy": { "label": "Energy..." },
+      "hydrostat": { "label": "Hydro ..." },
+      "InitialConditions": { "label": "Init cond..." },
+      "ppesolver": { "label": "Solver pp..." },
+      "momentumsolver": { "label": "Solver momentum..." },
+      "transportsolver": { "label": "Solver transp..." },
+      "VarOutput": { "label": "Ouput var..." },
+      "TempStatVarStatistics": { "label": "var stat..." },
+      "TempStatVarOutput": { "label": "var stat out..." },
+      "BoundaryCondition": { "label": "Boundary Conditions..." },
+      "PolyLinearFunction": { "label": "Functions..." }
+   }
+}

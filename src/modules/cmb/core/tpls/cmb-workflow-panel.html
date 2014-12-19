@@ -1,0 +1,33 @@
+<md-content class="md-padding">
+    <table  class='table table-striped table-hover table-condensed'
+            ng-repeat="group in groups">
+        <thead>
+            <tr>
+                <th>
+                    <i class="fa fa-database fa-fw"></i>
+                </th>
+                <th style='width: 20%;'>
+                    {{ group.name === user.login ? "My projects" : group.name }}
+                </th>
+                <th style='width: 60%;'></th>
+                <th style='width: 20%;'></th>
+                <th class='text-right' ng-click='createProject(group._id)'>
+                    <i class="fa fa-plus"></i>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="project in projects"
+                ng-if="project.parentId === group._id"
+                class="project-block">
+                <td></td>
+                <td ng-click='selectProject(project._id)'>{{ project.name }}</td>
+                <td ng-click='selectProject(project._id)'>{{ project.description }}</td>
+                <td ng-click='selectProject(project._id)'>{{ project.created | toDateNumber | date : 'medium' }}</td>
+                <td class='text-right' ng-click='deleteProject(project._id)'>
+                    <i class='fa fa-trash' ng-if='project._accessLevel == 2'></i>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</md-content>

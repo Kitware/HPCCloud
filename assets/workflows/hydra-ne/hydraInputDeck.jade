@@ -1,0 +1,223 @@
+| title
+| #{data.title}
+| 
+| cc_navierstokes
+| 
+|   nsteps  10000
+|   deltat  0.001
+|   term    10.0
+| 
+|   time_integration
+|     type    fixed_cfl
+|     CFLinit 1.0
+|     CFLmax  4.0
+|     dtmax   0.05
+|     dtscale 1.025
+|     thetaa  0.5
+|     thetak  0.5
+|     thetaf  0.5
+|   end
+| 
+|   # Output options
+|   pltype exodusii
+|   filetype serial # distributed
+|   plti   1000
+|   ttyi   10
+|   dump   1000
+| 
+|   # Material model setup & assignment to sets
+|   material
+|     id  1
+| 
+
+if data['material.rho']
+  |     rho #{data['material.rho']}
+  | 
+
+if data['material.mu']
+  |     mu  #{data['material.mu']}
+  | 
+
+|   end
+| 
+|   load_balance
+|     method   rib
+|   end
+| 
+|   materialset
+|     id 1
+|     material 1
+|     block 1
+|   end
+| 
+|   plotvar
+|     elem div
+|     elem vel
+|     elem procid
+|     elem volume
+|     elem turbke
+|     node dist
+|     node enstrophy
+|     node pressure
+|     node vel
+|     node vorticity
+|     node helicity
+| 
+|     # wall shear on the rods and spacers
+|     #side 8 wallshear
+|     #side 9 wallshear
+|     #side 10 wallshear
+| 
+|     # yplus on the rods and spacer
+|     # side 8 yplus
+|     # side 9 yplus
+|     # side 10 yplus
+| 
+|     # straction on the rods and spacers
+|     # side 8 straction
+|     # side 9 straction
+|     # side 10 straction
+|   end
+| 
+|   tmodel rng_ke
+| 
+|   # Simple IC's
+|   initial
+|     velx 0.0
+|     vely 0.0
+|     velz 5.2780
+|     tke  0.0938  # turbulent kinetic energy
+|     eps  30.3660 # turbulent dissipation rate
+|   end
+| 
+|   # ---------------------------------------------
+|   # Set definitions
+|   # Sideset 2 - Inlet
+|   # Sideset 11 - Outlet
+| 
+|   # Sideset 7,12,13,14 - -X Symmetry
+|   # Sideset 6,18,19,20 - +X Symmetry
+| 
+|   # Sideset 4,15,16,17 - -Y Symmetry
+|   # Sideset 5,21,22,23 - +Y Symmetry
+| 
+|   # Sideset 8 - Sp1
+|   # Sideset 9 - Sp1
+|   # Sideset 10 - Sp1
+| 
+|   # Sideset 3 - Inner_wall
+|   # ----------------------------------------------
+| 
+|   # Normal distance BC's
+|   distance
+|     sideset 8 -1 0.0  # Sp1
+|     sideset 9 -1 0.0  # Sp1
+|     sideset 10 -1 0.0  # Sp1
+|     sideset 3 -1 0.0  # Inner wall
+|   end
+| 
+|   velocity
+|     velx sideset 2 -1 0.0 # Inflow
+|     vely sideset 2 -1 0.0
+|     velz sideset 2 -1 5.2780
+| 
+|     velx sideset 8 -1 0.0 # Sp1
+|     vely sideset 8 -1 0.0
+|     velz sideset 8 -1 0.0
+| 
+|     velx sideset 9 -1 0.0 # Sp2
+|     vely sideset 9 -1 0.0
+|     velz sideset 9 -1 0.0
+| 
+|     velx sideset 10 -1 0.0 # Sp3
+|     vely sideset 10 -1 0.0
+|     velz sideset 10 -1 0.0
+| 
+|     velx sideset 3 -1 0.0 # Inner wall
+|     vely sideset 3 -1 0.0
+|     velz sideset 3 -1 0.0
+| 
+|     # -X Symmetry
+|     velx sideset 7 -1 0.0
+|     vely sideset 7 -1 0.0
+| 
+|     velx sideset 12 -1 0.0
+|     vely sideset 12 -1 0.0
+| 
+|     velx sideset 13 -1 0.0
+|     vely sideset 13 -1 0.0
+| 
+|     velx sideset 14 -1 0.0
+|     vely sideset 14 -1 0.0
+| 
+|     # +X Symmetry
+|     velx sideset 6 -1 0.0
+|     vely sideset 6 -1 0.0
+| 
+|     velx sideset 18 -1 0.0
+|     vely sideset 18 -1 0.0
+| 
+|     velx sideset 19 -1 0.0
+|     vely sideset 19 -1 0.0
+| 
+|     velx sideset 20 -1 0.0
+|     vely sideset 20 -1 0.0
+| 
+|     # -Y Symmetry
+|     velx sideset 4 -1 0.0
+|     vely sideset 4 -1 0.0
+| 
+|     velx sideset 15 -1 0.0
+|     vely sideset 15 -1 0.0
+| 
+|     velx sideset 16 -1 0.0
+|     vely sideset 16 -1 0.0
+| 
+|     velx sideset 17 -1 0.0
+|     vely sideset 17 -1 0.0
+| 
+|     # +Y Symmetry
+| 
+|     velx sideset 5 -1 0.0
+|     vely sideset 5 -1 0.0
+| 
+|     velx sideset 21 -1 0.0
+|     vely sideset 21 -1 0.0
+| 
+|     velx sideset 22 -1 0.0
+|     vely sideset 22 -1 0.0
+| 
+|     velx sideset 23 -1 0.0
+|     vely sideset 23 -1 0.0
+| 
+|   end
+| 
+|   pressure
+|     sideset 11 -1 0.0 # Outflow
+|   end
+| 
+|   ppesolver
+|     type  AMG
+|     itmax 500
+|     itchk 1
+|     amgpc hypre
+|     coarse_size 1000
+|     diagnostics off
+|     convergence off
+|     eps   1.0e-5
+|   end
+| 
+|   momentumsolver
+|     type  ILUFGMRES
+|     itmax 50
+|     itchk 2
+|     restart 25
+|     diagnostics off
+|     convergence off
+|     eps   1.0e-5
+|   end
+| 
+| end
+| 
+| exit
+| 

@@ -1,0 +1,14 @@
+<md-content class="md-padding"  layout="row" layout-align="center center">
+    <md-card style="width: 50%;">
+        <section layout="row" layout-sm="column" layout-align="space-around center">
+            <md-text-float flex class="width-90" label="Login" ng-model="userLogin"></md-text-float>
+            <md-text-float flex class="width-90" type="password" label="Password" ng-model="userPassword"></md-text-float>
+            <md-button class="md-fab cmb-button" aria-label="Connect" ng-click='login(userLogin, userPassword)'>
+                <i class="fa fa-arrow-right"></i>
+            </md-button>
+        </section>
+        <section layout="row" layout="column" layout-align="space-around center">
+          <md-button flex class="md-raised" ui-sref="register">Register</md-button>
+        </section>
+    </md-card>
+</md-content>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html ng-app="kw.cmb.app" ng-controller="cmb.CoreController">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ title }}</title>
+    <meta name="description" content="Leverage cloud resources to do parallel computation and visualization.">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="css/vendors.css">
+    <link rel="stylesheet" href="css/chpc-min.css">
+  </head>
+  <body layout="column" flex layout-fill>
+    <!--[if lt IE 10]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <md-toolbar class="cmb-header">
+      <div class="md-toolbar-tools">
+        <h3>{{ title }}</h3>
+        <span flex></span>
+        <h4 ng-if="user">{{ user.firstName}} {{ user.lastName }}</h4>
+        <span ng-if="user">
+          <md-button class="md-fab cmb-button" aria-label="Logout" ng-click="logout()">
+            <i class="fa fa-close md-warn"></i>
+            <md-tooltip>
+                Logout
+            </md-tooltip>
+          </md-button>
+        </span>
+      </div>
+    </md-toolbar>
+
+    <div cmb-navigation-bar></div>
+    <div ui-view></div>
+
+    <script src="js/vendors.js"></script>
+    <script src="js/jade-templates.js"></script>
+    <script src="js/chpc-tpl.js"></script>
+    <script src="js/chpc-min.js"></script>
+    <script src="js/vtk-web.js"></script>
+  </body>
+</html>
