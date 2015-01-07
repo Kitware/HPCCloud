@@ -1,0 +1,7 @@
+<p><b><i>type</i></b> - The type of material set (string, default=Eulerian). The <b>type</b> must be one of the following:
+
+     <ul>
+         <li><b>Eulerian</b> - Use Eulerian coordinates for this material set,
+         <li><b>Lagrangian</b> - Use Lagrangian coordinates for this material set, or
+         <li><b>ALE</b> - Use an arbitrary Lagrangian-Eulerian description for this material set.
+     </ul>

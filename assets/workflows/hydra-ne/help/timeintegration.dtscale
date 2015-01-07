@@ -1,0 +1,1 @@
+<p><b><i>dtscale</i></b> - Factor used to increase the time-step with the fixed CFL time-step control, <b>&alpha;</b> (float, default=1.025).

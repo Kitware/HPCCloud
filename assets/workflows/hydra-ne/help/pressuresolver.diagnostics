@@ -1,0 +1,5 @@
+<p><b><i>diagnostics</i></b> - Enable/disable the diagnostic information from the linear solver, <b>diagnostics</b> (string, default=Off).
+                             <ul>
+                                 <li><b>On</b> - Activate diagnostic output, or
+                                 <li><b>Off</b> - Suppress diagnostic output.
+                             </ul>

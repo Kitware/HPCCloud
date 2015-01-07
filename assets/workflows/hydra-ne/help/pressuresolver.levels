@@ -1,0 +1,1 @@
+<p><b><i>levels</i></b> - Set the maximum number of AMG levels to use in the multigrid cycle, <b>levels</b> (integer, default=20).

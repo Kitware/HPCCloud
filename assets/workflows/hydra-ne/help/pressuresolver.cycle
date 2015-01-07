@@ -1,0 +1,5 @@
+<p><b><i>cycle</i></b> - Specifies the type of AMG cycle, <b>cycle</b> (string, default=V). Values may be one of the following:
+                             <ul>
+                                 <li><b>V</b> - Use a V-cycle, or
+                                 <li><b>W</b> - Use a W-cycle.
+                             </ul>

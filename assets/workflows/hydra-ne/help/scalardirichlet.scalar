@@ -1,0 +1,11 @@
+<p><b><i>scalar</i></b> - The scalar (string, default=pressure). The <b>scalar</b> must be one of the following:
+
+                             <ul>
+                                 <li><b><i>Enthalpy</i></b> - a scalar Dirichlet boundary condition for enthalpy, <b>h</b> (aka enthalpybc, ebc, enthalpy).
+                                 <li><b><i>Turbulent Kinetic Energy</i></b>  - a scalar Dirichlet boundary condition for turbulent kinetic energy, <b>k</b> (aka tkebc, tke).
+                                 <li><b><i>Turbulent Dissipation</i></b>   - a scalar Dirichlet boundary condition for turbulent dissipation, <b>&epsilon;</b> (aka epsbc, eps).
+                                 <li><b><i>Distance Function</i></b>   - a scalar Dirichlet boundary condition for distance function (aka distancebc, dist, distance).
+                                 <li><b><i>Hydrodynamic Pressure</i></b>   - a scalar Dirichlet boundary condition for hydrodynamic pressure, <b>p</b> (aka pressurebc, pbc, pressure).
+                                 <li><b><i>Temperature</i></b>   - a scalar Dirichlet boundary condition for temperature, <b>T</b> (aka temperaturebc, tbc, temperature).
+                                 <li><b><i>Turbulent Viscosity</i></b>  - a scalar Dirichlet boundary condition for turbulent viscosity, <b>&upsilon;</b> (aka turbnubc, turbnu).
+                             </ul>

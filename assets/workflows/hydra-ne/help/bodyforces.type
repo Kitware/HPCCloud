@@ -1,0 +1,6 @@
+   <p><b><i>type</i></b> - The type of body force (string, default=Body Force). The <b>type</b> must be one of the following:
+                             <ul>
+                                 <li><b>Body Force</b> - Specifies a body force for the momentum equation,
+                                 <li><b>Boussinesq Force</b> - Specifies a body force using the Boussinesq approximation to represent the buoyant forces induced by temperature, and
+                                 <li><b>Porous Drag Force</b> - Specifies the application of a porous drag force for the momentum equations.
+                             </ul>

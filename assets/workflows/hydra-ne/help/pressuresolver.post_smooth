@@ -1,0 +1,1 @@
+<p><b><i>post_smooth</i></b> - Set the number of post-smoothing sweeps for AMG, <b>pre_smooth</b> (integer, default=1).

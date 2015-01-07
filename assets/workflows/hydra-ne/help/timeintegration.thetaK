@@ -1,0 +1,1 @@
+<p><b><i>thetaK</i></b> - Time-weight for the viscous/diffusive terms, <b>&Theta;K</b> (float, default=0.5). By default, the time-weight uses a second-order centering in time. For an explicit treatment, <b>&Theta;K</b>=0.0, and for an implicit treatment, <b>&Theta;K</b>=1.0.

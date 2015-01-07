@@ -1,0 +1,21 @@
+    <p><b><i>Element Variables</i></b> - Element variables that specifies plot output.
+
+    <ul>
+<li><b><i>cfl</i></b> - Courant-Friedrichs-Levy number
+<li><b><i>density</i></b> - Fluid density
+<li><b><i>dist</i></b> - Normal distance from no-slip/no-penetration surfaces
+<li><b><i>div</i></b> - Velocity divergence (&nabla; &sdot; v)
+<li><b><i>enthalpy</i></b> - Fluid specific enthalpy
+<li><b><i>enstrophy</i></b> - Enstrophy (&omega; &sdot; &omega;/2)
+<li><b><i>helicity</i></b> - Helicity (v &sdot; &omega;)
+<li><b><i>pressure</i></b> - Fluid pressure
+<li><b><i>procid</i></b> - Processor Id (MPI Rank)
+<li><b><i>temp</i></b> - Fluid temperature
+<li><b><i>turbeps</i></b> - Turbulent kinetic energy dissipation rate, (&epsilon;)
+<li><b><i>turbke</i></b> - Turbulent kinetic energy (k)
+<li><b><i>turbnu</i></b> - Turbulent eddy viscosity
+<li><b><i>vel</i></b> - Fluid velocity vector
+<li><b><i>vginv2</i></b> - Q-criteria, i.e., 2nd invariant of velocity gradient
+<li><b><i>vorticity</i></b> - Vorticity, i.e., curl of velocity (&nabla; x v)
+<li><b><i>ystar</i></b> - y<sup>*</sup> non-dimensional distance from walls
+    </ul>

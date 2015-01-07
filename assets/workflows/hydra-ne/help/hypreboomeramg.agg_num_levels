@@ -1,0 +1,1 @@
+<p><b><i>agg_num_levels</i></b> - Set number of levels of aggressive coarsening for Hypre/BoomerAMG, <b>agg_num_levels</b> (integer, default=0). Only effective if <b>type</b>=AMG and <b>amgpc</b>=HYPRE and <b>hypre_type</b>=BOOMERAMG.

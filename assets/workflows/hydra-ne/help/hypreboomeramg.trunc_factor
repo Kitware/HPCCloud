@@ -1,0 +1,1 @@
+<p><b><i>trunc_factor</i></b> - Specify the truncation factor for the interpolation in Hypre/BoomerAMG, <b>trunc_factor</b> (float, default=0.0). Only effective if <b>type</b>=AMG and <b>amgpc</b>=HYPRE and <b>hypre_type</b>=BOOMERAMG.

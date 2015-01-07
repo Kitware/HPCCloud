@@ -1,0 +1,1 @@
+<p><b><i>nitmax</i></b> - Defines the maximum number of non-linear iterations to be taken during each time step, <b>N<sub>itmax</sub></b> (int, default=5).

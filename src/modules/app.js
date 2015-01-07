@@ -39,7 +39,16 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb'])
     })
     .state('project', {
         url: "/project/:collectionID/:projectID",
-        template: "Inside a project",
-        controller: annonymousGoToLogin
+        templateProvider: ['$templateCache', function ($templateCache) {
+            return $templateCache.get('cmb/core/tpls/cmb-project-panel.html');
+        }],
+        controller: 'CmbProjectController'
+    })
+    .state('simulation', {
+        url: "/simulation/:collectionID/:projectID/:simulationID",
+        templateProvider: ['$templateCache', function ($templateCache) {
+            return $templateCache.get('cmb/core/tpls/cmb-simulation-panel.html');
+        }],
+        controller: 'CmbSimulationController'
     });
 }]);

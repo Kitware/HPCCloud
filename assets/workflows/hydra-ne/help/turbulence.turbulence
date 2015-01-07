@@ -1,0 +1,7 @@
+<p><b><i>turbulence</i></b> - The turbulence model (string, default=No Turbulence Model). The <b>turbulence</b> must be one of the following:
+                             <ul>
+                                 <li><b>No Turbulence Model</b> - No explicit turbulence model is used,
+                                 <li><b>RNG k-e Model</b> - Activate the RNG k-&epsilon; model,
+                                 <li><b>Smagorinsky Subgrid-Scale Model</b> - Use the Smagorinsky subgrid-scale model, or
+                                 <li><b>Wall-Adapted Large Eddy Subgrid-Scale Model</b> - Use the wall-adapted large eddy subgrid-scale model.
+                             </ul>

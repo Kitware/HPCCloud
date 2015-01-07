@@ -1,0 +1,6 @@
+<p><b><i>rigid</i></b> - Rigid body material specification for native conjugate heat transfer, <b>rigid</b> flag (string, default=off). Valid values are the following:
+
+    <ul>
+        <li><b>off</b> - treat material as a fluid or deformable body, or
+        <li><b>on</b> - treat material as a rigid body.
+    </ul>

@@ -1,0 +1,1 @@
+<p><b><i>pmax_elements</i></b> - Set the maximum elements/row for the interpolation for Hypre/BoomerAMG, <b>pmax_elements</b> (integer, default=0). Only effective if <b>type</b>=AMG and <b>amgpc</b>=HYPRE and <b>hypre_type</b>=BOOMERAMG.

@@ -1,0 +1,5 @@
+<p><b><i>diagnostics</i></b> - Write diagnostics information about the non-linear convergence history to the screen when using the picard solution method, <b>diagnostics</b> (string, default=Off).
+                             <ul>
+                                 <li><b>On</b> - Enable writing diagnostics during the non-linear iteration, or
+                                 <li><b>Off</b> - Disable writing diagnostics during the non-linear iteration.
+                             </ul>

@@ -1,0 +1,820 @@
+{
+   "defaults": {
+      "title": "Default input deck",
+      "material": {
+         "rho": 1.0,
+         "Tref": 0.0,
+         "beta": 0.0,
+         "velxyz": [0.0, 0.0, 0.0]
+      }
+   },
+   "views" : [
+      { "id": "energy",      "label" : "Energy",               "attributes": [ "Energy" ] },
+      { "id": "material",    "label" : "Materials",            "attributes": [ "Material" ] },
+      { "id": "initial",     "label" : "Initial Conditions",   "attributes": [ "Initial" ] },
+      { "id": "boundary",    "label" : "Boundary Conditions",  "attributes": [ "Boundary",  "ScalarDirichlet", "VelocityDirichlet", "SymmetryVelocity", "HeatFlux", "PassiveOutflow", "PressureOutflow", "User-DefinedVelocity"] },
+      { "id": "forces",      "label" : "Body Forces",          "attributes": [ "BodyForces", "BodyForce",  "BoussinesqForce", "PorousDragForce"] },
+      { "id": "sources",     "label" : "Heat Sources",         "attributes": [ "HeatSources", "HeatSource" ] },
+      { "id": "hydrostatic", "label" : "Hydrostatic Pressure", "attributes": [ "HydrostaticPressure" ] },
+      { "id": "turbulence",  "label" : "Turbulence",           "attributes": [ "Turbulence", "RNG_ke", "Smagorinsky", "WALE" ] },
+      { "id": "solution",    "label" : "Solution Method",      "attributes": [ "SolutionMethod" ] },
+      { "id": "solvers",     "label" : "Solvers",              "attributes": [ "Solvers", "Pressure", "HypreBoomerAMG", "MLAMG", "Momentum", "TransportSolver" ] },
+      { "id": "time",        "label" : "Time",                 "attributes": [ "Time", "TimeIntegration" ] },
+      { "id": "execution",   "label" : "Execution",            "attributes": [ "ExecutionControl", "LoadBalance" ] },
+      { "id": "output",      "label" : "Output",               "attributes": [ "Output", "Dump", "Plot", "ASCII", "TimeHistory", "VelocityMinMax", "TurbulenceStatistics" ] }
+   ],
+   "definitions": {
+      "Energy": {
+         "label": "Energy",
+         "parameters": [
+            {"name": "form", "label": "Form of the Energy Equation", "type": "enum", "default": "isothermal", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Isothermal", "value": "isothermal" },
+                  { "label": "Temperature", "value": "temperature" },
+                  { "label": "Enthalpy", "value": "enthalpy" },
+                  { "label": "Internal Energy", "value": "int_energy" }
+               ]},
+               "help": [ "(energy::form)" ], "id": "energy.form" }
+         ]
+      },
+      "Material": {
+         "label": "Material",
+         "parameters": [
+            {"name": "name", "label": "Name", "type": "string", "size": 1, "help": [ "(material::name)" ], "id": "material.name" },
+            {"name": "rho", "label": "Mass Density", "type": "double", "size": 1, "default": "1.0", "min": "0", "help": [ "(material::rho)" ], "id": "material.rho" },
+            {"name": "cp", "label": "Constant Pressure Specific Heat", "size": 1, "default": "1.0", "type": "double", "min": "0", "help": [ "(material::Cp)" ], "id": "material.cp"},
+            {"name": "cv", "label": "Constant Volume Specific Heat", "size": 1, "default": "1.0", "type": "double", "min": "0", "help": [ "(material::Cv)" ], "id": "material.cv"},
+            {"name": "k", "label": "Thermal Conductivity", "type": "double", "size": 6, "layout": "3x2", "help": [ "(material::{k11,k12,k13,k22,k23,k33})" ], "id": "material.k" },
+            {"name": "mu", "label": "Molecular Viscosity", "size": 1, "type": "double", "default": "1.0", "min": 0, "help": ["(material::mu)"], "id": "material.mu" },
+            {"name": "tref", "label": "Material Reference Temperature", "size": 1, "type": "double", "default": "0.0", "help": ["(material::Tref)"], "id": "material.tref" },
+            {"name": "beta", "label": "Coefficient of Thermal Expansion", "size": 1, "type": "double", "default": "0.0", "help": ["(material::beta)"], "id": "material.beta" },
+            {"name": "rigid", "label": "Rigid Body Type", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Fluid or Deformable Body", "value": "on" },
+                  { "label": "Rigid Body", "value": "off" }
+               ]},
+               "help": [ "(material::rigid)" ], "id": "material.rigid" },
+            {"name": "vel", "label": "Rigid Body Velocity", "size": 3, "type": "double", "default": "0.0", "help": ["(material::{velx,vely,velz})"], "id": "material.vel" },
+            {"name": "blockids", "label": "Block Ids", "size": 1, "type": "integer", "help": ["(material::blockid)"], "id": "material.blockids" },
+            {"name": "type", "label": "Type of Material", "type": "enum", "default": "Eulerian", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Eulerian", "value": "Eulerian" },
+                  { "label": "Lagrangian", "value": "Lagrangian" },
+                  { "label": "arbitrary Lagrangian-Eulerian", "value": "ALE" }
+               ]},
+               "help": [ "(material::type)" ], "id": "material.type" }
+         ]
+      },
+      "Initial": {
+         "label": "Initial Conditions",
+         "parameters": [
+            {"name": "tke", "label": "Turbulent Kinetic Energy", "type": "string", "size": 1, "default": "0.0", "help": [ "(initial::tke)" ], "id": "initial.tke" },
+            {"name": "eps", "label": "Turbulent Dissipation Rate", "type": "double", "size": 1, "default": "0.0", "help": [ "(initial::eps)" ], "id": "initial.eps" },
+            {"name": "omega", "label": "Inverse Dissipation Time Scale", "size": 1, "default": "0.0", "type": "double", "help": [ "(initial::omega)" ], "id": "initial.omega"},
+            {"name": "turbnu", "label": "Turbulent Viscosity", "size": 1, "default": "0.0", "type": "double", "help": [ "(initial::turbnu)" ], "id": "initial.turbnu"},
+            {"name": "temperature", "label": "Temperature", "type": "double", "size": 1, "default": "0.0", "help": [ "(initial::temperature)" ], "id": "initial.temperature" },
+            {"name": "enthalpy", "label": "Enthalpy", "size": 1, "type": "double", "default": "0.0", "min": 0, "help": ["(initial::enthalpy)"], "id": "initial.enthalpy" },
+            {"name": "int_energy", "label": "Internal Energy", "size": 1, "type": "double", "default": "0.0", "help": ["(initial::int_energy)"], "id": "initial.int_energy" }
+         ]
+      },
+      "Boundary": {
+         "label": "Boundary Conditions",
+         "parameters": [
+            {"name": "name", "label": "Name", "type": "string", "size": 1, "help": [ "(boundary::name)" ], "id": "boundary.name" },
+            {"name": "type", "label": "Type of Boundary Condition", "type": "enum", "default": "scalardirichlet", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Scalar Dirichlet", "value": "scalardirichlet" },
+                  { "label": "Velocity Dirichlet", "value": "velocitydirichlet" },
+                  { "label": "Symmetry Velocity", "value": "symmetryvelocity" },
+                  { "label": "Heat Flux", "value": "heatflux" },
+                  { "label": "Passive Outflow", "value": "passiveoutflow" },
+                  { "label": "Pressure Outflow", "value": "pressureoutflow" },
+                  { "label": "User-Defined Velocity", "value": "user-definedvelocity" }
+               ]},
+               "help": [ "(boundary::type)" ], "id": "boundary.type" }
+         ]
+      },
+      "ScalarDirichlet": {
+         "label": "Scalar Dirichlet",
+         "parameters": [
+            {"name": "scalar", "label": "Scalar", "type": "enum", "default": "scalardirichlet", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Enthalpy", "value": "enthalpy" },
+                  { "label": "Turbulent Kinetic Energy", "value": "tke" },
+                  { "label": "Turbulent Dissipation", "value": "eps" },
+                  { "label": "Distance Function", "value": "distance" },
+                  { "label": "Hydrodynamic Pressure", "value": "pressure" },
+                  { "label": "Temperature", "value": "temperature" },
+                  { "label": "Turbulent Viscosity", "value": "turbnu" }
+               ]},
+               "help": [ "(scalardirichlet::scalar)" ], "id": "scalardirichlet.scalar" },
+            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(scalardirichlet::setid)"], "id": "scalardirichlet.setids" },
+            {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(scalardirichlet::name)" ], "id": "scalardirichlet.name" },
+            {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(scalardirichlet::time-factor-pairs)" ], "id": "scalardirichlet.time-factor-pairs" },
+            {"name": "amplitude", "label": "Amplitude", "size": 1, "type": "float", "help": ["(scalardirichlet::amplitude)"], "id": "scalardirichlet.amplitude" }
+         ]
+      },
+      "VelocityDirichlet": {
+         "label": "Velocity Dirichlet",
+         "parameters": [
+            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(velocitydirichlet::setid)"], "id": "velocitydirichlet.setids" },
+            {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(velocitydirichlet::name)" ], "id": "velocitydirichlet.name" },
+            {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(velocitydirichlet::time-factor-pairs)" ], "id": "velocitydirichlet.time-factor-pairs" },
+            {"name": "amplitude", "label": "Amplitude", "size": 3, "type": "float", "help": ["(velocitydirichlet::amplitude)"], "id": "velocitydirichlet.amplitude" }
+         ]
+      },
+      "SymmetryVelocity": {
+         "label": "Symmetry Dirichlet",
+         "parameters": [
+            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(symmetrydirichlet::setid)"], "id": "symmetrydirichlet.setids" },
+            {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(symmetrydirichlet::name)" ], "id": "symmetrydirichlet.name" },
+            {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(symmetrydirichlet::time-factor-pairs)" ], "id": "symmetrydirichlet.time-factor-pairs" },
+            {"name": "amplitude", "label": "Amplitude", "size": 3, "type": "float", "help": ["(symmetrydirichlet::amplitude)"], "id": "symmetrydirichlet.amplitude" }
+         ]
+      },
+      "HeatFlux": {
+         "label": "Heat Flux",
+         "parameters": [
+            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(heatflux::setid)"], "id": "heatflux.setids" },
+            {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(heatflux::name)" ], "id": "heatflux.name" },
+            {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(heatflux::time-factor-pairs)" ], "id": "heatflux.time-factor-pairs" },
+            {"name": "amplitude", "label": "Amplitude", "size": 1, "type": "float", "help": ["(heatflux::amplitude)"], "id": "heatflux.amplitude" }
+         ]
+      },
+      "PassiveOutflow": {
+         "label": "Passive Outflow",
+         "parameters": [
+            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(passiveoutflow::setid)"], "id": "passiveoutflow.setids" }
+         ]
+      },
+      "PressureOutflow": {
+         "label": "Pressure Outflow",
+         "parameters": [
+            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(pressureoutflow::setid)"], "id": "pressureoutflow.setids" }
+         ]
+      },
+      "User-DefinedVelocity": {
+         "label": "User-Defined Velocity",
+         "parameters": [
+            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(user-definedvelocity::setid)"], "id": "user-definedvelocity.setids" }
+         ]
+      },
+      "BodyForces": {
+         "label": "Body Forces",
+         "parameters": [
+            {"name": "name", "label": "Name", "type": "string", "size": 1, "help": [ "(bodyforces::name)" ], "id": "bodyforces.name" },
+            {"name": "type", "label": "Type of Body Force", "type": "enum", "default": "bodyforce", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Body Force", "value": "bodyforce" },
+                  { "label": "Boussinesq Force", "value": "boussinesqforce" },
+                  { "label": "Porous Drag Force", "value": "porousdragforce" }
+               ]},
+               "help": [ "(bodyforces::type)" ], "id": "bodyforces.type" }
+         ]
+      },
+      "BodyForce": {
+         "label": "Body Force",
+         "parameters": [
+            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(bodyforce::setid)"], "id": "bodyforce.setids" },
+            {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(bodyforce::name)" ], "id": "bodyforce.name" },
+            {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(bodyforce::time-factor-pairs)" ], "id": "bodyforce.time-factor-pairs" },
+            {"name": "amplitude", "label": "Force Amplitude", "size": 3, "type": "float", "default": "0.0", "help": ["(bodyforce::amplitude)"], "id": "bodyforce.amplitude" }
+         ]
+      },
+      "BoussinesqForce": {
+         "label": "Boussinesq Force",
+         "parameters": [
+            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(boussinesqforce::setid)"], "id": "boussinesqforce.setids" },
+            {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(boussinesqforce::name)" ], "id": "boussinesqforce.name" },
+            {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(boussinesqforce::time-factor-pairs)" ], "id": "boussinesqforce.time-factor-pairs" },
+            {"name": "amplitude", "label": "Gravity Amplitude", "size": 3, "type": "float", "default": "0.0", "help": ["(boussinesqforce::amplitude)"], "id": "boussinesqforce.amplitude" }
+         ]
+      },
+      "PorousDragForce": {
+         "label": "Porous Drag Force",
+         "parameters": [
+            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(porousdragforce::setid)"], "id": "porousdragforce.setids" },
+            {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(porousdragforce::name)" ], "id": "porousdragforce.name" },
+            {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(porousdragforce::time-factor-pairs)" ], "id": "porousdragforce.time-factor-pairs" },
+            {"name": "amplitude", "label": "Porous Drag Amplitude", "size": 1, "type": "float", "default": "0.0", "help": ["(porousdragforce::porousdrag)"], "id": "porousdragforce.amplitude" }
+         ]
+      },
+      "HeatSources": {
+         "label": "Heat Sources",
+         "parameters": [
+            {"name": "name", "label": "Name", "type": "string", "size": 1, "help": [ "(heatsources::name)" ], "id": "heatsources.name" },
+            {"name": "type", "label": "Type of Heat Source", "type": "enum", "default": "heatsource", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Heat Source", "value": "heatsource" }
+               ]},
+               "help": [ "(heatsources::type)" ], "id": "heatsources.type" }
+         ]
+      },
+      "HeatSource": {
+         "label": "Heat Source",
+         "parameters": [
+            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(heatsource::setid)"], "id": "heatsource.setids" },
+            {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(heatsource::name)" ], "id": "heatsource.name" },
+            {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(heatsource::time-factor-pairs)" ], "id": "heatsource.time-factor-pairs" },
+            {"name": "amplitude", "label": "Volumetric Amplitude", "size": 1, "type": "float", "default": "0.0", "help": ["(heatsource::amplitude)"], "id": "heatsource.amplitude" }
+         ]
+      },
+      "HydrostaticPressure": {
+         "label": "Hydrostatic Pressure",
+         "parameters": [
+            {"name": "setid", "label": "Set Id", "size": 1, "type": "integer", "help": ["(hydrostatic::setid)"], "id": "hydrostatic.setid" },
+            {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(hydrostatic::name)" ], "id": "hydrostatic.name" },
+            {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(hydrostatic::time-factor-pairs)" ], "id": "hydrostatic.time-factor-pairs" },
+            {"name": "amplitude", "label": "Hydrostatic Pressure Amplitude", "size": 1, "type": "float", "help": ["(hydrostatic::amplitude)"], "id": "hydrostatic.amplitude" }
+         ]
+      },
+      "Turbulence": {
+         "label": "Turbulence",
+         "parameters": [
+            {"name": "name", "label": "Name", "size": 1, "type": "string", "help": ["(turbulence::name)"], "id": "turbulence.name" },
+            {"name": "tmodel", "label": "Predefined Turbulence Model", "type": "enum", "default": "no_turbmodel", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "No Turbulence Model", "value": "no_turbmodel" },
+                  { "label": "Spalart-Allmaras Model", "value": "spalart_allmaras" },
+                  { "label": "Detached-Eddy Spalart-Allmaras Model", "value": "spalart_allmaras_des" },
+                  { "label": "Smagorinsky Subgrid-Scale Model", "value": "smagorinsky" },
+                  { "label": "Wall-Adapted Large Eddy Subgrid-Scale Model", "value": "wale" },
+                  { "label": "RNG k-e Model", "value": "rng_ke" },
+                  { "label": "SST k-w Model (under development)", "value": "sst_kw" },
+                  { "label": "ksgs Subgrid-Scale Model (under development)", "value": "ksgs" },
+                  { "label": "LDKM ksgs Subgrid-Scale Model (under development)", "value": "ldkm_ksgs" }
+               ]},
+               "help": [ "(turbulence::tmodel)" ], "id": "turbulence.tmodel" },
+            {"name": "turbulence", "label": "Customizable Turbulence Model", "type": "enum", "default": "no_turbmodel", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "No Turbulence Model", "value": "no_turbmodel" },
+                  { "label": "RNG k-e Model", "value": "rng_ke" },
+                  { "label": "Smagorinsky Subgrid-Scale Model", "value": "smagorinsky" },
+                  { "label": "Wall-Adapted Large Eddy Subgrid-Scale Model", "value": "wale" }
+               ]},
+               "help": [ "(turbulence::turbulence)" ], "id": "turbulence.turbulence" }
+         ]
+      },
+      "RNG_ke": {
+         "label": "RNG k-e",
+         "parameters": [
+            {"name": "timescale_limiter", "label": "Timescale Limiter", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(rgn_ke::timescale_limiter)" ], "id": "rgn_ke.timescale_limiter" }
+         ]
+      },
+      "Smagorinsky": {
+         "label": "Smagorinsky",
+         "parameters": [
+            {"name": "c_s", "label": "Smagorinsky Model Constant", "size": 1, "type": "float", "default": "0.18", "help": ["(smagorinsky::c_s)"], "id": "smagorinsky.c_s" },
+            {"name": "prandtl", "label": "Turbulent Prandtl Number", "type": "float", "default": "0.8889", "size": 1, "help": [ "(smagorinsky::prandtl)" ], "id": "smagorinsky.prandtl" },
+            {"name": "schmidt", "label": "Turbulent Schmidt Number", "type": "float", "default": "1.0", "size": 1, "help": [ "(smagorinsky::schmidt)" ], "id": "smagorinsky.schmidt" }
+         ]
+      },
+      "WALE": {
+         "label": "WALE",
+         "parameters": [
+            {"name": "c_w", "label": "Smagorinsky Model Constant", "size": 1, "type": "float", "default": "0.5", "help": ["(wale::c_w)"], "id": "wale.c_w" },
+            {"name": "prandtl", "label": "Turbulent Prandtl Number", "type": "float", "default": "0.8889", "size": 1, "help": [ "(wale::prandtl)" ], "id": "wale.prandtl" },
+            {"name": "schmidt", "label": "Turbulent Schmidt Number", "type": "float", "default": "1.0", "size": 1, "help": [ "(wale::schmidt)" ], "id": "wale.schmidt" }
+         ]
+      },
+      "SolutionMethod": {
+         "label": "Solution Method",
+         "parameters": [
+            {"name": "strategy", "label": "Solution Method", "type": "enum", "default": "projection", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Semi-Implicit Projection Algorithm", "value": "projection" },
+                  { "label": "Fully-Implicit, Projection-Preconditioned, Picard Algorithm", "value": "picard" }
+               ]},
+               "help": [ "(solutionmethod::strategy)" ], "id": "solutionmethod.strategy" },
+            {"name": "nitmax", "label": "Maximum Non-Linear Iterations", "size": 1, "type": "integer", "default": "5", "help": ["(solutionmethod::nitmax)"], "id": "solutionmethod.nitmax" },
+            {"name": "nvec", "label": "Maximum Vectors for Non-Linear Krylov Acceleration", "size": 1, "type": "integer", "default": "0", "help": ["(solutionmethod::nvec)"], "id": "solutionmethod.nvec" },
+            {"name": "error_norm", "label": "Error Norm", "type": "enum", "default": "composite", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Composite RMS Norm", "value": "composite" },
+                  { "label": "Largest Dependent Variable Maximum Norm", "value": "max" }
+               ]},
+               "help": [ "(solutionmethod::error_norm)" ], "id": "solutionmethod.error_norm" },
+            {"name": "eps", "label": "Non-Linear Solver Convergence Criteria", "type": "float", "default": "1.0E-4", "size": 1, "help": [ "(solutionmethod::eps)" ], "id": "solutionmethod.eps" },
+            {"name": "eps_dist", "label": "Normal-Distance Function Convergence Criteria", "type": "float", "default": "1.0E-5", "size": 1, "help": [ "(solutionmethod::eps_dist)" ], "id": "solutionmethod.eps_dist" },
+            {"name": "eps_p0", "label": "Initial Projection/Pressure Convergence Criteria", "type": "float", "default": "1.0E-5", "size": 1, "help": [ "(solutionmethod::eps_p0)" ], "id": "solutionmethod.eps_p0" },
+            {"name": "drop_tol", "label": "Drop tolerance", "type": "float", "default": "1.0E-2", "size": 1, "help": [ "(solutionmethod::drop_tol)" ], "id": "solutionmethod.drop_tol" },
+            {"name": "timestep_control", "label": "Automatic Time-Step Growth/Reduction", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(solutionmethod::timestep_control)" ], "id": "solutionmethod.timestep_control" },
+            {"name": "convergence", "label": "Write Non-Linear Convergence History", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(solutionmethod::convergence)" ], "id": "solutionmethod.convergence" },
+            {"name": "subcycle", "label": "Subcycle Pressure Solves", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(solutionmethod::subcycle)" ], "id": "solutionmethod.subcycle" },
+            {"name": "diagnostics", "label": "Screen Non-Linear Convergence History", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(solutionmethod::diagnostics)" ], "id": "solutionmethod.diagnostics" }
+         ]
+      },
+      "Solvers": { "label": "Solvers" },
+      "Pressure": {
+         "label": "Pressure Solver",
+         "parameters": [
+            {"name": "type", "label": "Preconditioner - Krylov Solver", "type": "enum", "default": "AMG", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Algebraic Multigrid - Conjugate Gradient Method", "value": "AMG" },
+                  { "label": "Successive Over-Relaxation - Conjugate Gradient Method", "value": "SSORCG" },
+                  { "label": "Jacobi - Conjugate Gradient Method", "value": "JPCG" }
+               ]},
+               "help": [ "(pressuresolver::type)" ], "id": "pressuresolver.type" },
+            {"name": "amgpc", "label": "Preconditioner Package for the AMG solver", "type": "enum", "default": "ML", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Multilevel Preconditioner Package", "value": "ML" },
+                  { "label": "Hypre Preconditioner Package", "value": "HYPRE" }
+               ]},
+               "help": [ "(pressuresolver::amgpc)" ], "id": "pressuresolver.amgpc" },
+            {"name": "hypre_type", "label": "Preconditioner Sub-Package Hypre/AMG", "type": "enum", "default": "BOOMERAMG", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "BoomerAMG preconditioner", "value": "BOOMERAMG" }
+               ]},
+               "help": [ "(pressuresolver::hypre_type)" ], "id": "pressuresolver.hypre_type" },
+            {"name": "cycle", "label": "Type of AMG cycle", "type": "enum", "default": "V", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Use a V-Cycle", "value": "V" },
+                  { "label": "Use a W-Cycle", "value": "W" }
+               ]},
+               "help": [ "(pressuresolver::cycle)" ], "id": "pressuresolver.cycle" },
+            {"name": "solver", "label": "Underlying AMG Krylov Solver", "type": "enum", "default": "CG", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Conjugate Gradient Method", "value": "CG" },
+                  { "label": "Stabilized Bi-Conjugate Gradient Squared Method", "value": "BCGS" },
+                  { "label": "Flexible Generalized Minimum Residual Method", "value": "FGMRES" }
+               ]},
+               "help": [ "(pressuresolver::solver)" ], "id": "pressuresolver.solver" },
+            {"name": "pre_smooth", "label": "Pre-Smoothing Sweeps for AMG", "size": 1, "type": "integer", "default": "1", "help": ["(pressuresolver::pre_smooth)"], "id": "pressuresolver.pre_smooth" },
+            {"name": "post_smooth", "label": "Post-Smoothing Sweeps for AMG", "size": 1, "type": "integer", "default": "1", "help": ["(pressuresolver::post_smooth)"], "id": "pressuresolver.post_smooth" },
+            {"name": "levels", "label": "Maximum AMG Levels", "size": 1, "type": "integer", "default": "20", "help": ["(pressuresolver::levels)"], "id": "pressuresolver.levels" },
+            {"name": "nitmax", "label": "Maximum Linear Iterations", "size": 1, "type": "integer", "default": "500", "help": ["(pressuresolver::nitmax)"], "id": "pressuresolver.nitmax" },
+            {"name": "nitchk", "label": "Check Convergence Every", "size": 1, "type": "integer", "default": "2", "help": ["(pressuresolver::nitchk)"], "id": "pressuresolver.nitchk" },
+            {"name": "eps", "label": "Linear Solver Convergence Criteria", "type": "float", "default": "1.0E-5", "size": 1, "help": [ "(pressuresolver::eps)" ], "id": "pressuresolver.eps" },
+            {"name": "pivot", "label": "Value of a Zero Pivot", "type": "float", "default": "1.0E-16", "size": 1, "help": [ "(pressuresolver::pivot)" ], "id": "pressuresolver.pivot" },
+            {"name": "convergence", "label": "Write Non-Linear Convergence Information", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(pressuresolver::convergence)" ], "id": "pressuresolver.convergence" },
+            {"name": "diagnostics", "label": "Write Linear Convergence Diagnostics", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(pressuresolver::diagnostics)" ], "id": "pressuresolver.diagnostics" }
+         ]
+      },
+      "HypreBoomerAMG": {
+         "label": "Hypre/BoomerAMG",
+         "parameters": [
+            {"name": "hypre_coarsen", "label": "Parallel Coarsening Algorithm", "type": "enum", "default": "FALGOUT", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Cleary-Luby-Jones-Plassman", "value": "CLJP" },
+                  { "label": "Classical Ruge-Steuben", "value": "RUGE_STEUBEN" },
+                  { "label": "Modified Classical Ruge-Steuben", "value": "MODIFIED_RUGE_STEUBEN" },
+                  { "label": "Falgout Coarsening", "value": "FALGOUT" },
+                  { "label": "PMIS Coarsening", "value": "PMIS" },
+                  { "label": "HMIS Coarsening", "value": "HMIS" }
+               ]},
+               "help": [ "(hypreboomeramg::hypre_coarsen)" ], "id": "hypreboomeramg.hypre_coarsen" },
+            {"name": "hypre_smoother", "label": "Smoother Algorithm", "type": "enum", "default": "HYB_SGS", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Jacobi", "value": "JACOBI" },
+                  { "label": "Gauss-Seidel, Sequential", "value": "SEQ_SGS" },
+                  { "label": "Hybrid Gauss-Seidel or SOR, Forward Solve", "value": "HYB_GS" },
+                  { "label": "Hybrid Gauss-Seidel or SOR, Backward Solve", "value": "BACK_HYB_GS" },
+                  { "label": "Hybrid Symmetric Gauss-Seidel or SSOR", "value": "HYB_SGS" },
+                  { "label": "Gaussian Elimination", "value": "GE" }
+               ]},
+               "help": [ "(hypreboomeramg::hypre_smoother_up)" ], "id": "hypreboomeramg.hypre_smoother" },
+            {"name": "hypre_smoother", "label": "Up Smoother Algorithm", "type": "enum", "default": "HYB_SGS", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Jacobi", "value": "JACOBI" },
+                  { "label": "Gauss-Seidel, Sequential", "value": "SEQ_SGS" },
+                  { "label": "Hybrid Gauss-Seidel or SOR, Forward Solve", "value": "HYB_GS" },
+                  { "label": "Hybrid Gauss-Seidel or SOR, Backward Solve", "value": "BACK_HYB_GS" },
+                  { "label": "Hybrid Symmetric Gauss-Seidel or SSOR", "value": "HYB_SGS" },
+                  { "label": "Gaussian Elimination", "value": "GE" }
+               ]},
+               "help": [ "(hypreboomeramg::hypre_smoother_up)" ], "id": "hypreboomeramg.hypre_smoother_up" },
+            {"name": "hypre_smoother_dn", "label": "Down Smoother Algorithm", "type": "enum", "default": "HYB_SGS", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Jacobi", "value": "JACOBI" },
+                  { "label": "Gauss-Seidel, Sequential", "value": "SEQ_SGS" },
+                  { "label": "Hybrid Gauss-Seidel or SOR, Forward Solve", "value": "HYB_GS" },
+                  { "label": "Hybrid Gauss-Seidel or SOR, Backward Solve", "value": "BACK_HYB_GS" },
+                  { "label": "Hybrid Symmetric Gauss-Seidel or SSOR", "value": "HYB_SGS" },
+                  { "label": "Gaussian Elimination", "value": "GE" }
+               ]},
+               "help": [ "(hypreboomeramg::hypre_smoother_dn)" ], "id": "hypreboomeramg.hypre_smoother_dn" },
+            {"name": "hypre_smoother_co", "label": "Coarsest Smoother Algorithm", "type": "enum", "default": "GE", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Jacobi", "value": "JACOBI" },
+                  { "label": "Gauss-Seidel, Sequential", "value": "SEQ_SGS" },
+                  { "label": "Hybrid Gauss-Seidel or SOR, Forward Solve", "value": "HYB_GS" },
+                  { "label": "Hybrid Gauss-Seidel or SOR, Backward Solve", "value": "BACK_HYB_GS" },
+                  { "label": "Hybrid Symmetric Gauss-Seidel or SSOR", "value": "HYB_SGS" },
+                  { "label": "Gaussian Elimination", "value": "GE" }
+               ]},
+               "help": [ "(hypreboomeramg::hypre_smoother_co)" ], "id": "hypreboomeramg.hypre_smoother_co" },
+            {"name": "interp", "label": "Parallel Interpolation Operator", "type": "enum", "default": "CLASSICAL", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Classical Modified Interpolation", "value": "CLASSICAL" },
+                  { "label": "Direct Interpolation with Separation of Weights", "value": "DIRECT" },
+                  { "label": "Multipass Interpolation", "value": "MULTIPASS" },
+                  { "label": "Multipass Interpolation with Separation of Weights", "value": "MULTIPASS_WTS" },
+                  { "label": "Extended+i Interpolation", "value": "EXT+I" },
+                  { "label": "Extended+i, If No Common C Neighbor, Interpolation", "value": "EXT+I-CC" },
+                  { "label": "Standard Interpolation", "value": "STANDARD" },
+                  { "label": "Standard Interpolation with Separation of Weights", "value": "STANDARD_WTS" },
+                  { "label": "FF Interpolation", "value": "FF" },
+                  { "label": "FF1 Interpolation", "value": "FF1" }
+               ]},
+               "help": [ "(hypreboomeramg::interp)" ], "id": "hypreboomeramg.interp" },
+            {"name": "hypre_nodal", "label": "Nodal Systems Coarsening", "type": "enum", "default": "Off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(hypreboomeramg::hypre_nodal)" ], "id": "hypreboomeramg.hypre_nodal" },
+            {"name": "trunc_factor", "label": "Truncation Factor", "type": "float", "default": "0.0", "size": 1, "help": [ "(hypreboomeramg::trunc_factor)" ], "id": "hypreboomeramg.trunc_factor" },
+            {"name": "pmax_elements", "label": "Maximum Elements", "size": 1, "type": "integer", "default": "0", "help": ["(hypreboomeramg::pmax_elements)"], "id": "hypreboomeramg.pmax_elements" },
+            {"name": "agg_num_levels", "label": "Aggressive Coarsening Levels", "size": 1, "type": "integer", "default": "0", "help": ["(hypreboomeramg::agg_num_levels)"], "id": "hypreboomeramg.agg_num_levels" },
+            {"name": "agg_num_paths", "label": "Aggressive Coarsening Paths", "size": 1, "type": "integer", "default": "1", "help": ["(hypreboomeramg::agg_num_paths)"], "id": "hypreboomeramg.agg_num_paths" },
+            {"name": "strong_threshold", "label": "Strength Threshold", "type": "float", "default": "0.85", "size": 1, "help": [ "(hypreboomeramg::strong_threshold)" ], "id": "hypreboomeramg.strong_threshold" },
+            {"name": "max_rowsum", "label": "Diagonally Dominant Strength", "type": "float", "default": "0.9", "size": 1, "help": [ "(hypreboomeramg::max_rowsum)" ], "id": "hypreboomeramg.max_rowsum" }
+         ]
+      },
+      "MLAMG": {
+         "label": "ML AMG",
+         "parameters": [
+            {"name": "smoother", "label": "Smoother Algorithm", "type": "enum", "default": "ICC", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Incomplete Cholesky Factorization with No-Fill", "value": "ICC" },
+                  { "label": "Incomplete LU Factorization with No-Fill", "value": "ILU" },
+                  { "label": "Successive Over-Relaxation", "value": "SSOR" },
+                  { "label": "Chebychev Polynomial Smoother", "value": "CHEBYCHEV" }
+               ]},
+               "help": [ "(mlamg::smoother)" ], "id": "mlamg.smoother" }
+         ]
+      },
+      "Momentum": {
+         "label": "Momentum Solver",
+         "parameters": [
+            {"name": "type", "label": "Solution Method", "type": "enum", "default": "FGMRES", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Flexible Generalized Minimum Residual Method", "value": "FGMRES" },
+                  { "label": "ILU-Preconditioned Flexible Generalized Minimum Residual Method", "value": "ILU-FGMRES" },
+                  { "label": "Generalized Minimum Residual Method", "value": "GMRES" },
+                  { "label": "ILU-Preconditioned Generalized Minimum Residual Method", "value": "ILU-GMRES" }
+               ]},
+               "help": [ "(momentumsolver::type)" ], "id": "momentumsolver.type" },
+            {"name": "nrestart", "label": "Number of Restart Vectors", "size": 1, "type": "integer", "default": "30", "help": ["(momentumsolver::nrestart)"], "id": "momentumsolver.nrestart" },
+            {"name": "nitmax", "label": "Maximum Linear Iterations", "size": 1, "type": "integer", "default": "500", "help": ["(momentumsolver::nitmax)"], "id": "momentumsolver.nitmax" },
+            {"name": "nitchk", "label": "Check Convergence Every", "size": 1, "type": "integer", "default": "2", "help": ["(momentumsolver::nitchk)"], "id": "momentumsolver.nitchk" },
+            {"name": "eps", "label": "Linear Solver Convergence Criteria", "type": "float", "default": "1.0E-5", "size": 1, "help": [ "(momentumsolver::eps)" ], "id": "momentumsolver.eps" },
+            {"name": "convergence", "label": "Write Non-Linear Convergence Information", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(momentumsolver::convergence)" ], "id": "momentumsolver.convergence" },
+            {"name": "diagnostics", "label": "Write Linear Convergence Diagnostics", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(momentumsolver::diagnostics)" ], "id": "momentumsolver.diagnostics" }
+         ]
+      },
+      "TransportSolver": {
+         "label": "Transport Solver",
+         "parameters": [
+            {"name": "type", "label": "Solution Method", "type": "enum", "default": "FGMRES", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Flexible Generalized Minimum Residual Method", "value": "FGMRES" },
+                  { "label": "ILU-Preconditioned Flexible Generalized Minimum Residual Method", "value": "ILU-FGMRES" },
+                  { "label": "Generalized Minimum Residual Method", "value": "GMRES" },
+                  { "label": "ILU-Preconditioned Generalized Minimum Residual Method", "value": "ILU-GMRES" }
+               ]},
+               "help": [ "(transportsolver::type)" ], "id": "transportsolver.type" },
+            {"name": "nrestart", "label": "Number of Restart Vectors", "size": 1, "type": "integer", "default": "30", "help": ["(transportsolver::nrestart)"], "id": "transportsolver.nrestart" },
+            {"name": "nitmax", "label": "Maximum Linear Iterations", "size": 1, "type": "integer", "default": "500", "help": ["(transportsolver::nitmax)"], "id": "transportsolver.nitmax" },
+            {"name": "nitchk", "label": "Check Convergence Every", "size": 1, "type": "integer", "default": "2", "help": ["(transportsolver::nitchk)"], "id": "transportsolver.nitchk" },
+            {"name": "eps", "label": "Linear Solver Convergence Criteria", "type": "float", "default": "1.0E-5", "size": 1, "help": [ "(transportsolver::eps)" ], "id": "transportsolver.eps" },
+            {"name": "convergence", "label": "Write Non-Linear Convergence Information", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(transportsolver::convergence)" ], "id": "transportsolver.convergence" },
+            {"name": "diagnostics", "label": "Write Linear Convergence Diagnostics", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(transportsolver::diagnostics)" ], "id": "transportsolver.diagnostics" }
+         ]
+      },
+      "Time": {
+         "label": "Time",
+         "parameters": [
+            {"name": "nstep", "label": "Maximum Time Steps", "size": 1, "type": "integer", "default": "10", "help": ["(time::nstep)"], "id": "time.nstep" },
+            {"name": "term", "label": "Termination Time", "type": "float", "default": "1.0", "size": 1, "help": [ "(time::term)" ], "id": "time.term" },
+            {"name": "deltat", "label": "Time Step Size", "type": "float", "default": "0.01", "size": 1, "help": [ "(time::deltat)" ], "id": "time.deltat" }
+         ]
+      },
+      "TimeIntegration": {
+         "label": "Time Integration",
+         "parameters": [
+            {"name": "type", "label": "Time-Step Control Method", "type": "enum", "default": "fixed_cfl", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Time-Step Based on a Fixed Maximum CFL", "value": "fixed_cfl" },
+                  { "label": "Time-Step Based on a Fixed Maximum deltat", "value": "fixed_dt" }
+               ]},
+               "help": [ "(timeintegration::type)" ], "id": "timeintegration.type" },
+            {"name": "CFLinit", "label": "Initial CFL Number", "size": 1, "type": "float", "default": "1.0", "help": ["(timeintegration::CFLinit)"], "id": "timeintegration.CFLinit" },
+            {"name": "CFLmax", "label": "Maximum CFL Number", "size": 1, "type": "float", "default": "2.0", "help": ["(timeintegration::CFLmax)"], "id": "timeintegration.CFLmax" },
+            {"name": "dtmax", "label": "Maximum Time-Step", "type": "float", "default": "1.0", "size": 1, "help": [ "(timeintegration::dtmax)" ], "id": "timeintegration.dtmax" },
+            {"name": "dtscale", "label": "Time-Step Growth Factor", "type": "float", "default": "1.025", "size": 1, "help": [ "(timeintegration::dtscale)" ], "id": "timeintegration.dtscale" },
+            {"name": "thetaA", "label": "Advective Time-Weight", "type": "float", "default": "0.5", "size": 1, "help": [ "(timeintegration::thetaA)" ], "id": "timeintegration.thetaA" },
+            {"name": "thetaK", "label": "Viscous/Diffusive Time-Weight", "type": "float", "default": "0.5", "size": 1, "help": [ "(timeintegration::thetaK)" ], "id": "timeintegration.thetaK" },
+            {"name": "thetaF", "label": "Source Time-Weight", "type": "float", "default": "0.5", "size": 1, "help": [ "(timeintegration::thetaF)" ], "id": "timeintegration.thetaF" },
+            {"name": "trimlast", "label": "Exact Termination Time", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(timeintegration::trimlast)" ], "id": "timeintegration.trimlast" }
+         ]
+      },
+      "Execution": {
+         "label": "Execution"
+      },
+      "ExecutionControl": {
+         "label": "Execution Control",
+         "parameters": [
+            {"name": "nstep", "label": "Execution Control", "size": 1, "type": "integer", "default": "0", "help": ["(executioncontrol::nstep)"], "id": "executioncontrol.nstep" }
+         ]
+      },
+      "LoadBalance": {
+         "label": "Load Balance",
+         "parameters": [
+            {"name": "method", "label": "Type of Load Balancing", "type": "enum", "default": "sfc and hg", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Recursive Coordinate Bisection", "value": "rcb" },
+                  { "label": "Recursive Inertial Bisection", "value": "rib" },
+                  { "label": "Space-Filling Curve", "value": "sfc" },
+                  { "label": "Hypergraph", "value": "hg" },
+                  { "label": "Space-Filling Curve followed by Hypergraph", "value": "sfc_and_hg" }
+               ]},
+               "help": [ "(loadbalance::method)" ], "id": "loadbalance.method" },
+            {"name": "diagnostics", "label": "Load Balance Diagnostic Output", "type": "enum", "default": "off", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "On", "value": "on" },
+                  { "label": "Off", "value": "off" }
+               ]},
+               "help": [ "(loadbalance::diagnostics)" ], "id": "loadbalance.diagnostics" }
+         ]
+      },
+      "Output": {
+         "label": "Output"
+      },
+      "Dump": {
+         "label": "Dump File",
+         "parameters": [
+            {"name": "ndump", "label": "Dump Frequency", "size": 1, "type": "integer", "default": "0", "help": ["(dump::ndump)"], "id": "dump.ndump" }
+         ]
+      },
+      "Plot": {
+         "label": "Plot File",
+         "parameters": [
+            {"name": "filetype", "label": "Serial or Distributed", "type": "enum", "default": "serial", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "serial", "value": "serial" },
+                  { "label": "distributed", "value": "distributed" }
+               ]},
+               "help": [ "(plot::filetype)" ], "id": "plot.filetype" },
+            {"name": "pltype", "label": "Format", "type": "enum", "default": "exodusii", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "ASCII GMV", "value": "gmv_ascii" },
+                  { "label": "Exodus-II (CDF)", "value": "exodusii" },
+                  { "label": "Exodus-II (CDF) 64bit", "value": "exodusii64" },
+                  { "label": "Exodus-II (CDF) HDF5", "value": "exodusii_hdf5" },
+                  { "label": "Exodus-II (CDF) HDF5 64bit", "value": "exodusii64_hdf5" },
+                  { "label": "ASCII VTK", "value": "vtk_ascii" }
+               ]},
+               "help": [ "(plot::pltype)" ], "id": "plot.pltype" },
+            {"name": "evariables", "label": "Element Variables", "type": "enum", "default": "none", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "None", "value": "none" },
+                  { "label": "Courant-Friedrichs-Levy Number", "value": "cfl" },
+                  { "label": "Fluid Density", "value": "density" },
+                  { "label": "Normal Distance from No-Slip/No-Penetration Surfaces", "value": "dist" },
+                  { "label": "Velocity Divergence (&nabla; &sdot; v)", "value": "div" },
+                  { "label": "Fluid Specific Enthalpy", "value": "enthalpy" },
+                  { "label": "Enstrophy, (&omega; &sdot; &omega;/2)", "value": "enstrophy" },
+                  { "label": "Helicity, (v &sdot; &omega;)", "value": "helicity" },
+                  { "label": "Fluid Pressure", "value": "pressure" },
+                  { "label": "Processor Id (MPI Rank)", "value": "procid" },
+                  { "label": "Fluid temperature", "value": "temp" },
+                  { "label": "Turbulent Dissipation Rate (&epsilon;)", "value": "turbeps" },
+                  { "label": "Turbulent Kinetic Energy (k)", "value": "turbke" },
+                  { "label": "Turbulent Eddy Viscosity", "value": "turbnu" },
+                  { "label": "Nodal Displacement Vector for ALE Computations", "value": "u" },
+                  { "label": "Fluid Velocity Vector", "value": "vel" },
+                  { "label": "Q-Criteria, i.e., 2<sup>nd</sup> Invariant of Velocity Gradient", "value": "vginv2" },
+                  { "label": "Vorticity, i.e., Curl of Velocity (&nabla; x v)", "value": "vorticity" },
+                  { "label": "y<sup>*</sup> Non-Dimensional Distance", "value": "ystar" }
+               ]},
+               "help": ["(plot::evariables)"], "id": "plot.evariables" },
+            {"name": "nvariables", "label": "Node Variables", "type": "enum", "default": "none", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "None", "value": "none" },
+                  { "label": "Fluid Density", "value": "density" },
+                  { "label": "Normal Distance from No-Slip/No-Penetration Surfaces", "value": "dist" },
+                  { "label": "Fluid Specific Enthalpy", "value": "enthalpy" },
+                  { "label": "Enstrophy, (&omega; &sdot; &omega;/2)", "value": "enstrophy" },
+                  { "label": "Helicity, (v &sdot; &omega;)", "value": "helicity" },
+                  { "label": "Fluid Pressure", "value": "pressure" },
+                  { "label": "Processor Id (MPI Rank)", "value": "procid" },
+                  { "label": "Fluid temperature", "value": "temp" },
+                  { "label": "Turbulent Dissipation Rate (&epsilon;)", "value": "turbeps" },
+                  { "label": "Turbulent Kinetic Energy (k)", "value": "turbke" },
+                  { "label": "Turbulent Eddy Viscosity", "value": "turbnu" },
+                  { "label": "Nodal Displacement Vector for ALE Computations", "value": "u" },
+                  { "label": "Fluid Velocity Vector", "value": "vel" },
+                  { "label": "Q-Criteria, i.e., 2<sup>nd</sup> Invariant of Velocity Gradient", "value": "vginv2" },
+                  { "label": "Vorticity, i.e., Curl of Velocity (&nabla; x v)", "value": "vorticity" }
+               ]},
+               "help": ["(plot::nvariables)"], "id": "plot.nvariables" },
+            {"name": "svariables", "label": "Face Variables", "type": "enum", "default": "none", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "None", "value": "none" },
+                  { "label": "Traction Force Vector", "value": "traction" },
+                  { "label": "Shear Traction Force Vector", "value": "straction" },
+                  { "label": "Normal Traction Force Vector", "value": "ntraction" },
+                  { "label": "Wall Shear Force", "value": "wallshear" },
+                  { "label": "y<sup>+</sup>", "value": "yplus" },
+                  { "label": "y<sup>*</sup>", "value": "ystar" },
+                  { "label": "Spatial Variation of y<sup>+</sup>", "value": "varyplus" },
+                  { "label": "Heat Flux Vector", "value": "heatflux" },
+                  { "label": "Normal Heat Flux", "value": "nheatflux" },
+                  { "label": "Surface Area (of each Cell)", "value": "surfarea" }
+               ]},
+               "help": ["(plot::svariables)"], "id": "plot.svariables" },
+            {"name": "nplot", "label": "Frequency", "size": 1, "type": "integer", "default": "20", "help": ["(plot::nplot)"], "id": "plot.nplot" }
+         ]
+      },
+      "ASCII": {
+         "label": "ASCII File",
+         "parameters": [
+            {"name": "prtlev", "label": "Level", "type": "enum", "default": "param", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "Primary Code Options Only", "value": "param" },
+                  { "label": "Mesh Coordinates and Topology", "value": "results" },
+                  { "label": "Primitive Variables", "value": "verbose" }
+               ]},
+               "help": [ "(ascii::prtlev)" ], "id": "ascii.prtlev" },
+            {"name": "nprint", "label": "Frequency", "size": 1, "type": "integer", "default": "10", "help": ["(ascii::nprint)"], "id": "ascii.nprint" }
+         ]
+      },
+      "TimeHistory": {
+         "label": "Time-History File",
+         "parameters": [
+            {"name": "elementid", "label": "Element ID", "size": 1, "type": "integer", "default": "0", "help": ["(timehistory::elementid)"], "id": "timehistory.elementid" },
+            {"name": "evariables", "label": "Element Variables", "type": "enum", "default": "none", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "None", "value": "none" },
+                  { "label": "Mean Density", "value": "<density>" },
+                  { "label": "Fluid Density", "value": "density" },
+                  { "label": "Velocity Divergence (&nabla; &sdot; v)", "value": "div" },
+                  { "label": "Enstrophy, i.e., Square of Vorticity", "value": "enstrophy" },
+                  { "label": "Fluid Specific Enthalpy", "value": "enthalpy" },
+                  { "label": "Helicity, i.e., Dot Product of Velocity and Vorticity", "value": "helicity" },
+                  { "label": "Fluid Pressure", "value": "pressure" },
+                  { "label": "Fluid temperature", "value": "temp" },
+                  { "label": "Turbulent Dissipation Rate (&epsilon;)", "value": "turbeps" },
+                  { "label": "Turbulent Kinetic Energy (k)", "value": "turbke" },
+                  { "label": "Turbulent Eddy Viscosity", "value": "turbnu" },
+                  { "label": "Fluid Velocity Vector", "value": "vel" },
+                  { "label": "Vorticity, i.e., Curl of Velocity (&nabla; x v)", "value": "vorticity" }
+               ]},
+               "help": ["(timehistory::evariables)"], "id": "timehistory.evariables" },
+            {"name": "surfaceid", "label": "Surface ID", "size": 1, "type": "integer", "default": "0", "help": ["(timehistory::surfaceid)"], "id": "timehistory.surfaceid" },
+            {"name": "svariables", "label": "Surface Variables", "type": "enum", "default": "none", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "None", "value": "none" },
+                  { "label": "Average Pressure", "value": "avgpress" },
+                  { "label": "Average Temperature", "value": "avgtemp" },
+                  { "label": "Average Velocity Vector", "value": "avgvel" },
+                  { "label": "Integral Force", "value": "force" },
+                  { "label": "Integrated Volume of Fluid", "value": "fvol" },
+                  { "label": "Heat Flow", "value": "heatflow" },
+                  { "label": "Mass Flow", "value": "massflow" },
+                  { "label": "Integral Pressure Force", "value": "pressforce" },
+                  { "label": "Surface Area", "value": "surfarea" },
+                  { "label": "Integral Viscous Shear Force", "value": "viscforce" },
+                  { "label": "Volume Flow", "value": "volumeflow" }
+               ]},
+               "help": ["(timehistory::svariables)"], "id": "timehistory.svariables" },
+            {"name": "nstep", "label": "Frequency", "size": 1, "type": "integer", "default": "1", "help": ["(timehistory::nstep)"], "id": "timehistory.nstep" }
+         ]
+      },
+      "VelocityMinMax": {
+         "label": "Velocity Min/Max",
+         "parameters": [
+            {"name": "nstep", "label": "Frequency", "size": 1, "type": "integer", "default": "1", "help": ["(velocityminmax::nstep)"], "id": "velocityminmax.nstep" }
+         ]
+      },
+      "TurbulenceStatistics": {
+         "label": "Turbulence Statistics",
+         "parameters": [
+            {"name": "evariables", "label": "Element Variables", "type": "enum", "default": "none", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "None", "value": "none" },
+                  { "label": "Mean Density", "value": "<density>" },
+                  { "label": "Mean Pressure", "value": "<pressure>" },
+                  { "label": "Mean Velocity Vector", "value": "<velocity>" },
+                  { "label": "Mean Temperature", "value": "<temperature>" },
+                  { "label": "Mean Enstrophy", "value": "<enstrophy>" },
+                  { "label": "Mean Helicity", "value": "<helicity>" },
+                  { "label": "Mean Vorticity", "value": "<vorticity>" },
+                  { "label": "Mean Turbulent Viscosity", "value": "<turbnu>" },
+                  { "label": "Pressure Variance", "value": "<pressure', pressure'>" },
+                  { "label": "Temperature Variance", "value": "<temp', temp'>" },
+                  { "label": "Density-Pressure Covariance", "value": "<density', pressure'>" },
+                  { "label": "Pressure-Velocity Covariance", "value": "<pressure', velocity'>" },
+                  { "label": "Root-Mean-Square Pressure", "value": "rms-pressure" },
+                  { "label": "Root-Mean-Square Temperature", "value": "rms-temp" },
+                  { "label": "Turbulent Kinetic Energy", "value": "tke" },
+                  { "label": "Reynolds Stress Tensor", "value": "reynoldsstress" }
+               ]},
+               "help": ["(turbulencestatistics::evariables)"], "id": "turbulencestatistics.evariables" },
+            {"name": "nvariables", "label": "Node Variables", "type": "enum", "default": "none", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "None", "value": "none" },
+                  { "label": "Mean Density", "value": "<density>" },
+                  { "label": "Mean Pressure", "value": "<pressure>" },
+                  { "label": "Mean Velocity Vector", "value": "<velocity>" },
+                  { "label": "Mean Temperature", "value": "<temperature>" },
+                  { "label": "Mean Enstrophy", "value": "<enstrophy>" },
+                  { "label": "Mean Helicity", "value": "<helicity>" },
+                  { "label": "Mean Vorticity", "value": "<vorticity>" },
+                  { "label": "Pressure Variance", "value": "<pressure', pressure'>" },
+                  { "label": "Temperature Variance", "value": "<temp', temp'>" },
+                  { "label": "Density-Pressure Covariance", "value": "<density', pressure'>" },
+                  { "label": "Pressure-Velocity Covariance", "value": "<pressure', velocity'>" },
+                  { "label": "Root-Mean-Square Pressure", "value": "rms-pressure" },
+                  { "label": "Root-Mean-Square Temperature", "value": "rms-temp" },
+                  { "label": "Turbulent Kinetic Energy", "value": "tke" },
+                  { "label": "Reynolds Stress Tensor", "value": "reynoldsstress" }
+               ]},
+               "help": ["(turbulencestatistics::nvariables)"], "id": "turbulencestatistics.nvariables" },
+            {"name": "svariables", "label": "Face Variables", "type": "enum", "default": "none", "size": 1,
+               "enum": { "type": "string", "values": [
+                  { "label": "None", "value": "none" },
+                  { "label": "Mean Density", "value": "<density>" },
+                  { "label": "Mean Pressure", "value": "<pressure>" },
+                  { "label": "Mean Velocity Vector", "value": "<velocity>" },
+                  { "label": "Mean Temperature", "value": "<temperature>" },
+                  { "label": "Mean Heat Flux Vector", "value": "<heatflux>" },
+                  { "label": "Mean Shear Traction Force Vector", "value": "<straction>" },
+                  { "label": "Mean Normal Traction Force Vector", "value": "<ntraction>" },
+                  { "label": "Mean Traction Force Vector", "value": "<traction>" },
+                  { "label": "Mean Wall Shear Force", "value": "<wallshear>" },
+                  { "label": "Pressure Variance", "value": "<pressure', pressure'>" },
+                  { "label": "Temperature Variance", "value": "<temp', temp'>" },
+                  { "label": "Density-Pressure Covariance", "value": "<density', pressure'>" },
+                  { "label": "Root-Mean-Square Pressure", "value": "rms-pressure" },
+                  { "label": "Root-Mean-Square Temperature", "value": "rms-temp" }
+               ]},
+               "help": ["(turbulencestatistics::svariables)"], "id": "turbulencestatistics.svariables" },
+            {"name": "starttime", "label": "Start Time", "size": 1, "type": "float", "default": "0.0", "help": ["(turbulencestatistics::starttime)"], "id": "turbulencestatistics.starttime" },
+            {"name": "endtime", "label": "End Time", "size": 1, "type": "float", "default": "1.0", "help": ["(turbulencestatistics::endtime)"], "id": "turbulencestatistics.endtime" },
+            {"name": "plotwinsize", "label": "Time Window Size", "size": 1, "type": "float", "default": "0.1", "help": ["(turbulencestatistics::plotwinsize)"], "id": "turbulencestatistics.plotwinsize" }
+         ]
+       }
+   }
+}

@@ -1,4 +1,4 @@
-<md-content class="md-padding">
+<md-content>
     <table  class='table table-striped table-hover table-condensed'
             ng-repeat="group in groups">
         <thead>
@@ -11,7 +11,7 @@
                 </th>
                 <th style='width: 60%;'></th>
                 <th style='width: 20%;'></th>
-                <th class='text-right' ng-click='createProject(group._id)'>
+                <th class='text-right' ng-click='createProject(group._id, $event)'>
                     <i class="fa fa-plus"></i>
                 </th>
             </tr>
@@ -21,9 +21,15 @@
                 ng-if="project.parentId === group._id"
                 class="project-block">
                 <td></td>
-                <td ng-click='selectProject(project._id)'>{{ project.name }}</td>
-                <td ng-click='selectProject(project._id)'>{{ project.description }}</td>
-                <td ng-click='selectProject(project._id)'>{{ project.created | toDateNumber | date : 'medium' }}</td>
+                <td ui-sref="project({ collectionID: getActiveCollection(), projectID: project._id })">
+                    {{ project.name }}
+                </td>
+                <td ui-sref="project({ collectionID: getActiveCollection(), projectID: project._id })">
+                    {{ project.description }}
+                </td>
+                <td ui-sref="project({ collectionID: getActiveCollection(), projectID: project._id })">
+                    {{ project.created | toDateNumber | date : 'medium' }}
+                </td>
                 <td class='text-right' ng-click='deleteProject(project._id)'>
                     <i class='fa fa-trash' ng-if='project._accessLevel == 2'></i>
                 </td>

@@ -1,0 +1,5 @@
+<p><b><i>convergence</i></b> - Enable/disable the convergence metrics for the linear solver, <b>convergence</b> (string, default=Off).
+                             <ul>
+                                 <li><b>On</b> - Activate convergence output, or
+                                 <li><b>Off</b> - Suppress convergence output.
+                             </ul>

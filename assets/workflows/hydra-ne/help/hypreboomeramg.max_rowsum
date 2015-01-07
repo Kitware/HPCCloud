@@ -1,0 +1,1 @@
+<p><b><i>max_rowsum</i></b> - Set a parameter to modify the definition of strength for diagonally dominant portions of the matrix for Hypre/BoomerAMG, <b>max_rowsum</b> (float, default=0.9). Only effective if <b>type</b>=AMG and <b>amgpc</b>=HYPRE and <b>hypre_type</b>=BOOMERAMG.

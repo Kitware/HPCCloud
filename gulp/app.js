@@ -6,7 +6,7 @@ var gulp = require('gulp'),
 
 
 gulp.task('process-js', function() {
-    return gulp.src(['src/modules/**/module.js', 'src/modules/**/*.js'])
+    return gulp.src(['src/modules/**/module.js', 'src/modules/**/*.js', 'assets/workflows/*/helper.js'])
         // .pipe($.debug({verbose: true}))
         .pipe($.jshint())
         .pipe($.jshint.reporter('jshint-stylish'))
@@ -31,7 +31,7 @@ gulp.task('process-css', function() {
 });
 
 gulp.task('partials', function () {
-  return gulp.src('src/modules/**/tpls/*.html')
+  return gulp.src(['src/modules/**/tpls/*.html', 'assets/workflows/*/help/*', 'assets/workflows/*/dialog/*'])
     .pipe($.template({ quickLogin: quickLogin }))
     .pipe($.minifyHtml({
       empty: true,

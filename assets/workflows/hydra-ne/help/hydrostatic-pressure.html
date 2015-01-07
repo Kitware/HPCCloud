@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+	<head>
+		<title></title>
+	</head>
+	<body>
+	
+	<h2>Hydrostatic Pressure</h2>
+	
+	<p>Prescribe the hydrostatic pressure. This may be used in conjunction with prescribed pressure boundary conditions, or by itself. When used by itself, it plays two roles. 
+	      <ul>
+	          <li>It makes the pressure-Poisson equation non-singular and allows the pressure for the system to be uniquely determined. 
+	          <li>When used with prescribed pressure boundary conditions, then it only specifies the unique hydrostatic pressure level for the system. 
+	      </ul>
+	<p>In either case, the pressure time-history and field output is adjusted to reflect the specified hydrostatic pressure level.
+
+    <p><b><i>setid</i></b> - One node set on which the hydrostatic pressure will be applied, <b>setId</b> (integer, required).
+
+    <p><b><i>load_curve</i></b>
+
+    <blockquote>
+
+    <p> A load curve allows for the specification of time-dependent hydrostatic pressure. The load curve is defined as a list of time and factor pairs:
+        <ul>            <li>t<sub>i</sub> The time value 
+            <li>v<sub>i</sub> The load factor
+        </ul>
+
+	<p><b><i>name</i></b> - A descriptive load curve name (string, required). <b>name</b> is not used in the derived control file. A unique id for each specific load curve is generated underneath the cover of the web interface. While providing a descriptive name is not required, these descriptive names clearly increase usability.</p>
+
+    <p><b><i>time and factor pairs</i></b> -
+       <blockquote>
+          t<sub>1</sub>, v<sub>1</sub><br>
+          t<sub>2</sub>, v<sub>2</sub><br>          ￼t<sub>3</sub>, v<sub>3</sub><br>
+          ...<br>          t<sub>Npts</sub>, v<sub>Npts</sub><br>
+       </blockquote>
+       </blockquote>
+
+    <p><b><i>amplitude</i></b> - Prescribed hydrostatic pressure level, <b>amplitude</b> (float, required).
+	</body>
+</html>

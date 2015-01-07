@@ -1,0 +1,5 @@
+<p><b><i>amgpc</i></b> - Specifies the preconditioner package for the AMG solver, <b>amgpc</b> (string, default=ML). Only effective if <b>type</b>=AMG. Values can be one of the following:
+                             <ul>
+                                 <li><b>ML</b> - Multilevel preconditioner package, or
+                                 <li><b>HYPRE</b> - Hypre preconditioner package.
+                             </ul>

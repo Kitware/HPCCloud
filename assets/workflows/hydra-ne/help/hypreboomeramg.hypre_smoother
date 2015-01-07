@@ -1,0 +1,9 @@
+<p><b><i>hypre_smoother</i></b> - Specifies the smoother for both the up and down cycles for Hypre/BoomerAMG, <b>hypre_smoother</b> (string, default=HYB_SGS). Only effective if <b>type</b>=AMG and <b>amgpc</b>=HYPRE and <b>hypre_type</b>=BOOMERAMG. Values can be one of the following:
+                             <ul>
+                                 <li><b>JACOBI</b> - Jacobi,
+                                 <li><b>SEQ_SGS</b> - Gauss-Seidel, sequential (very slow!),
+                                 <li><b>HYB_GS</b> - Hybrid Gauss-Seidel or SOR, forward solve,
+                                 <li><b>BACK_HYB_GS</b> - Hybrid Gauss-Seidel or SOR, backward solve,
+                                 <li><b>HYB_SGS</b> - Hybrid symmetric Gauss-Seidel or SSOR, or
+                                 <li><b>GE</b> - Gaussian elimination.
+                             </ul>

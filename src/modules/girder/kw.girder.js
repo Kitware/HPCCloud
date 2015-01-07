@@ -278,6 +278,18 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.delete('folder/' + id);
         };
 
+        this.getCollection = function (id) {
+            return this.get('collection/' + id);
+        };
+
+        this.getFolder = function (id) {
+            return this.get('folder/' + id);
+        };
+
+        this.getItem = function (id) {
+            return this.get('item/' + id);
+        };
+
         this.deleteItem = function (id) {
             return this.delete('item/' + id);
         };
@@ -526,11 +538,7 @@ angular.module("kitware.girder", ["ngCookies"])
 
                     // Start task
                     self.put(['tasks', response._id, 'run'].join('/'), {
-                        cluster: {
-                            type: cluster.type,
-                            size: cluster.size,
-                            cores: cluster.cores
-                        },
+                        cluster: cluster,
                         input: {
                             item: { id: item._id },
                             path: "data"

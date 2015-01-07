@@ -1,0 +1,1 @@
+<p><b><i>nitmax</i></b> - Set the maximum number of iterations, <b>N<sub>itmax</sub></b> (int, default=500). In the case of AMG, this is the maximum number of V or W cycles.

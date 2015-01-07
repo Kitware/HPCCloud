@@ -1,0 +1,10 @@
+   <p><b><i>type</i></b> - The type of boundary condition (string, default=Scalar Dirichlet). The <b>type</b> must be one of the following:
+                             <ul>
+                                 <li><b>Scalar Dirichlet</b> - Use a scalar Dirichlet boundary conditions,
+                                 <li><b>Velocity Dirichlet</b> - Use a Dirichlet velocity boundary conditions,
+                                 <li><b>Symmetry Velocity</b> - Use a symmetry velocity boundary conditions,
+                                 <li><b>Heat Flux</b> - Use a heat flux boundary condition,
+                                 <li><b>Passive Outflow</b> - Use a passive advective condition for use at outflow boundaries,
+                                 <li><b>Pressure Outflow</b> - Use a pressure outflow boundary condition, or
+                                 <li><b>User-Defined Velocity</b> - Use a user-defined velocity boundary condition.
+                             </ul>

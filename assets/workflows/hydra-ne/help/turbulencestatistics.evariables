@@ -1,0 +1,20 @@
+<p><b><i>Element Variables</i></b> - Element variables that specifies plot output for statistics data.
+
+    <ul>
+<li><b><i>&lt;density&gt;</i></b> - Mean density
+<li><b><i>&lt;pressure&gt;</i></b> - Mean pressure
+<li><b><i>&lt;velocity&gt;</i></b> - Mean velocity vector
+<li><b><i>&lt;temperature&gt;</i></b> - Mean temperature
+<li><b><i>&lt;enstrophy&gt;</i></b> - Mean enstrophy
+<li><b><i>&lt;helicity&gt;</i></b> - Mean helicity
+<li><b><i>&lt;vorticity&gt;</i></b> - Mean vorticity
+<li><b><i>&lt;turbnu&gt;</i></b> - Mean turbulent viscosity
+<li><b><i>&lt;pressure', pressure'&gt;</i></b> - Pressure variance
+<li><b><i>&lt;temp', temp'&gt;</i></b> - Temperature variance
+<li><b><i>&lt;density', pressure'&gt;</i></b> - Density-pressure covariance
+<li><b><i>&lt;pressure', velocity'&gt;</i></b> - Pressure-velocity covariance
+<li><b><i>rms-pressure</i></b> - Root-Mean-Square pressure
+<li><b><i>rms-temp</i></b> - Root-Mean-Square temperature
+<li><b><i>tke</i></b> - Turbulent kinetic energy
+<li><b><i>reynoldsstress</i></b> - Reynolds stress tensor
+    </ul>

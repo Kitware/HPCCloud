@@ -1,0 +1,1 @@
+<p><b><i>nvec</i></b> - Defines the maximum number of vectors used for nonlinear Krylov acceleration (NKA) when using the picard solution method, <b>N<sub>vec</sub></b> (int, default=0).

@@ -1,0 +1,18 @@
+<p><b><i>Face Variables</i></b> - Face variables that specifies plot output for statistics data.
+
+    <ul>
+<li><b><i>&lt;density&gt;</i></b> - Mean density
+<li><b><i>&lt;pressure&gt;</i></b> - Mean pressure
+<li><b><i>&lt;velocity&gt;</i></b> - Mean velocity vector
+<li><b><i>&lt;temperature&gt;</i></b> - Mean temperature
+<li><b><i>&lt;heatflux&gt;</i></b> - Mean heat flux vector
+<li><b><i>&lt;straction&gt;</i></b> - Mean shear traction force vector
+<li><b><i>&lt;ntraction&gt;</i></b> - Mean normal traction force vector
+<li><b><i>&lt;traction&gt;</i></b> - Mean traction force vector
+<li><b><i>&lt;wallshear&gt;</i></b> - Mean wall shear force
+<li><b><i>&lt;pressure', pressure'&gt;</i></b> - Pressure variance
+<li><b><i>&lt;temp', temp'&gt;</i></b> - Temperature variance
+<li><b><i>&lt;density', pressure'&gt;</i></b> - Density-pressure covariance
+<li><b><i>rms-pressure</i></b> - Root-Mean-Square pressure
+<li><b><i>rms-temp</i></b> - Root-Mean-Square temperature
+    </ul>

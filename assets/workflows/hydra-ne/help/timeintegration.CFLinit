@@ -1,0 +1,1 @@
+<p><b><i>CFLinit</i></b> - Specifies the initial CFL number to use at startup with the fixed CFL time-step control, <b>CFL<sub>0</sub></b> (float, default=1.0). The initial CFL number may not exceed <b>CFL<sub>0</sub></b>=100.

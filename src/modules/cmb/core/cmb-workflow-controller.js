@@ -1,12 +1,10 @@
 angular.module("kitware.cmb.core")
-    .controller('CmbWorkflowController', ['$scope', 'kw.Girder', '$state', '$stateParams', function ($scope, $girder, $state, $stateParams) {
+    .controller('CmbWorkflowController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window) {
 
         $scope.groups = [];
         $scope.projects = {};
 
-        if($girder.getUser() === null) {
-            $state.go('login');
-        } else {
+        function updateProjectList() {
             $girder.listWorkflowGroups($stateParams.collectionID)
                 .success(function (groups) {
                     var found,
@@ -54,5 +52,38 @@ angular.module("kitware.cmb.core")
                         processGroups(groups);
                     }
                 });
+        }
+
+        $scope.createProject = function ( groupId, event ) {
+            var collectionName = $scope.collection.name;
+
+            $mdDialog.show({
+                controller: ['$scope', '$mdDialog', function($scope, $mdDialog) {
+                    $scope.ok = function(response) {
+                        $window.WorkflowHelper[collectionName]['create-project'](groupId, $girder, response, $mdDialog);
+                    };
+                    $scope.cancel = function() {
+                      $mdDialog.cancel();
+                    };
+                }],
+                template: $templateCache.get(collectionName + '/dialog/create-project.html'),
+                targetEvent: event,
+            })
+            .then(function(project) {
+                // Move to the newly created project
+                $state.go('project', { collectionID: $stateParams.collectionID, projectID: project._id });
+            }, function() {
+                // Nothing to do when close
+            });
+        };
+
+        $scope.deleteProject = function ( projectId ) {
+            $girder.deleteFolder(projectId).success(updateProjectList).error(updateProjectList);
+        };
+
+        if($girder.getUser() === null) {
+            $state.go('login');
+        } else {
+            updateProjectList();
         }
     }]);

@@ -1,3 +1,8 @@
+.md-subheader.cmb-subheader
+    background #cccc
+    color #000
+    margin 0
+
 md-toolbar
     min-height 32px
 
@@ -15,7 +20,7 @@ md-toolbar
 
 
     &.cmb-subheader
-        background #cccc
+        background #ccc
         color #000
 
         .breadcrumb
@@ -29,6 +34,25 @@ md-toolbar
         background #0a0a0a
         color #fff
 
+    &.cmb-subsubheader
+        background #eee
+        color #000
+
+        .md-button
+            margin 0 1px
+            padding 2px 10px
+
+            i
+                color #000
+
+        [toggle-filter-bar]
+            font-size 65%
+
+            .md-button
+                margin 0 2px
+                padding 2px 5px
+
+
 .cmb-button.md-button.md-fab
     width 28px
     height 28px
@@ -37,6 +61,15 @@ md-toolbar
         top -2px
         position relative
         font-size 20px
+
+[ng-click], [ui-sref]
+    cursor pointer
+
+input[type="file"]
+    height 100%
+
+strong[title]
+    font-size 1.5em
 
 
 .width-100
@@ -51,3 +84,6 @@ md-toolbar
 
     input
         width 90%
+
+.text-center
+    text-align center

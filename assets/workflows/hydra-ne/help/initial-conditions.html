@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+	<head>
+		<title></title>
+	</head>
+	<body>
+	
+	<h2>Initial Conditions</h2>
+	
+	For many CFD problems, a simplified specification of initial conditions is sufficient. Hydra-TH provides a simplified input mechanism for prescribing all initial conditions.
+	
+	<p><b><i>tke</i></b> - The turbulent kinetic energy, <b>k</b> (float, default=0.0) supporting k - &epsilon; and k - &omega; models.
+
+    <p><b><i>eps</i></b> - The turbulent dissipation rate, <b>&epsilon;</b> (float, default=0.0) with support for k - &epsilon; models.
+
+    <p><b><i>omega</i></b> - The inverse dissipation time scale, <b>&omega;</b> (float, default=0.0), which is used for k - &omega; models.
+
+    <p><b><i>turbnu</i></b> - The turbulent viscosity, <b>&upsilon;</b> (float, default=0.0) for Spalart-Allmaras and DES models.
+
+    <p><b><i>temperature</i></b> - The temperature, <b>T</b> (float, default=0.0) (aka: temp).
+
+    <p><b><i>enthalpy</i></b> - The enthalpy, <b>h</b> (float, default=0.0).
+
+    <p><b><i>int_energy</i></b> -  The internal energy, <b>e</b> (float, default=0.0).
+
+	</body>
+</html>

@@ -1,0 +1,1 @@
+<p><b><i>agg_num_paths</i></b> - Set number of paths for aggressive coarsening for Hypre/BoomerAMG, <b>agg_num_paths</b> (integer, default=1). Only effective if <b>type</b>=AMG and <b>amgpc</b>=HYPRE and <b>hypre_type</b>=BOOMERAMG.

@@ -1,0 +1,5 @@
+<p><b><i>hypre_nodal</i></b> - Enable/disable nodal systems coarsening for Hypre/BoomerAMG, <b>hypre_nodal</b> (string, default=Off). Only effective if <b>type</b>=AMG and <b>amgpc</b>=HYPRE and <b>hypre_type</b>=BOOMERAMG. Values may be one of the following:
+                             <ul>
+                                 <li><b>On</b> - Nodal systems coarsening, or
+                                 <li><b>Off</b> - Unknown-based coarsening.
+                             </ul>

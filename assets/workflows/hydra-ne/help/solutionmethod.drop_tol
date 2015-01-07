@@ -1,0 +1,1 @@
+<p><b><i>drop_tol</i></b> - Drop tolerance used when adding vectors to the nonlinear Krylov acceleration (NKA) subspace when using the picard solution method, <b>&epsilon;<sub>drop</sub></b> (float, default=1.0E-2).

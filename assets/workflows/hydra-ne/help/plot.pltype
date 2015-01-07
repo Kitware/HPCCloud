@@ -1,0 +1,11 @@
+<p><b><i>pltype</i></b> - Specifies the plot file format, <b>pltype</b> (string, default=exodusii). Valid values are the following:
+                             <ul>
+                                 <li><b>ASCII GMV</b> - Generates ASCII GMV files suitable for use with the GMV visualization tool,
+                                 <li><b>Exodus-II (CDF)</b> - generates Exodus-II (CDF) format plot files (By default, floating point results are represented with a 32-bit representation and is limited to mesh sizes below<b> </b>approximately 6 x 10<sup>6</sup> elements),
+                                 <li><b>Exodus-II (CDF) 64bit</b> - generates Exodus-II (CDF) format plot files (Floating point results are represented with a 64-bit representation and are limited to mesh sizes below approximately 6 x 10<sup>6</sup> elements),
+                                 <li><b>Exodus-II (CDF) HDF5</b> - generates Exodus-II (CDF) format plot files (By default, floating point results are represented with a 32-bit representation and allows for larger mesh sizes than the Exodus-II format),
+                                 <li><b>Exodus-II (CDF) HDF5 64bit</b> - generates Exodus-II (CDF) format plot files (Floating point results are represented with a 64-bit representation and allows for larger mesh sizes than the Exodus-II format), or
+                                 <li><b>ASCII VTK</b> - Generates ASCII VTK format plot files.
+                             </ul>
+
+     <p><b>Note</b>: The <b>pltype</b> selects the file format used for field output which includes both instantaneous state variables, and time-averaged statistical quantities. At this time, surface field variables associated with model side-sets is only available in the <code>exodusii</code> and <code>exodusii_hdf5</code> formats.

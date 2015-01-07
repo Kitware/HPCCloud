@@ -1,0 +1,12 @@
+   <p><b><i>tmodel</i></b> - The turbulence model (string, default=No Turbulence Model). The <b>tmodel</b> must be one of the following:
+                             <ul>
+                                 <li><b>No Turbulence Model</b> - No explicit turbulence model is used,
+                                 <li><b>Spalart-Allmaras Model</b> - Activate the Spalart-Allmaras model,
+                                 <li><b>Detached-Eddy Spalart-Allmaras Model</b> - Activate the detached-eddy model based on Spalart-Allmaras,
+                                 <li><b>Smagorinsky Subgrid-Scale Model</b> - Use the Smagorinsky subgrid-scale model,
+                                 <li><b>Wall-Adapted Large Eddy Subgrid-Scale Model</b> - Use the wall-adapted large eddy subgrid-scale model,
+                                 <li><b>RNG k-e Model</b> - Activate the RNG k-&epsilon; model,
+                                 <li><b>SST k-w Model</b> - Activate the SST k-&omega; model (under development),
+                                 <li><b>ksgs Subgrid-Scale Model</b> - Use the k<sub>sgs</sub> subgrid-scale model (under development), or
+                                 <li><b>LDKM ksgs Subgrid-Scale Model</b> - Use the LDKM ksgs subgrid-scale model (under development).
+                             </ul>

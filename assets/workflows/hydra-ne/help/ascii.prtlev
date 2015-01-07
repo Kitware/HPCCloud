@@ -1,0 +1,8 @@
+<p><b><i>prtlev</i></b> - The amount of data to output, <b>prtlev</b> (string, default=param). Valid values are the following:
+                             <ul>
+                                 <li><b>Primary Code Options Only</b> - Suppresses all output except for a data echo of the primary code options,
+                                 <li><b>Mesh Coordinates and Topology</b> - Produces data echo of the mesh coordinates and topology, or
+                                 <li><b>Primitive Variables</b> - Produces a data echo of the primitive variables every N<sub>print</sub> time steps.
+                             </ul>
+
+    <p><b>Note</b>: Controls the amount of data written to the ASCII (human-readable) output file.
