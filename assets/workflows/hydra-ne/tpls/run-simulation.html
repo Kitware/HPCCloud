@@ -1,0 +1,69 @@
+<md-dialog aria-label="{{ title }}" style="width: 50%;">
+    <md-subheader class="md-sticky-no-effect cmb-subheader">
+            <strong title>{{ title }}</strong>
+    </md-subheader>
+    <md-tabs ng-show="hasLauncher" flex md-selected="data.selectedIndex" class="cmb-subheader">
+      <md-tab id="ec2-cluster" aria-controls="ec2-cluster-content">
+        EC2 Cluster
+      </md-tab>
+      <md-tab id="launcher" aria-controls="launcher-content">
+        Launcher
+      </md-tab>
+    </md-tabs>
+    <md-content>
+    <ng-switch on="data.selectedIndex" class="tabpanel-container">
+        <div role="tabpanel" id="launcher-content" aria-labelledby="launcher" ng-switch-when="1">
+            This will run directly on the Web server. Interactive rendering will
+            be achieve using OSMesa which will be slower than a dedicated GPU
+            machine. Moreover, as the machine will be shared, no parallelism
+            will be authorized and only small model should be used for that
+            specific setting.
+        </div>
+        <div role="tabpanel" id="ec2-cluster-content" aria-labelledby="ec2-cluster" ng-switch-when="0">
+            <form layout="column">
+                <div layout="row" style="margin: 10px 0;">
+                    <label flex="20">
+                        Machine type
+                    </label>
+                    <div flex>
+                        <select ng-model='data.type' class="form-control" ng-change="updateCost()">
+                            <option ng-repeat="machine in machines" value="{{ machine.id }}">
+                                {{ machine.label }} - {{ machine.cpu }} cores - {{ machine.memory }} GB {{ machine.gpu ? " +        GPU" : "" }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div layout="row" style="margin: 10px 0;">
+                    <label flex="20">
+                        Cluster size
+                    </label>
+                    <div flex>
+                      <input type="number"
+                        ng-change="updateCost()"
+                        ng-model='data.size'
+                        value='1'
+                        min='1'
+                        max='5'
+                        step='1'
+                        class="form-control"
+                        ></textarea>
+                    </div>
+                </div>
+                <div layout="row" style="margin: 10px 0;" >
+                    <label flex="20">
+                        Hour cost
+                    </label>
+                    <label class="control-label" flex>
+                        {{ data.cost | currency : $ : 2 }} / hour
+                    </label>
+                </div>
+            </form>
+        </div>
+    </ng-switch>
+</md-content>
+  <div class="md-actions" layout="row">
+    <span flex></span>
+    <md-button ng-click="ok(data)" class="md-raised md-primary">Ok</md-button>
+    <md-button ng-click="cancel()" class="md-raised md-warn">Cancel</md-button>
+  </div>
+</md-dialog>

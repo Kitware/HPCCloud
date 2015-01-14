@@ -1,4 +1,3 @@
-<div ng-if="simulation.meta.status === 'incomplete' || simulation.meta.status === 'valid'" layout="column" layout-fill>
 <md-toolbar class="cmb-subsubheader" layout="row" layout-align="space-between center">
     <div flex layout="row" layout-align="start center">
         <md-button aria-label="Save input parameters">
@@ -11,15 +10,7 @@
     </div>
     <div flex layout="row" layout-align="end center">
         <md-button
-            aria-label="Simulation input is Invalid. Click to see some details."
-            ng-show="simulation.meta.status === 'incomplete'"
-            ng-click="showError($event)">
-            <i class="fa fa-fw fa-warning"></i>
-            <md-tooltip>Show errors or incomplete data</md-tooltip>
-        </md-button>
-        <md-button
             aria-label="Simulation input is Valid. Click to run it."
-            ng-show="simulation.meta.status === 'valid'"
             ng-click="runSimulation($event)">
             <i class="fa fa-fw fa-check"></i>
             <md-tooltip>Run the simulation</md-tooltip>
@@ -62,16 +53,3 @@
     </md-content>
     </section>
 </div>
-</div>
-
-<md-content ng-if="simulation.meta.status === 'running'">
-    Dynamic progressive graph
-</md-content>
-
-<md-content ng-if="simulation.meta.status === 'completed'">
-    ParaView Web Visualizer application loading item
-</md-content>
-
-<md-content ng-if="simulation.meta.status === 'error'">
-    Error you can only clone that simulation to retrieve its input.
-</md-content>

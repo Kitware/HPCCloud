@@ -10,7 +10,8 @@ angular.module("kitware.girder", ["ngCookies"])
         var apiBasePathURL = '/api/v1/',
             user = $cookies.cmbUser ? angular.fromJson($cookies.cmbUser) : null,
             authToken = $cookies.cmbAuthToken,
-            taskList = {};
+            taskList = {},
+            collectionMap = {};
 
         if(user && authToken) {
             $rootScope.$broadcast('login', user);
@@ -60,9 +61,10 @@ angular.module("kitware.girder", ["ngCookies"])
         this.fetchTaskList = function() {
             var self = this;
 
-            self.listWorkflows()
+            self.listCollections()
                 .success(function(collections) {
                     angular.forEach(collections, function(collection) {
+                        collectionMap[collection.name] = collection;
                         taskList[collection.name] = {};
                         self.listFolders(collection._id, 'collection')
                             .success(function(folders){
@@ -177,8 +179,8 @@ angular.module("kitware.girder", ["ngCookies"])
          * Perform a GET http call to the given url with
          * the authentication Token if available.
          */
-        this.get = function (url) {
-            return $http(generateHttpConfig('GET', url));
+        this.get = function (url, param) {
+            return $http(generateHttpConfig('GET', url, null, param));
         };
 
         /**
@@ -228,8 +230,8 @@ angular.module("kitware.girder", ["ngCookies"])
          * Return a promise which should provide the list of available groups
          * within a workflow.
          */
-        this.listWorkflowGroups = function ( workflowId ) {
-            return this.get('folder?parentType=collection&parentId=' + workflowId);
+        this.listWorkflowGroups = function ( collectionId ) {
+            return this.get('folder?parentType=collection&parentId=' + collectionId);
         };
 
         /**
@@ -278,8 +280,8 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.delete('folder/' + id);
         };
 
-        this.getCollection = function (id) {
-            return this.get('collection/' + id);
+        this.getCollectionFromName = function (name) {
+            return this.get('collection?text=' + name);
         };
 
         this.getFolder = function (id) {
@@ -308,6 +310,10 @@ angular.module("kitware.girder", ["ngCookies"])
                 });
             }
             return promise;
+        };
+
+        this.copyItem = function (simulationToClone, projectId, name, description) {
+            return this.post(['item', simulationToClone._id, 'copy?folderId=' + projectId + '&name=' + escape(name) + '&description=' + escape(description)].join('/'));
         };
 
         this.uploadChunk = function (uploadId, offset, blob) {
@@ -445,6 +451,10 @@ angular.module("kitware.girder", ["ngCookies"])
             self.getFileId(itemId, name, foundFileId);
         };
 
+        this.downloadItem = function (itemId) {
+            return this.get(['item', itemId, 'download'].join('/'), {responseType:'arraybuffer'});
+        };
+
         this.downloadContentFromItem = function (itemId, name, callback) {
             var self = this;
 
@@ -514,7 +524,7 @@ angular.module("kitware.girder", ["ngCookies"])
                     if(item.meta.status !== response.status) {
                         console.log('update status to ' + response.status);
                         var meta = angular.copy(item.meta);
-                        meta.status = response.status;
+                        meta.task = response.status;
                         self.updateItemMetadata(item, meta);
                     }
                 })
@@ -530,9 +540,9 @@ angular.module("kitware.girder", ["ngCookies"])
                 .success(function(response){
                     // Update Item metadata
                     var metadata = {
-                        task: response._id,
+                        taskId: response._id,
                         spec: response.taskSpecId,
-                        status: response.status
+                        task: response.status
                     };
                     self.updateItemMetadata(item, metadata);
 
@@ -562,7 +572,7 @@ angular.module("kitware.girder", ["ngCookies"])
 
         this.deleteTask = function (item) {
             var self = this,
-                taskId = item.meta.task;
+                taskId = item.meta.taskId;
 
             self.delete(['tasks', taskId].join('/'))
                 .success(function(){
@@ -583,14 +593,14 @@ angular.module("kitware.girder", ["ngCookies"])
 
         this.terminateTask = function (item) {
             var self = this,
-                taskId = item.meta.task;
+                taskId = item.meta.taskId;
 
             // PUT /task/<_id from above>/terminate
             // DELETE /task/<_id from above>
             self.put(['tasks', taskId, 'terminate'].join('/'))
                 .success(function(){
                     var metadata = angular.copy(item.meta);
-                    metadata.status = 'terminated';
+                    metadata.task = 'terminated';
                     self.updateItemMetadata(item, metadata);
                 })
                 .error(function(error) {

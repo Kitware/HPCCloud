@@ -29,7 +29,7 @@ gulp.task('bower-js', function () {
     .pipe($.filter('**/*.js'))
     // .pipe($.debug({verbose: true}))
     // .pipe($.flatten())
-    .pipe($.concat('vendors.js'))
+    .pipe($.concat('bower-vendors.js'))
     .pipe($.uglify({preserveComments: $.uglifySaveLicense}))
     // .pipe($.rev())
     .pipe($.size({title: "Bower js"}))
@@ -37,3 +37,19 @@ gulp.task('bower-js', function () {
     // .pipe(assetMapping = $.rev.manifest())
     ;
 });
+
+gulp.task('ext-js', function () {
+  return gulp.src('assets/js/**/*.js')
+    .pipe($.filter('**/*.js'))
+    // .pipe($.debug({verbose: true}))
+    // .pipe($.flatten())
+    .pipe($.concat('ext-vendors.js'))
+    .pipe($.uglify({preserveComments: $.uglifySaveLicense}))
+    // .pipe($.rev())
+    .pipe($.size({title: "Bower js"}))
+    .pipe(gulp.dest('dist/js'))
+    // .pipe(assetMapping = $.rev.manifest())
+    ;
+});
+
+

@@ -1,0 +1,33 @@
+<md-dialog aria-label="Simulation" style="width: 50%;">
+    <md-subheader class="md-sticky-no-effect cmb-subheader">
+      <div layout="row">
+        <strong title>Simulation controls</strong>
+        <span flex></span>
+        <span class="fa fa-close" ng-click="cancel()" style="padding: 0 16px 0 0;">
+        </span>
+      </div>
+    </md-subheader>
+    <md-content layout="row">
+      <div layout="column" flex>
+        <div layout="row">
+          <span flex="50"><b>Total cost<b></span>
+          <span>$ {{ simulation.meta.totalCost }}</span>
+        </div>
+        <div layout="row" ng-show="simulation.meta.taskId">
+          <span flex="50"><b>Active cluster<b></span>
+          <span>$ {{ simulation.meta.cost }} / hour => $ {{ activeCost }}</span>
+        </div>
+        <div layout="row" ng-show="simulation.meta.taskId">
+          <span flex="50"><b>Running time<b></span>
+          <span delta-time format="'hh:mm:ss'" start="simulation.meta.startTime"></span>
+        </div>
+      </div>
+      <md-button ng-show="simulation.meta.taskId" ng-click="terminateCluster(simulation)" class="md-raised md-warn">Terminate</md-button>
+    </md-content>
+  <div class="md-actions" layout="row">
+    <md-button ng-click="cloneSimulation($event, simulation)" class="md-raised">Clone</md-button>
+    <md-button ng-click="downloadSimulation(simulation)" class="md-raised">Download</md-button>
+    <span flex></span>
+    <md-button ng-click="deleteSimulation(simulation)" class="md-raised md-warn">Delete</md-button>
+  </div>
+</md-dialog>

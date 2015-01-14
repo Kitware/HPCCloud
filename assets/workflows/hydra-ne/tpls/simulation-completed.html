@@ -1,0 +1,41 @@
+<ng-switch on="simulation.meta.task">
+
+    <!-- Need to start something -->
+    <md-content class="md-padding" ng-switch-when="undefined" layout="column" layout-align="space-around center" >
+        <md-card layout="column" layout-align="space-around center" style="width: 80%;">
+            <img src="assets/wf/hydra-ne/result-viewer.png" class="md-card-image">
+        </md-card>
+
+        <p></p>
+
+        <div flex layout="row" style="width: 80%;">
+            <md-button flex class="md-raised">Use Web Server</md-button>
+            <span flex></span>
+            <md-button flex class="md-raised">Use EC2 Cluster</md-button>
+        </div>
+    </md-content>
+
+    <!-- Cluster pending -->
+    <md-content class="md-padding" ng-switch-when="pending" layout="column" layout-align="space-around center" >
+        <p>
+            The cluster is currently starting. Please wait during that process.
+            The Web Page will automatically refresh when the server side will be
+            ready.
+        </p>
+
+        <div layout="row" layout-align="space-around">
+            <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+        </div>
+
+        <span delta-time format="'mm:ss'" start="simulation.meta.startTime"></span>
+    </md-content>
+
+</ng-switch>
+
+
+
+
+<!-- <div ng-switch-when="undefined" pv-web-visualizer url="ws://localhost:9000/ws">
+    ParaViewWeb Visualizer directive
+</div>
+ -->

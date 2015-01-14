@@ -1,0 +1,65 @@
+angular.module('pv.web', [])
+   .directive('pvWebVisualizer', ['$templateCache', function($templateCache) {
+      return {
+         restrict: 'AE',
+         scope: {
+            url: '@',
+            itemId: '@'
+         },
+         controller: ['$scope', 'kw.Girder', function($scope, $girder) {
+            var session = null,
+               autobahnConnection = null,
+               viewport = null;
+
+            $scope.$on("$destroy", function() {
+               if(session) {
+                  console.log("close PVWeb client");
+                  var connectionToDelete = autobahnConnection;
+                  // session.call('application.exit.later', [ 5 ]).then(function(){
+                     try {
+                        connectionToDelete.close();
+                     } catch (closeError) {
+                     }
+                  // });
+                  session = null;
+                  autobahnConnection = null;
+                  viewport = null;
+               }
+            });
+
+
+
+         $scope.connect = function (url) {
+            console.log("Try to connect to " + url);
+
+               var configObject = {
+                  application: 'result-viewer',
+                  token: $girder.getAuthToken(),
+                  itemId: $scope.itemId
+               };
+               if(url.indexOf("ws") === 0) {
+                  configObject.sessionURL = url;
+               } else {
+                  configObject.sessionManagerURL = url;
+               }
+               vtkWeb.smartConnect(configObject,
+                  function(connection) {
+                     autobahnConnection = connection.connection;
+                     session = connection.session;
+
+                     $('.app-wait-start-page').remove();
+                     $('.hide-on-start').removeClass('hide-on-start');
+
+                     pv.initializeVisualizer( session, '.pv-viewport',
+                                             '.pv-pipeline', '.pv-proxy-editor',
+                                             '.pv-files', '.pv-source-list',
+                                             '.pv-filter-list', '.pv-data-info');
+                  },
+                  function(code, error) {
+                     console.log('Autobahn error ' + error);
+                  });
+            };
+         }],
+         template: $templateCache.get('pv/tpls/pv-web-visualizer.html')
+       };
+   }]);

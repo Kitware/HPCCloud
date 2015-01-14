@@ -8,26 +8,87 @@ angular.module("kitware.cmb.core")
             event.originalTarget.classList.toggle('md-raised');
         };
 
-        $scope.createSimulation = function (event) {
+        $scope.createSimulation = function (event, simulation) {
             var projectId = $scope.getActiveProject(),
                 collectionName = $scope.collection.name;
 
             $mdDialog.show({
                 controller: ['$scope', '$mdDialog', function($scope, $mdDialog) {
                     $scope.ok = function(response) {
-                        $window.WorkflowHelper[collectionName]['create-simulation'](projectId, $girder, response, $mdDialog);
+                        $window.WorkflowHelper[collectionName]['create-simulation'](projectId, $girder, response, $mdDialog, simulation);
                     };
                     $scope.cancel = function() {
                       $mdDialog.cancel();
                     };
                 }],
-                template: $templateCache.get(collectionName + '/dialog/create-simulation.html'),
+                template: $templateCache.get(collectionName + '/tpls/create-simulation.html'),
                 targetEvent: event,
             })
             .then(function(simulation) {
                 // Move to the newly created simulation
                 updateScope();
-                $state.go('simulation', { collectionID: $stateParams.collectionID, projectID: $stateParams.projectID, simulationID: simulation._id});
+            }, function() {
+                // Nothing to do when close
+            });
+        };
+
+        $scope.manageSimulation = function(event, simulation) {
+            var projectId = $scope.getActiveProject(),
+                collectionName = $scope.collection.name,
+                cloneFunction = $scope.createSimulation;
+
+            $mdDialog.show({
+                controller: ['$scope', '$mdDialog', function($scope, $mdDialog) {
+                    $scope.simulation = simulation;
+                    $scope.activeCost = simulation.meta.taskId ? Number(simulation.meta.cost) * (1+Math.floor((new Date().getTime() - Number(simulation.meta.startTime))/3600000)) : 0;
+                    $scope.cancel = function() {
+                        $mdDialog.cancel();
+                    };
+                    $scope.terminateCluster = function(simulation) {
+                        $girder.terminateTask(simulation);
+                        $mdDialog.hide(simulation);
+                    };
+                    $scope.cloneSimulation = function(event, simulation) {
+                        $mdDialog.hide(simulation);
+                        cloneFunction(event, simulation);
+                    };
+                    $scope.downloadSimulation = function(simulation) {
+                        $mdDialog.hide(simulation);
+                        $girder.listItemFiles(simulation._id)
+                            .success(function(fileList) {
+                                console.log(fileList);
+                                var downloadName = fileList.length > 1 ? simulation.name + '.zip' : fileList[0].name;
+                                $girder.downloadItem(simulation._id)
+                                    .success(function(data) {
+                                        $window.saveAs(new Blob([data], {type: "application/octet-stream"}), downloadName);
+                                    })
+                                    .error(function() {
+                                        console.log("Download error");
+                                    });
+                            })
+                            .error(function(){
+                                console.log("error in file listing");
+                            });
+
+                    };
+                    $scope.deleteSimulation = function(simulation) {
+                        $girder.deleteItem(simulation._id)
+                            .success(function(){
+                                $mdDialog.hide(simulation);
+                            })
+                            .error(function(){
+                                $mdDialog.hide(simulation);
+                            });
+
+                    };
+
+                }],
+                template: $templateCache.get('cmb/core/tpls/cmb-simulation-control.html'),
+                targetEvent: event,
+            })
+            .then(function(simulation) {
+                // Move to the newly created simulation
+                updateScope();
             }, function() {
                 // Nothing to do when close
             });

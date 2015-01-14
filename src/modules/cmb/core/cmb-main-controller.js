@@ -1,5 +1,5 @@
 angular.module("kitware.cmb.core")
-    .controller('cmb.CoreController', ['$scope', 'kw.Girder', '$modal', '$templateCache', '$state', '$stateParams', function ($scope, $girder, $modal, $templateCache, $state, $stateParams) {
+    .controller('cmb.CoreController', ['$scope', 'kw.Girder', '$modal', '$templateCache', '$state', '$stateParams', 'CmbWorkflowHelper', function ($scope, $girder, $modal, $templateCache, $state, $stateParams, CmbWorkflowHelper) {
 
         // Authentication / User handling -------------------------------------
 
@@ -11,23 +11,24 @@ angular.module("kitware.cmb.core")
         $scope.simulation = null;
 
         var previousActiveId = {
-            collectionID: '',
+            collectionName: '',
             projectID: '',
             simulationID: ''
         };
 
         $scope.$on('$stateChangeSuccess', function(event) {
             var projectId = $stateParams.projectID,
-                collectionId = $stateParams.collectionID,
+                collectionName = $stateParams.collectionName,
                 simulationId = $stateParams.simulationID;
 
-            if(collectionId && previousActiveId.collectionID !== collectionId) {
-               $girder.getCollection(collectionId).success(function(collection){
-                    $scope.collection = collection;
-                    previousActiveId.collectionID = collectionId;
+            if(collectionName && previousActiveId.collectionName !== collectionName) {
+               $girder.getCollectionFromName(collectionName).success(function(collections){
+                    $scope.collection = collections[0];
+                    previousActiveId.collectionName = collectionName;
+                    CmbWorkflowHelper.getTemplate(collections[0].name);
                 }).error(function(){
                     console.log('Error while fetching collection');
-                    previousActiveId.collectionID = '';
+                    previousActiveId.collectionName = '';
                     $scope.collection = null;
                 });
             }
@@ -63,7 +64,7 @@ angular.module("kitware.cmb.core")
         });
 
         $scope.getActiveCollection = function() {
-            return $stateParams.collectionID;
+            return $stateParams.collectionName;
         };
 
         $scope.getActiveProject = function() {
@@ -107,5 +108,9 @@ angular.module("kitware.cmb.core")
             $scope.user = null;
             $state.go('login');
         });
+
+        if($girder.getUser() === null) {
+            $state.go('login');
+        }
 
     }]);

@@ -31,23 +31,23 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb'])
         controller:'CmbCollectionsController'
     })
     .state('projects', {
-        url: "/projects/:collectionID",
+        url: "/projects/:collectionName",
         templateProvider: ['$templateCache', function ($templateCache) {
             return $templateCache.get('cmb/core/tpls/cmb-workflow-panel.html');
         }],
         controller: 'CmbWorkflowController'
     })
     .state('project', {
-        url: "/project/:collectionID/:projectID",
+        url: "/project/:collectionName/:projectID",
         templateProvider: ['$templateCache', function ($templateCache) {
             return $templateCache.get('cmb/core/tpls/cmb-project-panel.html');
         }],
         controller: 'CmbProjectController'
     })
     .state('simulation', {
-        url: "/simulation/:collectionID/:projectID/:simulationID",
-        templateProvider: ['$templateCache', function ($templateCache) {
-            return $templateCache.get('cmb/core/tpls/cmb-simulation-panel.html');
+        url: "/simulation/:collectionName/:projectID/:simulationID/:mode",
+        templateProvider: ['$templateCache', '$stateParams', function ($templateCache, $stateParams) {
+            return $templateCache.get($stateParams.collectionName + '/tpls/simulation-' + $stateParams.mode + '.html');
         }],
         controller: 'CmbSimulationController'
     });

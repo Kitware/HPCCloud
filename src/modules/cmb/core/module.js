@@ -50,4 +50,42 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
                 });
             }
         };
+    }])
+    .directive('deltaTime', ['$interval', 'dateFilter', function($interval, dateFilter) {
+
+        function link(scope, element, attrs) {
+            var format,
+                startTime = 0,
+                timeoutId;
+
+            function updateTime() {
+                var deltaDate = new Date();
+                deltaDate.setTime(deltaDate.getTime() - startTime);
+                element.text(dateFilter(deltaDate, format));
+            }
+
+            scope.$watch(attrs.format, function(value) {
+                format = value;
+                updateTime();
+            });
+
+            scope.$watch(attrs.start, function(value) {
+                console.log(value);
+                startTime = Number(value);
+                updateTime();
+            });
+
+            element.on('$destroy', function() {
+                $interval.cancel(timeoutId);
+            });
+
+            // start the UI update process; save the timeoutId for canceling
+            timeoutId = $interval(function() {
+              updateTime(); // update DOM
+            }, 1000);
+        }
+
+        return {
+          link: link
+        };
     }]);

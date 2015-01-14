@@ -1,6 +1,5 @@
 angular.module("kitware.cmb.core")
-    .controller('CmbSimulationController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$http', '$timeout', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $http, $timeout) {
-
+    .controller('CmbSimulationController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$http', '$timeout', 'CmbWorkflowHelper', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $http, $timeout, CmbWorkflowHelper) {
         var machines = [
             { "id": "m3.medium",    "label": "Basic Small",       "cpu": 1, "gpu": 0, "memory": 3.75, "cost": 0.07, "storage": [4] },
             { "id": "m3.large",     "label": "Basic Medium",      "cpu": 2, "gpu": 0, "memory": 7.5,  "cost": 0.14, "storage": [32] },
@@ -35,6 +34,7 @@ angular.module("kitware.cmb.core")
             $mdDialog.show({
                 controller: ['$scope', '$mdDialog', function($scope, $mdDialog) {
                     $scope.machines = machines;
+                    $scope.title = "Run simulation";
                     $scope.data = angular.copy($window.WorkflowHelper[collectionName]['default-simulation-cluster']);
 
                     $scope.updateCost = function() {
@@ -62,30 +62,23 @@ angular.module("kitware.cmb.core")
                       $mdDialog.cancel();
                     };
                 }],
-                template: $templateCache.get(collectionName + '/dialog/run-simulation.html'),
+                template: $templateCache.get(collectionName + '/tpls/run-simulation.html'),
                 targetEvent: event,
             })
             .then(function(simulation) {
                 // Move to the newly created simulation
                 updateScope();
-                $state.go('project', { collectionID: $stateParams.collectionID, projectID: $stateParams.projectID});
+                $state.go('project', { collectionName: $stateParams.collectionName, projectID: $stateParams.projectID});
             }, function() {
                 // Nothing to do when close
             });
         };
 
         function updateScope() {
-            if($scope.collection) {
-                $http
-                .get('assets/wf/' + $scope.collection.name + '/input-template.json')
-                .success(function(data, status, headers, config) {
-                    $scope.parameterDataTemplate = data;
-                })
-                .error(function(data, status, headers, config) {
-                    $scope.parameterDataTemplate = {};
-                });
+            if($scope.collection && CmbWorkflowHelper.getTemplate($scope.collection.name) !== null) {
+                $scope.parameterDataTemplate = CmbWorkflowHelper.getTemplate($scope.collection.name);
             } else {
-                $timeout(updateScope);
+                $timeout(updateScope, 100);
             }
         }
 

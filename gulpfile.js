@@ -10,7 +10,7 @@ gulp.task('default', ['clean'], function () {
     gulp.start('build');
 });
 
-gulp.task('build', ['jade', 'html', 'images', 'bower-fonts', 'bower-js', 'bower-css']);
+gulp.task('build', ['jade', 'html', 'images', 'bower-fonts', 'bower-js','ext-js', 'bower-css']);
 
 gulp.task('clean', function (cb) {
     return $.del(['dist'], cb);
