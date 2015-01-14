@@ -116,6 +116,13 @@ angular.module("kitware.cmb.core")
             });
         };
 
+        $scope.taskCallback = function(simulationResponse) {
+            // Handle mesh viewer state
+            // goTo ...
+            console.log("taskCallback");
+            console.log(simulationResponse[1]);
+        };
+
         function extractExodusFile(files) {
             var exoFile = null,
                 fCount = files.length;
