@@ -24,7 +24,7 @@ angular.module("kitware.cmb.core")
                                 i;
 
                             function processGroups(groups) {
-                                $scope.groups = groups;
+                                $scope.groups = [];
                                 var count = groups.length,
                                     array = groups,
                                     projectsMap = {};
@@ -40,7 +40,11 @@ angular.module("kitware.cmb.core")
                                 }
 
                                 while(count--) {
-                                    $girder.listFolders(array[count]._id).success(addGroupProjects);
+                                    if(array[count].name !== 'tasks') {
+                                        $scope.groups.push(array[count]);
+                                        $girder.listFolders(array[count]._id).success(addGroupProjects);
+                                    }
+
                                 }
                                 $scope.projects = projectsMap;
                             }
@@ -58,8 +62,7 @@ angular.module("kitware.cmb.core")
                             if (!found) {
                                 $girder.createFolder($stateParams.collectionName, $girder.getUser().login, $girder.getUser().login + "'s projects", "collection")
                                     .success(function (folder) {
-                                        $scope.groups = groups = groups.concat(folder);
-                                        processGroups(groups);
+                                        processGroups(groups.concat(folder));
                                     });
                             } else {
                                 processGroups(groups);
