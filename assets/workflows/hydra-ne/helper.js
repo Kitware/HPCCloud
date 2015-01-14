@@ -73,12 +73,6 @@
                     });
             }
         },
-        'run-simulation': function (simulation, $girder, $data, $mdDialog) {
-            // Edit meta-data, trigger task
-            // StartTask already do it: $girder.updateItemMetaData(simulation, { status: 'running' });
-            $girder.startTask(simulation, $girder.getTaskId('hydra-ne', 'hydra'), $data);
-            $mdDialog.hide(simulation);
-        },
         'default-simulation-cluster' : {
             type: 'm3.medium',
             size: 2

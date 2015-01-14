@@ -80,13 +80,13 @@
                 <td class="text-center" ng-click="manageSimulation($event, simulation)">
                     <i class="fa fa-fw"
                         ng-class="{ 'fa-pencil-square-o': simulation.meta.status === 'incomplete', 'fa-check-square-o': simulation.meta.status === 'valid', 'fa-line-chart': simulation.meta.status === 'running', 'fa-warning': simulation.meta.status === 'error', 'fa-database': simulation.meta.status === 'completed' && !simulation.meta.task , 'fa-dollar': simulation.meta.task }"></i></td>
-                <td ui-sref="simulation({ collectionName: getActiveCollection(), projectID: project._id, simulationID: simulation._id , mode: simulation.meta.status})">
+                <td ui-sref="simulation({ collectionName: getActiveCollection(), projectID: simulation.folderId, simulationID: simulation._id , mode: simulation.meta.status})">
                     {{ simulation.name }}
                 </td>
-                <td ui-sref="simulation({ collectionName: getActiveCollection(), projectID: project._id, simulationID: simulation._id , mode: simulation.meta.status})">
+                <td ui-sref="simulation({ collectionName: getActiveCollection(), projectID: simulation.folderId, simulationID: simulation._id , mode: simulation.meta.status})">
                     {{ simulation.description }}
                 </td>
-                <td class="text-center" ui-sref="simulation({ collectionName: getActiveCollection(), projectID: project._id, simulationID: simulation._id , mode: simulation.meta.status})">
+                <td class="text-center" ui-sref="simulation({ collectionName: getActiveCollection(), projectID: simulation.folderId, simulationID: simulation._id , mode: simulation.meta.status})">
                     {{ simulation.created | toDateNumber | date : 'medium' }}
                 </td>
             </tr>

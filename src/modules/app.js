@@ -50,5 +50,12 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb'])
             return $templateCache.get($stateParams.collectionName + '/tpls/simulation-' + $stateParams.mode + '.html');
         }],
         controller: 'CmbSimulationController'
+    })
+    .state('viewer', {
+        url: "/viewer/:collectionName/:projectID/:simulationID/:mode",
+        templateProvider: ['$templateCache', '$stateParams', function ($templateCache, $stateParams) {
+            return $templateCache.get('cmb/core/tpls/cmb-viewer-panel.html');
+        }],
+        controller: 'CmbViewerController'
     });
 }]);

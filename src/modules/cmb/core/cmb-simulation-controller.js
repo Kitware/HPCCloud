@@ -27,14 +27,14 @@ angular.module("kitware.cmb.core")
             $scope.activeSection = id;
         };
 
-        $scope.runSimulation = function(event) {
+        $scope.runTask = function (event, title, taskName) {
             var simulation = $scope.simulation,
                 collectionName = $scope.collection.name;
 
             $mdDialog.show({
                 controller: ['$scope', '$mdDialog', function($scope, $mdDialog) {
                     $scope.machines = machines;
-                    $scope.title = "Run simulation";
+                    $scope.title = title;
                     $scope.data = angular.copy($window.WorkflowHelper[collectionName]['default-simulation-cluster']);
 
                     $scope.updateCost = function() {
@@ -55,14 +55,15 @@ angular.module("kitware.cmb.core")
                     $scope.updateCost();
 
                     $scope.ok = function(response) {
-                        $window.WorkflowHelper[collectionName]['run-simulation'](simulation, $girder, response, $mdDialog);
+                        $girder.startTask(simulation, $girder.getTaskId(collectionName, taskName), response);
+                        $mdDialog.hide(simulation);
                     };
 
                     $scope.cancel = function() {
                       $mdDialog.cancel();
                     };
                 }],
-                template: $templateCache.get(collectionName + '/tpls/run-simulation.html'),
+                template: $templateCache.get('cmb/core/tpls/cmb-run-task-dialog.html'),
                 targetEvent: event,
             })
             .then(function(simulation) {

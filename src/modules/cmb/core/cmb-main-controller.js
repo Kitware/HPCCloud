@@ -64,15 +64,24 @@ angular.module("kitware.cmb.core")
         });
 
         $scope.getActiveCollection = function() {
-            return $stateParams.collectionName;
+            if($stateParams.collectionName) {
+                return $stateParams.collectionName;
+            }
+            return previousActiveId.collectionName === '' ? null : previousActiveId.collectionName;
         };
 
         $scope.getActiveProject = function() {
-            return $stateParams.projectID;
+            if($stateParams.projectID) {
+                return $stateParams.projectID;
+            }
+            return previousActiveId.projectID === '' ? null : previousActiveId.projectID;
         };
 
         $scope.getActiveSimulation = function() {
-            return $stateParams.simulationID;
+            if($stateParams.simulationID) {
+                return $stateParams.simulationID;
+            }
+            return previousActiveId.simulationID === '' ? null : previousActiveId.simulationID;
         };
 
         $scope.logout = function () {

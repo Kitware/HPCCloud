@@ -9,9 +9,19 @@
         <p></p>
 
         <div flex layout="row" style="width: 80%;">
-            <md-button flex class="md-raised">Use Web Server</md-button>
+            <md-button
+                flex
+                ui-sref="viewer({ collectionName: getActiveCollection(), projectId: simulation.folderId, simulationID: simulation._id , mode: 'launcher'})"
+                class="md-raised">
+                Use Web Server
+            </md-button>
             <span flex></span>
-            <md-button flex class="md-raised">Use EC2 Cluster</md-button>
+            <md-button
+                flex
+                ng-click="runTask($event, 'Explore simulation results', 'viewer')"
+                class="md-raised">
+                Use EC2 Cluster
+            </md-button>
         </div>
     </md-content>
 
@@ -31,11 +41,3 @@
     </md-content>
 
 </ng-switch>
-
-
-
-
-<!-- <div ng-switch-when="undefined" pv-web-visualizer url="ws://localhost:9000/ws">
-    ParaViewWeb Visualizer directive
-</div>
- -->

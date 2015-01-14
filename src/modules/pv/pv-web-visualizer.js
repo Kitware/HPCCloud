@@ -4,30 +4,36 @@ angular.module('pv.web', [])
          restrict: 'AE',
          scope: {
             url: '@',
-            itemId: '@'
+            item: '@'
          },
          controller: ['$scope', 'kw.Girder', function($scope, $girder) {
             var session = null,
                autobahnConnection = null,
-               viewport = null;
+               viewport = null,
+               launcher = false;
 
             $scope.$on("$destroy", function() {
                if(session) {
                   console.log("close PVWeb client");
                   var connectionToDelete = autobahnConnection;
-                  // session.call('application.exit.later', [ 5 ]).then(function(){
+                  if(launcher) {
+                     session.call('application.exit.later', [ 5 ]).then(function(){
+                        try {
+                           connectionToDelete.close();
+                        } catch (closeError) {
+                        }
+                     });
+                  } else {
                      try {
                         connectionToDelete.close();
                      } catch (closeError) {
                      }
-                  // });
+                  }
                   session = null;
                   autobahnConnection = null;
                   viewport = null;
                }
             });
-
-
 
          $scope.connect = function (url) {
             console.log("Try to connect to " + url);
@@ -35,11 +41,12 @@ angular.module('pv.web', [])
                var configObject = {
                   application: 'result-viewer',
                   token: $girder.getAuthToken(),
-                  itemId: $scope.itemId
+                  itemId: $scope.item
                };
                if(url.indexOf("ws") === 0) {
                   configObject.sessionURL = url;
                } else {
+                  launcher = true;
                   configObject.sessionManagerURL = url;
                }
                vtkWeb.smartConnect(configObject,
