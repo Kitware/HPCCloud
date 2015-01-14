@@ -1,5 +1,5 @@
 angular.module("kitware.cmb.core")
-    .controller('CmbSimulationController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$http', '$timeout', 'CmbWorkflowHelper', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $http, $timeout, CmbWorkflowHelper) {
+    .controller('CmbSimulationController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$http', '$timeout', '$interval', 'CmbWorkflowHelper', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $http, $timeout, $interval, CmbWorkflowHelper) {
         var machines = [
             { "id": "m3.medium",    "label": "Basic Small",       "cpu": 1, "gpu": 0, "memory": 3.75, "cost": 0.07, "storage": [4] },
             { "id": "m3.large",     "label": "Basic Medium",      "cpu": 2, "gpu": 0, "memory": 7.5,  "cost": 0.14, "storage": [32] },
@@ -19,7 +19,22 @@ angular.module("kitware.cmb.core")
             { "id": "r3.8xlarge",   "label": "Memory XX Large", "cpu": 32, "gpu": 0, "memory": 244,   "cost": 2.8,   "storage": [320,320] },
 
             { "id": "g2.2xlarge",   "label": "Graphic node", "cpu": 8, "gpu": 1, "memory": 15, "cost": 0.65, "storage": [60,60] }
-        ];
+        ], timoutId = 0;
+
+
+        // BEGIN - Refresh simulation status base on task progress every 10s
+        timeoutId = $interval(function() {
+            if($scope.simulation.meta.task === 'pending') {
+                $girder.updateTaskStatus($scope.simulation);
+            } else if($scope.simulation.meta.task === 'terminated') {
+                $girder.deleteTask($scope.simulation);
+            }
+        }, 10000);
+
+        $scope.$on('$destroy', function() {
+            $interval.cancel(timeoutId);
+        });
+        // END - Refresh simulation status base on task progress every 10s
 
         $scope.parameterDataTemplate = {};
 
@@ -69,7 +84,7 @@ angular.module("kitware.cmb.core")
             .then(function(simulation) {
                 // Move to the newly created simulation
                 updateScope();
-                $state.go('project', { collectionName: $stateParams.collectionName, projectID: $stateParams.projectID});
+                $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
             }, function() {
                 // Nothing to do when close
             });

@@ -40,4 +40,9 @@
         <span delta-time format="'mm:ss'" start="simulation.meta.startTime"></span>
     </md-content>
 
+    <!-- Cluster running -->
+    <div ng-switch-when="running" pv-web-visualizer url="{{ simulation.meta.connectionURL }}" item="{{ simulation._id }}" >
+        ParaViewWeb Visualizer directive
+    </div>
+
 </ng-switch>

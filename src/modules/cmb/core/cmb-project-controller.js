@@ -1,5 +1,27 @@
 angular.module("kitware.cmb.core")
-    .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window) {
+    .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$interval', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $interval) {
+        var timoutId = 0;
+
+
+        // BEGIN - Refresh simulation status base on task progress every 10s
+        timeoutId = $interval(function() {
+            var array = $scope.simulations,
+                count = array.length;
+
+            while(count--) {
+                console.log(array[count].meta.taskId);
+                if(array[count].meta.taskId) {
+                    $girder.updateTaskStatus(array[count]);
+                }
+            }
+        }, 10000);
+
+        $scope.$on('$destroy', function() {
+            $interval.cancel(timeoutId);
+        });
+        // END - Refresh simulation status base on task progress every 10s
+
+        $scope.parameterDataTemplate = {};
 
         $scope.mesh = null;
         $scope.simulations = [];

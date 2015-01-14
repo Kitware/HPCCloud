@@ -60,6 +60,7 @@ angular.module("kitware.cmb.core")
             if(!projectId) {
                 $scope.subTitle = null;
                 $scope.project = null;
+                previousActiveId.projectID = '';
             }
         });
 

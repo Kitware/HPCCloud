@@ -519,12 +519,16 @@ angular.module("kitware.girder", ["ngCookies"])
         this.updateTaskStatus = function (item) {
             var self = this;
 
-            self.get(['tasks/', item.meta.task, '/status'].join(''))
+            self.get(['tasks/', item.meta.taskId, '/status'].join(''))
                 .success(function(response) {
                     if(item.meta.status !== response.status) {
                         console.log('update status to ' + response.status);
-                        var meta = angular.copy(item.meta);
+                        var sesssionId = response.output.cluster._id + '%2F' + response.output.pvw_job._id,
+                            connectionURL = ( $window.location.protocol === 'https:' ? "wss://" : "ws://") + $window.location.host + "/proxy?sessionId=" + sesssionId,
+                            meta = angular.copy(item.meta);
+
                         meta.task = response.status;
+                        meta.connectionURL = connectionURL;
                         self.updateItemMetadata(item, meta);
                     }
                 })
@@ -542,7 +546,10 @@ angular.module("kitware.girder", ["ngCookies"])
                     var metadata = {
                         taskId: response._id,
                         spec: response.taskSpecId,
-                        task: response.status
+                        task: response.status,
+                        startTime: new Date().getTime(),
+                        cost: cluster.cost,
+                        totalCost: (item.meta.totalCost || 0)
                     };
                     self.updateItemMetadata(item, metadata);
 
@@ -578,7 +585,7 @@ angular.module("kitware.girder", ["ngCookies"])
                 .success(function(){
                     // Remove item metadata
                     self.updateItemMetadata(item, {
-                        task: null, status: null, spec: null
+                        task: null, status: null, spec: null, taskId: null
                     });
                 })
                 .error(function(error){
@@ -601,6 +608,8 @@ angular.module("kitware.girder", ["ngCookies"])
                 .success(function(){
                     var metadata = angular.copy(item.meta);
                     metadata.task = 'terminated';
+                    metadata.totalCost += metadata.cost * Math.floor( 1 + (new Date().getTime() - metadata.startTime)/3600000);
+                    metadata.startTime = null;
                     self.updateItemMetadata(item, metadata);
                 })
                 .error(function(error) {
