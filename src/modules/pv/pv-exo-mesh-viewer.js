@@ -1,5 +1,5 @@
 angular.module('pv.web')
-   .directive('pvWebVisualizer', ['$templateCache', function($templateCache) {
+   .directive('pvExoMeshViewer', ['$templateCache', function($templateCache) {
       return {
          restrict: 'AE',
          scope: {
@@ -39,7 +39,7 @@ angular.module('pv.web')
             console.log("Try to connect to " + url);
 
                var configObject = {
-                  application: 'result-viewer',
+                  application: 'mesh-viewer',
                   token: $girder.getAuthToken(),
                   itemId: $scope.item
                };

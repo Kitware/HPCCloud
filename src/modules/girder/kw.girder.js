@@ -537,7 +537,44 @@ angular.module("kitware.girder", ["ngCookies"])
                 });
         };
 
-        this.startTask = function (item, taskDefId, cluster) {
+        this.extractMeshInformationFromProject = function(folderId, callback) {
+            var self = this;
+
+            self.listItems(folderId)
+                .success(function(items) {
+                    var count = items.length,
+                        meshItem = null,
+                        meshFile = null;
+
+                    // Find item that contains the mesh
+                    while(count-- && meshItem === null) {
+                        if(items[count].name === 'mesh') {
+                           meshItem =  items[count];
+                        }
+                    }
+
+                    // Find the name of the mesh file
+                    self.listItemFiles(meshItem._id)
+                        .success(function(files) {
+                            count = files.length;
+
+                            while(count-- && meshFile === null) {
+                                if(files[count].exts[0] === 'exo') {
+                                    meshFile =  files[count];
+                                    callback(meshItem, meshFile);
+                                }
+                            }
+                        })
+                        .error(function(){
+                            console.log('Error while listing files inside mesh item');
+                        });
+                })
+                .error(function() {
+                    console.log('Error while listing items inside ' + folderId);
+                });
+        };
+
+        this.startTask = function (item, taskDefId, cluster, taskConfig) {
             var self = this;
             // Create task instance
             self.post('tasks', { taskSpecId: taskDefId })
@@ -554,15 +591,7 @@ angular.module("kitware.girder", ["ngCookies"])
                     self.updateItemMetadata(item, metadata);
 
                     // Start task
-                    self.put(['tasks', response._id, 'run'].join('/'), {
-                        cluster: cluster,
-                        input: {
-                            item: { id: item._id },
-                            path: "data"
-                        },
-                        output: {
-                            item: { id: item._id }
-                        }})
+                    self.put(['tasks', response._id, 'run'].join('/'), taskConfig)
                         .success(function(){
                             console.log("Task successfully started");
                         })

@@ -1,5 +1,5 @@
 angular.module("kitware.cmb.core")
-    .controller('cmb.CoreController', ['$scope', 'kw.Girder', '$modal', '$templateCache', '$state', '$stateParams', 'CmbWorkflowHelper', '$mdDialog', '$window', function ($scope, $girder, $modal, $templateCache, $state, $stateParams, CmbWorkflowHelper, $mdDialog, $window) {
+    .controller('cmb.CoreController', ['$scope', 'kw.Girder', '$modal', '$templateCache', '$state', '$stateParams', 'CmbWorkflowHelper', '$mdDialog', '$window', '$mdToast', function ($scope, $girder, $modal, $templateCache, $state, $stateParams, CmbWorkflowHelper, $mdDialog, $window, $mdToast) {
         var machines = [
             { "id": "m3.medium",    "label": "Basic Small",       "cpu": 1, "gpu": 0, "memory": 3.75, "cost": 0.07, "storage": [4] },
             { "id": "m3.large",     "label": "Basic Medium",      "cpu": 2, "gpu": 0, "memory": 7.5,  "cost": 0.14, "storage": [32] },
@@ -142,11 +142,8 @@ angular.module("kitware.cmb.core")
                     $scope.updateCost();
 
                     $scope.ok = function(response) {
-                        console.log(response);
-                        if(response.selectedIndex === 0) {
-                            $girder.startTask(simulation, $girder.getTaskId(collectionName, taskName), response);
-                        }
-                        $mdDialog.hide([simulation, response]);
+                        // Delegate the start class on the callback function
+                        $mdDialog.hide([simulation, response, $girder.getTaskId(collectionName, taskName)]);
                     };
 
                     $scope.cancel = function() {
@@ -157,7 +154,7 @@ angular.module("kitware.cmb.core")
                 targetEvent: event,
             })
             .then(callback, function() {
-                // Nothing to do when close
+                // Nothing to do when cancel
             });
         };
 
@@ -190,5 +187,19 @@ angular.module("kitware.cmb.core")
         if($girder.getUser() === null) {
             $state.go('login');
         }
+
+        $scope.$on('notification-message', function (evt, message) {
+            if(message === null) {
+                $mdToast.hide();
+            } else {
+                var percentage = message.type === 'upload' ? Math.floor(100 * message.done / message.total) : 0;
+                $mdToast.show(
+                    $mdToast.simple()
+                        .content( message.type === 'upload' ? (message.file + '  ' + percentage + ' %') : (message.message))
+                        .position('bottom left right')
+                        .hideDelay(5000)
+                );
+            }
+        });
 
     }]);

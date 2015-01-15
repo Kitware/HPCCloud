@@ -30,6 +30,65 @@ angular.module("kitware.cmb.core")
             $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
         };
 
+        $scope.runVisualizationCallback = function(args) {
+            var simulation = args[0],
+                clusterData = args[1],
+                taskId = args[2],
+                config = {
+                    cluster: clusterData,
+                    input: {
+                        item: { id: simulation._id },
+                        data: "data"
+                    },
+                    output: {
+                        item: { id: simulation._id }
+                    }
+                };
+            console.log(config);
+            if(clusterData.selectedIndex === 0) {
+                $girder.startTask(simulation, taskId, clusterData, config);
+            }
+
+            // Move back to the project view
+            $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
+        };
+
+        $scope.runSimulationCallback = function(args) {
+            var simulation = args[0],
+                clusterData = args[1],
+                taskId = args[2],
+                mesh = $scope.mesh;
+
+            $girder.extractMeshInformationFromProject(function(meshItem, meshFile){
+                var config = {
+                    cluster: clusterData,
+                    input: {
+                        data: {
+                            item: {
+                                id: meshItem._id
+                            }
+                        },
+                        config: {
+                            item: {
+                                id: simulation._id
+                            }
+                        }
+                    },
+                    mesh: {
+                        name: meshFile.name
+                    },
+                    output: {
+                        item: { id: simulation._id }
+                    }
+                };
+                console.log(config);
+                $girder.startTask(simulation, taskId, clusterData, config);
+            });
+
+            // Move back to the project view
+            $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
+        };
+
         function updateScope() {
             if($scope.collection && CmbWorkflowHelper.getTemplate($scope.collection.name) !== null) {
                 $scope.parameterDataTemplate = CmbWorkflowHelper.getTemplate($scope.collection.name);
