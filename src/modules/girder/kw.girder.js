@@ -13,10 +13,6 @@ angular.module("kitware.girder", ["ngCookies"])
             taskList = {},
             collectionMap = {};
 
-        if (authToken) {
-            this.fetchUser();
-        }
-
         this.fetchUser = function() {
             var self = this;
 
@@ -37,6 +33,10 @@ angular.module("kitware.girder", ["ngCookies"])
                 authToken = null;
             });
         };
+
+        if (authToken) {
+            this.fetchUser();
+        }
 
         // Helper function use to generate $http argument base on
         // the targetted method and URL.
