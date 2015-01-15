@@ -79,7 +79,11 @@
                 class="project-block" >
                 <td class="text-center" ng-click="manageSimulation($event, simulation)">
                     <i class="fa fa-fw"
-                        ng-class="{ 'fa-pencil-square-o': simulation.meta.status === 'incomplete', 'fa-check-square-o': simulation.meta.status === 'valid', 'fa-line-chart': simulation.meta.status === 'running', 'fa-warning': simulation.meta.status === 'error', 'fa-database': simulation.meta.status === 'completed' && !simulation.meta.task , 'fa-dollar': simulation.meta.task }"></i></td>
+                        ng-class="{ 'fa-pencil-square-o': simulation.meta.status === 'incomplete', 'fa-check-square-o': simulation.meta.status === 'valid', 'fa-line-chart': simulation.meta.status === 'running', 'fa-warning': simulation.meta.status === 'error', 'fa-database': simulation.meta.status === 'completed' && !simulation.meta.task , 'fa-dollar': simulation.meta.task }">
+                        <md-tooltip ng-if="simulation.meta.task">{{ simulation.meta.task }}</md-tooltip>
+                    </i>
+                    <i ng-show="simulation.meta.task === 'failure'" class="fa fa-fw fa-warning"></i>
+                </td>
                 <td ui-sref="simulation({ collectionName: getActiveCollection(), projectID: simulation.folderId, simulationID: simulation._id , mode: simulation.meta.status})">
                     {{ simulation.name }}
                 </td>
