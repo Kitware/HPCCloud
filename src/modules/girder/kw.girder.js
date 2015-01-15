@@ -554,6 +554,10 @@ angular.module("kitware.girder", ["ngCookies"])
                         if(meta.task === 'running' && meta.status === 'valid') {
                             meta.status = 'running';
                         }
+                        if(meta.task === 'complete' && meta.status === 'running') {
+                            meta.status = 'completed';
+                            meta.task = 'terminated';
+                        }
 
                         self.updateItemMetadata(item, meta);
                     }
