@@ -45,6 +45,7 @@ angular.module("kitware.cmb.core")
                     }
                 };
             console.log(config);
+            console.log('Task spec ' + taskId);
             if(clusterData.selectedIndex === 0) {
                 $girder.startTask(simulation, taskId, clusterData, config);
             }
@@ -81,6 +82,7 @@ angular.module("kitware.cmb.core")
                         item: { id: simulation._id }
                     }
                 };
+                console.log('Task spec ' + taskId);
                 console.log(config);
                 $girder.startTask(simulation, taskId, clusterData, config);
             });
