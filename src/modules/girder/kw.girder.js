@@ -8,14 +8,35 @@ angular.module("kitware.girder", ["ngCookies"])
 
         // Internal state
         var apiBasePathURL = '/api/v1/',
-            user = $cookies.cmbUser ? angular.fromJson($cookies.cmbUser) : null,
-            authToken = $cookies.cmbAuthToken,
+            user = null,
+            authToken = $cookies.girderToken,
             taskList = {},
             collectionMap = {};
 
-        if(user && authToken) {
-            $rootScope.$broadcast('login', user);
+        if (authToken) {
+            $this.fetchUser();
         }
+
+        this.fetchUser = function() {
+            var self = this;
+
+            $http({
+                method: 'GET',
+                url: apiBasePathURL + 'user/me',
+                headers: {
+                    'Girder-Token': authToken
+                }
+            })
+            .success(function(data, status, headers, config) {
+                user = data;
+                $rootScope.$broadcast('login', user);
+                self.fetchTaskList();
+            })
+            .error(function(data, status, headers, config) {
+                user = null;
+                authToken = null;
+            });
+        };
 
         // Helper function use to generate $http argument base on
         // the targetted method and URL.
@@ -126,8 +147,7 @@ angular.module("kitware.girder", ["ngCookies"])
                 authToken = data.authToken.token;
                 $rootScope.$broadcast('login', user);
 
-                $cookies.cmbAuthToken = authToken;
-                $cookies.cmbUser = angular.toJson(user);
+                $cookies.girderToken = authToken;
 
                 self.fetchTaskList();
             })
