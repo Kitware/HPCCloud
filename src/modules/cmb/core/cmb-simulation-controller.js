@@ -5,10 +5,10 @@ angular.module("kitware.cmb.core")
 
         // BEGIN - Refresh simulation status base on task progress every 10s
         timeoutId = $interval(function() {
-            if($scope.simulation.meta.task === 'pending') {
-                $girder.updateTaskStatus($scope.simulation);
-            } else if($scope.simulation.meta.task === 'terminated') {
+            if($scope.simulation.meta.task === 'terminated') {
                 $girder.deleteTask($scope.simulation);
+            } else if(scope.simulation.meta.taskId) {
+                $girder.updateTaskStatus($scope.simulation);
             }
         }, 10000);
 

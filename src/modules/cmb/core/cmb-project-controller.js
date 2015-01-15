@@ -9,10 +9,10 @@ angular.module("kitware.cmb.core")
                 count = array.length;
 
             while(count--) {
-                if(array[count].meta.taskId) {
-                    $girder.updateTaskStatus(array[count]);
-                } else if(array[count].meta.task === 'terminated') {
+                if(array[count].meta.task === 'terminated') {
                     $girder.deleteTask($scope.simulation);
+                } else if(array[count].meta.taskId) {
+                    $girder.updateTaskStatus(array[count]);
                 }
             }
         }, 10000);
