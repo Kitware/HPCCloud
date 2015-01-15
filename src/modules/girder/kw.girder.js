@@ -529,6 +529,12 @@ angular.module("kitware.girder", ["ngCookies"])
 
                         meta.task = response.status;
                         meta.connectionURL = connectionURL;
+
+                        // FIXME
+                        if(meta.task === 'running' && meta.status === 'valid') {
+                            meta.status = 'running';
+                        }
+
                         self.updateItemMetadata(item, meta);
                     }
                 })
@@ -616,7 +622,7 @@ angular.module("kitware.girder", ["ngCookies"])
                 .success(function(){
                     // Remove item metadata
                     self.updateItemMetadata(item, {
-                        task: null, status: null, spec: null, taskId: null
+                        task: null, spec: null, taskId: null
                     });
                 })
                 .error(function(error){
@@ -624,7 +630,7 @@ angular.module("kitware.girder", ["ngCookies"])
                     console.log(error);
                     console.log(item);
                     self.updateItemMetadata(item, {
-                        task: null, status: null, spec: null
+                        task: null, spec: null
                     });
                 });
         };
