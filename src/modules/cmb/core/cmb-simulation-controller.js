@@ -7,7 +7,7 @@ angular.module("kitware.cmb.core")
         timeoutId = $interval(function() {
             if($scope.simulation.meta.task === 'terminated') {
                 $girder.deleteTask($scope.simulation);
-            } else if(scope.simulation.meta.taskId) {
+            } else if($scope.simulation.meta.taskId) {
                 $girder.updateTaskStatus($scope.simulation);
             }
         }, 10000);
