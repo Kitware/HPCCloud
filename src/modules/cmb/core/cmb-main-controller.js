@@ -161,6 +161,7 @@ angular.module("kitware.cmb.core")
         $scope.$on('login', function (event, user) {
             $scope.user = user;
             $state.go('home');
+            $girder.fetchTaskList();
         });
 
         $scope.$on('login-error', function (event) {
