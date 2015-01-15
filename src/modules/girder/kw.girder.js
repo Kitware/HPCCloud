@@ -14,7 +14,7 @@ angular.module("kitware.girder", ["ngCookies"])
             collectionMap = {};
 
         if (authToken) {
-            $this.fetchUser();
+            this.fetchUser();
         }
 
         this.fetchUser = function() {
