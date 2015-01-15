@@ -39,7 +39,7 @@ angular.module('pv.web')
             console.log("Try to connect to " + url);
 
                var configObject = {
-                  application: 'resultViewer',
+                  application: 'result-viewer',
                   token: $girder.getAuthToken(),
                   itemId: $scope.item
                };
