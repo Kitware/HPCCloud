@@ -57,5 +57,12 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb'])
             return $templateCache.get('cmb/core/tpls/cmb-viewer-panel.html');
         }],
         controller: 'CmbViewerController'
+    })
+    .state('mesh', {
+        url: "/mesh/:collectionName/:projectID/:itemID/:fileID",
+        templateProvider: ['$templateCache', '$stateParams', function ($templateCache, $stateParams) {
+            return $templateCache.get('pv/tpls/pv-exo-mesh-viewer.html');
+        }],
+        controller: 'pvExoMeshViewerController'
     });
 }]);

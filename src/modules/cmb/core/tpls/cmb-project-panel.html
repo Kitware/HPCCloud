@@ -12,7 +12,7 @@
             <i class="fa fa-clock-o"></i>
             <md-tooltip>{{ mesh.created | toDateNumber | date : 'medium' }}</md-tooltip>
         </md-button>
-        <md-button aria-label="Tag mesh faces" ng-click="runTask($event, 'Mesh viewer', 'meshViewer', true, taskCallback)">
+        <md-button aria-label="Tag mesh faces" ui-sref="mesh({ collectionName: getActiveCollection(), projectID: meshItem.folderId, itemID: meshItem._id, fileID: mesh._id })">
             <i class="fa fa-tags"></i>
             <md-tooltip>Tag mesh faces using mesh viewer</md-tooltip>
         </md-button>

@@ -2,7 +2,6 @@ angular.module("kitware.cmb.core")
     .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$interval', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $interval) {
         var timoutId = 0;
 
-
         // BEGIN - Refresh simulation status base on task progress every 10s
         timeoutId = $interval(function() {
             var array = $scope.simulations,
@@ -24,6 +23,7 @@ angular.module("kitware.cmb.core")
 
         $scope.parameterDataTemplate = {};
 
+        $scope.meshItem = null;
         $scope.mesh = null;
         $scope.simulations = [];
 
@@ -148,6 +148,7 @@ angular.module("kitware.cmb.core")
                     $scope.simulations = [];
                     while(count--) {
                         if(items[count].name === 'mesh') {
+                            $scope.meshItem = items[count];
                             $girder.listItemFiles(items[count]._id).success(extractExodusFile);
                         } else {
                             // Simulation

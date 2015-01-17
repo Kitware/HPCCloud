@@ -1,0 +1,21 @@
+<md-dialog aria-label="Tag faces" style="width: 50%;" ng-init="updateData()">
+<md-subheader class="md-sticky-no-effect cmb-subheader">
+  <div layout="row">
+    <strong title>Tag mesh faces</strong>
+    <span flex></span>
+    <span class="fa fa-close" ng-click="cancel()" style="padding: 0 16px 0 0;">
+    </span>
+  </div>
+</md-subheader>
+<md-content layout="row">
+    <form layout="column" flex>
+        <md-text-float class="width-100" flex label="List of faces" ng-model="data.faces"></md-text-float>
+        <md-text-float class="width-100" flex label="List of tags" ng-model="data.tags"></md-text-float>
+    </form>
+</md-content>
+  <div class="md-actions" layout="row">
+    <span flex></span>
+    <md-button ng-click="ok(data)" class="md-raised md-primary">Save</md-button>
+    <md-button ng-click="cancel()" class="md-raised md-warn">Cancel</md-button>
+  </div>
+</md-dialog>

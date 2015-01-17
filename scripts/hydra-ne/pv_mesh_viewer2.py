@@ -39,7 +39,8 @@ except ImportError:
 
 class _MeshViewer(pv_wamp.PVServerProtocol):
 
-    meshFile = None
+    fileId = None
+    itemId = None
     faces = None
 
     @staticmethod
@@ -49,14 +50,19 @@ class _MeshViewer(pv_wamp.PVServerProtocol):
         parser.add_argument(
             "--url", default=None, help="The Girder base URL", dest="url")
         parser.add_argument(
-            "--mesh", default=None, help="Exodus Mesh file id to load", dest="file")
+            "--file", default=None, help="Exodus Mesh file id to load", dest="file")
+        parser.add_argument(
+            "--item", default=None, help="Item that contains the Exodus Mesh", dest="item")
 
     @staticmethod
     def configure(args):
         _MeshViewer.authKey = args.authKey
-        _MeshViewer.meshFileId = args.file
+        _MeshViewer.fileId = args.file
+        _MeshViewer.itemId = args.item
         _MeshViewer.url = args.url
         _MeshViewer.token = args.token
+
+        print args
 
     def initialize(self):
         # Bring used components
@@ -68,23 +74,25 @@ class _MeshViewer(pv_wamp.PVServerProtocol):
         # Update authentication key to use
         self.updateSecret(_MeshViewer.authKey)
 
-        _MeshViewer.meshFile = None
-        # Process file onlu once
+        _MeshViewer.fileName = None
+        # Process file only once
         if not _MeshViewer.faces:
             try:
                 self.processFile()
             except:
-                if _MeshViewer.meshFile:
-                    os.remove(_MeshViewer.meshFile)
+                if _MeshViewer.fileName:
+                    os.remove(_MeshViewer.fileName)
                 raise
 
     def _download_mesh_file(self):
         def _cleanup():
-            os.remove(_MeshViewer.meshFile)
+            os.remove(_MeshViewer.fileName)
 
         mesh_file = tempfile.NamedTemporaryFile(suffix='.exo', delete=False)
-        _MeshViewer.meshFile = mesh_file.name
-        url = '%s/file/%s/download' % (_MeshViewer.url, _MeshViewer.meshFileId)
+        _MeshViewer.fileName = mesh_file.name
+        url = '%s/file/%s/download' % (_MeshViewer.url, _MeshViewer.fileId)
+        print "Download", url
+        print "Token", _MeshViewer.token
         headers = {
             'Girder-Token': _MeshViewer.token
         }
@@ -106,7 +114,7 @@ class _MeshViewer(pv_wamp.PVServerProtocol):
         self.sideNames = []
         self.sideObjectValue = []
 
-        self.reader = simple.OpenDataFile(_MeshViewer.meshFile)
+        self.reader = simple.OpenDataFile(_MeshViewer.fileName)
         domain = self.reader.GetProperty('SideSetArrayStatus').GetDomain('array_list')
         sides = []
 
