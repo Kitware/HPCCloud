@@ -7,6 +7,7 @@ angular.module("kitware.cmb.core")
 
     function updateOutput() {
        if($scope.jobId) {
+            console.log('got jobId');
             var offset = $scope.outputStats.split('\n').length;
 
             // Get delta content
@@ -19,6 +20,18 @@ angular.module("kitware.cmb.core")
                 .error(function(err){
                     console.log(err);
                 });
+        } else if($scope.simulation) {
+            console.log('got simulation');
+            $girder.getTask($scope.simulation)
+                .success(function(task){
+                    console.log(task);
+                    // FIXME extract job id
+                })
+                .error(function(err){
+                    console.log(err);
+                });
+        } else {
+            console.log('no job id or simulation');
         }
     }
 
@@ -31,16 +44,6 @@ angular.module("kitware.cmb.core")
     $scope.$on('$destroy', function() {
         $interval.cancel(timeoutId);
     });
-
-    // Fetch current job id from task
-    $girder.getTask($scope.simulation)
-        .success(function(task){
-            console.log(task);
-            // FIXME extract job id
-        })
-        .error(function(err){
-            console.log(err);
-        });
 
     if($girder.getUser() === null) {
         $state.go('login');
