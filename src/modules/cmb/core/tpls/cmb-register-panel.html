@@ -1,20 +1,40 @@
 <md-content class="md-padding"  layout="row" layout-align="center center">
     <md-card style="width: 50%;">
+        <md-card-content>
         <section layout="column" layout-sm="column" layout-align="space-around center">
-            <md-text-float class="width-100" label="Choose a login name" ng-model="loginName"></md-text-float>
-            <md-text-float class="width-100" type="email" label="Enter your email address" ng-model="userPassword"></md-text-float>
+            <md-input-container flex class="width-100">
+                <label>Choose a login name</label>
+                <input ng-model="loginName">
+            </md-input-container>
+            <md-input-container flex class="width-100">
+                <label>Enter your email address</label>
+                <input ng-model="userMail" type="email">
+            </md-input-container>
         </section>
         <section layout="row" layout-sm="column" layout-align="space-around center">
-            <md-text-float class="width-90" label="First name" ng-model="firstName" flex></md-text-float>
-            <md-text-float class="width-90" label="Last name" ng-model="lastName" flex></md-text-float>
+            <md-input-container flex>
+                <label>First name</label>
+                <input ng-model="firstName">
+            </md-input-container>
+            <md-input-container flex>
+                <label>Last name</label>
+                <input ng-model="lastName">
+            </md-input-container>
         </section>
         <section layout="row" layout-sm="column" layout-align="space-around center">
-            <md-text-float class="width-90" type="password" label="Choose a password" ng-model="passwordA" flex></md-text-float>
-            <md-text-float class="width-90" type="password" label="Retype your password" ng-model="passwordB" flex></md-text-float>
+            <md-input-container flex>
+                <label>Choose a password</label>
+                <input ng-model="passwordA" type="password">
+            </md-input-container>
+            <md-input-container flex>
+                <label>Retype your password</label>
+                <input ng-model="passwordB" type="password">
+            </md-input-container>
         </section>
         <section layout="row" layout="column" layout-align="space-between center">
           <md-button class="md-raised" ui-sref="login">Cancel</md-button>
           <md-button class="md-raised">Register</md-button>
         </section>
+        </md-card-content>
     </md-card>
 </md-content>

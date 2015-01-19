@@ -31,7 +31,7 @@ gulp.task('process-css', function() {
 });
 
 gulp.task('partials', function () {
-  return gulp.src(['src/modules/**/tpls/*.html', 'assets/workflows/*/help/*', 'assets/workflows/*/tpls/*'])
+  return gulp.src(['src/modules/**/tpls/**/*.html', 'assets/workflows/*/help/*', 'assets/workflows/*/tpls/*'])
     .pipe($.template({ quickLogin: quickLogin }))
     .pipe($.minifyHtml({
       empty: true,

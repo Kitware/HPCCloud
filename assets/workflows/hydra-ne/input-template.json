@@ -44,7 +44,7 @@
             {"name": "rho", "label": "Mass Density", "type": "double", "size": 1, "default": "1.0", "min": "0", "help": [ "(material::rho)" ], "id": "material.rho" },
             {"name": "cp", "label": "Constant Pressure Specific Heat", "size": 1, "default": "1.0", "type": "double", "min": "0", "help": [ "(material::Cp)" ], "id": "material.cp"},
             {"name": "cv", "label": "Constant Volume Specific Heat", "size": 1, "default": "1.0", "type": "double", "min": "0", "help": [ "(material::Cv)" ], "id": "material.cv"},
-            {"name": "k", "label": "Thermal Conductivity", "type": "double", "size": 6, "layout": "3x2", "help": [ "(material::{k11,k12,k13,k22,k23,k33})" ], "id": "material.k" },
+            {"name": "k", "label": "Thermal Conductivity", "type": "double", "size": 6, "layout": "half-matrix", "help": [ "(material::{k11,k12,k13,k22,k23,k33})" ], "id": "material.k" },
             {"name": "mu", "label": "Molecular Viscosity", "size": 1, "type": "double", "default": "1.0", "min": 0, "help": ["(material::mu)"], "id": "material.mu" },
             {"name": "tref", "label": "Material Reference Temperature", "size": 1, "type": "double", "default": "0.0", "help": ["(material::Tref)"], "id": "material.tref" },
             {"name": "beta", "label": "Coefficient of Thermal Expansion", "size": 1, "type": "double", "default": "0.0", "help": ["(material::beta)"], "id": "material.beta" },

@@ -38,15 +38,16 @@
       <md-content flex class="md-padding" ng-repeat="attr in view.attributes" ng-class="{ collapsed: parameterDataTemplate.definitions[attr].collapsed }">
           <b ng-click="parameterDataTemplate.definitions[attr].collapsed = !parameterDataTemplate.definitions[attr].collapsed;">
             <i class="fa fa-lg fa-fw"
-              ng-class="{ 'fa-caret-down' : !parameterDataTemplate.definitions[attr].collapsed, 'fa-caret-right': parameterDataTemplate.    definitions[attr].collapsed }"></i>
+              ng-class="{ 'fa-caret-down' : !parameterDataTemplate.definitions[attr].collapsed, 'fa-caret-right': parameterDataTemplate.definitions[attr].collapsed }"></i>
             {{ parameterDataTemplate.definitions[attr].label }}
           </b>
           <hr/>
-          <form class="form-horizontal" role="form">
-            <div class="collapsable" input-parameter
+          <form class="form-horizontal" role="form" ng-hide="parameterDataTemplate.definitions[attr].collapsed">
+            <div class="collapsable"
               ng-repeat="param in parameterDataTemplate.definitions[attr].parameters"
-              property="param"
-              values="dataValues"></div>
+              cmb-property
+              workflow="{{ collection.name }}"
+              property="param"></div>
           </form>
       </md-content>
     </div>

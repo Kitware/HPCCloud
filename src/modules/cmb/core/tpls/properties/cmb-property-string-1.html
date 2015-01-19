@@ -1,0 +1,9 @@
+<div layout="row"  layout-align="space-around center">
+    <md-input-container flex="90">
+        <label>{{ property.label }}</label>
+        <input ng-model="data[property.id]">
+    </md-input-container>
+    <md-button class="md-fab help-button" aria-label="Toggle help" ng-click="toggleHelp(property.id)">
+        <i class="fa fa-fw fa-question md-primary"></i>
+    </md-button>
+</div>
