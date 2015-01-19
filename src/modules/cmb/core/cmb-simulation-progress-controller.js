@@ -7,8 +7,11 @@ angular.module("kitware.cmb.core")
 
     function updateOutput() {
        if($scope.jobId) {
-            console.log('got jobId');
+            console.log('got jobId ' + $scope.jobId);
             var offset = $scope.outputStats.split('\n').length;
+            if($scope.outputStats.length === 0) {
+                offset = 0;
+            }
 
             // Get delta content
             // FIXME path should be given base on the Workflow
@@ -21,7 +24,6 @@ angular.module("kitware.cmb.core")
                     console.log(err);
                 });
         } else if($scope.simulation) {
-            console.log('got simulation');
             $girder.getTask($scope.simulation)
                 .success(function(task){
                     console.log(task);
