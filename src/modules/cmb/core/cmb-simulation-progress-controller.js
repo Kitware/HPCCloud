@@ -12,7 +12,7 @@ angular.module("kitware.cmb.core")
 
             // Get delta content
             // FIXME path should be given base on the Workflow
-            $girder.getJobOutput(jobId, 'output/stat.txt', offset)
+            $girder.getJobOutput($scope.jobId, 'output/stat.txt', offset)
                 .success(function(deltaContent) {
                     console.log(deltaContent);
                     $scope.outputStats += deltaContent;
