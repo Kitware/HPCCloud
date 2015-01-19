@@ -536,11 +536,20 @@ angular.module("kitware.girder", ["ngCookies"])
                 });
         };
 
+        this.getJobOutput = function (jobId, filePath, offset) {
+            return this.get(['jobs', jobId, 'output?' + filePath + '&offset=' + offset].join('/'));
+        };
+
+        this.getTask = function(item) {
+            return this.get(['tasks/', item.meta.taskId].join(''));
+        };
+
         this.updateTaskStatus = function (item) {
             var self = this;
 
             self.get(['tasks/', item.meta.taskId].join(''))
                 .success(function(response) {
+                    console.log(response);
                     if(item.meta.status !== response.status) {
                         console.log('update status to ' + response.status);
                         var sesssionId = (response.output && response.output.pvw_job) ? response.output.cluster._id + '%2F' + response.output.pvw_job._id : '',
