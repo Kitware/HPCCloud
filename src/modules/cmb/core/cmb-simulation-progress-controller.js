@@ -25,7 +25,10 @@ angular.module("kitware.cmb.core")
             $girder.getTask($scope.simulation)
                 .success(function(task){
                     console.log(task);
-                    // FIXME extract job id
+                    if(task && task.output && task.output.hydra_job) {
+                        $scope.jobId = task.output.hydra_job._id;
+                        console.log('got id');
+                    }
                 })
                 .error(function(err){
                     console.log(err);
