@@ -537,7 +537,7 @@ angular.module("kitware.girder", ["ngCookies"])
         };
 
         this.getJobOutput = function (jobId, filePath, offset) {
-            return this.get(['jobs', jobId, 'output?' + filePath + '&offset=' + offset].join('/'));
+            return this.get(['jobs', jobId, 'output?path=' + filePath + '&offset=' + offset].join('/'));
         };
 
         this.getTask = function(item) {
