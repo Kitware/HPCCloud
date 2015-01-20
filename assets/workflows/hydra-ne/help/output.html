@@ -1,12 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-
-	<head>
-		<title></title>
-	</head>
-	<body>
-	
-	<h2>Output</h2>
+<h2>Output</h2>
 
     <p>The following commands are used to control the type of field and time-history output, plot files, and the intervals at which data is written to each type of file.
 
@@ -17,12 +9,12 @@
     <p><b>Note</b>: Dump activates checkpoint-restart files, where a restart file will be written every N<sub>dump</sub> time steps. In addition, a restart file will be written at the termination of the calculation. A restart file may be read on a subsequent invocation of HYDRA with the "<code>-r</code>" command-line option.
 
 	<h3>Plot</h3>
-	
+
 		<h4>Options</h4>
-	
+
 	<p>Options for plot files.
 
-    <p><b><i>filetype</i></b> - Specifies the type of plot files, <b>filetype</b> (string, default=serial). Valid values are the following: 
+    <p><b><i>filetype</i></b> - Specifies the type of plot files, <b>filetype</b> (string, default=serial). Valid values are the following:
                              <ul>
                                  <li><b>Serial</b> - This file type is the default for serial calculations. For parallel calculations, this file type requires the serialization of data using a parallel fan-in procedure, but results in a single plot file.
                                  <li><b>Distributed</b> - This file type results in one plot file per processor and is more scalable for problems where a large number of processors are used.
@@ -42,29 +34,57 @@
     <p><b><i>nplot</i></b> - Output plot files every N<sub>plot</sub> (integer, default=20) time steps.
 
 	<h4>Plot Variables</h4>
-	
+
 	<p><b><i>Element Variables</i></b> - Element variables that specifies plot output.
-	
+
 	<ul>
-<li><b><i>cfl</i></b> - Courant-Friedrichs-Levy number<li><b><i>density</i></b> - Fluid density<li><b><i>dist</i></b> - Normal distance from no-slip/no-penetration surfaces 
-<li><b><i>div</i></b> - Velocity divergence (&nabla; &sdot; v)<li><b><i>enthalpy</i></b> - Fluid specific enthalpy<li><b><i>enstrophy</i></b> - Enstrophy (&omega; &sdot; &omega;/2)<li><b><i>helicity</i></b> - Helicity (v &sdot; &omega;)<li><b><i>pressure</i></b> - Fluid pressure<li><b><i>procid</i></b> - Processor Id (MPI Rank)<li><b><i>temp</i></b> - Fluid temperature<li><b><i>turbeps</i></b> - Turbulent kinetic energy dissipation rate, (&epsilon;) 
-<li><b><i>turbke</i></b> - Turbulent kinetic energy (k)<li><b><i>turbnu</i></b> - Turbulent eddy viscosity<li><b><i>vel</i></b> - Fluid velocity vector<li><b><i>vginv2</i></b> - Q-criteria, i.e., 2nd invariant of velocity gradient
-<li><b><i>vorticity</i></b> - Vorticity, i.e., curl of velocity (&nabla; x v)<li><b><i>ystar</i></b> - y<sup>*</sup> non-dimensional distance from walls
+<li><b><i>cfl</i></b> - Courant-Friedrichs-Levy number
+<li><b><i>density</i></b> - Fluid density
+<li><b><i>dist</i></b> - Normal distance from no-slip/no-penetration surfaces
+<li><b><i>div</i></b> - Velocity divergence (&nabla; &sdot; v)
+<li><b><i>enthalpy</i></b> - Fluid specific enthalpy
+<li><b><i>enstrophy</i></b> - Enstrophy (&omega; &sdot; &omega;/2)
+<li><b><i>helicity</i></b> - Helicity (v &sdot; &omega;)
+<li><b><i>pressure</i></b> - Fluid pressure
+<li><b><i>procid</i></b> - Processor Id (MPI Rank)
+<li><b><i>temp</i></b> - Fluid temperature
+<li><b><i>turbeps</i></b> - Turbulent kinetic energy dissipation rate, (&epsilon;)
+<li><b><i>turbke</i></b> - Turbulent kinetic energy (k)
+<li><b><i>turbnu</i></b> - Turbulent eddy viscosity
+<li><b><i>vel</i></b> - Fluid velocity vector
+<li><b><i>vginv2</i></b> - Q-criteria, i.e., 2nd invariant of velocity gradient
+<li><b><i>vorticity</i></b> - Vorticity, i.e., curl of velocity (&nabla; x v)
+<li><b><i>ystar</i></b> - y<sup>*</sup> non-dimensional distance from walls
 	</ul>
 
 	<p><b><i>Node Variables</i></b> - Node variables that specifies plot output.
-	
+
 	<ul>
-<li><b><i>density</i></b> - Fluid density<li><b><i>dist</i></b> - Normal distance from no-slip/no-penetration surfaces 
-<li><b><i>enthalpy</i></b> - Fluid specific enthalpy<li><b><i>enstrophy</i></b> - Enstrophy (&omega; &sdot; &omega;/2)<li><b><i>helicity</i></b> - Helicity (v &sdot; &omega;)<li><b><i>pressure</i></b> - Fluid pressure<li><b><i>procid</i></b> - Processor Id (MPI Rank)<li><b><i>temp</i></b> - Fluid temperature<li><b><i>turbeps</i></b> - Turbulent kinetic energy dissipation rate, (&epsilon;) 
-<li><b><i>turbke</i></b> - Turbulent kinetic energy (k)<li><b><i>turbnu</i></b> - Turbulent eddy viscosity<li><b><i>u</i></b> - Nodal displacement vector for ALE computations 
-<li><b><i>vel</i></b> - Fluid velocity vector<li><b><i>vginv2</i></b> - Q-criteria, i.e., 2nd invariant of velocity gradient
-<li><b><i>vorticity</i></b> - Vorticity, i.e., curl of velocity (&nabla; x v)	</ul>
-	
+<li><b><i>density</i></b> - Fluid density
+<li><b><i>dist</i></b> - Normal distance from no-slip/no-penetration surfaces
+<li><b><i>enthalpy</i></b> - Fluid specific enthalpy
+<li><b><i>enstrophy</i></b> - Enstrophy (&omega; &sdot; &omega;/2)
+<li><b><i>helicity</i></b> - Helicity (v &sdot; &omega;)
+<li><b><i>pressure</i></b> - Fluid pressure
+<li><b><i>procid</i></b> - Processor Id (MPI Rank)
+<li><b><i>temp</i></b> - Fluid temperature
+<li><b><i>turbeps</i></b> - Turbulent kinetic energy dissipation rate, (&epsilon;)
+<li><b><i>turbke</i></b> - Turbulent kinetic energy (k)
+<li><b><i>turbnu</i></b> - Turbulent eddy viscosity
+<li><b><i>u</i></b> - Nodal displacement vector for ALE computations
+<li><b><i>vel</i></b> - Fluid velocity vector
+<li><b><i>vginv2</i></b> - Q-criteria, i.e., 2nd invariant of velocity gradient
+<li><b><i>vorticity</i></b> - Vorticity, i.e., curl of velocity (&nabla; x v)
+	</ul>
+
 		<p><b><i>Face Variables</i></b> - Face variables that specifies plot output.
-	
+
 	<ul>
-<li><b><i>traction</i></b> - Traction force vector<li><b><i>straction</i></b> - Shear traction force vector<li><b><i>ntraction</i></b> - Normal traction force vector<li><b><i>wallshear</i></b> - Wall shear force<li><b><i>yplus</i></b> - y<sup>+</sup> at a wall
+<li><b><i>traction</i></b> - Traction force vector
+<li><b><i>straction</i></b> - Shear traction force vector
+<li><b><i>ntraction</i></b> - Normal traction force vector
+<li><b><i>wallshear</i></b> - Wall shear force
+<li><b><i>yplus</i></b> - y<sup>+</sup> at a wall
 <li><b><i>ystar</i></b> - y<sup>*</sup> at a wall
 <li><b><i>varyplus</i></b> - Spatial variation of y<sup>+</sup> at a wall
 <li><b><i>heatflux</i></b> - Heat flux vector at a wall
@@ -74,7 +94,7 @@
 
 	<h3>ASCII</h3>
 
-    <p><b><i>prtlev</i></b> - The amount of data to output, <b>prtlev</b> (string, default=param). Valid values are the following: 
+    <p><b><i>prtlev</i></b> - The amount of data to output, <b>prtlev</b> (string, default=param). Valid values are the following:
                              <ul>
                                  <li><b>Primary Code Options Only</b> - Suppresses all output except for a data echo of the primary code options,
                                  <li><b>Mesh Coordinates and Topology</b> - Produces data echo of the mesh coordinates and topology, or
@@ -88,23 +108,43 @@
 	<h3>Time-History</h3>
 
 	<h4>Time-History Variables</h4>
-	
+
 	<p><b><i>elementid</i></b> - Element ID (integer, required).
 
 	<p><b><i>Element Variables</i></b> - Element variables that specifies plot output for statistics data.
-	
+
 	<ul>
 <li><b><i>&lt;density&gt;</i></b> - Mean density
 <li><b><i>density</i></b> - Fluid density
-<li><b><i>div</i></b> - Velocity divergence (&nabla; &sdot; v)<li><b><i>enstrophy</i></b> - Enstrophy, i.e., square of vorticity<li><b><i>enthalpy</i></b> -  Fluid specific enthalpy<li><b><i>helicity</i></b> - Helicity, i.e., dot product of velocity and vorticity<li><b><i>pressure</i></b> - Fluid pressure<li><b><i>temp</i></b> - Fluid temperature<li><b><i>turbeps</i></b> - Turbulent dissipation rate (&epsilon;)<li><b><i>turbke</i></b> - Turbulent kinetic energy (k)<li><b><i>turbnu</i></b> - Turbulent eddy viscosity<li><b><i>vel</i></b> - Fluid velocity vector<li><b><i>vorticity</i></b> - Vorticity, i.e., curl of velocity (&nabla; x v)
+<li><b><i>div</i></b> - Velocity divergence (&nabla; &sdot; v)
+<li><b><i>enstrophy</i></b> - Enstrophy, i.e., square of vorticity
+<li><b><i>enthalpy</i></b> -  Fluid specific enthalpy
+<li><b><i>helicity</i></b> - Helicity, i.e., dot product of velocity and vorticity
+<li><b><i>pressure</i></b> - Fluid pressure
+<li><b><i>temp</i></b> - Fluid temperature
+<li><b><i>turbeps</i></b> - Turbulent dissipation rate (&epsilon;)
+<li><b><i>turbke</i></b> - Turbulent kinetic energy (k)
+<li><b><i>turbnu</i></b> - Turbulent eddy viscosity
+<li><b><i>vel</i></b> - Fluid velocity vector
+<li><b><i>vorticity</i></b> - Vorticity, i.e., curl of velocity (&nabla; x v)
 	</ul>
-	
+
 		<p><b><i>surfaceid</i></b> - Surface ID (integer, required).
 
 		<p><b><i>Surface Variables</i></b> - Face variables that specifies plot output for statistics data.
-	
+
 	<ul>
-<li><b><i>avgpress</i></b> - Average pressure for a surface<li><b><i>avgtemp</i></b> - Average temperature for a surface<li><b><i>avgvel</i></b> - Average velocity vector for a surface<li><b><i>force</i></b> - Integral force acting on a surface<li><b><i>fvol</i></b> - Integrated volume of fluid that has crossed a surface <li><b><i>heatflow</i></b> - Heat flow rate crossing a surface<li><b><i>massflow</i></b> - Mass flow rate crossing a surface<li><b><i>pressforce</i></b> - Integral pressure force acting on a surface<li><b><i>surfarea</i></b> - Surface area<li><b><i>viscforce</i></b> - Integral viscous shear force acting on a surface <li><b><i>volumeflow</i></b> - Volume flow rate crossing a surface
+<li><b><i>avgpress</i></b> - Average pressure for a surface
+<li><b><i>avgtemp</i></b> - Average temperature for a surface
+<li><b><i>avgvel</i></b> - Average velocity vector for a surface
+<li><b><i>force</i></b> - Integral force acting on a surface
+<li><b><i>fvol</i></b> - Integrated volume of fluid that has crossed a surface
+<li><b><i>heatflow</i></b> - Heat flow rate crossing a surface
+<li><b><i>massflow</i></b> - Mass flow rate crossing a surface
+<li><b><i>pressforce</i></b> - Integral pressure force acting on a surface
+<li><b><i>surfarea</i></b> - Surface area
+<li><b><i>viscforce</i></b> - Integral viscous shear force acting on a surface
+<li><b><i>volumeflow</i></b> - Volume flow rate crossing a surface
 	</ul>
 
 	<h4>Frequency</h4>
@@ -122,39 +162,73 @@
     <p>Collecting turbulence statistics, for physics that are relevant.
 
 	<h4>Statistics Variables</h4>
-	
+
 	<p><b><i>Element Variables</i></b> - Element variables that specifies plot output for statistics data.
-	
+
 	<ul>
-<li><b><i>&lt;density&gt;</i></b> - Mean density<li><b><i>&lt;pressure&gt;</i></b> - Mean pressure<li><b><i>&lt;velocity&gt;</i></b> - Mean velocity vector<li><b><i>&lt;temperature&gt;</i></b> - Mean temperature
-<li><b><i>&lt;enstrophy&gt;</i></b> - Mean enstrophy<li><b><i>&lt;helicity&gt;</i></b> - Mean helicity<li><b><i>&lt;vorticity&gt;</i></b> - Mean vorticity<li><b><i>&lt;turbnu&gt;</i></b> - Mean turbulent viscosity<li><b><i>&lt;pressure', pressure'&gt;</i></b> - Pressure variance<li><b><i>&lt;temp', temp'&gt;</i></b> - Temperature variance<li><b><i>&lt;density', pressure'&gt;</i></b> - Density-pressure covariance
-<li><b><i>&lt;pressure', velocity'&gt;</i></b> - Pressure-velocity covariance<li><b><i>rms-pressure</i></b> - Root-Mean-Square pressure<li><b><i>rms-temp</i></b> - Root-Mean-Square temperature<li><b><i>tke</i></b> - Turbulent kinetic energy<li><b><i>reynoldsstress</i></b> - Reynolds stress tensor
+<li><b><i>&lt;density&gt;</i></b> - Mean density
+<li><b><i>&lt;pressure&gt;</i></b> - Mean pressure
+<li><b><i>&lt;velocity&gt;</i></b> - Mean velocity vector
+<li><b><i>&lt;temperature&gt;</i></b> - Mean temperature
+<li><b><i>&lt;enstrophy&gt;</i></b> - Mean enstrophy
+<li><b><i>&lt;helicity&gt;</i></b> - Mean helicity
+<li><b><i>&lt;vorticity&gt;</i></b> - Mean vorticity
+<li><b><i>&lt;turbnu&gt;</i></b> - Mean turbulent viscosity
+<li><b><i>&lt;pressure', pressure'&gt;</i></b> - Pressure variance
+<li><b><i>&lt;temp', temp'&gt;</i></b> - Temperature variance
+<li><b><i>&lt;density', pressure'&gt;</i></b> - Density-pressure covariance
+<li><b><i>&lt;pressure', velocity'&gt;</i></b> - Pressure-velocity covariance
+<li><b><i>rms-pressure</i></b> - Root-Mean-Square pressure
+<li><b><i>rms-temp</i></b> - Root-Mean-Square temperature
+<li><b><i>tke</i></b> - Turbulent kinetic energy
+<li><b><i>reynoldsstress</i></b> - Reynolds stress tensor
 	</ul>
 
 	<p><b><i>Node Variables</i></b> - Node variables that specifies plot output for statistics data.
-	
+
 	<ul>
-<li><b><i>&lt;density&gt;</i></b> - Mean density<li><b><i>&lt;pressure&gt;</i></b> - Mean pressure<li><b><i>&lt;velocity&gt;</i></b> - Mean velocity vector<li><b><i>&lt;temperature&gt;</i></b> - Mean temperature
-<li><b><i>&lt;enstrophy&gt;</i></b> - Mean enstrophy<li><b><i>&lt;helicity&gt;</i></b> - Mean helicity<li><b><i>&lt;vorticity&gt;</i></b> - Mean vorticity<li><b><i>&lt;pressure', pressure'&gt;</i></b> - Pressure variance<li><b><i>&lt;temp', temp'&gt;</i></b> - Temperature variance<li><b><i>&lt;density', pressure'&gt;</i></b> - Density-pressure covariance
-<li><b><i>&lt;pressure', velocity'&gt;</i></b> - Pressure-velocity covariance<li><b><i>rms-pressure</i></b> - Root-Mean-Square pressure<li><b><i>rms-temp</i></b> - Root-Mean-Square temperature<li><b><i>tke</i></b> - Turbulent kinetic energy<li><b><i>reynoldsstress</i></b> - Reynolds stress tensor
+<li><b><i>&lt;density&gt;</i></b> - Mean density
+<li><b><i>&lt;pressure&gt;</i></b> - Mean pressure
+<li><b><i>&lt;velocity&gt;</i></b> - Mean velocity vector
+<li><b><i>&lt;temperature&gt;</i></b> - Mean temperature
+<li><b><i>&lt;enstrophy&gt;</i></b> - Mean enstrophy
+<li><b><i>&lt;helicity&gt;</i></b> - Mean helicity
+<li><b><i>&lt;vorticity&gt;</i></b> - Mean vorticity
+<li><b><i>&lt;pressure', pressure'&gt;</i></b> - Pressure variance
+<li><b><i>&lt;temp', temp'&gt;</i></b> - Temperature variance
+<li><b><i>&lt;density', pressure'&gt;</i></b> - Density-pressure covariance
+<li><b><i>&lt;pressure', velocity'&gt;</i></b> - Pressure-velocity covariance
+<li><b><i>rms-pressure</i></b> - Root-Mean-Square pressure
+<li><b><i>rms-temp</i></b> - Root-Mean-Square temperature
+<li><b><i>tke</i></b> - Turbulent kinetic energy
+<li><b><i>reynoldsstress</i></b> - Reynolds stress tensor
 	</ul>
-	
+
 		<p><b><i>Face Variables</i></b> - Face variables that specifies plot output for statistics data.
-	
+
 	<ul>
-<li><b><i>&lt;density&gt;</i></b> - Mean density<li><b><i>&lt;pressure&gt;</i></b> - Mean pressure<li><b><i>&lt;velocity&gt;</i></b> - Mean velocity vector<li><b><i>&lt;temperature&gt;</i></b> - Mean temperature
-<li><b><i>&lt;heatflux&gt;</i></b> - Mean heat flux vector<li><b><i>&lt;straction&gt;</i></b> - Mean shear traction force vector<li><b><i>&lt;ntraction&gt;</i></b> - Mean normal traction force vector<li><b><i>&lt;traction&gt;</i></b> - Mean traction force vector<li><b><i>&lt;wallshear&gt;</i></b> - Mean wall shear force<li><b><i>&lt;pressure', pressure'&gt;</i></b> - Pressure variance<li><b><i>&lt;temp', temp'&gt;</i></b> - Temperature variance<li><b><i>&lt;density', pressure'&gt;</i></b> - Density-pressure covariance<li><b><i>rms-pressure</i></b> - Root-Mean-Square pressure<li><b><i>rms-temp</i></b> - Root-Mean-Square temperature
+<li><b><i>&lt;density&gt;</i></b> - Mean density
+<li><b><i>&lt;pressure&gt;</i></b> - Mean pressure
+<li><b><i>&lt;velocity&gt;</i></b> - Mean velocity vector
+<li><b><i>&lt;temperature&gt;</i></b> - Mean temperature
+<li><b><i>&lt;heatflux&gt;</i></b> - Mean heat flux vector
+<li><b><i>&lt;straction&gt;</i></b> - Mean shear traction force vector
+<li><b><i>&lt;ntraction&gt;</i></b> - Mean normal traction force vector
+<li><b><i>&lt;traction&gt;</i></b> - Mean traction force vector
+<li><b><i>&lt;wallshear&gt;</i></b> - Mean wall shear force
+<li><b><i>&lt;pressure', pressure'&gt;</i></b> - Pressure variance
+<li><b><i>&lt;temp', temp'&gt;</i></b> - Temperature variance
+<li><b><i>&lt;density', pressure'&gt;</i></b> - Density-pressure covariance
+<li><b><i>rms-pressure</i></b> - Root-Mean-Square pressure
+<li><b><i>rms-temp</i></b> - Root-Mean-Square temperature
 	</ul>
 
 	<h4>Statistics</h4>
-	
+
 	<p>Options for accumulating statistics of fluctuating variables.
-	
+
 	<p><b><i>starttime</i></b> - Start time for collecting statistics, t<sub>start</sub> (float, default=0.0).
 
 	<p><b><i>endtime</i></b> - End time for collecting statistics, t<sub>end</sub> (float, default=1.0).
 
 	<p><b><i>plotwinsize</i></b> - Time window size for output of field statistics, size (float, default=0.1).
-
-	</body>
-</html>

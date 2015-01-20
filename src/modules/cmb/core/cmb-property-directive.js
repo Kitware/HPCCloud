@@ -1,20 +1,41 @@
 angular.module("kitware.cmb.core")
     .directive('cmbProperty', ['$templateCache', '$compile', function ($templateCache, $compile) {
+
+        function extractDefault(property) {
+            var valueStr = property.default,
+                result = [],
+                value = null,
+                count = property.size;
+
+            if(property.type === 'double' || property.type === 'integer') {
+                value = Number(valueStr);
+            }
+
+            while(count--) {
+                result.push(value ? value : valueStr);
+            }
+
+            return result.length > 1 ? result : result[0];
+        }
+
         return {
             restrict: 'AE',
             scope: {
+                data: '=',
                 workflow: '@',
                 property: '='
             },
             controller: ['$scope', function($scope) {
                 $scope.toggleHelp = function(id) {
                     var domElem = document.getElementsByClassName('help-' + id)[0],
-                        display = domElem.style.display;
+                        display = domElem ? domElem.style.display : null;
 
-                    if(display === 'none') {
-                        domElem.style.display = '';
-                    } else {
-                        domElem.style.display = 'none';
+                    if(domElem) {
+                        if(display === 'none') {
+                            domElem.style.display = '';
+                        } else {
+                            domElem.style.display = 'none';
+                        }
                     }
                 };
             }],
@@ -28,10 +49,15 @@ angular.module("kitware.cmb.core")
 
                 htmlCode = $templateCache.get(templatePath);
                 if(htmlCode) {
+                    // Add data for property
+                    if(scope.data[scope.property.id] === undefined) {
+                        scope.data[scope.property.id] = extractDefault(scope.property);
+                    }
+
                     // Add help
                     var helpTemplate = $templateCache.get( scope.workflow + '/help/' + scope.property.id);
                     if(helpTemplate) {
-                        htmlCode += '<md-card class="help-'+scope.property.id+'"><md-card-content>' + helpTemplate + '</md-card-content></md-card>';
+                        htmlCode += '<md-card style="display:none;" class="help-content help-'+scope.property.id+'"><md-card-content>' + helpTemplate + '</md-card-content></md-card>';
                     }
                     element.replaceWith($compile(htmlCode)(scope));
                     if(helpTemplate) {

@@ -1,8 +1,8 @@
 <div layout="row"  layout-align="space-around center">
-    <md-input-container flex="90">
-        <label>{{ property.label }}</label>
-        <input ng-model="data[property.id]">
-    </md-input-container>
+    <label flex="20">{{ property.label }}</label>
+    <select ng-model="data[property.id]" flex="70" type="{{ property.enum.type }}">
+        <option ng-repeat="item in property.enum.values" value="{{ item.value }}">{{ item.label }}</option>
+    </select>
     <span flex></span>
     <md-button class="md-fab help-button" aria-label="Toggle help" ng-click="toggleHelp(property.id)">
         <i class="fa fa-fw fa-question md-primary"></i>

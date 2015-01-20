@@ -44,7 +44,7 @@
             {"name": "rho", "label": "Mass Density", "type": "double", "size": 1, "default": "1.0", "min": "0", "help": [ "(material::rho)" ], "id": "material.rho" },
             {"name": "cp", "label": "Constant Pressure Specific Heat", "size": 1, "default": "1.0", "type": "double", "min": "0", "help": [ "(material::Cp)" ], "id": "material.cp"},
             {"name": "cv", "label": "Constant Volume Specific Heat", "size": 1, "default": "1.0", "type": "double", "min": "0", "help": [ "(material::Cv)" ], "id": "material.cv"},
-            {"name": "k", "label": "Thermal Conductivity", "type": "double", "size": 6, "layout": "half-matrix", "help": [ "(material::{k11,k12,k13,k22,k23,k33})" ], "id": "material.k" },
+            {"name": "k", "label": "Thermal Conductivity", "components": ["k11","k12","k13","k22","k23","k33"],"type": "double", "size": 6, "layout": "half-matrix", "help": [ "(material::{k11,k12,k13,k22,k23,k33})" ], "id": "material.k" },
             {"name": "mu", "label": "Molecular Viscosity", "size": 1, "type": "double", "default": "1.0", "min": 0, "help": ["(material::mu)"], "id": "material.mu" },
             {"name": "tref", "label": "Material Reference Temperature", "size": 1, "type": "double", "default": "0.0", "help": ["(material::Tref)"], "id": "material.tref" },
             {"name": "beta", "label": "Coefficient of Thermal Expansion", "size": 1, "type": "double", "default": "0.0", "help": ["(material::beta)"], "id": "material.beta" },
@@ -54,7 +54,7 @@
                   { "label": "Rigid Body", "value": "off" }
                ]},
                "help": [ "(material::rigid)" ], "id": "material.rigid" },
-            {"name": "vel", "label": "Rigid Body Velocity", "size": 3, "type": "double", "default": "0.0", "help": ["(material::{velx,vely,velz})"], "id": "material.vel" },
+            {"name": "vel", "label": "Rigid Body Velocity", "components": ["X", "Y", "Z"], "size": 3, "type": "double", "default": "0.0", "help": ["(material::{velx,vely,velz})"], "id": "material.vel" },
             {"name": "blockids", "label": "Block Ids", "size": 1, "type": "integer", "help": ["(material::blockid)"], "id": "material.blockids" },
             {"name": "type", "label": "Type of Material", "type": "enum", "default": "Eulerian", "size": 1,
                "enum": { "type": "string", "values": [
@@ -111,7 +111,7 @@
             {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(scalardirichlet::setid)"], "id": "scalardirichlet.setids" },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(scalardirichlet::name)" ], "id": "scalardirichlet.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(scalardirichlet::time-factor-pairs)" ], "id": "scalardirichlet.time-factor-pairs" },
-            {"name": "amplitude", "label": "Amplitude", "size": 1, "type": "float", "help": ["(scalardirichlet::amplitude)"], "id": "scalardirichlet.amplitude" }
+            {"name": "amplitude", "label": "Amplitude", "size": 1, "type": "double", "help": ["(scalardirichlet::amplitude)"], "id": "scalardirichlet.amplitude" }
          ]
       },
       "VelocityDirichlet": {
@@ -120,7 +120,7 @@
             {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(velocitydirichlet::setid)"], "id": "velocitydirichlet.setids" },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(velocitydirichlet::name)" ], "id": "velocitydirichlet.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(velocitydirichlet::time-factor-pairs)" ], "id": "velocitydirichlet.time-factor-pairs" },
-            {"name": "amplitude", "label": "Amplitude", "size": 3, "type": "float", "help": ["(velocitydirichlet::amplitude)"], "id": "velocitydirichlet.amplitude" }
+            {"name": "amplitude", "label": "Amplitude", "size": 3, "type": "double", "help": ["(velocitydirichlet::amplitude)"], "id": "velocitydirichlet.amplitude" }
          ]
       },
       "SymmetryVelocity": {
@@ -129,7 +129,7 @@
             {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(symmetrydirichlet::setid)"], "id": "symmetrydirichlet.setids" },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(symmetrydirichlet::name)" ], "id": "symmetrydirichlet.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(symmetrydirichlet::time-factor-pairs)" ], "id": "symmetrydirichlet.time-factor-pairs" },
-            {"name": "amplitude", "label": "Amplitude", "size": 3, "type": "float", "help": ["(symmetrydirichlet::amplitude)"], "id": "symmetrydirichlet.amplitude" }
+            {"name": "amplitude", "label": "Amplitude", "size": 3, "type": "double", "help": ["(symmetrydirichlet::amplitude)"], "id": "symmetrydirichlet.amplitude" }
          ]
       },
       "HeatFlux": {
@@ -138,7 +138,7 @@
             {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(heatflux::setid)"], "id": "heatflux.setids" },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(heatflux::name)" ], "id": "heatflux.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(heatflux::time-factor-pairs)" ], "id": "heatflux.time-factor-pairs" },
-            {"name": "amplitude", "label": "Amplitude", "size": 1, "type": "float", "help": ["(heatflux::amplitude)"], "id": "heatflux.amplitude" }
+            {"name": "amplitude", "label": "Amplitude", "size": 1, "type": "double", "help": ["(heatflux::amplitude)"], "id": "heatflux.amplitude" }
          ]
       },
       "PassiveOutflow": {
@@ -178,7 +178,7 @@
             {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(bodyforce::setid)"], "id": "bodyforce.setids" },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(bodyforce::name)" ], "id": "bodyforce.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(bodyforce::time-factor-pairs)" ], "id": "bodyforce.time-factor-pairs" },
-            {"name": "amplitude", "label": "Force Amplitude", "size": 3, "type": "float", "default": "0.0", "help": ["(bodyforce::amplitude)"], "id": "bodyforce.amplitude" }
+            {"name": "amplitude", "label": "Force Amplitude", "size": 3, "type": "double", "default": "0.0", "help": ["(bodyforce::amplitude)"], "id": "bodyforce.amplitude" }
          ]
       },
       "BoussinesqForce": {
@@ -187,7 +187,7 @@
             {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(boussinesqforce::setid)"], "id": "boussinesqforce.setids" },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(boussinesqforce::name)" ], "id": "boussinesqforce.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(boussinesqforce::time-factor-pairs)" ], "id": "boussinesqforce.time-factor-pairs" },
-            {"name": "amplitude", "label": "Gravity Amplitude", "size": 3, "type": "float", "default": "0.0", "help": ["(boussinesqforce::amplitude)"], "id": "boussinesqforce.amplitude" }
+            {"name": "amplitude", "label": "Gravity Amplitude", "size": 3, "type": "double", "default": "0.0", "help": ["(boussinesqforce::amplitude)"], "id": "boussinesqforce.amplitude" }
          ]
       },
       "PorousDragForce": {
@@ -196,7 +196,7 @@
             {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(porousdragforce::setid)"], "id": "porousdragforce.setids" },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(porousdragforce::name)" ], "id": "porousdragforce.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(porousdragforce::time-factor-pairs)" ], "id": "porousdragforce.time-factor-pairs" },
-            {"name": "amplitude", "label": "Porous Drag Amplitude", "size": 1, "type": "float", "default": "0.0", "help": ["(porousdragforce::porousdrag)"], "id": "porousdragforce.amplitude" }
+            {"name": "amplitude", "label": "Porous Drag Amplitude", "size": 1, "type": "double", "default": "0.0", "help": ["(porousdragforce::porousdrag)"], "id": "porousdragforce.amplitude" }
          ]
       },
       "HeatSources": {
@@ -216,7 +216,7 @@
             {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(heatsource::setid)"], "id": "heatsource.setids" },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(heatsource::name)" ], "id": "heatsource.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(heatsource::time-factor-pairs)" ], "id": "heatsource.time-factor-pairs" },
-            {"name": "amplitude", "label": "Volumetric Amplitude", "size": 1, "type": "float", "default": "0.0", "help": ["(heatsource::amplitude)"], "id": "heatsource.amplitude" }
+            {"name": "amplitude", "label": "Volumetric Amplitude", "size": 1, "type": "double", "default": "0.0", "help": ["(heatsource::amplitude)"], "id": "heatsource.amplitude" }
          ]
       },
       "HydrostaticPressure": {
@@ -225,7 +225,7 @@
             {"name": "setid", "label": "Set Id", "size": 1, "type": "integer", "help": ["(hydrostatic::setid)"], "id": "hydrostatic.setid" },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(hydrostatic::name)" ], "id": "hydrostatic.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(hydrostatic::time-factor-pairs)" ], "id": "hydrostatic.time-factor-pairs" },
-            {"name": "amplitude", "label": "Hydrostatic Pressure Amplitude", "size": 1, "type": "float", "help": ["(hydrostatic::amplitude)"], "id": "hydrostatic.amplitude" }
+            {"name": "amplitude", "label": "Hydrostatic Pressure Amplitude", "size": 1, "type": "double", "help": ["(hydrostatic::amplitude)"], "id": "hydrostatic.amplitude" }
          ]
       },
       "Turbulence": {
@@ -269,17 +269,17 @@
       "Smagorinsky": {
          "label": "Smagorinsky",
          "parameters": [
-            {"name": "c_s", "label": "Smagorinsky Model Constant", "size": 1, "type": "float", "default": "0.18", "help": ["(smagorinsky::c_s)"], "id": "smagorinsky.c_s" },
-            {"name": "prandtl", "label": "Turbulent Prandtl Number", "type": "float", "default": "0.8889", "size": 1, "help": [ "(smagorinsky::prandtl)" ], "id": "smagorinsky.prandtl" },
-            {"name": "schmidt", "label": "Turbulent Schmidt Number", "type": "float", "default": "1.0", "size": 1, "help": [ "(smagorinsky::schmidt)" ], "id": "smagorinsky.schmidt" }
+            {"name": "c_s", "label": "Smagorinsky Model Constant", "size": 1, "type": "double", "default": "0.18", "help": ["(smagorinsky::c_s)"], "id": "smagorinsky.c_s" },
+            {"name": "prandtl", "label": "Turbulent Prandtl Number", "type": "double", "default": "0.8889", "size": 1, "help": [ "(smagorinsky::prandtl)" ], "id": "smagorinsky.prandtl" },
+            {"name": "schmidt", "label": "Turbulent Schmidt Number", "type": "double", "default": "1.0", "size": 1, "help": [ "(smagorinsky::schmidt)" ], "id": "smagorinsky.schmidt" }
          ]
       },
       "WALE": {
          "label": "WALE",
          "parameters": [
-            {"name": "c_w", "label": "Smagorinsky Model Constant", "size": 1, "type": "float", "default": "0.5", "help": ["(wale::c_w)"], "id": "wale.c_w" },
-            {"name": "prandtl", "label": "Turbulent Prandtl Number", "type": "float", "default": "0.8889", "size": 1, "help": [ "(wale::prandtl)" ], "id": "wale.prandtl" },
-            {"name": "schmidt", "label": "Turbulent Schmidt Number", "type": "float", "default": "1.0", "size": 1, "help": [ "(wale::schmidt)" ], "id": "wale.schmidt" }
+            {"name": "c_w", "label": "Smagorinsky Model Constant", "size": 1, "type": "double", "default": "0.5", "help": ["(wale::c_w)"], "id": "wale.c_w" },
+            {"name": "prandtl", "label": "Turbulent Prandtl Number", "type": "double", "default": "0.8889", "size": 1, "help": [ "(wale::prandtl)" ], "id": "wale.prandtl" },
+            {"name": "schmidt", "label": "Turbulent Schmidt Number", "type": "double", "default": "1.0", "size": 1, "help": [ "(wale::schmidt)" ], "id": "wale.schmidt" }
          ]
       },
       "SolutionMethod": {
@@ -299,10 +299,10 @@
                   { "label": "Largest Dependent Variable Maximum Norm", "value": "max" }
                ]},
                "help": [ "(solutionmethod::error_norm)" ], "id": "solutionmethod.error_norm" },
-            {"name": "eps", "label": "Non-Linear Solver Convergence Criteria", "type": "float", "default": "1.0E-4", "size": 1, "help": [ "(solutionmethod::eps)" ], "id": "solutionmethod.eps" },
-            {"name": "eps_dist", "label": "Normal-Distance Function Convergence Criteria", "type": "float", "default": "1.0E-5", "size": 1, "help": [ "(solutionmethod::eps_dist)" ], "id": "solutionmethod.eps_dist" },
-            {"name": "eps_p0", "label": "Initial Projection/Pressure Convergence Criteria", "type": "float", "default": "1.0E-5", "size": 1, "help": [ "(solutionmethod::eps_p0)" ], "id": "solutionmethod.eps_p0" },
-            {"name": "drop_tol", "label": "Drop tolerance", "type": "float", "default": "1.0E-2", "size": 1, "help": [ "(solutionmethod::drop_tol)" ], "id": "solutionmethod.drop_tol" },
+            {"name": "eps", "label": "Non-Linear Solver Convergence Criteria", "type": "double", "default": "1.0E-4", "size": 1, "help": [ "(solutionmethod::eps)" ], "id": "solutionmethod.eps" },
+            {"name": "eps_dist", "label": "Normal-Distance Function Convergence Criteria", "type": "double", "default": "1.0E-5", "size": 1, "help": [ "(solutionmethod::eps_dist)" ], "id": "solutionmethod.eps_dist" },
+            {"name": "eps_p0", "label": "Initial Projection/Pressure Convergence Criteria", "type": "double", "default": "1.0E-5", "size": 1, "help": [ "(solutionmethod::eps_p0)" ], "id": "solutionmethod.eps_p0" },
+            {"name": "drop_tol", "label": "Drop tolerance", "type": "double", "default": "1.0E-2", "size": 1, "help": [ "(solutionmethod::drop_tol)" ], "id": "solutionmethod.drop_tol" },
             {"name": "timestep_control", "label": "Automatic Time-Step Growth/Reduction", "type": "enum", "default": "off", "size": 1,
                "enum": { "type": "string", "values": [
                   { "label": "On", "value": "on" },
@@ -369,8 +369,8 @@
             {"name": "levels", "label": "Maximum AMG Levels", "size": 1, "type": "integer", "default": "20", "help": ["(pressuresolver::levels)"], "id": "pressuresolver.levels" },
             {"name": "nitmax", "label": "Maximum Linear Iterations", "size": 1, "type": "integer", "default": "500", "help": ["(pressuresolver::nitmax)"], "id": "pressuresolver.nitmax" },
             {"name": "nitchk", "label": "Check Convergence Every", "size": 1, "type": "integer", "default": "2", "help": ["(pressuresolver::nitchk)"], "id": "pressuresolver.nitchk" },
-            {"name": "eps", "label": "Linear Solver Convergence Criteria", "type": "float", "default": "1.0E-5", "size": 1, "help": [ "(pressuresolver::eps)" ], "id": "pressuresolver.eps" },
-            {"name": "pivot", "label": "Value of a Zero Pivot", "type": "float", "default": "1.0E-16", "size": 1, "help": [ "(pressuresolver::pivot)" ], "id": "pressuresolver.pivot" },
+            {"name": "eps", "label": "Linear Solver Convergence Criteria", "type": "double", "default": "1.0E-5", "size": 1, "help": [ "(pressuresolver::eps)" ], "id": "pressuresolver.eps" },
+            {"name": "pivot", "label": "Value of a Zero Pivot", "type": "double", "default": "1.0E-16", "size": 1, "help": [ "(pressuresolver::pivot)" ], "id": "pressuresolver.pivot" },
             {"name": "convergence", "label": "Write Non-Linear Convergence Information", "type": "enum", "default": "off", "size": 1,
                "enum": { "type": "string", "values": [
                   { "label": "On", "value": "on" },
@@ -458,12 +458,12 @@
                   { "label": "Off", "value": "off" }
                ]},
                "help": [ "(hypreboomeramg::hypre_nodal)" ], "id": "hypreboomeramg.hypre_nodal" },
-            {"name": "trunc_factor", "label": "Truncation Factor", "type": "float", "default": "0.0", "size": 1, "help": [ "(hypreboomeramg::trunc_factor)" ], "id": "hypreboomeramg.trunc_factor" },
+            {"name": "trunc_factor", "label": "Truncation Factor", "type": "double", "default": "0.0", "size": 1, "help": [ "(hypreboomeramg::trunc_factor)" ], "id": "hypreboomeramg.trunc_factor" },
             {"name": "pmax_elements", "label": "Maximum Elements", "size": 1, "type": "integer", "default": "0", "help": ["(hypreboomeramg::pmax_elements)"], "id": "hypreboomeramg.pmax_elements" },
             {"name": "agg_num_levels", "label": "Aggressive Coarsening Levels", "size": 1, "type": "integer", "default": "0", "help": ["(hypreboomeramg::agg_num_levels)"], "id": "hypreboomeramg.agg_num_levels" },
             {"name": "agg_num_paths", "label": "Aggressive Coarsening Paths", "size": 1, "type": "integer", "default": "1", "help": ["(hypreboomeramg::agg_num_paths)"], "id": "hypreboomeramg.agg_num_paths" },
-            {"name": "strong_threshold", "label": "Strength Threshold", "type": "float", "default": "0.85", "size": 1, "help": [ "(hypreboomeramg::strong_threshold)" ], "id": "hypreboomeramg.strong_threshold" },
-            {"name": "max_rowsum", "label": "Diagonally Dominant Strength", "type": "float", "default": "0.9", "size": 1, "help": [ "(hypreboomeramg::max_rowsum)" ], "id": "hypreboomeramg.max_rowsum" }
+            {"name": "strong_threshold", "label": "Strength Threshold", "type": "double", "default": "0.85", "size": 1, "help": [ "(hypreboomeramg::strong_threshold)" ], "id": "hypreboomeramg.strong_threshold" },
+            {"name": "max_rowsum", "label": "Diagonally Dominant Strength", "type": "double", "default": "0.9", "size": 1, "help": [ "(hypreboomeramg::max_rowsum)" ], "id": "hypreboomeramg.max_rowsum" }
          ]
       },
       "MLAMG": {
@@ -493,7 +493,7 @@
             {"name": "nrestart", "label": "Number of Restart Vectors", "size": 1, "type": "integer", "default": "30", "help": ["(momentumsolver::nrestart)"], "id": "momentumsolver.nrestart" },
             {"name": "nitmax", "label": "Maximum Linear Iterations", "size": 1, "type": "integer", "default": "500", "help": ["(momentumsolver::nitmax)"], "id": "momentumsolver.nitmax" },
             {"name": "nitchk", "label": "Check Convergence Every", "size": 1, "type": "integer", "default": "2", "help": ["(momentumsolver::nitchk)"], "id": "momentumsolver.nitchk" },
-            {"name": "eps", "label": "Linear Solver Convergence Criteria", "type": "float", "default": "1.0E-5", "size": 1, "help": [ "(momentumsolver::eps)" ], "id": "momentumsolver.eps" },
+            {"name": "eps", "label": "Linear Solver Convergence Criteria", "type": "double", "default": "1.0E-5", "size": 1, "help": [ "(momentumsolver::eps)" ], "id": "momentumsolver.eps" },
             {"name": "convergence", "label": "Write Non-Linear Convergence Information", "type": "enum", "default": "off", "size": 1,
                "enum": { "type": "string", "values": [
                   { "label": "On", "value": "on" },
@@ -522,7 +522,7 @@
             {"name": "nrestart", "label": "Number of Restart Vectors", "size": 1, "type": "integer", "default": "30", "help": ["(transportsolver::nrestart)"], "id": "transportsolver.nrestart" },
             {"name": "nitmax", "label": "Maximum Linear Iterations", "size": 1, "type": "integer", "default": "500", "help": ["(transportsolver::nitmax)"], "id": "transportsolver.nitmax" },
             {"name": "nitchk", "label": "Check Convergence Every", "size": 1, "type": "integer", "default": "2", "help": ["(transportsolver::nitchk)"], "id": "transportsolver.nitchk" },
-            {"name": "eps", "label": "Linear Solver Convergence Criteria", "type": "float", "default": "1.0E-5", "size": 1, "help": [ "(transportsolver::eps)" ], "id": "transportsolver.eps" },
+            {"name": "eps", "label": "Linear Solver Convergence Criteria", "type": "double", "default": "1.0E-5", "size": 1, "help": [ "(transportsolver::eps)" ], "id": "transportsolver.eps" },
             {"name": "convergence", "label": "Write Non-Linear Convergence Information", "type": "enum", "default": "off", "size": 1,
                "enum": { "type": "string", "values": [
                   { "label": "On", "value": "on" },
@@ -541,8 +541,8 @@
          "label": "Time",
          "parameters": [
             {"name": "nstep", "label": "Maximum Time Steps", "size": 1, "type": "integer", "default": "10", "help": ["(time::nstep)"], "id": "time.nstep" },
-            {"name": "term", "label": "Termination Time", "type": "float", "default": "1.0", "size": 1, "help": [ "(time::term)" ], "id": "time.term" },
-            {"name": "deltat", "label": "Time Step Size", "type": "float", "default": "0.01", "size": 1, "help": [ "(time::deltat)" ], "id": "time.deltat" }
+            {"name": "term", "label": "Termination Time", "type": "double", "default": "1.0", "size": 1, "help": [ "(time::term)" ], "id": "time.term" },
+            {"name": "deltat", "label": "Time Step Size", "type": "double", "default": "0.01", "size": 1, "help": [ "(time::deltat)" ], "id": "time.deltat" }
          ]
       },
       "TimeIntegration": {
@@ -554,13 +554,13 @@
                   { "label": "Time-Step Based on a Fixed Maximum deltat", "value": "fixed_dt" }
                ]},
                "help": [ "(timeintegration::type)" ], "id": "timeintegration.type" },
-            {"name": "CFLinit", "label": "Initial CFL Number", "size": 1, "type": "float", "default": "1.0", "help": ["(timeintegration::CFLinit)"], "id": "timeintegration.CFLinit" },
-            {"name": "CFLmax", "label": "Maximum CFL Number", "size": 1, "type": "float", "default": "2.0", "help": ["(timeintegration::CFLmax)"], "id": "timeintegration.CFLmax" },
-            {"name": "dtmax", "label": "Maximum Time-Step", "type": "float", "default": "1.0", "size": 1, "help": [ "(timeintegration::dtmax)" ], "id": "timeintegration.dtmax" },
-            {"name": "dtscale", "label": "Time-Step Growth Factor", "type": "float", "default": "1.025", "size": 1, "help": [ "(timeintegration::dtscale)" ], "id": "timeintegration.dtscale" },
-            {"name": "thetaA", "label": "Advective Time-Weight", "type": "float", "default": "0.5", "size": 1, "help": [ "(timeintegration::thetaA)" ], "id": "timeintegration.thetaA" },
-            {"name": "thetaK", "label": "Viscous/Diffusive Time-Weight", "type": "float", "default": "0.5", "size": 1, "help": [ "(timeintegration::thetaK)" ], "id": "timeintegration.thetaK" },
-            {"name": "thetaF", "label": "Source Time-Weight", "type": "float", "default": "0.5", "size": 1, "help": [ "(timeintegration::thetaF)" ], "id": "timeintegration.thetaF" },
+            {"name": "CFLinit", "label": "Initial CFL Number", "size": 1, "type": "double", "default": "1.0", "help": ["(timeintegration::CFLinit)"], "id": "timeintegration.CFLinit" },
+            {"name": "CFLmax", "label": "Maximum CFL Number", "size": 1, "type": "double", "default": "2.0", "help": ["(timeintegration::CFLmax)"], "id": "timeintegration.CFLmax" },
+            {"name": "dtmax", "label": "Maximum Time-Step", "type": "double", "default": "1.0", "size": 1, "help": [ "(timeintegration::dtmax)" ], "id": "timeintegration.dtmax" },
+            {"name": "dtscale", "label": "Time-Step Growth Factor", "type": "double", "default": "1.025", "size": 1, "help": [ "(timeintegration::dtscale)" ], "id": "timeintegration.dtscale" },
+            {"name": "thetaA", "label": "Advective Time-Weight", "type": "double", "default": "0.5", "size": 1, "help": [ "(timeintegration::thetaA)" ], "id": "timeintegration.thetaA" },
+            {"name": "thetaK", "label": "Viscous/Diffusive Time-Weight", "type": "double", "default": "0.5", "size": 1, "help": [ "(timeintegration::thetaK)" ], "id": "timeintegration.thetaK" },
+            {"name": "thetaF", "label": "Source Time-Weight", "type": "double", "default": "0.5", "size": 1, "help": [ "(timeintegration::thetaF)" ], "id": "timeintegration.thetaF" },
             {"name": "trimlast", "label": "Exact Termination Time", "type": "enum", "default": "off", "size": 1,
                "enum": { "type": "string", "values": [
                   { "label": "On", "value": "on" },
@@ -811,9 +811,9 @@
                   { "label": "Root-Mean-Square Temperature", "value": "rms-temp" }
                ]},
                "help": ["(turbulencestatistics::svariables)"], "id": "turbulencestatistics.svariables" },
-            {"name": "starttime", "label": "Start Time", "size": 1, "type": "float", "default": "0.0", "help": ["(turbulencestatistics::starttime)"], "id": "turbulencestatistics.starttime" },
-            {"name": "endtime", "label": "End Time", "size": 1, "type": "float", "default": "1.0", "help": ["(turbulencestatistics::endtime)"], "id": "turbulencestatistics.endtime" },
-            {"name": "plotwinsize", "label": "Time Window Size", "size": 1, "type": "float", "default": "0.1", "help": ["(turbulencestatistics::plotwinsize)"], "id": "turbulencestatistics.plotwinsize" }
+            {"name": "starttime", "label": "Start Time", "size": 1, "type": "double", "default": "0.0", "help": ["(turbulencestatistics::starttime)"], "id": "turbulencestatistics.starttime" },
+            {"name": "endtime", "label": "End Time", "size": 1, "type": "double", "default": "1.0", "help": ["(turbulencestatistics::endtime)"], "id": "turbulencestatistics.endtime" },
+            {"name": "plotwinsize", "label": "Time Window Size", "size": 1, "type": "double", "default": "0.1", "help": ["(turbulencestatistics::plotwinsize)"], "id": "turbulencestatistics.plotwinsize" }
          ]
        }
    }
