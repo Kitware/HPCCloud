@@ -13,7 +13,22 @@ angular.module("kitware.cmb.core")
             // FIXME path should be given base on the Workflow
             $girder.getJobOutput($scope.jobId, 'output/stat.txt', offset)
                 .success(function(deltaContent) {
-                    $scope.outputStats = $scope.outputStats.concat(deltaContent.content);
+                    var lines = deltaContent.content,
+                        idx = 0,
+                        count = lines.length;
+
+                    if($scope.outputStats.length === 0) {
+                        idx = 1;
+                    }
+
+                    while(idx < count) {
+                        var line = lines[idx].replace(/  /g, ' ').replace(/RMS Div/g, 'RMS-Div').replace(/# /g, '').split(' ');
+                        console.log(line);
+                        $scope.outputStats.push(line);
+
+                        // Next line
+                        ++idx;
+                    }
                 })
                 .error(function(err){
                     console.log(err);

@@ -15,6 +15,10 @@
 </div>
 </md-toolbar>
 <md-content layout="row" layout-align="center center">
-    <div flex ng-repeat="line in outputStats">{{line}}</div>
+    <table flex>
+        <tr ng-repeat="line in outputStats">
+            <td ng-repeat="column in line">{{ column }}</td>
+        </tr>
+    </table>
 </md-content>
 </div>
