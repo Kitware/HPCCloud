@@ -18,7 +18,7 @@ angular.module("kitware.cmb.core")
                 .error(function(err){
                     console.log(err);
                 });
-        } else if($scope.simulation && $scope.simulation.task && $scope.simulation.task !== 'completed') {
+        } else if($scope.simulation && $scope.simulation.meta.task && $scope.simulation.meta.task !== 'completed') {
             $girder.getTask($scope.simulation)
                 .success(function(task){
                     console.log(task);
