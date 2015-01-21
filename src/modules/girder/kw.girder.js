@@ -616,8 +616,7 @@ angular.module("kitware.girder", ["ngCookies"])
         this.startTask = function (item, taskDefId, cluster, taskConfig) {
             var self = this;
             // Create task instance
-            console.log("Post tasks");
-            console.log({ taskSpecId: taskDefId });
+            taskConfig.cluster.name = item._id;
             self.post('tasks', { taskSpecId: taskDefId })
                 .success(function(response){
                     // Update Item metadata
