@@ -22,8 +22,7 @@ angular.module("kitware.cmb.core")
                     }
 
                     while(idx < count) {
-                        var line = lines[idx].replace(/  /g, ' ').replace(/  /g, ' ').replace(/  /g, ' ').replace(/RMS Div/g, 'RMS-Div').replace(/# /g, '').split(' ');
-                        console.log(line);
+                        var line = lines[idx].replace(/  /g, ' ').replace(/  /g, ' ').replace(/  /g, ' ').replace(/  /g, ' ').replace(/RMS Div/g, 'RMS-Div').replace(/# /g, '').split(' ');
                         $scope.outputStats.push(line);
 
                         // Next line
@@ -36,9 +35,9 @@ angular.module("kitware.cmb.core")
         } else if($scope.simulation && $scope.simulation.meta.task && $scope.simulation.meta.task !== 'completed') {
             $girder.getTask($scope.simulation)
                 .success(function(task){
-                    console.log(task);
                     if(task && task.output && task.output.hydra_job) {
                         $scope.jobId = task.output.hydra_job._id;
+                        updateOutput();
                     }
                 })
                 .error(function(err){
