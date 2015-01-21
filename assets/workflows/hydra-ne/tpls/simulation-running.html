@@ -16,8 +16,8 @@
 </md-toolbar>
 <md-content layout="row" layout-align="center center">
     <table flex>
-        <tr ng-repeat="line in outputStats">
-            <td ng-repeat="column in line">{{ column }}</td>
+        <tr ng-repeat="line in outputStats track by $index">
+            <td ng-repeat="column in line track by $index">{{ column }}</td>
         </tr>
     </table>
 </md-content>
