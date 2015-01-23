@@ -1,0 +1,28 @@
+<md-content flex class="md-padding">
+    <div ng-repeat="attribute in template.views[viewId].attributes">
+    <div layout="row"
+         class="cmb-property-head-group">
+        <i class="fa fa-lg fa-fw"
+            ng-class="{ 'fa-caret-down' : !viewData[attribute].collapsed, 'fa-caret-right': viewData[attribute].collapsed }"
+            ng-click="viewData[attribute].collapsed = !viewData[attribute].collapsed;">
+        </i>
+        <b ng-click="viewData[attribute].collapsed = !viewData[attribute].collapsed;">
+            {{ template.definitions[attribute].label }}
+        </b>
+        <hr style="position: relative; top: 1em; margin: 0 20px;" flex/>
+        <i class="fa fa-fw fa-gear"></i>
+        <i class="fa fa-fw fa-question" ng-click="toggleHelp($event)"></i>
+    </div>
+    <form class="form-horizontal cmb-property-panel" role="form"
+          ng-hide="viewData[attribute].collapsed">
+        <div class="collapsable"
+             ng-repeat="param in template.definitions[attribute].parameters"
+             cmb-property
+             workflow="{{ workflow }}"
+             property="param"
+             data="viewData[attribute]">
+        </div>
+    </form>
+    </div>
+</md-content>
+

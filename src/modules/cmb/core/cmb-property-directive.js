@@ -26,7 +26,8 @@ angular.module("kitware.cmb.core")
                 property: '='
             },
             controller: ['$scope', function($scope) {
-                $scope.toggleHelp = function(id) {
+                $scope.toggleLocalHelp = function(id) {
+                    console.log('toggleLocalHelp ' + id);
                     var domElem = document.getElementsByClassName('help-' + id)[0],
                         display = domElem ? domElem.style.display : null;
 
@@ -58,6 +59,8 @@ angular.module("kitware.cmb.core")
                     var helpTemplate = $templateCache.get( scope.workflow + '/help/' + scope.property.id);
                     if(helpTemplate) {
                         htmlCode += '<md-card style="display:none;" class="help-content help-'+scope.property.id+'"><md-card-content>' + helpTemplate + '</md-card-content></md-card>';
+                    } else {
+                        console.log("No help for " + scope.property.id + ' path: ' + scope.workflow + '/help/' + scope.property.id);
                     }
                     element.replaceWith($compile(htmlCode)(scope));
                     if(helpTemplate) {

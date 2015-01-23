@@ -17,39 +17,9 @@ angular.module("kitware.cmb.core")
         });
         // END - Refresh simulation status base on task progress every 10s
 
-        $scope.parameterDataTemplate = {};
-        $scope.data = {};
-
-        function updateData(newDataModel) {
-            console.log(newDataModel);
-            if(newDataModel) {
-                $scope.data = newDataModel;
-            }
-        }
-
-        $scope.saveAndValidate = function () {
-            console.log($scope.data);
-            $girder.uploadContentToItem($scope.simulation._id, 'hydra.json', JSON.stringify($scope.data, undefined, 3));
-        };
-
-        $scope.toggleHelp = function ($event) {
-            var list = $event.originalTarget.parentElement.parentElement.getElementsByClassName('help-content'),
-                count = list.length,
-                show = count > 0 ? (list[0].style.display === 'none') : false;
-
-            while(count--){
-                list[count].style.display = show ? '' : 'none';
-            }
-        };
-
-        $scope.activateSection = function(id) {
-            $scope.activeSection = id;
-        };
-
         $scope.taskCallback = function(simulationResponse) {
             // Move to the newly created simulation
             var simulation = simulationResponse[0];
-            updateScope();
             $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
         };
 
@@ -116,18 +86,8 @@ angular.module("kitware.cmb.core")
             $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
         };
 
-        function updateScope() {
-            if($scope.collection && CmbWorkflowHelper.getTemplate($scope.collection.name) !== null && $scope.simulation) {
-                $scope.parameterDataTemplate = CmbWorkflowHelper.getTemplate($scope.collection.name);
-                $girder.downloadContentFromItem($scope.simulation._id, 'hydra.json', updateData);
-            } else {
-                $timeout(updateScope, 100);
-            }
-        }
 
         if($girder.getUser() === null) {
             $state.go('login');
-        } else {
-            updateScope();
         }
     }]);

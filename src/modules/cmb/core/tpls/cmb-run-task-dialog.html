@@ -28,7 +28,7 @@
                     <div flex>
                         <select ng-model='data.type' class="form-control" ng-change="updateCost()">
                             <option ng-repeat="machine in machines" value="{{ machine.id }}">
-                                {{ machine.label }} - {{ machine.cpu }} cores - {{ machine.memory }} GB {{ machine.gpu ? " +        GPU" : "" }}
+                                {{ machine.label }} - {{ machine.cpu }} cores - {{ machine.memory }} GB {{ machine.gpu ? " + GPU" : "" }} - {{ machine.storage }}
                             </option>
                         </select>
                     </div>
@@ -43,7 +43,7 @@
                         ng-model='data.size'
                         value='1'
                         min='1'
-                        max='5'
+                        max='100'
                         step='1'
                         class="form-control"
                         ></textarea>

@@ -1,8 +1,9 @@
 <div layout="row"  layout-align="space-around center">
     <label flex="20">{{ property.label }}</label>
-    <select flex="70"
-        ng-model="data[property.id]"
+    <select multiple flex="70"
         type="{{ property.enum.type }}"
+        ng-multiple="true"
+        ng-model="data[property.id]"
         ng-options="item as item.label for item in property.enum.values">
     </select>
     <span flex></span>

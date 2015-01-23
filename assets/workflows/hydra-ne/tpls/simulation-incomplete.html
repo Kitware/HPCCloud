@@ -1,3 +1,4 @@
+<div ng-controller="cmbSimulationConfigurationController">
 <md-toolbar class="cmb-subsubheader" layout="row" layout-align="space-between center">
     <div flex layout="row" layout-align="start center">
         <md-button aria-label="Save input parameters" ng-click="saveAndValidate()">
@@ -22,38 +23,28 @@
     <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="1">
       <md-content class="md-padding">
         <ul class="nav">
-            <li ng-repeat="view in parameterDataTemplate.views"
-                ng-class="{ active: (activeSection == view.id) }"
-                ng-click="activateSection(view.id)">
-                <i class="fa fa-fw" ng-class="getClassIcon(view.id)"></i>
-                {{ view.label }}
+            <li ng-repeat="viewId in template.order"
+                ng-class="{ active: (activeSection.view === viewId) }">
+                <i class="fa fa-fw" ng-class="{ 'fa-check' : dataModel[viewId], 'fa-warning': !dataModel[viewId]}"></i>
+                <span ng-click="activateSection(viewId, 0)">{{ template.views[viewId].label }}</span>
+                <i ng-show="template.views[viewId].size === -1" class="fa fa-fw fa-plus pull-right" ng-click="addView($event, viewId)"></i>
+                <ul ng-show="dataModel[viewId] && dataModel[viewId].length > 0 && template.views[viewId].size !== undefined">
+                   <li ng-repeat="subView in dataModel[viewId]">
+                      <span ng-click="activateSection(viewId, $index)">{{ subView.name }}</span>
+                      <i class="fa fa-fw fa-trash pull-right" ng-click="removeView(viewId, $index)"></i>
+                   </li>
+                </ul>
             </li>
         </ul>
     </md-sidenav>
-    <md-content flex class="md-padding">
-    <div class='row' layout="column"
-            ng-repeat="view in parameterDataTemplate.views"
-            ng-show="activeSection == view.id">
-      <md-content flex class="md-padding" ng-repeat="attr in view.attributes" ng-class="{ collapsed: parameterDataTemplate.definitions[attr].collapsed }">
-          <div layout="row">
-            <i class="fa fa-lg fa-fw"
-              ng-click="parameterDataTemplate.definitions[attr].collapsed = !parameterDataTemplate.definitions[attr].collapsed;"
-              ng-class="{ 'fa-caret-down' : !parameterDataTemplate.definitions[attr].collapsed, 'fa-caret-right': parameterDataTemplate.definitions[attr].collapsed }"></i>
-            <b>{{ parameterDataTemplate.definitions[attr].label }}</b>
-            <hr style="position: relative; top: 1em; margin: 0 20px;" flex/>
-            <i class="fa fa-fw fa-gear"></i>
-            <i class="fa fa-fw fa-question" ng-click="toggleHelp($event)"></i>
-          </div>
-          <form class="form-horizontal cmb-property-panel" role="form" ng-hide="parameterDataTemplate.definitions[attr].collapsed">
-            <div class="collapsable"
-              ng-repeat="param in parameterDataTemplate.definitions[attr].parameters"
-              cmb-property
-              workflow="{{ collection.name }}"
-              property="param"
-              data="data"></div>
-          </form>
-      </md-content>
-    </div>
+    <md-content flex class="md-padding" layout="column"
+        cmb-view-panel
+        view-id="{{ activeSection.view }}"
+        view-index="{{ activeSection.idx }}"
+        view-data="activeSection.data"
+        template="template"
+        workflow="{{ workflow }}">
     </md-content>
     </section>
+</div>
 </div>
