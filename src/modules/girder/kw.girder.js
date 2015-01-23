@@ -650,21 +650,64 @@ angular.module("kitware.girder", ["ngCookies"])
             var self = this,
                 taskId = item.meta.taskId;
 
-            self.delete(['tasks', taskId].join('/'))
-                .success(function(){
-                    // Remove item metadata
-                    self.updateItemMetadata(item, {
-                        task: null, spec: null, taskId: null
-                    });
+            // Retrieve timing information first
+            self.get(['tasks', taskId].join('/'))
+                .success(function(task){
+                    var clusterId = null,
+                        jobId = null,
+                        timings = [];
+
+                    console.log(task);
+                    if(task.output && task.output.cluster) {
+                        clusterId = task.output.cluster._id;
+                    }
+                    if(task.output && task.output.hydra_job) {
+                        jobId = task.output.hydra_job._id;
+                    }
+
+                    // Fetch job timing first
+                    self.get(['jobs', jobId].join('/'))
+                        .success(function(job) {
+                            console.log('job');
+                            console.log(job);
+                            self.get(['clusters', clusterId].join('/'))
+                                .success(function(cluster) {
+                                    console.log('cluster');
+                                    console.log(cluster);
+
+                                    // self.updateItemMetadata(item, {
+                                    //     timings: timings
+                                    // });
+
+                                    // Execute the delete
+                                    // self.delete(['tasks', taskId].join('/'))
+                                    //     .success(function(){
+                                    //         // Remove item metadata
+                                    //         self.updateItemMetadata(item, {
+                                    //             task: null, spec: null, taskId: null
+                                    //         });
+                                    //     })
+                                    //     .error(function(error){
+                                    //         console.log("Error when deleting task " + taskId);
+                                    //         console.log(error);
+                                    //         console.log(item);
+                                    //         self.updateItemMetadata(item, {
+                                    //             task: null, spec: null
+                                    //         });
+                                    //     });
+                                })
+                                .error(function(){
+                                    console.log('error while fetching job ' + jobId);
+                        });
+                        })
+                        .error(function(){
+                            console.log('error while fetching job ' + jobId);
+                        });
                 })
-                .error(function(error){
-                    console.log("Error when deleting task " + taskId);
-                    console.log(error);
-                    console.log(item);
-                    self.updateItemMetadata(item, {
-                        task: null, spec: null
-                    });
-                });
+                .error(function() {
+                    console.log('unable to fetch task');
+                    // Maybe update metadata if task does not exist anymore...
+                })
         };
 
         this.terminateTask = function (item) {
