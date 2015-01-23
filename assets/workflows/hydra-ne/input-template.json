@@ -16,8 +16,8 @@
    "views" : {
       "material"    : { "id": "material",    "label" : "Materials",            "attributes": [ "Material" ] , "size": 1, "names": ["Material"]},
       "initial"     : { "id": "initial",     "label" : "Initial Conditions",   "attributes": [ "Initial" ] },
-      "boundary"    : { "id": "boundary",    "label" : "Boundary Conditions",  "attributes": [ "Boundary",  "ScalarDirichlet", "VelocityDirichlet", "SymmetryVelocity", "HeatFlux", "PassiveOutflow", "PressureOutflow", "User-DefinedVelocity"], "size": -1 },
-      "forces"      : { "id": "forces",      "label" : "Body Forces",          "attributes": [ "BodyForces", "BodyForce",  "BoussinesqForce", "PorousDragForce"], "size": -1  },
+      "boundary"    : { "id": "boundary",    "label" : "Boundary Conditions",  "attributes": [[ "ScalarDirichlet", "VelocityDirichlet", "SymmetryVelocity", "HeatFlux", "PassiveOutflow", "PressureOutflow", "User-DefinedVelocity"]], "size": -1 },
+      "forces"      : { "id": "forces",      "label" : "Body Forces",          "attributes": [["BodyForce",  "BoussinesqForce", "PorousDragForce" ]], "size": -1  },
       "sources"     : { "id": "sources",     "label" : "Sources",              "attributes": [ "HeatSources", "HeatSource" ], "size": -1},
       "hydrostatic" : { "id": "hydrostatic", "label" : "Hydrostatic Pressure", "attributes": [ "HydrostaticPressure" ] },
       "turbulence"  : { "id": "turbulence",  "label" : "Turbulence",           "attributes": [ "Turbulence", "RNG_ke", "Smagorinsky", "WALE" ] },
@@ -44,7 +44,6 @@
       "Material": {
          "label": "Material",
          "parameters": [
-            {"name": "name", "label": "Name", "type": "string", "size": 1, "help": [ "(material::name)" ], "id": "material.name" },
             {"name": "rho", "label": "Mass Density", "type": "double", "size": 1, "default": "1.0", "min": "0", "help": [ "(material::rho)" ], "id": "material.rho" },
             {"name": "cp", "label": "Constant Pressure Specific Heat", "size": 1, "default": "1.0", "type": "double", "min": "0", "help": [ "(material::Cp)" ], "id": "material.cp"},
             {"name": "cv", "label": "Constant Volume Specific Heat", "size": 1, "default": "1.0", "type": "double", "min": "0", "help": [ "(material::Cv)" ], "id": "material.cv"},
@@ -84,7 +83,6 @@
       "Boundary": {
          "label": "Boundary Conditions",
          "parameters": [
-            {"name": "name", "label": "Name", "type": "string", "size": 1, "help": [ "(boundary::name)" ], "id": "boundary.name" },
             {"name": "type", "label": "Type of Boundary Condition", "type": "enum", "default": 0, "size": 1,
                "enum": { "type": "string", "values": [
                   { "label": "Scalar Dirichlet", "value": "scalardirichlet" },
@@ -112,7 +110,9 @@
                   { "label": "Turbulent Viscosity", "value": "turbnu" }
                ]},
                "help": [ "(scalardirichlet::scalar)" ], "id": "scalardirichlet.scalar" },
-            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(scalardirichlet::setid)"], "id": "scalardirichlet.setids" },
+            {"name": "tags", "label": "Face tags", "size": -1, "layout": "globals", "type": "enum", "help": ["(scalardirichlet::setid)"], "id": "scalardirichlet.face.tags",
+               "enum": { "type": "face-tags" }
+            },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(scalardirichlet::name)" ], "id": "scalardirichlet.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(scalardirichlet::time-factor-pairs)" ], "id": "scalardirichlet.time-factor-pairs" },
             {"name": "amplitude", "label": "Amplitude", "size": 1, "type": "double", "help": ["(scalardirichlet::amplitude)"], "id": "scalardirichlet.amplitude" }
@@ -121,7 +121,9 @@
       "VelocityDirichlet": {
          "label": "Velocity Dirichlet",
          "parameters": [
-            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(velocitydirichlet::setid)"], "id": "velocitydirichlet.setids" },
+            {"name": "tags", "label": "Face tags", "size": -1, "layout": "globals", "type": "enum", "help": ["(velocitydirichlet::setid)"], "id": "velocitydirichlet.face.tags",
+               "enum": { "type": "face-tags" }
+            },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(velocitydirichlet::name)" ], "id": "velocitydirichlet.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(velocitydirichlet::time-factor-pairs)" ], "id": "velocitydirichlet.time-factor-pairs" },
             {"name": "amplitude", "label": "Amplitude", "size": 3, "type": "double", "help": ["(velocitydirichlet::amplitude)"], "id": "velocitydirichlet.amplitude" }
@@ -130,7 +132,9 @@
       "SymmetryVelocity": {
          "label": "Symmetry Dirichlet",
          "parameters": [
-            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(symmetrydirichlet::setid)"], "id": "symmetrydirichlet.setids" },
+            {"name": "tags", "label": "Face tags", "size": -1, "layout": "globals", "type": "enum", "help": ["(symmetrydirichlet::setid)"], "id": "symmetrydirichlet.face.tags",
+               "enum": { "type": "face-tags" }
+            },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(symmetrydirichlet::name)" ], "id": "symmetrydirichlet.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(symmetrydirichlet::time-factor-pairs)" ], "id": "symmetrydirichlet.time-factor-pairs" },
             {"name": "amplitude", "label": "Amplitude", "size": 3, "type": "double", "help": ["(symmetrydirichlet::amplitude)"], "id": "symmetrydirichlet.amplitude" }
@@ -139,7 +143,9 @@
       "HeatFlux": {
          "label": "Heat Flux",
          "parameters": [
-            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(heatflux::setid)"], "id": "heatflux.setids" },
+            {"name": "tags", "label": "Face tags", "size": -1, "layout": "globals", "type": "enum", "help": ["(heatflux::setid)"], "id": "heatflux.face.tags",
+               "enum": { "type": "face-tags" }
+            },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(heatflux::name)" ], "id": "heatflux.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(heatflux::time-factor-pairs)" ], "id": "heatflux.time-factor-pairs" },
             {"name": "amplitude", "label": "Amplitude", "size": 1, "type": "double", "help": ["(heatflux::amplitude)"], "id": "heatflux.amplitude" }
@@ -148,38 +154,33 @@
       "PassiveOutflow": {
          "label": "Passive Outflow",
          "parameters": [
-            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(passiveoutflow::setid)"], "id": "passiveoutflow.setids" }
+            {"name": "tags", "label": "Face tags", "size": -1, "layout": "globals", "type": "enum", "help": ["(passiveoutflow::setid)"], "id": "passiveoutflow.face.tags",
+               "enum": { "type": "face-tags" }
+            }
          ]
       },
       "PressureOutflow": {
          "label": "Pressure Outflow",
          "parameters": [
-            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(pressureoutflow::setid)"], "id": "pressureoutflow.setids" }
+            {"name": "tags", "label": "Face tags", "size": -1, "layout": "globals", "type": "enum", "help": ["(pressureoutflow::setid)"], "id": "pressureoutflow.face.tags",
+               "enum": { "type": "face-tags" }
+            }
          ]
       },
       "User-DefinedVelocity": {
          "label": "User-Defined Velocity",
          "parameters": [
-            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(user-definedvelocity::setid)"], "id": "user-definedvelocity.setids" }
-         ]
-      },
-      "BodyForces": {
-         "label": "Body Forces",
-         "parameters": [
-            {"name": "name", "label": "Name", "type": "string", "size": 1, "help": [ "(bodyforces::name)" ], "id": "bodyforces.name" },
-            {"name": "type", "label": "Type of Body Force", "type": "enum", "default": 0, "size": 1,
-               "enum": { "type": "string", "values": [
-                  { "label": "Body Force", "value": "bodyforce" },
-                  { "label": "Boussinesq Force", "value": "boussinesqforce" },
-                  { "label": "Porous Drag Force", "value": "porousdragforce" }
-               ]},
-               "help": [ "(bodyforces::type)" ], "id": "bodyforces.type" }
+            {"name": "tags", "label": "Face tags", "size": -1, "layout": "globals", "type": "enum", "help": ["(user-definedvelocity::setid)"], "id": "user-definedvelocity.face.tags",
+               "enum": { "type": "face-tags" }
+            }
          ]
       },
       "BodyForce": {
          "label": "Body Force",
          "parameters": [
-            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(bodyforce::setid)"], "id": "bodyforce.setids" },
+            {"name": "tags", "label": "Face tags", "size": -1, "layout": "globals", "type": "enum", "help": ["(bodyforce::setid)"], "id": "bodyforce.face.tags",
+               "enum": { "type": "face-tags" }
+            },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(bodyforce::name)" ], "id": "bodyforce.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(bodyforce::time-factor-pairs)" ], "id": "bodyforce.time-factor-pairs" },
             {"name": "amplitude", "label": "Force Amplitude", "size": 3, "type": "double", "default": "0.0", "help": ["(bodyforce::amplitude)"], "id": "bodyforce.amplitude" }
@@ -188,7 +189,9 @@
       "BoussinesqForce": {
          "label": "Boussinesq Force",
          "parameters": [
-            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(boussinesqforce::setid)"], "id": "boussinesqforce.setids" },
+            {"name": "tags", "label": "Face tags", "size": -1, "layout": "globals", "type": "enum", "help": ["(boussinesqforce::setid)"], "id": "boussinesqforce.face.tags",
+               "enum": { "type": "face-tags" }
+            },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(boussinesqforce::name)" ], "id": "boussinesqforce.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(boussinesqforce::time-factor-pairs)" ], "id": "boussinesqforce.time-factor-pairs" },
             {"name": "amplitude", "label": "Gravity Amplitude", "size": 3, "type": "double", "default": "0.0", "help": ["(boussinesqforce::amplitude)"], "id": "boussinesqforce.amplitude" }
@@ -197,7 +200,9 @@
       "PorousDragForce": {
          "label": "Porous Drag Force",
          "parameters": [
-            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(porousdragforce::setid)"], "id": "porousdragforce.setids" },
+            {"name": "tags", "label": "Face tags", "size": -1, "layout": "globals", "type": "enum", "help": ["(porousdragforce::setid)"], "id": "porousdragforce.face.tags",
+               "enum": { "type": "face-tags" }
+            },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(porousdragforce::name)" ], "id": "porousdragforce.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(porousdragforce::time-factor-pairs)" ], "id": "porousdragforce.time-factor-pairs" },
             {"name": "amplitude", "label": "Porous Drag Amplitude", "size": 1, "type": "double", "default": "0.0", "help": ["(porousdragforce::porousdrag)"], "id": "porousdragforce.amplitude" }
@@ -206,7 +211,6 @@
       "HeatSources": {
          "label": "Heat Sources",
          "parameters": [
-            {"name": "name", "label": "Name", "type": "string", "size": 1, "help": [ "(heatsources::name)" ], "id": "heatsources.name" },
             {"name": "type", "label": "Type of Heat Source", "type": "enum", "default": "heatsource", "size": 1,
                "enum": { "type": "string", "values": [
                   { "label": "Heat Source", "value": "heatsource" }
@@ -217,7 +221,9 @@
       "HeatSource": {
          "label": "Heat Source",
          "parameters": [
-            {"name": "setids", "label": "Set Ids", "size": 1, "type": "integer", "help": ["(heatsource::setid)"], "id": "heatsource.setids" },
+            {"name": "tags", "label": "Face tags", "size": -1, "layout": "globals", "type": "enum", "help": ["(heatsource::setid)"], "id": "heatsource.face.tags",
+               "enum": { "type": "face-tags" }
+            },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(heatsource::name)" ], "id": "heatsource.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(heatsource::time-factor-pairs)" ], "id": "heatsource.time-factor-pairs" },
             {"name": "amplitude", "label": "Volumetric Amplitude", "size": 1, "type": "double", "default": "0.0", "help": ["(heatsource::amplitude)"], "id": "heatsource.amplitude" }
@@ -226,7 +232,9 @@
       "HydrostaticPressure": {
          "label": "Hydrostatic Pressure",
          "parameters": [
-            {"name": "setid", "label": "Set Id", "size": 1, "type": "integer", "help": ["(hydrostatic::setid)"], "id": "hydrostatic.setid" },
+            {"name": "tags", "label": "Face tags", "size": -1, "layout": "globals", "type": "enum", "help": ["(hydrostatic::setid)"], "id": "hydrostatic.face.tags",
+               "enum": { "type": "face-tags" }
+            },
             {"name": "name", "label": "Load Curve Name", "type": "string", "size": 1, "help": [ "(hydrostatic::name)" ], "id": "hydrostatic.name" },
             {"name": "time-factor-pairs", "label": "Time and Factor Pairs", "type": "string", "size": 1, "help": [ "(hydrostatic::time-factor-pairs)" ], "id": "hydrostatic.time-factor-pairs" },
             {"name": "amplitude", "label": "Hydrostatic Pressure Amplitude", "size": 1, "type": "double", "help": ["(hydrostatic::amplitude)"], "id": "hydrostatic.amplitude" }
@@ -235,7 +243,6 @@
       "Turbulence": {
          "label": "Turbulence",
          "parameters": [
-            {"name": "name", "label": "Name", "size": 1, "type": "string", "help": ["(turbulence::name)"], "id": "turbulence.name" },
             {"name": "tmodel", "label": "Predefined Turbulence Model", "type": "enum", "default": 0, "size": 1,
                "enum": { "type": "string", "values": [
                   { "label": "No Turbulence Model", "value": "no_turbmodel" },

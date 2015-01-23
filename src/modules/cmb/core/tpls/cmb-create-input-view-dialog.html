@@ -1,0 +1,18 @@
+<md-dialog aria-label="{{ title }}" style="width: 50%;">
+    <md-subheader class="md-sticky-no-effect cmb-subheader">
+      <strong title>{{ title }}</strong>
+    </md-subheader>
+    <md-content>
+    <form layout="column">
+        <md-input-container flex>
+            <label>{{ namePlaceHolder }}</label>
+            <input ng-model="data.name">
+        </md-input-container>
+    </form>
+</md-content>
+  <div class="md-actions" layout="row">
+    <span flex></span>
+    <md-button ng-click="ok(data)" class="md-raised md-primary">Ok</md-button>
+    <md-button ng-click="cancel()" class="md-raised md-warn">Cancel</md-button>
+  </div>
+</md-dialog>

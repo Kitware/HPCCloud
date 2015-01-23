@@ -1,28 +1,60 @@
 <md-content flex class="md-padding">
     <div ng-repeat="attribute in template.views[viewId].attributes">
-    <div layout="row"
-         class="cmb-property-head-group">
-        <i class="fa fa-lg fa-fw"
-            ng-class="{ 'fa-caret-down' : !viewData[attribute].collapsed, 'fa-caret-right': viewData[attribute].collapsed }"
-            ng-click="viewData[attribute].collapsed = !viewData[attribute].collapsed;">
-        </i>
-        <b ng-click="viewData[attribute].collapsed = !viewData[attribute].collapsed;">
-            {{ template.definitions[attribute].label }}
-        </b>
-        <hr style="position: relative; top: 1em; margin: 0 20px;" flex/>
-        <i class="fa fa-fw fa-gear"></i>
-        <i class="fa fa-fw fa-question" ng-click="toggleHelp($event)"></i>
-    </div>
-    <form class="form-horizontal cmb-property-panel" role="form"
-          ng-hide="viewData[attribute].collapsed">
-        <div class="collapsable"
-             ng-repeat="param in template.definitions[attribute].parameters"
-             cmb-property
-             workflow="{{ workflow }}"
-             property="param"
-             data="viewData[attribute]">
+        <div ng-if="isArray(attribute)" ng-init="activeOrIdx = $index;">
+            <div layout="row"
+                 class="cmb-property-head-group">
+                <i class="fa fa-lg fa-fw"
+                    ng-class="{ 'fa-caret-down' : !viewData.or[activeOrIdx].collapsed, 'fa-caret-right': viewData.or[activeOrIdx].collapsed }"
+                    ng-click="viewData.or[activeOrIdx].collapsed = !viewData.or[activeOrIdx].collapsed;">
+                </i>
+                <select
+                    ng-model="viewData.or[$index].active"
+                    ng-options="opt as opt.label for opt in viewData.or[$index].list">
+                </select>
+                <hr style="position: relative; top: 1em; margin: 0 20px;" flex/>
+                <i class="fa fa-fw fa-gear"></i>
+                <i class="fa fa-fw fa-question" ng-click="toggleHelp($event)"></i>
+            </div>
+            <div ng-repeat="attr in attribute" ng-hide="viewData.or[activeOrIdx].collapsed">
+                <form class="form-horizontal cmb-property-panel" role="form"
+                      ng-show="viewData.or[activeOrIdx].active.value === attr">
+                    <div class="collapsable"
+                         ng-repeat="param in template.definitions[attr].parameters"
+                         cmb-property
+                         workflow="{{ workflow }}"
+                         property="param"
+                         data="viewData[attr]"
+                         globals="globals">
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
+        <div ng-if="!isArray(attribute)">
+            <div layout="row"
+                 class="cmb-property-head-group">
+                <i class="fa fa-lg fa-fw"
+                    ng-class="{ 'fa-caret-down' : !viewData[attribute].collapsed, 'fa-caret-right': viewData[attribute].collapsed }"
+                    ng-click="viewData[attribute].collapsed = !viewData[attribute].collapsed;">
+                </i>
+                <b ng-click="viewData[attribute].collapsed = !viewData[attribute].collapsed;">
+                    {{ template.definitions[attribute].label }}
+                </b>
+                <hr style="position: relative; top: 1em; margin: 0 20px;" flex/>
+                <i class="fa fa-fw fa-gear"></i>
+                <i class="fa fa-fw fa-question" ng-click="toggleHelp($event)"></i>
+            </div>
+            <form class="form-horizontal cmb-property-panel" role="form"
+                  ng-hide="viewData[attribute].collapsed">
+                <div class="collapsable"
+                     ng-repeat="param in template.definitions[attribute].parameters"
+                     cmb-property
+                     workflow="{{ workflow }}"
+                     property="param"
+                     data="viewData[attribute]"
+                     globals="globals">
+                </div>
+            </form>
+        </div>
     </div>
 </md-content>
 

@@ -1,11 +1,10 @@
 <div layout="row"  layout-align="space-around center" style="height: 90px;">
     <label flex="20">{{ property.label }}</label>
-    {{ globals[property.enum.type] }}
     <select multiple flex="70"
         type="{{ property.enum.type }}"
         ng-multiple="true"
         ng-model="data[property.id]"
-        ng-options="item as item.label for item in property.enum.values">
+        ng-options="item as item.label for item in globals[property.enum.type]">
     </select>
     <span flex></span>
     <md-button class="md-fab help-button" aria-label="Toggle help" ng-click="toggleLocalHelp(property.id)">

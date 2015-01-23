@@ -7,9 +7,12 @@ angular.module("kitware.cmb.core")
                 viewIndex: '@',
                 viewData: '=',
                 template: '=',
+                globals: '=',
                 workflow: '@'
             },
             controller: ['$scope', function($scope) {
+                $scope.isArray = angular.isArray;
+
                 $scope.toggleHelp = function ($event) {
                     var list = $event.target.parentElement.parentElement.getElementsByClassName('help-content'),
                         count = list.length,

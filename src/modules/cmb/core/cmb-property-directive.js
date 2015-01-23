@@ -23,7 +23,8 @@ angular.module("kitware.cmb.core")
             scope: {
                 data: '=',
                 workflow: '@',
-                property: '='
+                property: '=',
+                globals: '='
             },
             controller: ['$scope', function($scope) {
                 $scope.toggleLocalHelp = function(id) {
