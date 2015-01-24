@@ -1,6 +1,6 @@
 angular.module("kitware.cmb.core")
     .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$interval', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $interval) {
-        var timoutId = 0;
+        var timeoutId = 0;
 
         // BEGIN - Refresh simulation status base on task progress every 10s
         timeoutId = $interval(function() {
