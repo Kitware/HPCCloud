@@ -669,59 +669,54 @@ angular.module("kitware.girder", ["ngCookies"])
 
         this.deleteTask = function (item) {
             var self = this,
-                taskId = item.meta.taskId;
+                taskId = item.meta.taskId,
+                timings = {},
+                ready = 0;
+
+            function extractTiming(obj) {
+                angular.extend(obj.timings, timings);
+                self.updateItemMetadata(item, {timings: timings});
+                ready--;
+
+                if(ready === 0){
+                    // Execute the delete
+                    self.delete(['tasks', taskId].join('/'))
+                        .success(function(){
+                            // Remove item metadata
+                            self.updateItemMetadata(item, {
+                                task: null, spec: null, taskId: null
+                            });
+                        })
+                        .error(function(error){
+                            console.log("Error when deleting task " + taskId);
+                            console.log(error);
+                            console.log(item);
+                            self.updateItemMetadata(item, {
+                                task: null, spec: null
+                            });
+                        });
+                }
+            }
 
             // Retrieve timing information first
             self.get(['tasks', taskId].join('/'))
                 .success(function(task){
                     var clusterId = null,
-                        jobId = null,
-                        timings = {};
+                        jobId = null;
 
-                    console.log(task);
                     if(task.output && task.output.cluster) {
                         clusterId = task.output.cluster._id;
+                        ready++;
                     }
                     if(task.output && task.output.hydra_job) {
+                        ready++;
                         jobId = task.output.hydra_job._id;
                     }
 
-                    // Fetch job timing first
+                    self.get(['clusters', clusterId].join('/'))
+                        .success(extractTiming);
                     self.get(['jobs', jobId].join('/'))
-                        .success(function(job) {
-                            angular.extend(job.timings, timings);
-                            self.get(['clusters', clusterId].join('/'))
-                                .success(function(cluster) {
-                                    angular.extend(cluster.timings, timings);
-
-                                    self.updateItemMetadata(item, {
-                                        timings: timings
-                                    });
-
-                                    // Execute the delete
-                                    self.delete(['tasks', taskId].join('/'))
-                                        .success(function(){
-                                            // Remove item metadata
-                                            self.updateItemMetadata(item, {
-                                                task: null, spec: null, taskId: null
-                                            });
-                                        })
-                                        .error(function(error){
-                                            console.log("Error when deleting task " + taskId);
-                                            console.log(error);
-                                            console.log(item);
-                                            self.updateItemMetadata(item, {
-                                                task: null, spec: null
-                                            });
-                                        });
-                                })
-                                .error(function(){
-                                    console.log('error while fetching job ' + jobId);
-                        });
-                        })
-                        .error(function(){
-                            console.log('error while fetching job ' + jobId);
-                        });
+                        .success(extractTiming);
                 })
                 .error(function() {
                     console.log('unable to fetch task');
