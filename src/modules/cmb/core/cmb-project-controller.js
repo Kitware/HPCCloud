@@ -13,6 +13,7 @@ angular.module("kitware.cmb.core")
                     $girder.deleteTask(array[count]);
                     needUpdate = true;
                 } else if(array[count].meta.taskId) {
+                    console.log('update task');
                     $girder.updateTaskStatus(array[count]);
                     needUpdate = true;
                 }

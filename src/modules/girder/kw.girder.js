@@ -549,9 +549,8 @@ angular.module("kitware.girder", ["ngCookies"])
 
             self.get(['tasks/', item.meta.taskId].join(''))
                 .success(function(response) {
-                    console.log(response);
                     if(item.meta.status !== response.status) {
-                        console.log('update status to ' + response.status);
+                        console.log('update status to ' + response.status + ' from: ' + item.meta.status);
                         var sesssionId = (response.output && response.output.pvw_job) ? response.output.cluster._id + '%2F' + response.output.pvw_job._id : '',
                             connectionURL = ( $window.location.protocol === 'https:' ? "wss://" : "ws://") + $window.location.host + "/proxy?sessionId=" + sesssionId,
                             meta = angular.copy(item.meta);
@@ -562,10 +561,12 @@ angular.module("kitware.girder", ["ngCookies"])
                         // FIXME
                         if(meta.task === 'running' && meta.status === 'valid') {
                             meta.status = 'running';
+                            console.log('wf => running');
                         }
                         if(meta.task === 'complete' && meta.status === 'running') {
                             meta.status = 'completed';
                             meta.task = 'terminated';
+                            console.log('wf => completed(terminated)');
                         }
 
                         self.updateItemMetadata(item, meta);
@@ -577,10 +578,12 @@ angular.module("kitware.girder", ["ngCookies"])
                         if(newMeta.task === 'running' && newMeta.status === 'valid') {
                             newMeta.status = 'running';
                             changeDetected = true;
+                            console.log('wf => running');
                         }
                         if(newMeta.task === 'complete' && newMeta.status === 'running') {
                             newMeta.status = 'completed';
                             newMeta.task = 'terminated';
+                            console.log('wf => completed(terminated)');
                             changeDetected = true;
                         }
 
