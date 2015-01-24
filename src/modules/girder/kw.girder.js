@@ -569,6 +569,24 @@ angular.module("kitware.girder", ["ngCookies"])
                         }
 
                         self.updateItemMetadata(item, meta);
+                    } else {
+                        var changeDetected = false,
+                            newMeta = angular.copy(item.meta);
+
+                        // FIXME
+                        if(newMeta.task === 'running' && newMeta.status === 'valid') {
+                            newMeta.status = 'running';
+                            changeDetected = true;
+                        }
+                        if(newMeta.task === 'complete' && newMeta.status === 'running') {
+                            newMeta.status = 'completed';
+                            newMeta.task = 'terminated';
+                            changeDetected = true;
+                        }
+
+                        if(changeDetected) {
+                            self.updateItemMetadata(item, newMeta);
+                        }
                     }
                 })
                 .error(function(resp){
@@ -707,7 +725,7 @@ angular.module("kitware.girder", ["ngCookies"])
                 .error(function() {
                     console.log('unable to fetch task');
                     // Maybe update metadata if task does not exist anymore...
-                })
+                });
         };
 
         this.terminateTask = function (item) {
