@@ -20,6 +20,7 @@ angular.module("kitware.cmb.core")
             }
 
             if(needUpdate) {
+                needUpdate = false;
                 updateScope();
             }
         }, 10000);
