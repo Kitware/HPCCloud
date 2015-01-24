@@ -673,7 +673,7 @@ angular.module("kitware.girder", ["ngCookies"])
                 .success(function(task){
                     var clusterId = null,
                         jobId = null,
-                        timings = [];
+                        timings = {};
 
                     console.log(task);
                     if(task.output && task.output.cluster) {
@@ -686,33 +686,31 @@ angular.module("kitware.girder", ["ngCookies"])
                     // Fetch job timing first
                     self.get(['jobs', jobId].join('/'))
                         .success(function(job) {
-                            console.log('job');
-                            console.log(job);
+                            angular.extend(job.timings, timings);
                             self.get(['clusters', clusterId].join('/'))
                                 .success(function(cluster) {
-                                    console.log('cluster');
-                                    console.log(cluster);
+                                    angular.extend(cluster.timings, timings);
 
-                                    // self.updateItemMetadata(item, {
-                                    //     timings: timings
-                                    // });
+                                    self.updateItemMetadata(item, {
+                                        timings: timings
+                                    });
 
                                     // Execute the delete
-                                    // self.delete(['tasks', taskId].join('/'))
-                                    //     .success(function(){
-                                    //         // Remove item metadata
-                                    //         self.updateItemMetadata(item, {
-                                    //             task: null, spec: null, taskId: null
-                                    //         });
-                                    //     })
-                                    //     .error(function(error){
-                                    //         console.log("Error when deleting task " + taskId);
-                                    //         console.log(error);
-                                    //         console.log(item);
-                                    //         self.updateItemMetadata(item, {
-                                    //             task: null, spec: null
-                                    //         });
-                                    //     });
+                                    self.delete(['tasks', taskId].join('/'))
+                                        .success(function(){
+                                            // Remove item metadata
+                                            self.updateItemMetadata(item, {
+                                                task: null, spec: null, taskId: null
+                                            });
+                                        })
+                                        .error(function(error){
+                                            console.log("Error when deleting task " + taskId);
+                                            console.log(error);
+                                            console.log(item);
+                                            self.updateItemMetadata(item, {
+                                                task: null, spec: null
+                                            });
+                                        });
                                 })
                                 .error(function(){
                                     console.log('error while fetching job ' + jobId);
