@@ -25,6 +25,7 @@ angular.module("kitware.cmb.core")
         }, 10000);
 
         $scope.$on('$destroy', function() {
+            console.log('$destroy CmbProjectController');
             $interval.cancel(timeoutId);
         });
         // END - Refresh simulation status base on task progress every 10s
