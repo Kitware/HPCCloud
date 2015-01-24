@@ -550,7 +550,7 @@ angular.module("kitware.girder", ["ngCookies"])
             self.get(['tasks/', item.meta.taskId].join(''))
                 .success(function(response) {
                     if(item.meta.status !== response.status) {
-                        console.log('update status to ' + response.status + ' from: ' + item.meta.status);
+                        console.log('update status to ' + response.status + ' from: ' + item.meta.task);
                         var sesssionId = (response.output && response.output.pvw_job) ? response.output.cluster._id + '%2F' + response.output.pvw_job._id : '',
                             connectionURL = ( $window.location.protocol === 'https:' ? "wss://" : "ws://") + $window.location.host + "/proxy?sessionId=" + sesssionId,
                             meta = angular.copy(item.meta);
