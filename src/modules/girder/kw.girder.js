@@ -674,7 +674,7 @@ angular.module("kitware.girder", ["ngCookies"])
                 ready = 0;
 
             function extractTiming(obj) {
-                angular.extend(obj.timings, timings);
+                angular.extend(timings, obj.timings);
                 self.updateItemMetadata(item, {timings: timings});
                 ready--;
 
