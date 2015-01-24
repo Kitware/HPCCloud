@@ -712,11 +712,18 @@ angular.module("kitware.girder", ["ngCookies"])
                         ready++;
                         jobId = task.output.hydra_job._id;
                     }
+                    if(ready === 0) {
+                        extractTiming({timing:{"info": "nothing to get"}});
+                    }
 
-                    self.get(['clusters', clusterId].join('/'))
-                        .success(extractTiming);
-                    self.get(['jobs', jobId].join('/'))
-                        .success(extractTiming);
+                    if(clusterId) {
+                        self.get(['clusters', clusterId].join('/'))
+                            .success(extractTiming);
+                    }
+                    if(jobId) {
+                        self.get(['jobs', jobId].join('/'))
+                            .success(extractTiming);
+                    }
                 })
                 .error(function() {
                     console.log('unable to fetch task');
