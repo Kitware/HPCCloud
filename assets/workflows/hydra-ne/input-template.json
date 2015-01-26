@@ -11,7 +11,8 @@
       "solvers",
       "time",
       "execution",
-      "output"
+      "output",
+      "functions"
    ],
    "views" : {
       "material"    : { "id": "material",    "label" : "Materials",            "attributes": [ "Material" ] , "size": 1, "names": ["Material"]},
@@ -25,9 +26,24 @@
       "solvers"     : { "id": "solvers",     "label" : "Solvers",              "attributes": [ "Energy", "Pressure", "HypreBoomerAMG", "MLAMG", "Momentum", "TransportSolver" ] },
       "time"        : { "id": "time",        "label" : "Time",                 "attributes": [ "Time", "TimeIntegration" ] },
       "execution"   : { "id": "execution",   "label" : "Execution",            "attributes": [ "ExecutionControl", "LoadBalance" ] },
-      "output"      : { "id": "output",      "label" : "Output",               "attributes": [ "Dump", "Plot", "ASCII", "TimeHistory", "VelocityMinMax", "TurbulenceStatistics" ] }
+      "output"      : { "id": "output",      "label" : "Output",               "attributes": [ "Dump", "Plot", "ASCII", "TimeHistory", "VelocityMinMax", "TurbulenceStatistics" ] },
+      "functions"   : { "id": "functions",   "label" : "Time functions",       "attributes": [ "TimeFunction"], "size": -1}
    },
    "definitions": {
+      "TimeFunction": {
+         "label": "Time function",
+         "parameters": [
+            {
+               "name": "func",
+               "label": "Time function",
+               "type": "function",
+               "default": "",
+               "size": 1,
+               "help": [""],
+               "id": "function.temporal"
+            }
+         ]
+      },
       "Energy": {
          "label": "Energy",
          "parameters": [

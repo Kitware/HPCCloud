@@ -25,6 +25,8 @@ angular.module("kitware.cmb.core")
                 } else {
                     return parameter.enum.values[value];
                 }
+            } else if (type === 'function') {
+                return [];
             } else if(['integrer', 'double'].indexOf(type) !== -1) {
                 value = Number(value);
             }
@@ -131,6 +133,11 @@ angular.module("kitware.cmb.core")
                 targetEvent: event,
             })
             .then(function(formData) {
+                // Make sure we have room for given view
+                if($scope.dataModel[viewId] === undefined) {
+                   $scope.dataModel[viewId] = [];
+                }
+
                 // Activate view
                 var viewModel = generateViewDataModel(viewId, controllerScope.dataModel[viewId].length);
                 viewModel.name = formData.name;
@@ -227,7 +234,7 @@ angular.module("kitware.cmb.core")
                         console.log(err);
                     });
             } else {
-                $timeout(fetchData, 100);
+                $timeout(fetchData, 500);
             }
         }
 
