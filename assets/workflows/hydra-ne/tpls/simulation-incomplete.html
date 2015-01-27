@@ -1,51 +1,23 @@
-<div ng-controller="cmbSimulationConfigurationController">
-<md-toolbar class="cmb-subsubheader" layout="row" layout-align="space-between center">
-    <div flex layout="row" layout-align="start center">
-        <md-button aria-label="Save input parameters" ng-click="saveAndValidate()">
-            <i class="fa fa-save"></i>
-            <md-tooltip>Save input parameters</md-tooltip>
-        </md-button>
+<div>
+    <md-toolbar class="cmb-subsubheader" layout="row" layout-align="space-between center">
+        <div flex layout="row" layout-align="start center">
+            <md-button aria-label="Save input parameters" ng-click="saveAndValidate()">
+                <i class="fa fa-save"></i>
+                <md-tooltip>Save input parameters</md-tooltip>
+            </md-button>
+        </div>
+        <div flex layout="row" layout-align="center center">
+            {{ simulation.name }}
+        </div>
+        <div flex layout="row" layout-align="end center">
+            <md-button
+                aria-label="Simulation input is Invalid. Click to see some details."
+                ng-click="showError($event)">
+                <i class="fa fa-fw fa-warning"></i>
+                <md-tooltip>Show errors or incomplete data</md-tooltip>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <div layout="column" cmb-simulation-input>
     </div>
-    <div flex layout="row" layout-align="center center">
-        {{ simulation.name }}
-    </div>
-    <div flex layout="row" layout-align="end center">
-        <md-button
-            aria-label="Simulation input is Invalid. Click to see some details."
-            ng-click="showError($event)">
-            <i class="fa fa-fw fa-warning"></i>
-            <md-tooltip>Show errors or incomplete data</md-tooltip>
-        </md-button>
-    </div>
-</md-toolbar>
-<div layout="column">
-    <section layout="row" flex>
-    <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="1">
-      <md-content class="md-padding">
-        <ul class="nav">
-            <li ng-repeat="viewId in template.order">
-                <i class="fa fa-fw" ng-class="{ 'fa-check' : dataModel[viewId], 'fa-warning': !dataModel[viewId]}"></i>
-                <span ng-click="(dataModel[viewId].length === 0) ? addView($event, viewId) : activateSection(viewId, 0)" ng-class="{ active: (activeSection.view === viewId) }">{{ template.views[viewId].label }}</span>
-                <i ng-show="template.views[viewId].size === -1" class="fa fa-fw fa-plus pull-right" ng-click="addView($event, viewId)"></i>
-                <ul ng-show="dataModel[viewId] && dataModel[viewId].length > 0 && template.views[viewId].size !== undefined">
-                   <li ng-repeat="subView in dataModel[viewId]"
-                       ng-class="{ active: (activeSection.view === viewId && activeSection.idx === $index) }">
-                      <span ng-click="activateSection(viewId, $index)" >{{ subView.name }}</span>
-                      <i class="fa fa-fw fa-trash pull-right" ng-click="removeView(viewId, $index)"></i>
-                   </li>
-                </ul>
-            </li>
-        </ul>
-    </md-sidenav>
-    <md-content flex class="md-padding" layout="column"
-        cmb-view-panel
-        view-id="{{ activeSection.view }}"
-        view-index="{{ activeSection.idx }}"
-        view-data="activeSection.data"
-        template="template"
-        globals="meshAnnotations"
-        workflow="{{ workflow }}">
-    </md-content>
-    </section>
-</div>
 </div>

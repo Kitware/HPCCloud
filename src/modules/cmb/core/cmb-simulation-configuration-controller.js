@@ -1,11 +1,118 @@
 angular.module("kitware.cmb.core")
     .controller('cmbSimulationConfigurationController', ['$scope', 'kw.Girder', '$mdDialog', '$templateCache', '$window', '$timeout', 'CmbWorkflowHelper', function ($scope, $girder, $mdDialog, $templateCache, $window, $timeout, CmbWorkflowHelper) {
+        var templateIndexForSelect = null;
 
         $scope.workflow = null;
         $scope.template = null;
         $scope.dataModel = null;
         $scope.activeSection = null;
         $scope.meshAnnotations = null;
+
+        function extractEnumList(template) {
+            var indexedData = {},
+                attributes = template.definitions;
+
+            for(var key in attributes) {
+                // Reserve memory
+                indexedData[key] = [];
+
+                var parameters = attributes[key].parameters,
+                    count = parameters ? parameters.length : 0;
+
+                while(count--) {
+                    if(parameters[count].type === 'enum') {
+                        indexedData[key].push(parameters[count].id);
+                    }
+                }
+            }
+            return indexedData;
+        }
+
+        function extractActiveItemInEnum(activeValue, template, globals, attributeName, parameterId) {
+            var parameters = template.definitions[attributeName].parameters,
+                count = parameters ? parameters.length : 0,
+                list = null;
+
+            while(count--) {
+                if(parameters[count].id === parameterId) {
+                    list = parameters[count].enum.values;
+                    count = 0;
+
+                    if(list === undefined) {
+                        // Must be a global enum
+                        list = globals[parameters[count].enum.type];
+                    }
+                }
+            }
+
+            // Search active value
+            count = list ? list.length : 0;
+            while(count--) {
+                if(angular.equals(activeValue, list[count].value)) {
+                    return list[count];
+                }
+            }
+
+            return null;
+        }
+
+        function updateActiveListElements(modelToValidate, template, globals) {
+            var list, count, active, views, viewCount;
+
+            // Handle enum selection
+            for(var attrName in modelToValidate) {
+                if(['or', 'name'].indexOf(attrName) !== -1 || attrName[0] === '$') {
+                    continue;
+                }
+
+                list = templateIndexForSelect[attrName];
+                count = list.length;
+
+                while(count--) {
+                    active = modelToValidate[attrName][list[count]];
+                    if(active) {
+                        if(angular.isArray(active)) {
+                            var newSetOfActive = [];
+                            for(var idx = 0; idx < active.length; ++idx) {
+                                newSetOfActive.push(
+                                    extractActiveItemInEnum(
+                                        active[idx].value,
+                                        template,
+                                        globals,
+                                        attrName,
+                                        list[count]));
+                            }
+                            modelToValidate[attrName][list[count]] = newSetOfActive;
+                        } else {
+                            modelToValidate[attrName][list[count]] =
+                                extractActiveItemInEnum(
+                                    active.value,
+                                    template,
+                                    globals,
+                                    attrName,
+                                    list[count]);
+                        }
+                    }
+                }
+            }
+
+            // Handle the OR selection
+            views = modelToValidate.or;
+            viewCount = views.length;
+
+            while(viewCount--) {
+                list = views[viewCount].list;
+                active = views[viewCount].active;
+                count = list ? list.length : 0;
+
+                while(count--) {
+                    if(active.value === list[count].value) {
+                        views[viewCount].active = list[count];
+                        count = 0;
+                    }
+                }
+            }
+        }
 
         function extractDefault(parameter) {
             var value = parameter.default,
@@ -102,7 +209,6 @@ angular.module("kitware.cmb.core")
         }
 
         $scope.removeView = function (viewId, index) {
-            console.log('removeView ' + index);
             $scope.dataModel[viewId].splice(index,1);
             $scope.activateSection(null, 0);
         };
@@ -149,7 +255,6 @@ angular.module("kitware.cmb.core")
         };
 
         $scope.activateSection = function(viewId, index) {
-            console.log('activateSection(' + viewId + ', ' + index + ')');
             var viewSubDataModel = null;
 
             if(!viewId ) {
@@ -166,15 +271,13 @@ angular.module("kitware.cmb.core")
                 viewSubDataModel = $scope.dataModel[viewId][index];
 
                 // Revalidate enum properties...
-                // FIXME
                 console.log('got it from model');
-
+                updateActiveListElements(viewSubDataModel, $scope.template, $scope.meshAnnotations);
 
             } else {
                 // Need to generate data from default
                 console.log('generate it');
                 viewSubDataModel = generateViewDataModel(viewId, $scope.dataModel[viewId] ? $scope.dataModel[viewId].length : 0);
-                console.log(viewSubDataModel);
                 $scope.dataModel[viewId].push(viewSubDataModel);
             }
 
@@ -185,8 +288,16 @@ angular.module("kitware.cmb.core")
             if($scope.collection && CmbWorkflowHelper.getTemplate($scope.collection.name) !== null && $scope.simulation) {
                 $scope.workflow = $scope.collection.name;
                 $scope.template = CmbWorkflowHelper.getTemplate($scope.collection.name);
-                $girder.downloadContentFromItem($scope.simulation._id, 'hydra.json', function(dataModelFromServer) {
-                    $scope.dataModel = dataModelFromServer || {};
+
+                templateIndexForSelect = extractEnumList($scope.template);
+                var fetchedId = $scope.simulation._id;
+
+                $girder.downloadContentFromItem(fetchedId, 'hydra.json', function(dataModelFromServer) {
+                    if(fetchedId !== $scope.simulation._id) {
+                        fetchData();
+                    } else {
+                        $scope.dataModel = dataModelFromServer || {};
+                    }
                 });
 
                 // Extract annotation

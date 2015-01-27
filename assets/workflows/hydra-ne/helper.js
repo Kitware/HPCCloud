@@ -2,6 +2,9 @@
     var module = GLOBAL.WorkflowHelper || {};
 
     module['hydra-ne'] = {
+        'validate-input': function (viewModel, template) {
+            return { data: viewModel, valid: true };
+        },
         'create-project' : function (groupId, $girder, $data, $mdDialog) {
             $girder.createFolder(groupId, $data.name, $data.description)
                 .success(function (folder) {

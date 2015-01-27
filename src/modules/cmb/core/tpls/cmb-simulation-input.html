@@ -1,0 +1,39 @@
+<section layout="row" flex>
+    <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="1">
+      <md-content class="md-padding">
+        <ul class="nav">
+            <li ng-repeat="viewId in template.order">
+                <i class="fa fa-fw" ng-class="{ 'fa-check' : dataModel[viewId], 'fa-warning': !dataModel[viewId]}"></i>
+                <span
+                    ng-click="(!dataModel[viewId] || dataModel[viewId].length === 0) ? addView($event, viewId) :  activateSection(viewId, 0)"
+                    ng-class="{ active: (activeSection.view === viewId) }">
+                    {{ template.views[viewId].label }}
+                </span>
+                <i  class="fa fa-fw fa-plus pull-right"
+                    ng-show="template.views[viewId].size === -1"
+                    ng-click="addView($event,   viewId)">
+                </i>
+                <ul ng-show="dataModel[viewId] && dataModel[viewId].length > 0 && template.views[viewId].size !== undefined">
+                   <li ng-repeat="subView in dataModel[viewId]"
+                       ng-class="{ active: (activeSection.view === viewId && activeSection.idx === $index) }">
+                        <span ng-click="activateSection(viewId, $index)" >
+                            {{ subView.name }}
+                        </span>
+                        <i class="fa fa-fw fa-trash pull-right"
+                           ng-click="removeView(viewId, $index)">
+                        </i>
+                   </li>
+                </ul>
+            </li>
+        </ul>
+    </md-sidenav>
+    <md-content flex class="md-padding" layout="column"
+        cmb-view-panel
+        view-id="{{ activeSection.view }}"
+        view-index="{{ activeSection.idx }}"
+        view-data="activeSection.data"
+        template="template"
+        globals="globals"
+        workflow="{{ workflow }}">
+    </md-content>
+</section>
