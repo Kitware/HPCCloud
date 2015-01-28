@@ -1,62 +1,99 @@
+//- ==== Standard header ====
+
 | title
-| #{data.title}
+| #{title}
 | 
-| cc_navierstokes
+| cc_navierstokes # cell-centered incompressible Navier-Stokes
 | 
-|   nsteps  10000
-|   deltat  0.001
-|   term    10.0
+
+//- ==== Time section ====
+
+| 
+|   # Time section
+|   nsteps #{time.nsteps}
+|   deltat #{time.deltat}
+|   term   #{time.term}
 | 
 |   time_integration
-|     type    fixed_cfl
-|     CFLinit 1.0
-|     CFLmax  4.0
-|     dtmax   0.05
-|     dtscale 1.025
-|     thetaa  0.5
-|     thetak  0.5
-|     thetaf  0.5
+|     type    #{time_integration.type}
+|     CFLinit #{time_integration.CFLinit}
+|     CFLmax  #{time_integration.CFLmax}
+|     dtmax   #{time_integration.dtmax}
+|     dtscale #{time_integration.dtscale}
+|     thetaa  #{time_integration.thetaa}
+|     thetak  #{time_integration.thetak}
+|     thetaf  #{time_integration.thetaf}
 |   end
+| 
+
+//- ==== Output section ====
+
 | 
 |   # Output options
-|   pltype exodusii
-|   filetype serial # distributed
-|   plti   1000
-|   ttyi   10
-|   dump   1000
-| 
-|   # Material model setup & assignment to sets
-|   material
-|     id  1
+|   pltype   #{output.pltype}
+|   filetype #{output.filetype}
+|   dump     #{output.dump}
+|   plti     100
+|   ttyi     10
 | 
 
-if data['material.rho']
-  |     rho #{data['material.rho']}
-  | 
+//- ==== Materials section ====
 
-if data['material.mu']
-  |     mu  #{data['material.mu']}
-  | 
+|   # Materials
+each mat, index in materials
+    | 
+    |   material # #{mat.name}
+    |       id     #{index + 1}
+    |       rho    #{mat.rho}
+    |       mu     #{mat.mu}
+    |   end
+    |   
+    |   materialset # #{mat.name}
+    |       id        #{index + 1}
+    |       material  #{index + 1}
+    |       block     #{mat.blockids}
+    |   end
+    | 
 
-|   end
+//- ==== Execution section ====
+
 | 
 |   load_balance
-|     method   rib
+|     method       #{loadBalance.method}
+|     diagnostics  #{loadBalance.diagnostics}
 |   end
 | 
-|   materialset
-|     id 1
-|     material 1
-|     block 1
+
+//- ==== Solution section ====
+
+| 
+|   solution_method
+|     strategy           #{solution.strategy}
+|     itmax              #{solution.itmax}
+|     eps                #{solution.eps}
+|     eps_dist           #{solution.eps_dist}
+|     eps_p0             #{solution.eps_p0}
+|     timestep_control   #{solution.timestep_control}
+|     diagnostics        #{solution.diagnostics}
+|     convergence        #{solution.convergence}
 |   end
+| 
+|   histvar
+|     side  11 avgvel
+| #    element 3720242 turbke
+|     element 3720242 vel
+|   end
+| 
+|   thti 2
+| 
 | 
 |   plotvar
 |     elem div
 |     elem vel
 |     elem procid
 |     elem volume
-|     elem turbke
-|     node dist
+| #    elem turbke
+| #    node dist
 |     node enstrophy
 |     node pressure
 |     node vel
@@ -79,7 +116,24 @@ if data['material.mu']
 |     # side 10 straction
 |   end
 | 
-|   tmodel rng_ke
+|   statistics
+|     starttime 0.001
+|     endtime 1
+|     plotwinsize 0.001
+|   end
+| 
+|   plotstatvar
+|     node <velocity>
+|     node <pressure>
+|     node <helicity>
+|     node <vorticity>
+|     node tke
+|     node reynoldsstress
+|   end
+| 
+|   #tmodel rng_ke ->should default to a "good" turbulence model
+|   # for time accurate use wale, spalart_allmaras_des and smagorinsky
+|   tmodel smagorinsky
 | 
 |   # Simple IC's
 |   initial
@@ -88,25 +142,10 @@ if data['material.mu']
 |     velz 5.2780
 |     tke  0.0938  # turbulent kinetic energy
 |     eps  30.3660 # turbulent dissipation rate
+|     # the following seem to work as ICs for wale and smagorinsky but not spalart_allmaras_des
+|     #tke  0.0938  # turbulent kinetic energy
+|     #eps  30.3660 # turbulent dissipation rate
 |   end
-| 
-|   # ---------------------------------------------
-|   # Set definitions
-|   # Sideset 2 - Inlet
-|   # Sideset 11 - Outlet
-| 
-|   # Sideset 7,12,13,14 - -X Symmetry
-|   # Sideset 6,18,19,20 - +X Symmetry
-| 
-|   # Sideset 4,15,16,17 - -Y Symmetry
-|   # Sideset 5,21,22,23 - +Y Symmetry
-| 
-|   # Sideset 8 - Sp1
-|   # Sideset 9 - Sp1
-|   # Sideset 10 - Sp1
-| 
-|   # Sideset 3 - Inner_wall
-|   # ----------------------------------------------
 | 
 |   # Normal distance BC's
 |   distance
@@ -192,7 +231,7 @@ if data['material.mu']
 | 
 |   end
 | 
-|   pressure
+|    pressure
 |     sideset 11 -1 0.0 # Outflow
 |   end
 | 
@@ -201,6 +240,7 @@ if data['material.mu']
 |     itmax 500
 |     itchk 1
 |     amgpc hypre
+|     strong_threshold 0.85
 |     coarse_size 1000
 |     diagnostics off
 |     convergence off
@@ -220,4 +260,3 @@ if data['material.mu']
 | end
 | 
 | exit
-| 

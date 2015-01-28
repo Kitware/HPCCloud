@@ -1,23 +1,23 @@
 <div>
-  <md-toolbar class="cmb-subsubheader" layout="row" layout-align="space-between center">
-    <div flex layout="row" layout-align="start center">
-        <md-button aria-label="Save input parameters">
-            <i class="fa fa-save"></i>
-            <md-tooltip>Save input parameters</md-tooltip>
-        </md-button>
+    <md-toolbar class="cmb-subsubheader" layout="row" layout-align="space-between center">
+        <div flex layout="row" layout-align="start center">
+            <md-button aria-label="Save input parameters" ng-click="saveAndValidate()">
+                <i class="fa fa-save"></i>
+                <md-tooltip>Save input parameters</md-tooltip>
+            </md-button>
+        </div>
+        <div flex layout="row" layout-align="center center">
+            {{ simulation.name }}
+        </div>
+        <div flex layout="row" layout-align="end center">
+            <md-button
+                aria-label="Simulation input is Valid. Click to run it."
+                ng-click="runTask($event, 'Start simulation computation', 'hydra', false, runSimulationCallback)">
+                <i class="fa fa-fw fa-check"></i>
+                <md-tooltip>Run the simulation</md-tooltip>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <div layout="column" cmb-simulation-input>
     </div>
-    <div flex layout="row" layout-align="center center">
-        {{ simulation.name }}
-    </div>
-    <div flex layout="row" layout-align="end center">
-        <md-button
-            aria-label="Simulation input is Valid. Click to run it."
-            ng-click="runTask($event, 'Start simulation computation', 'hydra', false, runSimulationCallback)">
-            <i class="fa fa-fw fa-check"></i>
-            <md-tooltip>Run the simulation</md-tooltip>
-        </md-button>
-    </div>
-  </md-toolbar>
-  <div layout="column" cmb-simulation-input>
-  </div>
 </div>

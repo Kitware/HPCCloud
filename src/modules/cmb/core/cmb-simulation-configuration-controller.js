@@ -1,5 +1,5 @@
 angular.module("kitware.cmb.core")
-    .controller('cmbSimulationConfigurationController', ['$scope', 'kw.Girder', '$mdDialog', '$templateCache', '$window', '$timeout', 'CmbWorkflowHelper', function ($scope, $girder, $mdDialog, $templateCache, $window, $timeout, CmbWorkflowHelper) {
+    .controller('cmbSimulationConfigurationController', ['$scope', 'kw.Girder', '$mdDialog', '$templateCache', '$window', '$timeout', 'CmbWorkflowHelper', '$state', '$stateParams', function ($scope, $girder, $mdDialog, $templateCache, $window, $timeout, CmbWorkflowHelper, $state, $stateParams) {
         var templateIndexForSelect = null;
 
         $scope.workflow = null;
@@ -215,7 +215,24 @@ angular.module("kitware.cmb.core")
 
         $scope.saveAndValidate = function () {
             console.log($scope.dataModel);
+            var wf = $scope.workflow,
+                jadeDataModel = WorkflowHelper[wf]['validate-input']($scope.simulation, $scope.dataModel, $scope.template),
+                newState = jadeDataModel.valid ? 'valid' : 'incomplete';
+
+            // Save data model
             $girder.uploadContentToItem($scope.simulation._id, 'hydra.json', JSON.stringify($scope.dataModel, undefined, 3));
+
+            // Update item state
+            if($scope.simulation.meta.status !== newState) {
+                $girder.updateItemMetadata($scope.simulation, { status: newState });
+            }
+
+            // Generate and save input deck
+            if(jadeDataModel.valid) {
+                $girder.uploadContentToItem($scope.simulation._id, 'hydra.ctln', tpls.templatizer[wf]['input-template'](jadeDataModel.data));
+            }
+
+            $state.go('simulation', { collectionName: $stateParams.collectionName, projectID: $scope.simulation.folderId, mode: newState, simulationID: $scope.simulation._id });
         };
 
         $scope.addView = function (event, viewId) {
