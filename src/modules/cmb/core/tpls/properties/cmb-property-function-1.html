@@ -1,1 +1,9 @@
-<p>One usage of your directive go here.</p>
+<div layout="row"  layout-align="space-around center">
+    <div id='cmb-time-function-container'>
+        <div cmb-time-function class='cmb-time-function-widget' data='data' key='{{ property.id }}'> </div>
+    </div>
+    <span flex></span>
+    <md-button class="md-fab help-button" aria-label="Toggle help" ng-click="toggleLocalHelp(property.id)">
+        <i class="fa fa-fw fa-question md-primary"></i>
+    </md-button>
+</div>
