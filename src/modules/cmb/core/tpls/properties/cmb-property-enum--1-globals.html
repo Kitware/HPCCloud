@@ -4,7 +4,7 @@
         type="{{ property.enum.type }}"
         ng-multiple="true"
         ng-model="data[property.id]"
-        ng-options="item as item.label for item in globals[property.enum.type]">
+        ng-options="item as item for item in globals[property.enum.type].list">
     </select>
     <span flex></span>
     <md-button class="md-fab help-button" aria-label="Toggle help" ng-click="toggleLocalHelp(property.id)">

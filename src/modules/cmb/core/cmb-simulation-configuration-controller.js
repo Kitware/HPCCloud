@@ -1,12 +1,12 @@
 angular.module("kitware.cmb.core")
-    .controller('cmbSimulationConfigurationController', ['$scope', 'kw.Girder', '$mdDialog', '$templateCache', '$window', '$timeout', 'CmbWorkflowHelper', '$state', '$stateParams', function ($scope, $girder, $mdDialog, $templateCache, $window, $timeout, CmbWorkflowHelper, $state, $stateParams) {
+    .controller('cmbSimulationConfigurationController', ['$scope', 'kw.Girder', '$mdDialog', '$templateCache', '$window', '$timeout', 'CmbWorkflowHelper', '$state', '$stateParams', '$mdToast', function ($scope, $girder, $mdDialog, $templateCache, $window, $timeout, CmbWorkflowHelper, $state, $stateParams, $mdToast) {
         var templateIndexForSelect = null;
 
         $scope.workflow = null;
         $scope.template = null;
         $scope.dataModel = null;
         $scope.activeSection = null;
-        $scope.meshAnnotations = null;
+        $scope.globals = null;
 
         function extractEnumList(template) {
             var indexedData = {},
@@ -33,6 +33,8 @@ angular.module("kitware.cmb.core")
                 count = parameters ? parameters.length : 0,
                 list = null;
 
+            console.log('extract active ' + attributeName + ' => '+ parameterId);
+
             while(count--) {
                 if(parameters[count].id === parameterId) {
                     list = parameters[count].enum.values;
@@ -40,7 +42,12 @@ angular.module("kitware.cmb.core")
 
                     if(list === undefined) {
                         // Must be a global enum
-                        list = globals[parameters[count].enum.type];
+
+                        console.log("no values ?");
+                        console.log(globals);
+                        console.log(parameters[count].enum.values);
+
+                        list = globals[parameters[count].enum.type].list;
                     }
                 }
             }
@@ -48,11 +55,15 @@ angular.module("kitware.cmb.core")
             // Search active value
             count = list ? list.length : 0;
             while(count--) {
-                if(angular.equals(activeValue, list[count].value)) {
+                console.log(activeValue);
+                console.log(list[count]);
+                if(angular.equals(activeValue, list[count].hasOwnProperty('value') ? list[count].value : list[count])) {
+                    console.log('extract active => OK');
                     return list[count];
                 }
             }
 
+            console.log('extract active => null');
             return null;
         }
 
@@ -74,6 +85,8 @@ angular.module("kitware.cmb.core")
                         if(angular.isArray(active)) {
                             var newSetOfActive = [];
                             for(var idx = 0; idx < active.length; ++idx) {
+                                console.log('active');
+                                console.log(active);
                                 newSetOfActive.push(
                                     extractActiveItemInEnum(
                                         active[idx].value,
@@ -219,6 +232,16 @@ angular.module("kitware.cmb.core")
                 jadeDataModel = WorkflowHelper[wf]['validate-input']($scope.simulation, $scope.dataModel, $scope.template),
                 newState = jadeDataModel.valid ? 'valid' : 'incomplete';
 
+            if(jadeDataModel.error.length > 0) {
+                $mdToast.show(
+                    $mdToast.simple()
+                        .content(jadeDataModel.error.join('\n'))
+                        .position('bottom left right')
+                        .hideDelay(5000)
+                );
+                console.log(jadeDataModel.error.join('\n'));
+            }
+
             // Save data model
             $girder.uploadContentToItem($scope.simulation._id, 'hydra.json', JSON.stringify($scope.dataModel, undefined, 3));
 
@@ -229,6 +252,7 @@ angular.module("kitware.cmb.core")
 
             // Generate and save input deck
             if(jadeDataModel.valid) {
+                console.log(jadeDataModel.data);
                 $girder.uploadContentToItem($scope.simulation._id, 'hydra.ctln', tpls.templatizer[wf]['input-template'](jadeDataModel.data));
             }
 
@@ -289,7 +313,7 @@ angular.module("kitware.cmb.core")
 
                 // Revalidate enum properties...
                 console.log('got it from model');
-                updateActiveListElements(viewSubDataModel, $scope.template, $scope.meshAnnotations);
+                updateActiveListElements(viewSubDataModel, $scope.template, $scope.globals);
 
             } else {
                 // Need to generate data from default
@@ -348,13 +372,14 @@ angular.module("kitware.cmb.core")
 
                                 // Make enum structure
                                 for(var tag in tagMap) {
-                                    processedTags.push({ label: tag, value: tagMap[tag] });
+                                    processedTags.push(tag);
                                 }
+                                processedTags.sort();
 
 
-                                $scope.meshAnnotations = { 'face-tags': processedTags };
+                                $scope.globals = { 'face-tags': { list: processedTags, map: processedTags } };
                                 count = 0;
-                                console.log($scope.meshAnnotations);
+                                console.log($scope.globals);
                             }
                         }
                     })

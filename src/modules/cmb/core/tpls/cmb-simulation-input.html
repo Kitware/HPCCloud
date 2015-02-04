@@ -24,6 +24,31 @@
                         </i>
                    </li>
                 </ul>
+                <ul ng-show="template.views[viewId].children !== undefined">
+                   <li ng-repeat="subViewId in template.views[viewId].children">
+                        <i class="fa fa-fw" ng-class="{ 'fa-check' : dataModel[subViewId], 'fa-warning': !dataModel[subViewId]}"></i>
+                        <span
+                            ng-click="((!dataModel[subViewId] || dataModel[subViewId].length === 0) && template.views[subViewId].size) ? addView     ($event, subViewId) :  activateSection(subViewId, 0)"
+                            ng-class="{ active: (activeSection.view === subViewId) }">
+                            {{ template.views[subViewId].label }}
+                        </span>
+                        <i  class="fa fa-fw fa-plus pull-right"
+                            ng-show="template.views[subViewId].size === -1"
+                            ng-click="addView($event, subViewId)">
+                        </i>
+                        <ul ng-show="dataModel[subViewId] && dataModel[subViewId].length > 0 && template.views[subViewId].size !== undefined">
+                           <li ng-repeat="subView in dataModel[subViewId]"
+                               ng-class="{ active: (activeSection.view === subViewId && activeSection.idx === $index) }">
+                                <span ng-click="activateSection(subViewId, $index)" >
+                                    {{ subView.name }}
+                                </span>
+                                <i class="fa fa-fw fa-trash pull-right"
+                                   ng-click="removeView(subViewId, $index)">
+                                </i>
+                           </li>
+                        </ul>
+                   </li>
+                </ul>
             </li>
         </ul>
     </md-sidenav>

@@ -9,6 +9,20 @@ angular.module('pv.web')
           viewport = null,
           launcher = false;
 
+      // return a-b
+      function arraySubstract(a, b) {
+         var result = [],
+            count = a.length;
+
+         while(count--) {
+            if(b.indexOf(a[count]) === -1) {
+               result.push(a[count]);
+            }
+         }
+
+         return result;
+      }
+
       function extractUnique(array) {
          var uniqueArray = [],
             count = array.length;
@@ -108,7 +122,7 @@ angular.module('pv.web')
                      $scope.faces = [];
                      var size = names.length;
                      for(var i = 0; i < size; ++i) {
-                        $scope.faces.push({ visible: true, name: names[i], tags: [], color: colorPalette[i%colorPalette.length]});
+                        $scope.faces.push({ visible: true, id: names[i].split('ID:')[1].trim(), name: names[i], tags: [], color: colorPalette[i%colorPalette.length]});
                      }
                   }
 
@@ -231,6 +245,7 @@ angular.module('pv.web')
                }
 
                $scope.data = {
+                  union: extractAllUnionFaceTags(),
                   faces: faceList.join(', '),
                   tags: extractAllUnionFaceTags().join(', ')
                };
@@ -244,6 +259,7 @@ angular.module('pv.web')
                   }
 
                   $scope.data = {
+                     union: extractAllUnionFaceTags(),
                      faces: faceList.join(', '),
                      tags: extractAllUnionFaceTags().join(', ')
                   };
@@ -262,7 +278,12 @@ angular.module('pv.web')
          .then(function(formData) {
             var tags = formData.tags.split(','),
                faceIdx = formData.faces.split(','),
-               count;
+               unionList = formData.union,
+               count = 0;
+
+            if(tags.length === 1 && tags[0].trim() === "") {
+               tags.pop();
+            }
 
             count = tags.length;
             while(count--) {
@@ -272,9 +293,9 @@ angular.module('pv.web')
             count = faceIdx.length;
             while(count--) {
                var idx = Number(faceIdx[count].trim()),
-                  duplicateList = faces[idx].tags.concat(tags);
-
-               faces[idx].tags = extractUnique(duplicateList);
+                  listToKeep = arraySubstract(faces[idx].tags, unionList);
+                  
+               faces[idx].tags = listToKeep.concat(tags);
             }
 
             saveAnnotation();
