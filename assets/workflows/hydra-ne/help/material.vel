@@ -1,1 +1,0 @@
-<p><b><i>vel</i></b> - The x-, y-, and z-components of the rigid body velocity for native conjugate heat transfer, <b>vel</b>, {velx, vely, velz} (3 x float, default={0.0, 0.0, 0.0}).

@@ -1,1 +1,0 @@
-<p><b><i>eps_p0</i></b> - Convergence criteria for initial div-free projection and initial pressure computation performed during initialization, <b>&epsilon;<sub>p0</sub></b> (float, default=1.0E-5).

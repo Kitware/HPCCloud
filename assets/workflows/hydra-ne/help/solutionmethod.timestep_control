@@ -1,5 +1,0 @@
-<p><b><i>timestep_control</i></b> - Activate time-step control in conjunction with the non-linear solution strategy, <b>timestep_control</b> (string, default=Off).
-                             <ul>
-                                 <li><b>On</b> - Enable automatic time-step growth/reduction, or
-                                 <li><b>Off</b> - Disable automatic time-step reduction and use a fixed number of iterations per time-step.
-                             </ul>

@@ -1,1 +1,0 @@
-<p><b><i>dtmax</i></b> - Set the maximum time step that can be used with the fixed CFL time-step control, <b>&Delta;t<sub>max</sub></b> (float, default=1.0).

@@ -1,6 +1,0 @@
-<p><b><i>type</i></b> - Specifies the preconditioner - Krylov solver combination, <b>type</b> (string, default=AMG). Values can be one of the following:
-                             <ul>
-                                 <li><b>AMG</b> - Algebraic multigrid with the conjugate gradient method,
-                                 <li><b>SSORCG</b> - Successive over-relaxation preconditioner with the conjugate gradient method, or
-                                 <li><b>JPCG</b> - Jacobi preconditioner with the conjugate gradient method.
-                             </ul>

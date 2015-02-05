@@ -1,5 +1,0 @@
-<p><b><i>diagnostics</i></b> - Specify the verbosity of load balance output, <b>diagnostics</b> (string, default=off). Valid values are the following:
-                             <ul>
-                                 <li><b>On</b> - Activate diagnostic output from the load-balancer, or
-                                 <li><b>Off</b> - Suppress diagnostic output from the load-balancer.
-                             </ul>

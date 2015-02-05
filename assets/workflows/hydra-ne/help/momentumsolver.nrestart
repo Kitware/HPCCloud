@@ -1,1 +1,0 @@
-<p><b><i>nrestart</i></b> - Specifies the number of restart vectors used with GMRES/FGMRES, <b>N<sub>restart</sub></b> (int, default=30).

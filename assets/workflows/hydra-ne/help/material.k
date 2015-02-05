@@ -1,1 +1,0 @@
-<p><b><i>k</i></b> -  The symmetric thermal conductivity tensor, <b>k</b>, {k<sub>11</sub>, k<sub>12</sub>, k<sub>13</sub>, k<sub>22</sub>, k<sub>23</sub>, k<sub>33</sub>} (6 x float, default=identity k<sub>ii</sub> = 1.0 or for i&ne;j k<sub>ij</sub> = 0.0). For fluid dynamics problems, this is the only thermal conductivity that is required.

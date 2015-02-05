@@ -1,3 +1,0 @@
-<p><b><i>nminmax</i></b> - Output min/max values of velocity every N<sub>minmax</sub> (integer, default=10) time steps.
-
-    <p><b>Note</b>: Set the interval to report the min/max values of the velocity to N<sub>minmax</sub>. The min/max values are normally written to the screen at run-time.

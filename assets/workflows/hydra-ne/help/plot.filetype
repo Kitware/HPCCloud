@@ -1,5 +1,0 @@
- <p><b><i>filetype</i></b> - Specifies the type of plot files, <b>filetype</b> (string, default=serial). Valid values are the following:
-                             <ul>
-                                 <li><b>Serial</b> - This file type is the default for serial calculations. For parallel calculations, this file type requires the serialization of data using a parallel fan-in procedure, but results in a single plot file.
-                                 <li><b>Distributed</b> - This file type results in one plot file per processor and is more scalable for problems where a large number of processors are used.
-                             </ul>

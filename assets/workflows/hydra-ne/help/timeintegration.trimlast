@@ -1,1 +1,0 @@
-<p><b><i>trimlast</i></b> - Enable/disable the use of an exact termination time, i.e., trimming the last time step to achieve an exact termination time,  <b>trimlast</b> (string, default=off).

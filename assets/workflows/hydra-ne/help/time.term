@@ -1,3 +1,0 @@
-<p><b><i>term</i></b> - Maximum number of time steps to take, <b>T<sub>f</sub></b> (float, default=1.0).
-
-    <p><b>Note</b>: The termination time, in units consistent with the problem definition. <b>T<sub>f</sub></b> and <b>n<sub>step</sub></b> both affect the the length of simulated time in Hydra. If the number of time steps specified using <b>n<sub>step</sub></b> would yield a simulation time greater than the termination time, the number of time steps is reduced to terminate the calculation according to <b>T<sub>f</sub></b>. Thus, <b>T<sub>f</sub></b> places a ceiling on the simulation termination time regardless of how many time steps have been specified by the <b>n<sub>step</sub></b>.

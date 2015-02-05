@@ -1,3 +1,0 @@
-<p><b><i>deltat</i></b> - The time step value, <b>&Delta;t</b> (float, default=0.01).
-
-    <p><b>Note</b>: <b>&Delta;t</b> may be over-ridden by physics specific constraints on the time step.

@@ -1,3 +1,0 @@
-<p><b><i>ndump</i></b> - Output dump files every N<sub>dump</sub> (integer, default=0) time steps.
-
-    <p><b>Note</b>: Dump activates checkpoint-restart files, where a restart file will be written every N<sub>dump</sub> time steps. In addition, a restart file will be written at the termination of the calculation. A restart file may be read on a subsequent invocation of HYDRA with the "<code>-r</code>" command-line option.

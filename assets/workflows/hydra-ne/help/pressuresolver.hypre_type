@@ -1,4 +1,0 @@
-<p><b><i>hypre_type</i></b> - Specifies the preconditioner sub-package for the Hypre/AMG solver, <b>hypre_type</b> (string, default=BOOMERAMG). Only effective if <b>type</b>=AMG and <b>amgpc</b>=HYPRE. Values can be one of the following:
-                             <ul>
-                                 <li><b>BOOMERAMG</b> - BoomerAMG preconditioner.
-                             </ul>

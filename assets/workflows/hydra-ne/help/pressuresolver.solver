@@ -1,6 +1,0 @@
-<p><b><i>solver</i></b> - Specifies the underlying Krylov solver to be used with AMG, <b>solver</b> (string, default=CG). Values can be one of the following:
-                             <ul>
-                                 <li><b>CG</b> - Conjugate gradient method,
-                                 <li><b>BCGS</b> - Stabilized bi-conjugate gradient squared method, or
-                                 <li><b>FGMRES</b> - Flexible generalized minimum residual method.
-                             </ul>

@@ -1,7 +1,0 @@
-<p><b><i>type</i></b> - Specifies the time-step control method, <b>type</b> (string, default=fixed_cfl). Valid values are the following:
-                             <ul>
-                                 <li><b>fixed_cfl</b> - Sets the time-step based on a fixed maximum CFL condition using <b>CFL<sub>max</sub></b>, or
-                                 <li><b>fixed_dt</b> - Uses a fixed time-step based on <b>&Delta;t<sub>max</sub></b>.
-                             </ul>
-
-<p><b>Note</b>: The fixed CFL time-step control uses the initial velocity field and with the initial CFL number <b>CFL<sub>0</sub></b> to estimate the time-step. For all subsequent time-steps, <b>CFL<sub>max</sub></b> is used estimate the time-step. When the time-step can increase based on <b>CFL<sub>max</sub></b>, the growth is based on the time-step scale factor <b>&alpha;</b>. An upper bound on the time-step is set with <b>&Delta;t<sub>max</sub></b>.

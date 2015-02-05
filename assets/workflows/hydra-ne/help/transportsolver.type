@@ -1,7 +1,0 @@
-<p><b><i>type</i></b> - Specifies the preconditioner - Krylov solver combination, <b>type</b> (string, default=FGMRES). Values can be one of the following:
-                             <ul>
-                                 <li><b>FGMRES</b> - Flexible generalized minimum residual method,
-                                 <li><b>ILUFGMRES</b> - ILU-preconditoned FGMRES,
-                                 <li><b>GMRES</b> - Generalized minimum residual method, or
-                                 <li><b>ILUGMRES</b> - ILU-preconditioned GMRES.
-                             </ul>

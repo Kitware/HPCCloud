@@ -1,8 +1,0 @@
-<p><b><i>method</i></b> -  Specifies the type load balancing, <b>method</b> (string, default=sfc_and_hg). The value must be one of the following:
-                             <ul>
-                                 <li><b>Recursive Coordinate Bisection</b> - Use recursive coordinate bisection for domain decomposition,
-                                 <li><b>Recursive Inertial Bisection</b> - Use recursive inertial bisection for domain decomposition,
-                                 <li><b>Space-Filling Curve</b> - Use a space-filling curve for domain decomposition,
-                                 <li><b>Hypergraph</b> - Use hypergraph domain decomposition, or
-                                 <li><b>Space-Filling Curve followed by Hypergraph</b> - Use a space-filling curve for the initial domain decomposition, followed by a hypergraph partitioning algorithm.
-                             </ul>

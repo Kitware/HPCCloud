@@ -1,1 +1,0 @@
-<p><b><i>name</i></b> - A descriptive body force name (string, default=null). <b>name</b> is not used in the derived control file. A unique id for each specific body force is generated underneath the cover of the web interface. While providing a descriptive name is not required, these descriptive names clearly increase usability.</p>

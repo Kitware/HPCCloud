@@ -1,4 +1,0 @@
-   <p><b><i>type</i></b> - The type of heat source (string, default=Heat Source). The <b>type</b> must be one of the following:
-                             <ul>
-                                 <li><b>Heat Source</b> - Specifies a volumetric heat source.
-                             </ul>

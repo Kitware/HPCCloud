@@ -1,5 +1,0 @@
-<p><b><i>strategy</i></b> - Specifies the solution method, <b>strategy</b> (string, default=projection). Valid solution methods include:
-                             <ul>
-                                 <li><b>projection</b> - Activates the semi-implicit projection algorithm, or
-                                 <li><b>picard</b> - Activates the fully-implicit, projection-preconditioned, Picard algorithm.
-                             </ul>

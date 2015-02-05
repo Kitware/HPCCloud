@@ -1,5 +1,0 @@
-<p><b><i>error_norm</i></b> - When using the picard solution strategy for fully-implicit time integration, this option defines the non-linear convergence norm, <b>error_norm</b> (string, default=composite). Valid options for the error norm include:
-                             <ul>
-                                 <li><b>composite</b> - Composite RMS norm based on Gresho's norm definition, or
-                                 <li><b>max</b> - Use the largest dependent variable maximum norm.
-                             </ul>

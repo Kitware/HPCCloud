@@ -1,1 +1,0 @@
-<p><b><i>eps_dist</i></b> - Convergence criteria for normal-distance function solved during initialization, <b>&epsilon;<sub>dist</sub></b> (float, default=1.0E-5).

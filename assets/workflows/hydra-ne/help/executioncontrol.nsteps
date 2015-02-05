@@ -1,3 +1,0 @@
-    <p><b><i>Nstep</i></b> - Check execution control file every <b>N<sub>step</sub></b> (integer, default=0) time steps.
-
-    <p><b>Note</b>: The execution directory can be changed by invoking "<code>-e exe_cntl</code>" command line argument.

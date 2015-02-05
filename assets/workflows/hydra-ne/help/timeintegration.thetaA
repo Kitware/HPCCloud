@@ -1,1 +1,0 @@
-<p><b><i>thetaA</i></b> - Time-weight for the advective terms, <b>&Theta;A</b> (float, default=0.5). By default, the time-weight uses a second-order centering in time. For explicit advection, <b>&Theta;A</b>=0.0, and for an implicit treatment, <b>&Theta;A</b>=1.0.

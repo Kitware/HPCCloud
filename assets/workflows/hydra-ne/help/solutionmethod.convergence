@@ -1,5 +1,0 @@
-<p><b><i>convergence</i></b> - Write information about the non-linear convergence history to the conv file when using the picard solution method, <b>convergence</b> (string, default=Off).
-                             <ul>
-                                 <li><b>On</b> - Enable writing the non-linear convergence history, or
-                                 <li><b>Off</b> - Disable writing the non-linear convergence history.
-                             </ul>
