@@ -9,10 +9,10 @@ angular.module("kitware.cmb.core")
                 needUpdate = false;
 
             while(count--) {
-                if(array[count].meta.task === 'terminated') {
+                if(array[count].meta && array[count].meta.task === 'terminated') {
                     $girder.deleteTask(array[count]);
                     needUpdate = true;
-                } else if(array[count].meta.taskId) {
+                } else if(array[count].meta && array[count].meta.taskId) {
                     console.log('update task');
                     $girder.updateTaskStatus(array[count]);
                     needUpdate = true;
