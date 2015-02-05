@@ -1,5 +1,5 @@
 angular.module("kitware.cmb.core")
-    .controller('cmb.CoreController', ['$scope', 'kw.Girder', '$modal', '$templateCache', '$state', '$stateParams', 'CmbWorkflowHelper', '$mdDialog', '$window', '$mdToast', function ($scope, $girder, $modal, $templateCache, $state, $stateParams, CmbWorkflowHelper, $mdDialog, $window, $mdToast) {
+    .controller('cmb.CoreController', ['$scope', 'kw.Girder', '$modal', '$templateCache', '$state', '$stateParams', '$mdDialog', '$window', '$mdToast', function ($scope, $girder, $modal, $templateCache, $state, $stateParams, $mdDialog, $window, $mdToast) {
         var machines = [
             { "id": "m3.medium",    "label": "Basic Small",       "cpu": 1, "gpu": 0, "memory": 3.75, "cost": 0.07, "storage": [4] },
             { "id": "m3.large",     "label": "Basic Medium",      "cpu": 2, "gpu": 0, "memory": 7.5,  "cost": 0.14, "storage": [32] },
@@ -45,7 +45,6 @@ angular.module("kitware.cmb.core")
                $girder.getCollectionFromName(collectionName).success(function(collections){
                     $scope.collection = collections[0];
                     previousActiveId.collectionName = collectionName;
-                    CmbWorkflowHelper.getTemplate(collections[0].name);
                 }).error(function(){
                     console.log('Error while fetching collection');
                     previousActiveId.collectionName = '';

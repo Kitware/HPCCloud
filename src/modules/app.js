@@ -1,4 +1,4 @@
-angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb'])
+angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb', 'kitware.SimPut'])
 .config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
   var annonymousGoToLogin = ["$state", "$scope", function ($state, $scope) {if($scope.user === null) {$state.go('login');}}],
     goToHome = ["$state", "$scope", function ($state, $scope) {if($scope.user !== null) {$state.go('home');}}];

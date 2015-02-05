@@ -1,23 +1,2 @@
-<div>
-    <md-toolbar class="cmb-subsubheader" layout="row" layout-align="space-between center">
-        <div flex layout="row" layout-align="start center">
-            <md-button aria-label="Save input parameters" ng-click="saveAndValidate()">
-                <i class="fa fa-save"></i>
-                <md-tooltip>Save input parameters</md-tooltip>
-            </md-button>
-        </div>
-        <div flex layout="row" layout-align="center center">
-            {{ simulation.name }}
-        </div>
-        <div flex layout="row" layout-align="end center">
-            <md-button
-                aria-label="Simulation input is Invalid. Click to see some details."
-                ng-click="showError($event)">
-                <i class="fa fa-fw fa-warning"></i>
-                <md-tooltip>Show errors or incomplete data</md-tooltip>
-            </md-button>
-        </div>
-    </md-toolbar>
-    <div layout="column" cmb-simulation-input>
-    </div>
+<div layout="column" simput-input-panel template="template" view-model="viewModel">
 </div>

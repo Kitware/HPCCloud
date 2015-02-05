@@ -39,14 +39,14 @@ gulp.task('bower-js', function () {
 });
 
 gulp.task('ext-js', function () {
-  return gulp.src('assets/js/**/*.js')
+  return gulp.src(['assets/simput/simput-tpls-min.js', 'assets/simput/simput-min.js', 'assets/simput/hydra.js', 'assets/js/**/*.js'])
     .pipe($.filter('**/*.js'))
     // .pipe($.debug({verbose: true}))
     // .pipe($.flatten())
     .pipe($.concat('ext-vendors.js'))
     .pipe($.uglify({preserveComments: $.uglifySaveLicense}))
     // .pipe($.rev())
-    .pipe($.size({title: "Bower js"}))
+    .pipe($.size({title: "Ext js"}))
     .pipe(gulp.dest('dist/js'))
     // .pipe(assetMapping = $.rev.manifest())
     ;
