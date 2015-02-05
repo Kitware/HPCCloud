@@ -131,7 +131,10 @@ angular.module("kitware.cmb.core")
                         while(count--) {
                             if(array[count].id === $scope.data.type) {
                                cost = array[count].cost;
+
+                               // Keep track of machine CPU + GPU
                                $scope.data.cores =  array[count].cpu;
+                               $scope.data.gpu = array[count].gpu;
                             }
                         }
 
