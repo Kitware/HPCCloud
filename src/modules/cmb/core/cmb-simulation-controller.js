@@ -153,6 +153,7 @@ angular.module("kitware.cmb.core")
 
                                 $scope.external = { 
                                     'face-tags': { labels: processedTags, values: tagValues },
+                                    'element-tags': { labels: ["Elements for Stats"], values: [ 3720242 ] },
                                     'block-tags': { labels: ["Water"], values: [1] } // FIXME specific to hydra
                                 };
 
