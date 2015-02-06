@@ -135,9 +135,9 @@ angular.module("kitware.cmb.core")
 
                                     while(tagCount--) {
                                         if(tagMap[tags[tagCount]]) {
-                                            tagMap[tags[tagCount]].push(faceCount);
+                                            tagMap[tags[tagCount]].push(faces[faceCount].id);
                                         } else {
-                                            tagMap[tags[tagCount]] = [ faceCount ];
+                                            tagMap[tags[tagCount]] = [ faces[faceCount].id ];
                                         }
                                     }
                                 }
