@@ -1,7 +1,7 @@
 (function(GLOBAL) {
     var module = GLOBAL.WorkflowHelper || {};
 
-    module['hydra-ne'] = {
+    module['hydra-th'] = {
         'create-project' : function (groupId, $girder, $data, $mdDialog) {
             $girder.createFolder(groupId, $data.name, $data.description)
                 .success(function (folder) {
