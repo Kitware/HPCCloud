@@ -191,7 +191,7 @@ angular.module("kitware.cmb.core")
                 }
 
                 // Update input deck
-                $girder.uploadContentToItem($scope.simulation._id, 'hydra.ctln', arg.content);
+                $girder.uploadContentToItem($scope.simulation._id, arg.name, arg.content);
 
                 // Move to the valid page
                 $state.go('simulation', { collectionName: $stateParams.collectionName, projectID: $scope.simulation.folderId, mode: 'valid', simulationID: $scope.simulation._id });
