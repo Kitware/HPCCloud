@@ -9,6 +9,8 @@ angular.module('pv.web')
           viewport = null,
           launcher = false;
 
+      $scope.mainVisible = true;
+
       // return a-b
       function arraySubstract(a, b) {
          var result = [],
