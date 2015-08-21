@@ -104,6 +104,13 @@ angular.module("kitware.cmb.core")
             return previousActiveId.simulationID === '' ? null : previousActiveId.simulationID;
         };
 
+        $scope.enterPressed = function(event) {
+            if (event.keyCode === 13) {
+                console.log($scope.userLogin, $scope.userPassword);
+                $scope.login($scope.userLogin, $scope.userPassword);
+            }
+        };
+
         $scope.logout = function () {
             $girder.logout();
         };

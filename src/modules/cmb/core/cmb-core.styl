@@ -62,11 +62,17 @@ md-toolbar
 .cmb-button.md-button.md-fab
     width 28px
     height 28px
+    color black
+    background-color #eeeeee
 
     .fa
         top -2px
         position relative
         font-size 20px
+
+    &:hover:enabled
+        color white
+        background-color #F44336
 
 [ng-click], [ui-sref]
     cursor pointer
@@ -143,3 +149,5 @@ md-sidenav
     .active
         font-weight bold
 
+.cmb-username
+    padding-right 7px

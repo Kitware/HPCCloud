@@ -75,7 +75,6 @@ angular.module("kitware.cmb.core")
 
         $scope.createProject = function ( groupId, event ) {
             var collectionName = $scope.collection.name;
-
             $mdDialog.show({
                 controller: ['$scope', '$mdDialog', function($scope, $mdDialog) {
                     $scope.ok = function(response) {
