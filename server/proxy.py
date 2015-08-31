@@ -8,7 +8,7 @@ from girder.api import access
 from girder.api.describe import Description
 from girder.constants import AccessType
 from girder.api.docs import addModel
-from girder.api.rest import RestException
+from girder.api.rest import RestException, getBodyJson
 from lockfile import LockFile
 
 class Proxy(Resource):
@@ -21,7 +21,7 @@ class Proxy(Resource):
 
     @access.public
     def add_entry(self, params):
-        body = json.loads(cherrypy.request.body.read())
+        body = getBodyJson()
 
         if 'clusterId' not in body:
             raise RestException('clusterId is required', code=400)
