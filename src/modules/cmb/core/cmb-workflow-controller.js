@@ -96,7 +96,18 @@ angular.module("kitware.cmb.core")
         };
 
         $scope.deleteProject = function ( projectId ) {
-            $girder.deleteFolder(projectId).success(updateProjectList).error(updateProjectList);
+            //make this a mdDialog
+            var confirm = $mdDialog.confirm({
+                title: 'Are you sure you want to delete this project?',
+                ok: 'Delete',
+                cancel: 'Cancel'
+            });
+
+            $mdDialog.show(confirm).then(function(){
+                $girder.deleteFolder(projectId).success(updateProjectList).error(updateProjectList);
+            }, function() {
+                //clicked
+            });
         };
 
         if($girder.getUser() === null) {

@@ -167,6 +167,10 @@ angular.module("kitware.cmb.core")
             });
         };
 
+        $scope.goHome = function() {
+            $state.go('home');
+        };
+
         $scope.$on('login', function (event, user) {
             $scope.user = user;
             $state.go('home');
