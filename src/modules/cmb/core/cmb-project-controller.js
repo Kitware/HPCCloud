@@ -48,10 +48,17 @@ angular.module("kitware.cmb.core")
             $mdDialog.show({
                 controller: ['$scope', '$mdDialog', function($scope, $mdDialog) {
                     $scope.ok = function(response) {
+                        if ($scope.data.name.trim() === '') {
+                            return;
+                        }
                         $window.WorkflowHelper[collectionName]['create-simulation'](projectId, $girder, response, $mdDialog, simulation);
                     };
                     $scope.cancel = function() {
                       $mdDialog.cancel();
+                    };
+                    $scope.data = {
+                        name: '',
+                        description: ''
                     };
                 }],
                 template: $templateCache.get(collectionName + '/tpls/create-simulation.html'),
@@ -89,7 +96,7 @@ angular.module("kitware.cmb.core")
                         $mdDialog.hide(simulation);
                         $girder.listItemFiles(simulation._id)
                             .success(function(fileList) {
-                                console.log(fileList);
+                                console.log('file list:', fileList);
                                 var downloadName = fileList.length > 1 ? simulation.name + '.zip' : fileList[0].name;
                                 $girder.downloadItem(simulation._id)
                                     .success(function(data) {

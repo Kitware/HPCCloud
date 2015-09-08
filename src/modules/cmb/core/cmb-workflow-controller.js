@@ -83,6 +83,10 @@ angular.module("kitware.cmb.core")
                     $scope.cancel = function() {
                       $mdDialog.cancel();
                     };
+                    $scope.data = {
+                        name: '',
+                        description: ''
+                    };
                 }],
                 template: $templateCache.get(collectionName + '/tpls/create-project.html'),
                 targetEvent: event,

@@ -11,7 +11,7 @@
             <input type="text"
               ng-model='data.name'
               flex
-              placeholder="Your simulation name"></textarea>
+              placeholder="Your simulation name">
         </div>
         <div layout="row" style="margin: 10px 0;">
             <label class="control-label" flex="20">
@@ -38,7 +38,7 @@
 </md-content>
   <div class="md-actions" layout="row">
     <span flex></span>
-    <md-button ng-click="ok(data)" class="md-raised md-primary">Ok</md-button>
     <md-button ng-click="cancel()" class="md-raised md-warn">Cancel</md-button>
+    <md-button ng-click="ok(data)" class="md-raised md-primary" ng-disabled="data.name.trim().length === 0">Ok</md-button>
   </div>
 </md-dialog>
