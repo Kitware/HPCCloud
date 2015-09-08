@@ -22,7 +22,12 @@ angular.module("kitware.cmb.core")
                     }
 
                     while(idx < count) {
-                        var line = lines[idx].replace(/  /g, ' ').replace(/  /g, ' ').replace(/  /g, ' ').replace(/  /g, ' ').replace(/RMS Div/g, 'RMS-Div').replace(/# /g, '').split(' ');
+                        var line = lines[idx].replace(/  /g, ' ')
+                            .replace(/  /g, ' ')
+                            .replace(/  /g, ' ')
+                            .replace(/  /g, ' ')
+                            .replace(/RMS Div/g, 'RMS-Div')
+                            .replace(/# /g, '').split(' ');
                         $scope.outputStats.push(line);
 
                         // Next line

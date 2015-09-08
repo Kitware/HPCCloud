@@ -38,7 +38,7 @@ angular.module("kitware.cmb.core")
         $scope.simulations = [];
 
         $scope.toggleSimulationFilter = function (event) {
-            event.originalTarget.classList.toggle('md-raised');
+            event.target.classList.toggle('md-raised');
         };
 
         $scope.createSimulation = function (event, simulation) {
@@ -105,6 +105,9 @@ angular.module("kitware.cmb.core")
 
                     };
                     $scope.deleteSimulation = function(simulation) {
+                        if (!confirm('Are you sure youw want to delete "' + simulation.name + '?"')) {
+                            return;
+                        }
                         $girder.deleteItem(simulation._id)
                             .success(function(){
                                 $mdDialog.hide(simulation);
