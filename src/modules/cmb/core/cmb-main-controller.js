@@ -84,14 +84,20 @@ angular.module("kitware.cmb.core")
         });
 
         $scope.getActiveCollection = function() {
-            if($stateParams.collectionName) {
+            if (!/project/.test($state.current.url)) {
+                return null;
+            }
+            else if($stateParams.collectionName) {
                 return $stateParams.collectionName;
             }
             return previousActiveId.collectionName === '' ? null : previousActiveId.collectionName;
         };
 
         $scope.getActiveProject = function() {
-            if($stateParams.projectID) {
+            if (!/projectID/.test($state.current.url)) {
+                return null;
+            }
+            else if($stateParams.projectID) {
                 return $stateParams.projectID;
             }
             return previousActiveId.projectID === '' ? null : previousActiveId.projectID;
