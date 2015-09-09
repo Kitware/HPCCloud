@@ -181,6 +181,10 @@ angular.module("kitware.girder", ["ngCookies"])
             }
         };
 
+        this.changeUserPassword = function(oldPass, newPass) {
+            return this.put('user/password?old='+oldPass+'&new='+newPass);
+        };
+
         /**
          * Return the logged in user if any.
          */

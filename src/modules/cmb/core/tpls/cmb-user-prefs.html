@@ -1,0 +1,35 @@
+<md-content class="md-padding"  layout="column" layout-align="center center">
+    <md-card class="pref-card">
+        <md-card-content>
+            <h2 class="md-title">Amazon AWS Key</h2>
+            <md-input-container>
+                <label>Amazon Key</label>
+                <input required>
+            </md-input-container>
+            <md-input-container>
+                <label>Amazon Secret Key</label>
+                <input required>
+            </md-input-container>
+            <md-button>Save</md-button>
+        </md-card-content>
+    </md-card style>
+
+    <md-card class="pref-card">
+        <md-card-content>
+            <h2 class="md-title">Change password</h2>
+            <md-input-container flex>
+                <label>Old Password</label>
+                <input ng-model="password.oldPass" type="password" required>
+            </md-input-container>
+            <md-input-container flex>
+                <label>New Password</label>
+                <input ng-model="password.newPass" type="password" required>
+            </md-input-container>
+            <md-input-container flex>
+                <label>Confirm New Password</label>
+                <input ng-model="password.confirmPass" type="password" required>
+            </md-input-container>
+            <md-button ng-click="changePassword()">Update password</md-button>
+        </md-card-content>
+    </md-card style>
+</md-content>

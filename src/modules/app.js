@@ -30,6 +30,13 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb', 'kitware.SimPut'])
         }],
         controller:'CmbCollectionsController'
     })
+    .state('preferences', {
+        url: "/preferences",
+        templateProvider: ['$templateCache', function ($templateCache) {
+            return $templateCache.get('cmb/core/tpls/cmb-user-prefs.html');
+        }],
+        controller:'CmbUserPreferencesController'
+    })
     .state('projects', {
         url: "/projects/:collectionName",
         templateProvider: ['$templateCache', function ($templateCache) {

@@ -1,0 +1,177 @@
+md-toolbar
+
+    &.simput-header
+        background #0a0a0a
+        color #fff
+
+.file-drag
+    cursor pointer
+    background #ffffff
+    padding 20px
+
+md-content.md-default-theme
+    background none
+
+md-content#drop-data-model
+    background none
+
+.simput-property-head-group md-select
+    margin-top -8px
+    margin-bottom 0
+
+    md-select-value
+        border-bottom-width 0
+
+@keyframes blink {
+    0% { background: #fff; }
+    50% { background: #ccc; }
+    100% { background: #fff; }
+}
+
+md-content#drop-data-model.drag-over
+    background #eee
+    animation blink 2s linear infinite
+
+.function-chart, .function-text
+    &.isHidden
+        display none
+
+.nav
+    list-style outside none none
+    margin-bottom 0
+    padding-left 0
+
+ul
+    margin-top 0
+
+.simput-property-head-group > i:first-child
+    font-size 1.3333em
+    outline none
+    transition transform 0.2s ease
+    transform-origin 50% 40%
+
+.simput-property-head-group > i:first-child.collapsed
+    transform rotate(-90deg)
+
+.simput-property
+    margin-top 30px
+
+.simput-property-panel label
+    color rgba(0,0,0,0.26)
+
+.simput-property-head-group
+   margin-top 20px
+   margin-bottom 20px
+   position relative
+   left -5px
+   hr
+        height 1px
+        margin-top 15px
+
+[ng-click], [ui-sref]
+    cursor pointer
+
+strong[title]
+    font-size 1.5em
+
+.width-100
+    width 100%
+
+    input
+        width 100%
+
+.width-90
+    width 90%
+
+    input
+        width 90%
+
+.text-center
+    text-align center
+
+button.md-button.md-fab.help-button
+    background #ccc
+
+button.md-button.md-fab.help-button.md-default-theme:hover
+    background #aaa
+
+.sidenav-header > button.md-button
+    min-width 0
+
+button.md-button > md-icon.fa{
+    margin-top: 7px;
+}
+
+.md-select-menu-container
+    background-color white
+
+md-option
+    &:hover
+        background-color #E3F2FD
+    &[selected=selected]
+        background-color #BBDEFB
+
+md-sidenav
+    .active
+        font-weight bold
+
+        //get rid of a persistent outline on nav items
+        &:active, &:focus
+            outline none
+
+        > span:active, > span:focus
+            outline none
+
+
+.time-function-widget
+    width               100%
+    height              100%
+
+.time-function-container
+    height              100%
+    width               100%
+
+    .time-function-drop-zone
+        width               100%
+        height              100%
+        border-style        solid
+        border-width        1px
+        border-color        lightgray
+        margin-top          20px
+
+    .axis path, .axis line
+        fill                none
+        stroke              #000
+        shape-rendering     crispEdges
+
+    .line
+        fill                none
+        stroke              steelblue
+        stroke-width        1.5px
+
+    .time-function-textarea
+        -webkit-transition  all linear 0.5s
+        transition          all linear 0.5s
+        background-color    none
+
+    .time-function-textarea.invalid
+        background-color    rgba(255,0,0,0.1)
+
+    textarea
+        width               100%
+        resize              none
+        -webkit-box-sizing  border-box
+        -moz-box-sizing     border-box
+        box-sizing          border-box
+
+    .time-function-chart, .time-function-textarea
+        height              550px
+
+    md-tabs.md-default-theme .md-header
+        background          #888888
+
+    md-tabs.md-default-theme md-tab
+        color               #cccccc
+
+    md-tabs.md-default-theme md-tab.active
+        color               #ffffff
