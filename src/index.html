@@ -15,9 +15,11 @@
 
     <md-toolbar class="cmb-header">
       <div class="md-toolbar-tools">
-        <h3 ng-click="goHome()">{{ title }}</h3>
+        <h3 ng-click="goHome()" ng-bind="title"></h3>
         <span flex></span>
-        <h4 ui-sref="preferences" ng-if="user" class="cmb-username">{{ user.firstName}} {{ user.lastName }}</h4>
+        <h4 ui-sref="preferences" ng-if="user" class="cmb-username"
+          ng-bind="user.firstName + ' ' + user.lastName">
+        </h4>
         <span ng-if="user">
           <md-button class="md-fab cmb-button" aria-label="Logout" ng-click="logout()">
             <i class="fa fa-close md-warn"></i>
