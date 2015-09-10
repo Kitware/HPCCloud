@@ -78,7 +78,7 @@ class Proxy(Resource):
                 'type': 'integer'
             }
         }
-    })
+    }, 'proxy')
 
     add_entry.description = (Description(
             'Add entry to the proxy file'
