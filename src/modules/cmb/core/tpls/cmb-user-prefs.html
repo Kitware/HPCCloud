@@ -1,18 +1,49 @@
 <md-content class="md-padding"  layout="column" layout-align="center center">
     <md-card class="pref-card">
-        <md-card-content>
-            <h2 class="md-title">Amazon AWS Key</h2>
-            <md-input-container>
-                <label>Amazon Key</label>
-                <input required>
-            </md-input-container>
-            <md-input-container>
-                <label>Amazon Secret Key</label>
-                <input required>
-            </md-input-container>
-            <md-button>Save</md-button>
+        <md-card-content layout="column" class="no-padding">
+            <md-toolbar>
+                <div class="md-toolbar-tools">
+                    <h3>Amazon AWS</h3>
+                    <span flex></span>
+                    <md-button class="md-icon-button" ng-click="addItem()">
+                        <i class="fa fa-plus"></i>
+                    </md-button>
+                </div>
+            </md-toolbar>
+            <section layout="row" flex="">
+                <accordion close-others="false">
+                    <accordion-group ng-repeat="profile in awsProfiles">
+                        <accordion-heading>
+                            <i class="fa fa-terminal"></i>
+                            <span>{{ profile.name }}</span>
+                        </accordion-heading>
+                        <form layout="column">
+                            <md-input-container>
+                                <label>AWS ID Key</label>
+                                <input type="text" value="">
+                            </md-input-container>
+                            <md-input-container>
+                                <label>AWS Secret Key</label>
+                                <input type="text" value="">
+                            </md-input-container>
+                            <md-input-container>
+                                <label>Region</label>
+                                <input type="text" value="">
+                            </md-input-container>
+                            <md-input-container>
+                                <label>Availability</label>
+                                <input type="text" value="">
+                            </md-input-container>
+                        </form>
+                        <section layout="row" layout-align="end center">
+                            <md-button class="md-primary" ng-click="saveItem()">Save</md-button>
+                            <md-button class="md-warn" ng-click="deleteItem($index-1)">Delete</md-button>
+                        </section>
+                    </accordion-group>
+                </accordion>
+            </section>
         </md-card-content>
-    </md-card style>
+    </md-card>
 
     <md-card class="pref-card">
         <md-card-content>
@@ -29,7 +60,7 @@
                 <label>Confirm New Password</label>
                 <input ng-model="password.confirmPass" type="password" required>
             </md-input-container>
-            <md-button ng-click="changePassword()">Update password</md-button>
+            <md-button class="md-primary" ng-click="changePassword()">Update password</md-button>
         </md-card-content>
-    </md-card style>
+    </md-card>
 </md-content>
