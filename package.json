@@ -1,6 +1,9 @@
 {
   "name": "cmb-web",
   "version": "0.1.0",
+  "engines": {
+    "npm": ">=2.10"
+  },
   "license": "BSD",
   "repository": {
     "type": "git",

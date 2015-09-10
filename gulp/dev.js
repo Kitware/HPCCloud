@@ -12,6 +12,15 @@ gulp.task('watch', ['build'] ,function () {
   gulp.watch('bower.json', ['bower-js', 'bower-css', 'bower-fonts', $.browserSync.reload]);
 });
 
+// no browser-sync
+gulp.task('watch-simple', ['build'] ,function () {
+  gulp.watch('src/**/*', ['jade','html']);
+  gulp.watch('assets/**/*.js', ['html']);
+  gulp.watch('assets/**/*.html', ['html']);
+  gulp.watch('src/assets/images/**/*', ['images']);
+  gulp.watch('bower.json', ['bower-js', 'bower-css', 'bower-fonts']);
+});
+
 gulp.task('serve', ['watch'], function() {
     $.browserSync({
         server: {
@@ -20,4 +29,3 @@ gulp.task('serve', ['watch'], function() {
         notify: false
     });
 });
-
