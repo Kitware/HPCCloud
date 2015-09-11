@@ -1,11 +1,12 @@
 <md-content class="md-padding"  layout="column" layout-align="center center">
-    <md-card class="pref-card">
+    <!-- AWS -->
+    <md-card class="half-width-card">
         <md-card-content layout="column" class="no-padding">
             <md-toolbar>
                 <div class="md-toolbar-tools">
                     <h3>Amazon AWS</h3>
                     <span flex></span>
-                    <md-button class="md-icon-button" ng-click="addItem()">
+                    <md-button class="md-icon-button" ng-click="addItem()" aria-label="Add new profile">
                         <i class="fa fa-plus"></i>
                     </md-button>
                 </div>
@@ -14,7 +15,7 @@
                 <accordion close-others="false">
                     <accordion-group ng-repeat="profile in awsProfiles">
                         <accordion-heading>
-                            <i class="fa fa-terminal"></i>
+                            <i class="fa fw" ng-class="statusClasses[profile.status]"></i>
                             <span>{{ profile.name }}</span>
                         </accordion-heading>
                         <form layout="column">
@@ -28,16 +29,22 @@
                             </md-input-container>
                             <md-input-container>
                                 <label>Region</label>
-                                <input type="text" value="">
+                                <md-select ng-model="region">
+                                    <md-option ng-repeat="region in regions" value="{{region}}">
+                                        {{region}}
+                                    </md-option>
+                                </md-select>
                             </md-input-container>
                             <md-input-container>
                                 <label>Availability</label>
-                                <input type="text" value="">
+                                <md-select ng-model="zone">
+                                    <md-option ng-repeat="availZone in ec2[region]" value="{{$index}}">{{availZone}}</md-option>
+                                </md-select>
                             </md-input-container>
                         </form>
                         <section layout="row" layout-align="end center">
-                            <md-button class="md-primary" ng-click="saveItem()">Save</md-button>
-                            <md-button class="md-warn" ng-click="deleteItem($index-1)">Delete</md-button>
+                            <md-button class="md-primary" ng-click="saveAWSProfile($index)">Save</md-button>
+                            <md-button class="md-warn" ng-click="deleteAWSProfile($index)">Delete</md-button>
                         </section>
                     </accordion-group>
                 </accordion>
@@ -45,7 +52,43 @@
         </md-card-content>
     </md-card>
 
-    <md-card class="pref-card">
+    <!-- CLUSTERS -->
+    <md-card class="half-width-card">
+        <md-card-content layout="column" class="no-padding">
+            <md-toolbar>
+                <div class="md-toolbar-tools">
+                    <h3>Clusters</h3>
+                    <span flex></span>
+                    <md-button class="md-icon-button" ng-click="addItem()" aria-label="Add new cluster">
+                        <i class="fa fa-plus"></i>
+                    </md-button>
+                </div>
+            </md-toolbar>
+            <section layout="row" flex="">
+                <accordion close-others="false">
+                    <accordion-group ng-repeat="profile in clusterProfiles">
+                        <accordion-heading>
+                            <i class="fa fw"></i>
+                            <span>{{ profile.name }}</span>
+                        </accordion-heading>
+                        <form layout="column">
+                            <md-input-container>
+                                <label>SSH Key</label>
+                                <textarea columns="1"></textarea>
+                            </md-input-container>
+                        </form>
+                        <section layout="row" layout-align="end center">
+                            <md-button class="md-primary" ng-click="saveClusterProfile($index)">Save</md-button>
+                            <md-button class="md-warn" ng-click="deleteClusterProfile($index)">Delete</md-button>
+                        </section>
+                    </accordion-group>
+                </accordion>
+            </section>
+        </md-card-content>
+    </md-card>
+
+    <!-- PASSWORD -->
+    <md-card class="half-width-card">
         <md-card-content>
             <h2 class="md-title">Change password</h2>
             <md-input-container flex>
