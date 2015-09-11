@@ -1,7 +1,7 @@
 <md-content class="md-padding"  layout="row" layout-align="center center">
-    <md-card style="width: 50%;">
+    <md-card class="half-width-card">
         <md-card-content>
-            <section layout="row" layout-sm="column" layout-align="space-around center"
+            <section layout="row" layout-sm="column" layout-align="center center"
                 ng-keypress="(userLogin && userPassword && $event.keyCode === 13) ? login(userLogin, userPassword) : null">
                 <md-input-container flex>
                     <label>Login</label>
@@ -11,14 +11,13 @@
                     <label>Password</label>
                     <input ng-model="userPassword" type="password">
                 </md-input-container>
-                <md-button class="md-fab cmb-button" aria-label="Login"
-                    ng-click='login(userLogin, userPassword)'
-                    ng-disabled="!userLogin.length||!userPassword.length">
-                    <i class="fa fa-arrow-right"></i>
-                </md-button>
             </section>
-            <section layout="row" layout="column" layout-align="space-around center">
-              <md-button flex class="md-raised" ui-sref="register">Register</md-button>
+            <section layout="row" layout-sm="column" layout-align="end center">
+                <md-button class="md-flat" ui-sref="register" flex-order-sm="2">Register</md-button>
+                <md-button class="md-raised md-primary" aria-label="Login"
+                    ng-click='login(userLogin, userPassword)' flex-order-sm="1">
+                    Login
+                </md-button>
             </section>
         </md-card-content>
     </md-card>

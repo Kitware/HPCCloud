@@ -38,7 +38,7 @@ angular.module("kitware.cmb.core")
         $scope.simulations = [];
 
         $scope.toggleSimulationFilter = function (event) {
-            event.target.classList.toggle('md-raised');
+            event.currentTarget.classList.toggle('md-raised');
         };
 
         $scope.createSimulation = function (event, simulation) {

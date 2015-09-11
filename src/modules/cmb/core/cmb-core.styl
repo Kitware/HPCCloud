@@ -154,12 +154,16 @@ md-sidenav
 .cmb-username
     padding-right 7px
 
-.pref-card
-    width 50%
-
 .no-padding
     padding 0
 
+.project-filter-button
+    padding: 0;
+    width: 30px;
+    min-width: 0;
+    min-height: 0;
+    height: 26px;
+    line-height: normal;
 
 accordion
     width 100%
@@ -172,12 +176,15 @@ a.accordion-toggle
     align-items baseline
     outline none
 
-    &:hover
+    &:hover, &:focus
         text-decoration none
 
     span
-        margin-left 4px
+        margin-left 16px
+
+.half-width-card
+    width 50%
 
 @media screen and (max-width: 600px)
-    .pref-card
+    .half-width-card
         width 100%
