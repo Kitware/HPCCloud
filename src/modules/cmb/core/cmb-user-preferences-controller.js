@@ -19,7 +19,7 @@ angular.module("kitware.cmb.core")
             $scope.statusClasses = {
                 'ready': 'fa-check',
                 'starting': 'fa-circle-o-notch fa-spin',
-                'created': 'fa-terminal',
+                'available': 'fa-terminal',
                 'incomplete': 'fa-warning'
             };
 
@@ -40,9 +40,27 @@ angular.module("kitware.cmb.core")
 
             $girder.getAWSProfiles()
                 .success(function(data){
-                    $scope.awsProfiles = data;
-                }).error(function(res){
-                    showToast(res.message);
+                    data.map(function(el) {
+                        el.saved = true;
+                        return el;
+                    });
+                    console.log(data);
+                    $scope.awsProfiles = angular.copy(data);
+                })
+                .error(function(err){
+                    showToast(err.message);
+                });
+
+            $girder.getClusterProfiles()
+                .success(function(data){
+                    data.map(function(el) {
+                        el.saved = true;
+                        return el;
+                    });
+                    $scope.clusterProfiles = angular.copy(data);
+                })
+                .error(function(err) {
+                    showToast(err.message);
                 });
 
             $scope.changePassword = function() {
@@ -99,6 +117,7 @@ angular.module("kitware.cmb.core")
                 $girder.createAWSProfile($scope.awsProfiles[index])
                     .success(function(data) {
                         console.log('created aws profile :)');
+                        $scope.awsProfiles[index].saved = true;
                     })
                     .error(function(err){
                         showToast(err.message);
@@ -107,16 +126,17 @@ angular.module("kitware.cmb.core")
             }
 
             $scope.saveAWSProfile = function(index) {
-                if (!$scope.clusterProfiles[index].saved) {
+                if (!$scope.awsProfiles[index].saved) {
                     createAWSProfile(index);
                     return;
                 }
 
                 $girder.saveAWSProfile($scope.awsProfiles[index])
-                    .success(function() {
-                        console.log('saved aws profile :)');
+                    .success(function(data) {
+                        showToast('"' + $scope.awsProfiles[index].name + '" updated.');
                     })
-                    .error(function(){
+                    .error(function(err){
+                        showToast(err.message);
                         console.log('failed to save aws profile');
                     });
             };
