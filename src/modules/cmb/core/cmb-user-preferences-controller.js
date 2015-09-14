@@ -3,15 +3,9 @@ angular.module("kitware.cmb.core")
         '$templateCache', '$window', '$http', '$timeout', '$interval', '$mdToast', '$mdDialog',
         function ($scope, $girder, $state, $stateParams, $templateCache, $window, $http, $timeout, $interval, $mdToast, $mdDialog) {
             $scope.password = {oldPass: '', newPass: '', confirmPass: ''};
-            //sample data
-            $scope.awsProfiles = [
-                {name: 'item 1', description: 'no description', status: 'ready'},
-                {name: 'item 2', description: 'no description either!', status: 'created'},
-                {name: 'item third', description: 'One day in 1945,'+
-                'Mike the Headless Chicken was decapitated in a farm in Colorado;'+
-                'he survived another 18 months as part of sideshows before choking'+
-                'to death in Phoenix, Arizona.', status: 'starting'},
-            ];
+
+            // formatted {'accessKeyId','availabilityZone','name','regionName','secretAccessKey}
+            $scope.awsProfiles = [];
 
             $scope.clusterProfiles = [
                 {name: 'item 1', description: 'no description', status: 'ready'},
@@ -44,19 +38,23 @@ angular.module("kitware.cmb.core")
             };
             $scope.regions = Object.keys($scope.ec2);
 
-            $scope.region = '';
-            $scope.zone = '';
+            $girder.getAWSProfiles()
+                .success(function(data){
+                    $scope.awsProfiles = data;
+                }).error(function(res){
+                    showToast(res.message);
+                });
 
             $scope.changePassword = function() {
                 if ($scope.password.newPass !== $scope.password.confirmPass) {
-                    toastMe('New passwords are not equal');
+                    showToast('New passwords are not equal');
                     return;
                 }
                 $girder.changeUserPassword($scope.password.oldPass, $scope.password.newPass)
                     .success(function(){
-                        toastMe('Password updated!');
+                        showToast('Password updated!');
                     }).error(function(res){
-                        toastMe(res.message);
+                        showToast(res.message);
                     });
             };
 
@@ -81,9 +79,10 @@ angular.module("kitware.cmb.core")
             $scope.deleteAWSProfile = function(index){
                confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
                 function() {
-                    var tmpProfiles = $scope.awsProfiles;
-                    tmpProfiles.splice(index, 1);
+                    var tmpProfiles = $scope.awsProfiles,
+                        removed = tmpProfiles.splice(index, 1)[0];
                     $scope.awsProfiles = tmpProfiles;
+                    $girder.deleteAWSProfile(removed);
                 }, function(){});
             };
 
@@ -96,17 +95,42 @@ angular.module("kitware.cmb.core")
                 }, function(){});
             };
 
+            function createAWSProfile(index) {
+                $girder.createAWSProfile($scope.awsProfiles[index])
+                    .success(function(data) {
+                        console.log('created aws profile :)');
+                    })
+                    .error(function(err){
+                        showToast(err.message);
+                        console.log('failed to create aws profile');
+                    });
+            }
+
             $scope.saveAWSProfile = function(index) {
-                // some post to the girder endpoint
-                console.log('aws profile saved');
+                if (!$scope.clusterProfiles[index].saved) {
+                    createAWSProfile(index);
+                    return;
+                }
+
+                $girder.saveAWSProfile($scope.awsProfiles[index])
+                    .success(function() {
+                        console.log('saved aws profile :)');
+                    })
+                    .error(function(){
+                        console.log('failed to save aws profile');
+                    });
             };
+
+            function createClusterProfile(index) {
+                console.log('cluster profile created');
+            }
 
             $scope.saveClusterProfile = function(index) {
                 // some post to the girder endpoint
                 console.log('cluster item saved');
             };
 
-            function toastMe(message) {
+            function showToast(message) {
                 $mdToast.show(
                     $mdToast.simple()
                         .content(message)

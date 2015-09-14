@@ -224,13 +224,16 @@ angular.module("kitware.girder", ["ngCookies"])
         };
 
         /**
-         * Perform a POST http call to the given url with
+         * Perform a PATCH http call to the given url with
          * the authentication Token if available.
          */
         this.post = function (url, data, config) {
             return $http(generateHttpConfig('POST', url, data, config));
         };
 
+        this.patch = function (url, data, config) {
+            return $http(generateHttpConfig('PATCH', url, data, config));
+        };
         /**
          * Annonymous HTTP get call on a given URL and
          * return a promise like on which could be
@@ -765,6 +768,40 @@ angular.module("kitware.girder", ["ngCookies"])
                     console.log("Error when fetching task info for " + taskId);
                     console.log(error);
                 });
+        };
+
+        // AWS
+        this.getAWSProfiles = function() {
+            return this.get('user/' + user._id + '/aws/profiles');
+        };
+
+        this.createAWSProfile = function(prof) {
+            return this.post('user/' + user._id + '/aws/profiles', prof);
+        };
+
+        this.saveAWSProfile = function(prof) {
+            return this.patch('user/' + user._id + '/aws/profiles/' + prof._id, prof);
+        };
+
+        this.deleteAWSProfile = function(prof) {
+            return this.delete('user/' + user._id + '/aws/profiles/' + prof._id);
+        };
+
+        this.getAWSStatus = function() {
+            return this.get('user/' + user._id + '/aws/profiles');
+        };
+
+        // Clusters
+        this.getClusterProfiles = function() {
+            return this.get('clusters?type=trad');
+        };
+
+        this.saveClusterProfile = function() {
+
+        };
+
+        this.deleteClusterProfile = function(id) {
+
         };
 
     }]);

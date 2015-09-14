@@ -6,7 +6,7 @@
                 <div class="md-toolbar-tools">
                     <h3>Amazon AWS</h3>
                     <span flex></span>
-                    <md-button class="md-icon-button" ng-click="addItem()" aria-label="Add new profile">
+                    <md-button class="md-icon-button" ng-click="addProfile()" aria-label="Add new profile">
                         <i class="fa fa-plus"></i>
                     </md-button>
                 </div>
@@ -21,15 +21,15 @@
                         <form layout="column">
                             <md-input-container>
                                 <label>AWS ID Key</label>
-                                <input type="text" value="">
+                                <input type="text" ng-model="awsProfiles[$index].accessKeyId">
                             </md-input-container>
                             <md-input-container>
                                 <label>AWS Secret Key</label>
-                                <input type="text" value="">
+                                <input type="text" ng-model="awsProfiles[$index].secretAccessKey">
                             </md-input-container>
                             <md-input-container>
                                 <label>Region</label>
-                                <md-select ng-model="region">
+                                <md-select ng-model="awsProfiles[$index].regionName">
                                     <md-option ng-repeat="region in regions" value="{{region}}">
                                         {{region}}
                                     </md-option>
@@ -37,8 +37,11 @@
                             </md-input-container>
                             <md-input-container>
                                 <label>Availability</label>
-                                <md-select ng-model="zone">
-                                    <md-option ng-repeat="availZone in ec2[region]" value="{{$index}}">{{availZone}}</md-option>
+                                <md-select ng-model="awsProfiles[$index].availabilityZone">
+                                    <md-option ng-repeat="availZone in ec2[awsProfiles[$index].regionName]"
+                                        value="{{awsProfiles[$index].regionName + availZone}}">
+                                        {{availZone[availZone.length - 1]}}
+                                    </md-option>
                                 </md-select>
                             </md-input-container>
                         </form>
@@ -59,7 +62,7 @@
                 <div class="md-toolbar-tools">
                     <h3>Clusters</h3>
                     <span flex></span>
-                    <md-button class="md-icon-button" ng-click="addItem()" aria-label="Add new cluster">
+                    <md-button class="md-icon-button" ng-click="addClusterProfile()" aria-label="Add new cluster">
                         <i class="fa fa-plus"></i>
                     </md-button>
                 </div>
@@ -73,8 +76,12 @@
                         </accordion-heading>
                         <form layout="column">
                             <md-input-container>
-                                <label>SSH Key</label>
-                                <textarea columns="1"></textarea>
+                                <label>Username</label>
+                                <input type="text" value="">
+                            </md-input-container>
+                            <md-input-container>
+                                <label>Password</label>
+                                <input type="text" value="">
                             </md-input-container>
                         </form>
                         <section layout="row" layout-align="end center">
