@@ -76,6 +76,7 @@ angular.module("kitware.cmb.core")
                     });
             };
 
+            // AWS profile
             $scope.addProfile = function() {
                 inputDialog( 'Add AWS profile', 'profile name',
                     function(name) {
@@ -83,34 +84,6 @@ angular.module("kitware.cmb.core")
                     },
                     function(){/*do nothing on failure*/}
                 );
-            };
-
-            $scope.addClusterProfile = function() {
-                inputDialog( 'Add cluster profile', 'profile name',
-                    function(name) {
-                        $scope.clusterProfiles.push({name: name, description: 'no description', status: 'incomplete'});
-                    },
-                    function(){/*do nothing on failure*/}
-                );
-            };
-
-            $scope.deleteAWSProfile = function(index){
-               confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
-                function() {
-                    var tmpProfiles = $scope.awsProfiles,
-                        removed = tmpProfiles.splice(index, 1)[0];
-                    $scope.awsProfiles = tmpProfiles;
-                    $girder.deleteAWSProfile(removed);
-                }, function(){});
-            };
-
-            $scope.deleteClusterProfile = function(index){
-               confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
-                function() {
-                    var tmpProfiles = $scope.clusterProfiles;
-                    tmpProfiles.splice(index, 1);
-                    $scope.clusterProfiles = tmpProfiles;
-                }, function(){});
             };
 
             function createAWSProfile(index) {
@@ -141,15 +114,57 @@ angular.module("kitware.cmb.core")
                     });
             };
 
+            $scope.deleteAWSProfile = function(index){
+               confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
+                function() {
+                    var tmpProfiles = $scope.awsProfiles,
+                        removed = tmpProfiles.splice(index, 1)[0];
+                    $scope.awsProfiles = tmpProfiles;
+                    $girder.deleteAWSProfile(removed);
+                }, function(){});
+            };
+
+            // Cluster profile
+            $scope.addClusterProfile = function() {
+                inputDialog( 'Add cluster profile', 'profile name',
+                    function(name) {
+                        $scope.clusterProfiles.push({name: name, description: 'no description', status: 'incomplete'});
+                    },
+                    function(){/*do nothing on failure*/}
+                );
+            };
+
             function createClusterProfile(index) {
                 console.log('cluster profile created');
             }
 
             $scope.saveClusterProfile = function(index) {
-                // some post to the girder endpoint
-                console.log('cluster item saved');
+                if (!$scope.clusterProfiles[index].saved) {
+                    createClusterProfile(index);
+                    return;
+                }
+
+                $girder.saveClusterProfile($scope.awsProfiles[index])
+                    .success(function(data) {
+                        showToast('"' + $scope.clusterProfiles[index].name + '" updated.');
+                    })
+                    .error(function(err){
+                        showToast(err.message);
+                        console.log('failed to save cluster profile');
+                    });
             };
 
+            $scope.deleteClusterProfile = function(index){
+               confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
+                function() {
+                    var tmpProfiles = $scope.clusterProfiles,
+                        removed = tmpProfiles.splice(index, 1);
+                    $scope.clusterProfiles = tmpProfiles;
+                    $girder.deleteAWSProfile(removed);
+                }, function(){});
+            };
+
+            // Other UI functions
             function showToast(message) {
                 $mdToast.show(
                     $mdToast.simple()

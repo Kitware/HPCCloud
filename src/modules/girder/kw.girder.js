@@ -787,21 +787,21 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.delete('user/' + user._id + '/aws/profiles/' + prof._id);
         };
 
-        this.getAWSStatus = function() {
-            return this.get('user/' + user._id + '/aws/profiles');
-        };
-
         // Clusters
         this.getClusterProfiles = function() {
             return this.get('clusters?type=trad');
         };
 
-        this.saveClusterProfile = function() {
-
+        function createClusterProfile(prof) {
+            return this.post('clusters', prof);
         };
 
-        this.deleteClusterProfile = function(id) {
+        this.saveClusterProfile = function(prof) {
+            return this.patch('clusters/' + prof._id, data);
+        };
 
+        this.deleteClusterProfile = function(prof) {
+            return this.delete('clusters/' + prof._id);
         };
 
     }]);
