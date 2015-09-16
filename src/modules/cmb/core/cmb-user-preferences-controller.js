@@ -8,9 +8,17 @@ angular.module("kitware.cmb.core")
             $scope.clusterProfiles = [];
 
             $scope.statusClasses = {
+                //AWS
                 'creating': 'fa-circle-o-notch fa-spin',
                 'available': 'fa-check',
-                'error': 'fa-warning'
+                'error': 'fa-warning',
+                //Cluster
+                'created': 'fa-check',
+                'initializing': 'fa-circle-o-notch fa-spin',
+                'running': 'fa-rocket',
+                'terminating': 'fa-bomb',
+                'terminated': 'fa-ban',
+                //'error': 'fa-warning'
             };
 
             // regions: https://docs.aws.amazon.com/general/latest/gr/rande.html#ec2_region
