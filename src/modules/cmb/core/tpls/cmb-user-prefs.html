@@ -15,7 +15,11 @@
                 <accordion close-others="false">
                     <accordion-group ng-repeat="profile in awsProfiles">
                         <accordion-heading>
-                            <i class="fa fw" ng-class="statusClasses[profile.status]"></i>
+                            <i class="fa fw" ng-class="statusClasses[profile.status]">
+                                <md-tooltip>
+                                  {{profile.status}}
+                                </md-tooltip>
+                            </i>
                             <span>{{ profile.name }}</span>
                         </accordion-heading>
                         <form layout="column">
