@@ -788,11 +788,11 @@ angular.module("kitware.girder", ["ngCookies"])
         };
 
         // Clusters
-        this.getClusterProfiles = function() {
+        this.getClusterProfile = function() {
             return this.get('clusters?type=trad');
         };
 
-        function createClusterProfile(prof) {
+        this.createClusterProfile = function(prof) {
             return this.post('clusters', prof);
         };
 

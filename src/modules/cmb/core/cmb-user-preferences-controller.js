@@ -4,17 +4,8 @@ angular.module("kitware.cmb.core")
         function ($scope, $girder, $state, $stateParams, $templateCache, $window, $http, $timeout, $interval, $mdToast, $mdDialog) {
             $scope.password = {oldPass: '', newPass: '', confirmPass: ''};
 
-            // formatted {'accessKeyId','availabilityZone','name','regionName','secretAccessKey}
             $scope.awsProfiles = [];
-
-            $scope.clusterProfiles = [
-                {name: 'item 1', description: 'no description', status: 'ready'},
-                {name: 'item 2', description: 'no description either!', status: 'created'},
-                {name: 'item third', description: 'One day in 1945,'+
-                'Mike the Headless Chicken was decapitated in a farm in Colorado;'+
-                'he survived another 18 months as part of sideshows before choking'+
-                'to death in Phoenix, Arizona.', status: 'starting'},
-            ];
+            $scope.clusterProfiles = [];
 
             $scope.statusClasses = {
                 'ready': 'fa-check',
@@ -135,7 +126,16 @@ angular.module("kitware.cmb.core")
             };
 
             function createClusterProfile(index) {
-                console.log('cluster profile created');
+                $girder.createClusterProfile($scope.clusterProfiles[index])
+                    .success(function(data) {
+                        console.log('created aws profile :)');
+                        $scope.clusterProfiles[index].saved = true;
+                        $scope.clusterProfiles[index].type = 'trad';
+                    })
+                    .error(function(err){
+                        showToast(err.message);
+                        console.log('failed to create aws profile');
+                    });
             }
 
             $scope.saveClusterProfile = function(index) {
