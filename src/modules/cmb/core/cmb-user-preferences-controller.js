@@ -75,6 +75,18 @@ angular.module("kitware.cmb.core")
             };
 
             // AWS profile
+            $scope.validateZone = function(ind) {
+                var region = $scope.awsProfiles[ind].regionName,
+                    aZone = $scope.awsProfiles[ind].availabilityZone;
+                if (aZone.indexOf(region) < 0) {
+                    $scope.awsProfiles[ind].availabilityZone = region + $scope.ec2[region][0];
+                }
+            };
+
+            $scope.validateX = function(){
+                console.log('invald');
+            };
+
             $scope.addProfile = function() {
                 inputDialog( 'Add AWS profile', 'profile name',
                     function(name) {

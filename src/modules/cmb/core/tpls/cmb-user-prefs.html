@@ -33,17 +33,17 @@
                             </md-input-container>
                             <md-input-container>
                                 <label>Region</label>
-                                <md-select ng-model="awsProfiles[$index].regionName">
-                                    <md-option ng-repeat="region in regions" value="{{region}}">
+                                <md-select ng-model="awsProfiles[$index].regionName" md-on-close="validateZone($index)">
+                                    <md-option ng-repeat="region in regions" ng-value="region">
                                         {{region}}
                                     </md-option>
                                 </md-select>
                             </md-input-container>
                             <md-input-container>
-                                <label>Availability</label>
+                                <label>Availability Zone</label>
                                 <md-select ng-model="awsProfiles[$index].availabilityZone">
                                     <md-option ng-repeat="availZone in ec2[awsProfiles[$index].regionName]"
-                                        value="{{awsProfiles[$index].regionName + availZone}}">
+                                        ng-value="awsProfiles[$parent.$index].regionName + availZone">
                                         {{availZone[availZone.length - 1]}}
                                     </md-option>
                                 </md-select>
