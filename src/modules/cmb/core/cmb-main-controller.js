@@ -125,6 +125,32 @@ angular.module("kitware.cmb.core")
             $girder.login(user, password);
         };
 
+        $scope.registerUser = function(user) {
+            if (user.password !== user.passwordConf) {
+                $mdToast.show(
+                    $mdToast.simple()
+                        .content('Passwords do not match')
+                        .position('bottom left right')
+                        .hideDelay(3000)
+                );
+                return;
+            }
+
+            $girder.registerUser(user)
+                .success(function() {
+                    $girder.login(user.login, user.password);
+                })
+                .error(function(err) {
+                    $mdToast.show(
+                        $mdToast.simple()
+                            .content(err.message)
+                            .position('bottom left right')
+                            .hideDelay(3000)
+                    );
+                    return;
+                });
+        };
+
         $scope.runTask = function (event, title, taskName, hasLauncher, callback) {
             var simulation = $scope.simulation,
                 collectionName = $scope.collection.name;

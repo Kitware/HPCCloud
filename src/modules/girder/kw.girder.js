@@ -38,6 +38,22 @@ angular.module("kitware.girder", ["ngCookies"])
             this.fetchUser();
         }
 
+        // takes an object returns a parameterized url suffix
+        // e.g. {profile: 'Joe', id: 12345, zone: 'west'} =>
+        // "?profile=Joe&id=12345&zone=west"
+        function objectArgumentSerializer(obj) {
+          var str = '';
+          Object.keys(obj).forEach(function(el, index) {
+            if (index === 0) {
+              str += '?' + el + '=' + obj[el].toString();
+            }
+            else {
+              str += '&' + el + '=' + obj[el].toString();
+            }
+          });
+          return str;
+        }
+
         // Helper function use to generate $http argument base on
         // the targetted method and URL.
         function generateHttpConfig (method, url, data, config) {
@@ -181,6 +197,10 @@ angular.module("kitware.girder", ["ngCookies"])
             }
         };
 
+        this.registerUser = function(user) {
+            return this.post('user' + objectArgumentSerializer(user));
+        };
+
         this.changeUserPassword = function(oldPass, newPass) {
             return this.put('user/password?old='+oldPass+'&new='+newPass);
         };
@@ -300,7 +320,10 @@ angular.module("kitware.girder", ["ngCookies"])
 
         this.createFolder = function (parentId, name, description, parentType) {
             parentType = parentType || "folder";
-            return this.post(['folder?parentId=', parentId, '&parentType=', parentType, '&name=', escape(name), '&description=', escape(description)].join(''));
+            return this.post(['folder?parentId=', parentId,
+                '&parentType=', parentType,
+                '&name=', escape(name),
+                '&description=', escape(description)].join(''));
         };
 
         this.deleteFolder = function (id) {
@@ -325,7 +348,9 @@ angular.module("kitware.girder", ["ngCookies"])
 
         this.createItem = function (folderId, name, description, metadata) {
             var that = this,
-                promise = this.post(['item?folderId=', folderId, '&name=', escape(name), '&description=', escape(description)].join(''));
+                promise = this.post(['item?folderId=', folderId,
+                    '&name=', escape(name),
+                    '&description=', escape(description)].join(''));
             if(metadata) {
                 promise
                 .success(function(newItem) {

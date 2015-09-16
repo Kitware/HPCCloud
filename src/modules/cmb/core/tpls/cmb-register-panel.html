@@ -1,39 +1,39 @@
 <md-content class="md-padding"  layout="row" layout-align="center center">
-    <md-card style="width: 50%;">
+    <md-card class="half-width-card">
         <md-card-content>
         <section layout="column" layout-sm="column" layout-align="space-around center">
             <md-input-container flex class="width-100">
                 <label>Choose a login name</label>
-                <input ng-model="loginName">
+                <input ng-model="user.login">
             </md-input-container>
             <md-input-container flex class="width-100">
                 <label>Enter your email address</label>
-                <input ng-model="userMail" type="email">
+                <input ng-model="user.email" type="email">
             </md-input-container>
         </section>
         <section layout="row" layout-sm="column" layout-align="space-around center">
             <md-input-container flex>
                 <label>First name</label>
-                <input ng-model="firstName">
+                <input ng-model="user.firstName">
             </md-input-container>
             <md-input-container flex>
                 <label>Last name</label>
-                <input ng-model="lastName">
+                <input ng-model="user.lastName">
             </md-input-container>
         </section>
         <section layout="row" layout-sm="column" layout-align="space-around center">
             <md-input-container flex>
                 <label>Choose a password</label>
-                <input ng-model="passwordA" type="password">
+                <input ng-model="user.password" type="password">
             </md-input-container>
             <md-input-container flex>
                 <label>Retype your password</label>
-                <input ng-model="passwordB" type="password">
+                <input ng-model="user.passwordConf" type="password">
             </md-input-container>
         </section>
         <section layout="row" layout="column" layout-align="space-between center">
           <md-button class="md-raised" ui-sref="login">Cancel</md-button>
-          <md-button class="md-raised">Register</md-button>
+          <md-button class="md-raised" ng-click="registerUser(user)">Register</md-button>
         </section>
         </md-card-content>
     </md-card>
