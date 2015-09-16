@@ -20,31 +20,31 @@
     <div flex toggle-filter-bar layout="row" layout-align="center center">
         <md-button class="md-raised project-filter-button"
             aria-label="Toggle incomplete simulations"
-            ng-click="toggleSimulationFilter($event)">
+            ng-click="toggleSimulationFilter($event, 'incomplete')">
             <i class="fa fa-fw fa-pencil-square-o"></i>
             <md-tooltip>Toggle incomplete simulations</md-tooltip>
         </md-button>
         <md-button class="md-raised project-filter-button"
             aria-label="Toggle valid simulations"
-            ng-click="toggleSimulationFilter($event)">
+            ng-click="toggleSimulationFilter($event, 'valid')">
             <i class="fa fa-fw fa-check-square-o"></i>
             <md-tooltip>Toggle valid simulations ready to run</md-tooltip>
         </md-button>
         <md-button class="md-raised project-filter-button"
             aria-label="Toggle running simulations"
-            ng-click="toggleSimulationFilter($event)">
+            ng-click="toggleSimulationFilter($event, 'running')">
             <i class="fa fa-fw fa-line-chart"></i>
             <md-tooltip>Toggle running simulations</md-tooltip>
         </md-button>
         <md-button class="md-raised project-filter-button"
             aria-label="Toggle simulations with results"
-            ng-click="toggleSimulationFilter($event)">
+            ng-click="toggleSimulationFilter($event, 'results')">
             <i class="fa fa-fw fa-database"></i>
             <md-tooltip>Toggle simulations with results</md-tooltip>
         </md-button>
         <md-button class="md-raised project-filter-button"
             aria-label="Toggle simulations with errors"
-            ng-click="toggleSimulationFilter($event)">
+            ng-click="toggleSimulationFilter($event, 'errors')">
             <i class="fa fa-fw fa-warning"></i>
             <md-tooltip>Toggle simulations with errors</md-tooltip>
         </md-button>
@@ -75,7 +75,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="simulation in simulations"
+            <tr ng-repeat="simulation in simulations | filter: simulationFilter(filters)"
                 class="project-block" >
                 <td class="text-center" ng-click="manageSimulation($event, simulation)">
                     <i ng-hide="simulation.meta.task === 'failure'" class="fa fa-fw"

@@ -36,9 +36,23 @@ angular.module("kitware.cmb.core")
         $scope.meshItem = null;
         $scope.mesh = null;
         $scope.simulations = [];
+        $scope.filters = {
+            incomplete: true,
+            valid: true,
+            running: true,
+            results: true,
+            errors: true
+        };
 
-        $scope.toggleSimulationFilter = function (event) {
+        $scope.toggleSimulationFilter = function (event, filter) {
             event.currentTarget.classList.toggle('md-raised');
+            $scope.filters[filter] = !$scope.filters[filter];
+        };
+
+        $scope.simulationFilter = function(filters) {
+            return function(sim) {
+                return filters[sim.meta.status];
+            };
         };
 
         $scope.createSimulation = function (event, simulation) {
@@ -175,6 +189,7 @@ angular.module("kitware.cmb.core")
                             $scope.simulations.push(items[count]);
                         }
                     }
+                    console.log($scope.simulations);
                 })
                 .error(function(err) {
                     console.log(err);
