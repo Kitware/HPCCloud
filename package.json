@@ -64,11 +64,13 @@
     "uglify-save-license": "^0.4.1"
   },
   "devDependencies": {
-    "precommit": "^1.1.5"
+    "pre-commit": "^1.1.1"
   },
   "scripts": {
     "build": "gulp",
     "postinstall": "./node_modules/.bin/bower install --config.interactive=false && ./node_modules/.bin/gulp"
   },
-  "precommit": ["npm run build"]
+  "pre-commit": [
+    "build"
+  ]
 }
