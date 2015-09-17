@@ -45,10 +45,10 @@ angular.module("kitware.girder", ["ngCookies"])
           var str = '';
           Object.keys(obj).forEach(function(el, index) {
             if (index === 0) {
-              str += '?' + el + '=' + obj[el].toString();
+              str += '?' + el + '=' + escape(obj[el].toString());
             }
             else {
-              str += '&' + el + '=' + obj[el].toString();
+              str += '&' + el + '=' + escape(obj[el].toString());
             }
           });
           return str;
@@ -348,9 +348,8 @@ angular.module("kitware.girder", ["ngCookies"])
 
         this.createItem = function (folderId, name, description, metadata) {
             var that = this,
-                promise = this.post(['item?folderId=', folderId,
-                    '&name=', escape(name),
-                    '&description=', escape(description)].join(''));
+                obj = {folderId: folderId, name: name, description: description},
+                promise = this.post('item' + objectArgumentSerializer(obj));
             if(metadata) {
                 promise
                 .success(function(newItem) {

@@ -90,10 +90,10 @@
                     <md-tooltip ng-if="simulation.meta.task">{{ simulation.meta.task }}</md-tooltip>
                 </td>
                 <td ui-sref="simulation({ collectionName: getActiveCollection(), projectID: simulation.folderId, simulationID: simulation._id , mode: simulation.meta.status})">
-                    {{ simulation.name }}
+                    {{ simulation.name | unescape}}
                 </td>
                 <td ui-sref="simulation({ collectionName: getActiveCollection(), projectID: simulation.folderId, simulationID: simulation._id , mode: simulation.meta.status})">
-                    {{ simulation.description }}
+                    {{ simulation.description | unescape}}
                 </td>
                 <td class="text-center" ui-sref="simulation({ collectionName: getActiveCollection(), projectID: simulation.folderId, simulationID: simulation._id , mode: simulation.meta.status})">
                     {{ simulation.created | toDateNumber | date : 'medium' }}

@@ -19,6 +19,15 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
             return (bytes / Math.pow(1024, Math.floor(number))).toFixed(precision) +  ' ' + units[number];
         };
     })
+    .filter('unescape', function() {
+        return function(str) {
+            if (!str || str.length === 0) {
+                return '';
+            } else {
+                return unescape(str);
+            }
+        };
+    })
     .directive("fileread", [function () {
         return {
             scope: {

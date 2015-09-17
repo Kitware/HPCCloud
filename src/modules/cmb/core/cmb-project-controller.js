@@ -189,7 +189,6 @@ angular.module("kitware.cmb.core")
                             $scope.simulations.push(items[count]);
                         }
                     }
-                    console.log($scope.simulations);
                 })
                 .error(function(err) {
                     console.log(err);

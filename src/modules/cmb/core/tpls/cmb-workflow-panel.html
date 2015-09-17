@@ -22,10 +22,10 @@
                 class="project-block">
                 <td></td>
                 <td ui-sref="project({ collectionName: getActiveCollection(), projectID: project._id })">
-                    {{ project.name }}
+                    {{ project.name | unescape}}
                 </td>
                 <td ui-sref="project({ collectionName: getActiveCollection(), projectID: project._id })">
-                    {{ project.description }}
+                    {{ project.description | unescape}}
                 </td>
                 <td ui-sref="project({ collectionName: getActiveCollection(), projectID: project._id })">
                     {{ project.created | toDateNumber | date : 'medium' }}

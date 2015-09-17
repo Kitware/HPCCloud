@@ -7,7 +7,7 @@
         <li ng-show="getActiveProject()" ui-sref="project({ collectionName: getActiveCollection(), projectID: getActiveProject() })"><span class='clickable fa fa-tasks'></span></li>
       </ol>
     </div>
-    <div flex layout="row" layout-align="center center">{{ subTitle }}</div>
+    <div flex layout="row" layout-align="center center">{{ subTitle | unescape }}</div>
     <!-- <div flex layout="row" layout-align="end center">
       <input type="search" class="search-query" placeholder="Search" ng-model="query"/>
     </div> -->
