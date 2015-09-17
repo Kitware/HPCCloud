@@ -95,35 +95,6 @@ angular.module("kitware.girder", ["ngCookies"])
             return httpConfig;
         }
 
-        this.fetchTaskList = function() {
-            var self = this;
-
-            self.listCollections()
-                .success(function(collections) {
-                    angular.forEach(collections, function(collection) {
-                        collectionMap[collection.name] = collection;
-                        taskList[collection.name] = {};
-                        self.listFolders(collection._id, 'collection')
-                            .success(function(folders){
-                                angular.forEach(folders, function(folder) {
-                                    if (folder.name === 'tasks') {
-                                        self.listItems(folder._id)
-                                            .success(function(items) {
-                                                angular.forEach(items, function(item) {
-                                                    self.listItemFiles(item._id).success(function(files){
-                                                        angular.forEach(files, function(file) {
-                                                            taskList[collection.name][file.name] = file._id;
-                                                        });
-                                                    });
-                                                });
-                                            });
-                                    }
-                                });
-                            });
-                    });
-                });
-        };
-
         this.getApiBase = function () {
             return apiBasePathURL;
         };
@@ -549,14 +520,6 @@ angular.module("kitware.girder", ["ngCookies"])
           );
         };
 
-        this.getTaskId = function(workflow, taskName) {
-            console.log(taskList);
-            if(workflow && taskName) {
-                return taskList[workflow][taskName];
-            }
-            return null;
-        };
-
         this.updateItemMetadata = function (item, metadata) {
             return this.put(['item', item._id, 'metadata'].join('/'), metadata)
                 .success(function(){
@@ -571,8 +534,116 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.get(['jobs', jobId, 'output?path=' + filePath + '&offset=' + offset].join('/'));
         };
 
+        this.extractMeshInformationFromProject = function(folderId, callback) {
+            var self = this;
+
+            self.listItems(folderId)
+                .success(function(items) {
+                    var count = items.length,
+                        meshItem = null,
+                        meshFile = null;
+
+                    // Find item that contains the mesh
+                    while(count-- && meshItem === null) {
+                        if(items[count].name === 'mesh') {
+                           meshItem =  items[count];
+                        }
+                    }
+
+                    // Find the name of the mesh file
+                    self.listItemFiles(meshItem._id)
+                        .success(function(files) {
+                            count = files.length;
+
+                            while(count-- && meshFile === null) {
+                                if(files[count].exts[0] === 'exo') {
+                                    meshFile =  files[count];
+                                    callback(meshItem, meshFile);
+                                }
+                            }
+                        })
+                        .error(function(){
+                            console.log('Error while listing files inside mesh item');
+                        });
+                })
+                .error(function() {
+                    console.log('Error while listing items inside ' + folderId);
+                });
+        };
+
+        // Tasks
+        this.startTask = function (item, taskDefId, cluster, taskConfig) {
+            var self = this;
+            // Create task instance
+            taskConfig.cluster.name = item._id;
+            self.post('tasks', { taskSpecId: taskDefId })
+                .success(function(response){
+                    // Update Item metadata
+                    var metadata = {
+                        taskId: response._id,
+                        spec: response.taskSpecId,
+                        task: response.status,
+                        startTime: new Date().getTime(),
+                        cost: cluster.cost,
+                        totalCost: (item.meta.totalCost || 0)
+                    };
+                    self.updateItemMetadata(item, metadata);
+
+                    // Start task
+                    self.put(['tasks', response._id, 'run'].join('/'), taskConfig)
+                        .success(function(){
+                            console.log("Task successfully started");
+                        })
+                        .error(function(error) {
+                            console.log("Error while starting Task");
+                            console.log(error);
+                        });
+                })
+                .error(function(error) {
+                    console.log("Error while task creation");
+                    console.log(error);
+                });
+        };
+
+        this.getTaskId = function(workflow, taskName) {
+            console.log(taskList);
+            if(workflow && taskName) {
+                return taskList[workflow][taskName];
+            }
+            return null;
+        };
+
         this.getTask = function(item) {
             return this.get(['tasks/', item.meta.taskId].join(''));
+        };
+
+        this.fetchTaskList = function() {
+            var self = this;
+
+            self.listCollections()
+                .success(function(collections) {
+                    angular.forEach(collections, function(collection) {
+                        collectionMap[collection.name] = collection;
+                        taskList[collection.name] = {};
+                        self.listFolders(collection._id, 'collection')
+                            .success(function(folders){
+                                angular.forEach(folders, function(folder) {
+                                    if (folder.name === 'tasks') {
+                                        self.listItems(folder._id)
+                                            .success(function(items) {
+                                                angular.forEach(items, function(item) {
+                                                    self.listItemFiles(item._id).success(function(files){
+                                                        angular.forEach(files, function(file) {
+                                                            taskList[collection.name][file.name] = file._id;
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                    }
+                                });
+                            });
+                    });
+                });
         };
 
         this.updateTaskStatus = function (item) {
@@ -625,76 +696,6 @@ angular.module("kitware.girder", ["ngCookies"])
                 })
                 .error(function(resp){
                     console.log('error when updating status');
-                });
-        };
-
-        this.extractMeshInformationFromProject = function(folderId, callback) {
-            var self = this;
-
-            self.listItems(folderId)
-                .success(function(items) {
-                    var count = items.length,
-                        meshItem = null,
-                        meshFile = null;
-
-                    // Find item that contains the mesh
-                    while(count-- && meshItem === null) {
-                        if(items[count].name === 'mesh') {
-                           meshItem =  items[count];
-                        }
-                    }
-
-                    // Find the name of the mesh file
-                    self.listItemFiles(meshItem._id)
-                        .success(function(files) {
-                            count = files.length;
-
-                            while(count-- && meshFile === null) {
-                                if(files[count].exts[0] === 'exo') {
-                                    meshFile =  files[count];
-                                    callback(meshItem, meshFile);
-                                }
-                            }
-                        })
-                        .error(function(){
-                            console.log('Error while listing files inside mesh item');
-                        });
-                })
-                .error(function() {
-                    console.log('Error while listing items inside ' + folderId);
-                });
-        };
-
-        this.startTask = function (item, taskDefId, cluster, taskConfig) {
-            var self = this;
-            // Create task instance
-            taskConfig.cluster.name = item._id;
-            self.post('tasks', { taskSpecId: taskDefId })
-                .success(function(response){
-                    // Update Item metadata
-                    var metadata = {
-                        taskId: response._id,
-                        spec: response.taskSpecId,
-                        task: response.status,
-                        startTime: new Date().getTime(),
-                        cost: cluster.cost,
-                        totalCost: (item.meta.totalCost || 0)
-                    };
-                    self.updateItemMetadata(item, metadata);
-
-                    // Start task
-                    self.put(['tasks', response._id, 'run'].join('/'), taskConfig)
-                        .success(function(){
-                            console.log("Task successfully started");
-                        })
-                        .error(function(error) {
-                            console.log("Error while starting Task");
-                            console.log(error);
-                        });
-                })
-                .error(function(error) {
-                    console.log("Error while task creation");
-                    console.log(error);
                 });
         };
 
