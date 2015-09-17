@@ -32,16 +32,20 @@
                                 <input type="text" ng-model="awsProfiles[$index].secretAccessKey">
                             </md-input-container>
                             <md-input-container>
-                                <label>Region</label>
-                                <md-select ng-model="awsProfiles[$index].regionName" md-on-close="validateZone($index)">
+                                <label>Region {{profile.saved ? '(cannot be changed after creation)' : ''}}</label>
+                                <md-select
+                                    ng-model="awsProfiles[$index].regionName"
+                                    md-on-close="validateZone($index)"
+                                    ng-disabled="profile.saved">
                                     <md-option ng-repeat="region in regions" ng-value="region">
                                         {{region}}
                                     </md-option>
                                 </md-select>
                             </md-input-container>
                             <md-input-container>
-                                <label>Availability Zone</label>
-                                <md-select ng-model="awsProfiles[$index].availabilityZone">
+                                <label>Availability Zone {{profile.saved ? '(cannot be changed after creation)' : ''}}</label>
+                                <md-select ng-model="awsProfiles[$index].availabilityZone"
+                                    ng-disabled="profile.saved">
                                     <md-option ng-repeat="availZone in ec2[awsProfiles[$index].regionName]"
                                         ng-value="awsProfiles[$parent.$index].regionName + availZone">
                                         {{availZone[availZone.length - 1]}}
@@ -87,7 +91,7 @@
                                 <label>Username</label>
                                 <input type="text" value="">
                             </md-input-container>
-                            <md-input-container>
+                            <md-input-container ng-show="profile.status">
                                 <label>Public SSH key</label>
                                 <textarea></textarea>
                             </md-input-container>

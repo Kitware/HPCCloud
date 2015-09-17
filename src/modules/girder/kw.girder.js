@@ -38,6 +38,16 @@ angular.module("kitware.girder", ["ngCookies"])
             this.fetchUser();
         }
 
+        if ($window.EventSource) {
+            var notifications = new EventSource('/notification');
+            notifications.addEventListener('message', function(data) {
+                console.log('broadcasting SSE: ', data.type);
+                $rootScope.$broadcast(data.type, data.data);
+            }, false);
+        } else {
+            console.error('No Server Side Event notifications available');
+        }
+
         // takes an object returns a parameterized url suffix
         // e.g. {profile: 'Joe', id: 12345, zone: 'west'} =>
         // "?profile=Joe&id=12345&zone=west"

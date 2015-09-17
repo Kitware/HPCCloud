@@ -4,20 +4,19 @@ angular.module("kitware.cmb.core")
 
         // BEGIN - Refresh simulation status base on task progress every 10s
         timeoutId = $interval(function() {
-            var array = $scope.simulations,
-                count = array.length,
+            var simulations = $scope.simulations,
                 needUpdate = false;
 
-            while(count--) {
-                if(array[count].meta && array[count].meta.task === 'terminated') {
-                    $girder.deleteTask(array[count]);
+            simulations.forEach(function(sim) {
+                if (sim.meta && sim.meta.task === 'terminated') {
+                    $girder.deleteTask(sim);
                     needUpdate = true;
-                } else if(array[count].meta && array[count].meta.taskId) {
+                } else if (sim.meta && sim.meta.taskId) {
                     console.log('update task');
-                    $girder.updateTaskStatus(array[count]);
+                    $girder.updateTaskStatus(sim);
                     needUpdate = true;
                 }
-            }
+            });
 
             if(needUpdate) {
                 needUpdate = false;

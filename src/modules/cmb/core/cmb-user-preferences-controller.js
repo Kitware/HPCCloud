@@ -90,7 +90,7 @@ angular.module("kitware.cmb.core")
             $scope.addProfile = function() {
                 inputDialog( 'Add AWS profile', 'profile name',
                     function(name) {
-                        $scope.awsProfiles.push({name: name, description: 'no description', status: 'incomplete'});
+                        $scope.awsProfiles.push({name: name});
                     },
                     function(){/*do nothing on failure*/}
                 );
@@ -138,7 +138,7 @@ angular.module("kitware.cmb.core")
             $scope.addClusterProfile = function() {
                 inputDialog( 'Add cluster profile', 'profile name',
                     function(name) {
-                        $scope.clusterProfiles.push({name: name, description: 'no description', status: 'incomplete'});
+                        $scope.clusterProfiles.push({name: name});
                     },
                     function(){/*do nothing on failure*/}
                 );
