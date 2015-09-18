@@ -831,10 +831,6 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.post('clusters', prof);
         };
 
-        this.saveClusterProfile = function(prof) {
-            return this.patch('clusters/' + prof._id, data);
-        };
-
         this.deleteClusterProfile = function(prof) {
             return this.delete('clusters/' + prof._id);
         };

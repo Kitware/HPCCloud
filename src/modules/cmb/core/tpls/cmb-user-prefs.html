@@ -28,8 +28,9 @@
                                 <input type="text" ng-model="awsProfiles[$index].accessKeyId">
                             </md-input-container>
                             <md-input-container>
-                                <label>AWS Secret Key</label>
-                                <input type="text" ng-model="awsProfiles[$index].secretAccessKey">
+                                <label>AWS Secret Key {{profile.saved ? '(cannot be changed after creation)' : ''}}</label>
+                                <input type="text" ng-model="awsProfiles[$index].secretAccessKey"
+                                    ng-disabled="profile.saved">
                             </md-input-container>
                             <md-input-container>
                                 <label>Region {{profile.saved ? '(cannot be changed after creation)' : ''}}</label>
@@ -89,28 +90,25 @@
                         <form layout="column">
                             <md-input-container>
                                 <label>Hostname</label>
-                                <input type="text" ng-model="profile.config.host">
+                                <input type="text" ng-model="profile.config.host" ng-disabled="profile.saved">
                             </md-input-container>
                             <md-input-container>
                                 <label>Username</label>
-                                <input type="text" value="" ng-model="profile.config.ssh.user">
+                                <input type="text" value="" ng-model="profile.config.ssh.user" ng-disabled="profile.saved">
                             </md-input-container>
-                            <div ng-hide="profile.status === undefined || profile.status === 'initializing'" class="ssh-key">
+                            <div ng-show="ableToTestCluster(profile)" class="ssh-key">
                                 <label>Public SSH key</label>
                                 <pre>{{profile.config.ssh.publicKey}}</pre>
-                                <label>Add this key</label>
-                                <pre>
-echo "&lt;public_key&gt;" | \
-ssh &lt;username&gt;@&lt;hostname&gt; \
-"umask 077 && mkdir -p ~/.ssh && cat &gt;&gt; ~/.ssh/authorized_keys"
-                                </pre>
+                                <label>Command to add this key to cluster</label>
+                                <pre>echo "&lt;{{profile.config.ssh.publicKey}}&gt;" | \
+ssh &lt;{{profile.config.ssh.user}}&gt;@&lt;{{profile.config.host}}&gt; \
+"umask 077 && mkdir -p ~/.ssh && cat &gt;&gt; ~/.ssh/authorized_keys"</pre>
                             </div>
                         </form>
                         <section layout="row" layout-align="end center">
-                            <md-button class="md-primary"
-                                ng-hide="profile.status === undefined || profile.status === 'initializing'"
-                                ng-click="testClusterProfile($index)">Test</md-button>
-                            <md-button class="md-primary" ng-click="saveClusterProfile($index)">Save</md-button>
+                            <md-button class="md-primary" ng-click="clusterProfileAction($index, profile)">
+                                {{ableToTestCluster(profile) ? 'Test' : 'Save'}}
+                            </md-button>
                             <md-button class="md-warn" ng-click="deleteClusterProfile($index)">Delete</md-button>
                         </section>
                     </accordion-group>

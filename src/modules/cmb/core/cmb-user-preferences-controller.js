@@ -78,7 +78,7 @@ angular.module("kitware.cmb.core")
             $scope.validateZone = function(ind) {
                 var region = $scope.awsProfiles[ind].regionName,
                     aZone = $scope.awsProfiles[ind].availabilityZone;
-                if (aZone.indexOf(region) < 0) {
+                if (aZone && aZone.indexOf(region) < 0) {
                     $scope.awsProfiles[ind].availabilityZone = region + $scope.ec2[region][0];
                 }
             };
@@ -142,6 +142,18 @@ angular.module("kitware.cmb.core")
                 );
             };
 
+            $scope.ableToTestCluster = function(profile){
+                return profile.saved && profile.status !== 'initializing';
+            };
+
+            $scope.clusterProfileAction = function(index, profile) {
+                if ($scope.ableToTestCluster(profile)) {
+                    testClusterProfile(index);
+                } else {
+                    createClusterProfile(index);
+                }
+            };
+
             function createClusterProfile(index) {
                 $girder.createClusterProfile($scope.clusterProfiles[index])
                     .success(function(data) {
@@ -154,25 +166,9 @@ angular.module("kitware.cmb.core")
                     });
             }
 
-            $scope.saveClusterProfile = function(index) {
-                if (!$scope.clusterProfiles[index].saved) {
-                    createClusterProfile(index);
-                    return;
-                }
-
-                $girder.saveClusterProfile($scope.awsProfiles[index])
-                    .success(function(data) {
-                        showToast('"' + $scope.clusterProfiles[index].name + '" updated.');
-                    })
-                    .error(function(err){
-                        showToast(err.message);
-                        console.log('failed to save cluster profile');
-                    });
-            };
-
-            $scope.testClusterProfile = function(index) {
+            function testClusterProfile(index) {
                 console.log('this does nothing right now');
-            };
+            }
 
             $scope.deleteClusterProfile = function(index){
                confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
