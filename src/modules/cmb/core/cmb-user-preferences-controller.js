@@ -13,7 +13,7 @@ angular.module("kitware.cmb.core")
                 'available': 'fa-check',
                 'error': 'fa-warning',
                 //Cluster
-                'created': 'fa-check',
+                'created': 'fa-pencil-square-o',
                 'initializing': 'fa-circle-o-notch fa-spin',
                 'running': 'fa-rocket',
                 'terminating': 'fa-bomb',
@@ -83,10 +83,6 @@ angular.module("kitware.cmb.core")
                 }
             };
 
-            $scope.validateX = function(){
-                console.log('invald');
-            };
-
             $scope.addProfile = function() {
                 inputDialog( 'Add AWS profile', 'profile name',
                     function(name) {
@@ -99,7 +95,7 @@ angular.module("kitware.cmb.core")
             function createAWSProfile(index) {
                 $girder.createAWSProfile($scope.awsProfiles[index])
                     .success(function(data) {
-                        console.log('created aws profile :)');
+                        console.log('created aws profile');
                         $scope.awsProfiles[index].saved = true;
                     })
                     .error(function(err){
@@ -138,7 +134,7 @@ angular.module("kitware.cmb.core")
             $scope.addClusterProfile = function() {
                 inputDialog( 'Add cluster profile', 'profile name',
                     function(name) {
-                        $scope.clusterProfiles.push({name: name});
+                        $scope.clusterProfiles.push({name: name, type: 'trad'});
                     },
                     function(){/*do nothing on failure*/}
                 );
@@ -147,13 +143,12 @@ angular.module("kitware.cmb.core")
             function createClusterProfile(index) {
                 $girder.createClusterProfile($scope.clusterProfiles[index])
                     .success(function(data) {
-                        console.log('created aws profile :)');
+                        console.log('created cluster profile :)');
                         $scope.clusterProfiles[index].saved = true;
-                        $scope.clusterProfiles[index].type = 'trad';
                     })
                     .error(function(err){
                         showToast(err.message);
-                        console.log('failed to create aws profile');
+                        console.log('failed to create cluster profile');
                     });
             }
 

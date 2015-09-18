@@ -79,17 +79,21 @@
                 <accordion close-others="false">
                     <accordion-group ng-repeat="profile in clusterProfiles">
                         <accordion-heading>
-                            <i class="fa fw"></i>
+                            <i class="fa fw" ng-class="statusClasses[profile.status]">
+                                <md-tooltip>
+                                  {{profile.status}}
+                                </md-tooltip>
+                            </i>
                             <span>{{ profile.name }}</span>
                         </accordion-heading>
                         <form layout="column">
                             <md-input-container>
                                 <label>Hostname</label>
-                                <input type="text" value="">
+                                <input type="text" ng-model="profile.config.host">
                             </md-input-container>
                             <md-input-container>
                                 <label>Username</label>
-                                <input type="text" value="">
+                                <input type="text" value="" ng-model="profile.config.ssh.user">
                             </md-input-container>
                             <md-input-container ng-show="profile.status">
                                 <label>Public SSH key</label>

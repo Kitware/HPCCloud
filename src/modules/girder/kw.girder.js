@@ -39,7 +39,7 @@ angular.module("kitware.girder", ["ngCookies"])
         }
 
         if ($window.EventSource) {
-            var notifications = new EventSource('/notification');
+            var notifications = new EventSource(apiBasePathURL + 'notification/stream');
             notifications.addEventListener('message', function(data) {
                 console.log('broadcasting SSE: ', data.type);
                 $rootScope.$broadcast(data.type, data.data);
