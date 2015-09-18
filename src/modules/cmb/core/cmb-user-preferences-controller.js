@@ -13,12 +13,13 @@ angular.module("kitware.cmb.core")
                 'available': 'fa-check',
                 'error': 'fa-warning',
                 //Cluster
+                //'creating' ...
                 'created': 'fa-pencil-square-o',
                 'initializing': 'fa-circle-o-notch fa-spin',
                 'running': 'fa-rocket',
                 'terminating': 'fa-bomb',
                 'terminated': 'fa-ban',
-                //'error': 'fa-warning'
+                //'error' ...
             };
 
             // regions: https://docs.aws.amazon.com/general/latest/gr/rande.html#ec2_region
@@ -38,11 +39,10 @@ angular.module("kitware.cmb.core")
 
             $girder.getAWSProfiles()
                 .success(function(data){
-                    data.map(function(el) {
+                    data = data.map(function(el) {
                         el.saved = true;
                         return el;
                     });
-                    console.log(data);
                     $scope.awsProfiles = angular.copy(data);
                 })
                 .error(function(err){
@@ -51,7 +51,7 @@ angular.module("kitware.cmb.core")
 
             $girder.getClusterProfiles()
                 .success(function(data){
-                    data.map(function(el) {
+                    data = data.map(function(el) {
                         el.saved = true;
                         return el;
                     });
@@ -121,15 +121,8 @@ angular.module("kitware.cmb.core")
             };
 
             $scope.deleteAWSProfile = function(index){
-               confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
-                function() {
-                    var tmpProfile = $scope.awsProfiles,
-                        removed = tmpProfile.splice(index, 1)[0];
-                    $scope.awsProfiles = tmpProfile;
-                    if (tmpProfile.saved) {
-                        $girder.deleteAWSProfile(removed);
-                    }
-                }, function(){});
+                confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
+                    genericDelete('awsProfiles', index, 'deleteAWSProfile'), function(){});
             };
 
             // Cluster profile
@@ -143,7 +136,9 @@ angular.module("kitware.cmb.core")
             };
 
             $scope.ableToTestCluster = function(profile){
-                return profile.saved && profile.status !== 'initializing';
+                return profile.saved &&
+                    profile.status !== 'initializing' &&
+                    profile.status !== 'creating';
             };
 
             $scope.clusterProfileAction = function(index, profile) {
@@ -171,15 +166,8 @@ angular.module("kitware.cmb.core")
             }
 
             $scope.deleteClusterProfile = function(index){
-               confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
-                function() {
-                    var tmpProfile = $scope.clusterProfiles,
-                        removed = tmpProfile.splice(index, 1);
-                    $scope.clusterProfiles = tmpProfile;
-                    if (tmpProfile.saved) {
-                        $girder.deleteAWSProfile(removed);
-                    }
-                }, function(){});
+                confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
+                    genericDelete('clusterProfiles', index, 'deleteClusterProfile'), function(){});
             };
 
             // Other UI functions
@@ -212,6 +200,17 @@ angular.module("kitware.cmb.core")
                     targetEvent: event,
                 })
                 .then(succesCallback, failureCallback);
+            }
+
+            function genericDelete(profileSet, index, girderDeleteFunc) {
+                return function() {
+                    var tmpProfile = $scope[profileSet],
+                        removed = tmpProfile.splice(index, 1)[0];
+                    $scope[profileSet] = tmpProfile;
+                    if (removed.saved || removed._id) {
+                        $girder[girderDeleteFunc](removed);
+                    }
+                };
             }
 
             function confirmDialog(title, ok, cancel, succesCallback, failureCallback) {

@@ -100,9 +100,9 @@
                                 <label>Public SSH key</label>
                                 <pre>{{profile.config.ssh.publicKey}}</pre>
                                 <label>Command to add this key to cluster</label>
-                                <pre>echo "&lt;{{profile.config.ssh.publicKey}}&gt;" | \
-ssh &lt;{{profile.config.ssh.user}}&gt;@&lt;{{profile.config.host}}&gt; \
-"umask 077 && mkdir -p ~/.ssh && cat &gt;&gt; ~/.ssh/authorized_keys"</pre>
+                                <pre>echo "{{profile.config.ssh.publicKey}}" | \
+ssh {{profile.config.ssh.user}}@{{profile.config.host}} \
+"umask 077 &amp;&amp; mkdir -p ~/.ssh &amp;&amp; cat &gt;&gt; ~/.ssh/authorized_keys"</pre>
                             </div>
                         </form>
                         <section layout="row" layout-align="end center">
