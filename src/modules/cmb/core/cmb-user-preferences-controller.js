@@ -123,10 +123,12 @@ angular.module("kitware.cmb.core")
             $scope.deleteAWSProfile = function(index){
                confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
                 function() {
-                    var tmpProfiles = $scope.awsProfiles,
-                        removed = tmpProfiles.splice(index, 1)[0];
-                    $scope.awsProfiles = tmpProfiles;
-                    $girder.deleteAWSProfile(removed);
+                    var tmpProfile = $scope.awsProfiles,
+                        removed = tmpProfile.splice(index, 1)[0];
+                    $scope.awsProfiles = tmpProfile;
+                    if (tmpProfile.saved) {
+                        $girder.deleteAWSProfile(removed);
+                    }
                 }, function(){});
             };
 
@@ -171,10 +173,12 @@ angular.module("kitware.cmb.core")
             $scope.deleteClusterProfile = function(index){
                confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
                 function() {
-                    var tmpProfiles = $scope.clusterProfiles,
-                        removed = tmpProfiles.splice(index, 1);
-                    $scope.clusterProfiles = tmpProfiles;
-                    $girder.deleteAWSProfile(removed);
+                    var tmpProfile = $scope.clusterProfiles,
+                        removed = tmpProfile.splice(index, 1);
+                    $scope.clusterProfiles = tmpProfile;
+                    if (tmpProfile.saved) {
+                        $girder.deleteAWSProfile(removed);
+                    }
                 }, function(){});
             };
 

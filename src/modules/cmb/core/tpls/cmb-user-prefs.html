@@ -95,10 +95,16 @@
                                 <label>Username</label>
                                 <input type="text" value="" ng-model="profile.config.ssh.user">
                             </md-input-container>
-                            <md-input-container ng-show="profile.status">
+                            <div ng-hide="profile.status === undefined || profile.status === 'initializing'" class="ssh-key">
                                 <label>Public SSH key</label>
-                                <textarea></textarea>
-                            </md-input-container>
+                                <pre>{{profile.config.ssh.publicKey}}</pre>
+                                <label>Add this key</label>
+                                <pre>
+echo "&lt;public_key&gt;" | \
+ssh &lt;username&gt;@&lt;hostname&gt; \
+"umask 077 && mkdir -p ~/.ssh && cat &gt;&gt; ~/.ssh/authorized_keys"
+                                </pre>
+                            </div>
                         </form>
                         <section layout="row" layout-align="end center">
                             <md-button class="md-primary" ng-click="saveClusterProfile($index)">Save</md-button>
