@@ -170,6 +170,10 @@ angular.module("kitware.cmb.core")
                     });
             };
 
+            $scope.testClusterProfile = function(index) {
+                console.log('this does nothing right now');
+            };
+
             $scope.deleteClusterProfile = function(index){
                confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
                 function() {

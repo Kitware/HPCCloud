@@ -107,6 +107,9 @@ ssh &lt;username&gt;@&lt;hostname&gt; \
                             </div>
                         </form>
                         <section layout="row" layout-align="end center">
+                            <md-button class="md-primary"
+                                ng-hide="profile.status === undefined || profile.status === 'initializing'"
+                                ng-click="testClusterProfile($index)">Test</md-button>
                             <md-button class="md-primary" ng-click="saveClusterProfile($index)">Save</md-button>
                             <md-button class="md-warn" ng-click="deleteClusterProfile($index)">Delete</md-button>
                         </section>
