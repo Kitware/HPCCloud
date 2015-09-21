@@ -124,7 +124,8 @@ angular.module("kitware.cmb.core")
             };
 
             $scope.deleteAWSProfile = function(index){
-                confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
+                confirmDialog('Are you sure you want to delete this profile, "' +
+                    $scope.awsProfiles[index].name + '"?', 'Delete', 'Cancel',
                     genericDelete('awsProfiles', index, 'deleteAWSProfile'), function(){});
             };
 
@@ -167,11 +168,18 @@ angular.module("kitware.cmb.core")
             }
 
             function testClusterProfile(index) {
-                console.log('this does nothing right now');
+                $girder.testCluster($scope.clusterProfiles[index]._id)
+                    .success(function(data, status){
+                        if (status == 200) {
+                            showToast('Test successfull');
+                        }
+                    })
+                    .error(function(){});
             }
 
             $scope.deleteClusterProfile = function(index){
-                confirmDialog('Are you sure you want to delete this profile?', 'Delete', 'Cancel',
+                confirmDialog('Are you sure you want to delete this profile, "' +
+                    $scope.clusterProfiles[index].name + '"?', 'Delete', 'Cancel',
                     genericDelete('clusterProfiles', index, 'deleteClusterProfile'), function(){});
             };
 
