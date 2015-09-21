@@ -832,6 +832,14 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.get('clusters/' + id);
         };
 
+        this.getClusterStatus = function(id) {
+            return this.get('clusters/' + id + '/status');
+        };
+
+        this.testCluster = function(id) {
+            return this.put('clusters/' + id + '/start');
+        };
+
         this.createClusterProfile = function(prof) {
             return this.post('clusters', prof);
         };

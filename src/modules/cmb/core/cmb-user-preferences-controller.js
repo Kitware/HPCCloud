@@ -169,10 +169,17 @@ angular.module("kitware.cmb.core")
 
             function testClusterProfile(index) {
                 $girder.testCluster($scope.clusterProfiles[index]._id)
-                    .success(function(data, status){
-                        if (status == 200) {
-                            showToast('Test successfull');
-                        }
+                    .success(function(){
+                        $girder.getClusterStatus($scope.clusterProfiles[index]._id)
+                            .success(function(data){
+                                $scope.clusterProfiles[index].status = data.status;
+                                if (data.status === 'running') {
+                                    showToast('Test succesfull');
+                                } else {
+                                    showToast('Test produced an error');
+                                }
+                            })
+                            .error(function(){});
                     })
                     .error(function(){});
             }
