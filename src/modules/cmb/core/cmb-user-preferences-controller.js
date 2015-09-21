@@ -61,6 +61,9 @@ angular.module("kitware.cmb.core")
                     showToast(err.message);
                 });
 
+            $scope.$on('profile.status', genericStatusUpdate('awsProfiles'));
+            $scope.$on('cluster.status', genericStatusUpdate('clusterProfiles'));
+
             $scope.changePassword = function() {
                 if ($scope.password.newPass !== $scope.password.confirmPass) {
                     showToast('New passwords are not equal');
@@ -154,6 +157,8 @@ angular.module("kitware.cmb.core")
                     .success(function(data) {
                         console.log('created cluster profile :)');
                         $scope.clusterProfiles[index].saved = true;
+                        $scope.clusterProfiles[index].status = data.status;
+                        $scope.clusterProfiles[index]._id = data._id;
                     })
                     .error(function(err){
                         showToast(err.message);
@@ -209,6 +214,34 @@ angular.module("kitware.cmb.core")
                     $scope[profileSet] = tmpProfile;
                     if (removed.saved || removed._id) {
                         $girder[girderDeleteFunc](removed);
+                    }
+                };
+            }
+
+             function genericStatusUpdate(profileSet) {
+                return function(event, data) {
+                    var profileIndex,
+                        notFound = $scope[profileSet].every(function(el, index) {
+                            if (el._id === data._id) {
+                                profileIndex = index;
+                                return false; //break
+                            } else {
+                                return true;
+                            }
+                        });
+                    if (notFound) {
+                        console.error('_id "'+data._id+'" from SSE not found in ' + profileSet);
+                    } else {
+                        $scope[profileSet][profileIndex].status = data.status;
+                        if (/cluster/.test(event.name)) {
+                            $girder.getSingleClusterProfile(data._id)
+                                .success(function(data) {
+                                    $scope[profileSet][profileIndex].config = data.config;
+                                })
+                                .error(function(err) {
+                                    console.error(err.message);
+                                });
+                        }
                     }
                 };
             }

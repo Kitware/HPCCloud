@@ -40,9 +40,10 @@ angular.module("kitware.girder", ["ngCookies"])
 
         if ($window.EventSource) {
             var notifications = new EventSource(apiBasePathURL + 'notification/stream');
-            notifications.onmessage = function(data) {
-                console.log('broadcasting SSE: ', data.type);
-                $rootScope.$broadcast(data.type, data.data);
+            notifications.onmessage = function(e) {
+                var parsed = JSON.parse(e.data);
+                console.log('broadcasting SSE:', parsed.type, parsed.data.status);
+                $rootScope.$broadcast(parsed.type, parsed.data);
             };
         } else {
             console.error('No Server Side Event notifications available');
@@ -825,6 +826,10 @@ angular.module("kitware.girder", ["ngCookies"])
         // Clusters
         this.getClusterProfiles = function() {
             return this.get('clusters?type=trad');
+        };
+
+        this.getSingleClusterProfile = function(id) {
+            return this.get('clusters/' + id);
         };
 
         this.createClusterProfile = function(prof) {
