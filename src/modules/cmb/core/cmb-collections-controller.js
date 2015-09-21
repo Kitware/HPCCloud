@@ -1,5 +1,5 @@
 angular.module("kitware.cmb.core")
-    .controller('CmbCollectionsController', ['$scope', 'kw.Girder', '$state', function ($scope, $girder, $templateCache, $state) {
+    .controller('CmbCollectionsController', ['$scope', 'kw.Girder', '$state', function ($scope, $girder, $state) {
 
         $scope.collections = [];
 
