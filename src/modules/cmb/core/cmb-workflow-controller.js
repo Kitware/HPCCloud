@@ -60,10 +60,14 @@ angular.module("kitware.cmb.core")
                             }
 
                             if (!found) {
-                                $girder.createFolder($stateParams.collectionName, $girder.getUser().login, $girder.getUser().login + "'s projects", "collection")
-                                    .success(function (folder) {
-                                        processGroups(groups.concat(folder));
-                                    });
+
+                                return $girder.getCollectionFromName($stateParams.collectionName).then(function(result) {
+                                    var collectionId = result.data[0]._id;
+                                    return $girder.createFolder(collectionId, $girder.getUser().login, $girder.getUser().login + "'s projects", "collection")
+                                        .success(function (folder) {
+                                            processGroups(groups.concat(folder));
+                                        });
+                                });
                             } else {
                                 processGroups(groups);
                             }
