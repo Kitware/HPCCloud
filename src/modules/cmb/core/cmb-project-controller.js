@@ -2,32 +2,35 @@ angular.module("kitware.cmb.core")
     .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$interval', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $interval) {
         var timeoutId = 0;
 
-        // BEGIN - Refresh simulation status base on task progress every 10s
-        timeoutId = $interval(function() {
-            var simulations = $scope.simulations,
-                needUpdate = false;
-
-            simulations.forEach(function(sim) {
-                if (sim.meta && sim.meta.task === 'terminated') {
-                    $girder.deleteTask(sim);
-                    needUpdate = true;
-                } else if (sim.meta && sim.meta.taskId) {
-                    console.log('update task');
-                    $girder.updateTaskStatus(sim);
+        $scope.$on('task.status', function(data) {
+            console.log('There was a job update');
+            var taskIndex,
+                needUpdate = false,
+                notFound = $scope.simulations.every(function(el, index) {
+                    if (el.meta.taskId === data._id) {
+                        taskIndex = index;
+                        return false;
+                    } else {
+                        return true;
+                    }
+                });
+            if (notFound) {
+                console.error('_id '+data._id+' not found');
+            } else {
+                if ($scope.simulations[taskIndex].meta.status === 'terminated') {
+                    $girder.deleteTask($scope.simulations[taskIndex]);
+                } else {
+                    $scope.simulations[taskIndex].meta.status = data.status;
                     needUpdate = true;
                 }
-            });
+            }
 
             if(needUpdate) {
                 needUpdate = false;
                 updateScope();
             }
-        }, 10000);
-
-        $scope.$on('$destroy', function() {
-            console.log('$destroy CmbProjectController');
-            $interval.cancel(timeoutId);
         });
+
         // END - Refresh simulation status base on task progress every 10s
 
         $scope.parameterDataTemplate = {};

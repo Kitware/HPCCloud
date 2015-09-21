@@ -5,19 +5,29 @@ angular.module("kitware.cmb.core")
         $scope.template = null;
         $scope.viewModel = null;
 
-
-        // BEGIN - Refresh simulation status base on task progress every 10s
-        timeoutId = $interval(function() {
-            if($scope.simulation.meta.task === 'terminated') {
-                $girder.deleteTask($scope.simulation);
-            } else if($scope.simulation.meta.taskId) {
-                $girder.updateTaskStatus($scope.simulation);
+        $scope.$on('task.status', function(data) {
+            console.log('There was a job update');
+            var taskIndex;
+                notFound = $scope.simulations.every(function(el, index) {
+                    if (el.meta.taskId === data._id) {
+                        taskIndex = index;
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                });
+            if (notFound) {
+                console.error('_id '+data._id+' not found');
+            } else {
+                if ($scope.simulations[taskIndex].meta.task === 'terminated') {
+                    $girder.deleteTask($scope.simulations[taskIndex]);
+                } else {
+                    $scope.simulations[taskIndex].meta.status = data.status;
+                }
             }
-        }, 10000);
-
-        $scope.$on('$destroy', function() {
-            $interval.cancel(timeoutId);
         });
+
         // END - Refresh simulation status base on task progress every 10s
 
         $scope.taskCallback = function(simulationResponse) {
@@ -151,7 +161,7 @@ angular.module("kitware.cmb.core")
                                     tagValues.push(tagMap[processedTags[idx]]);
                                 }
 
-                                $scope.external = { 
+                                $scope.external = {
                                     'face-tags': { labels: processedTags, values: tagValues },
                                     'element-tags': { labels: ["Elements for Stats"], values: [ 3720242 ] },
                                     'block-tags': { labels: ["Water"], values: [1] } // FIXME specific to hydra
@@ -199,10 +209,10 @@ angular.module("kitware.cmb.core")
         });
         $scope.$on('simput-click', function(event, type) {
             if(type === 'save-output') {
-                $girder.uploadContentToItem($scope.simulation._id, 'hydra.json', JSON.stringify($scope.viewModel, undefined, 3));    
+                $girder.uploadContentToItem($scope.simulation._id, 'hydra.json', JSON.stringify($scope.viewModel, undefined, 3));
             }
         });
-        
+
         if($girder.getUser() === null) {
             $state.go('login');
         } else {
