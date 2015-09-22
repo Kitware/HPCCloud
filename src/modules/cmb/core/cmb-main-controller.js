@@ -152,45 +152,16 @@ angular.module("kitware.cmb.core")
         };
 
         $scope.runTask = function (event, title, taskName, hasLauncher, callback) {
-            var simulation = $scope.simulation,
-                collectionName = $scope.collection.name;
-
             $mdDialog.show({
-                controller: ['$scope', '$mdDialog', function($scope, $mdDialog) {
-                    $scope.hasLauncher = hasLauncher;
-                    $scope.machines = machines;
-                    $scope.title = title;
-                    $scope.data = angular.copy($window.WorkflowHelper[collectionName]['default-simulation-cluster']);
-
-                    $scope.updateCost = function() {
-                        var cost = 0,
-                            array = machines,
-                            count = array.length;
-
-                        while(count--) {
-                            if(array[count].id === $scope.data.type) {
-                               cost = array[count].cost;
-
-                               // Keep track of machine CPU + GPU
-                               $scope.data.cores =  array[count].cpu;
-                               $scope.data.gpu = array[count].gpu;
-                            }
-                        }
-
-                        cost *= Number($scope.data.size);
-                        $scope.data.cost = cost;
-                    };
-                    $scope.updateCost();
-
-                    $scope.ok = function(response) {
-                        // Delegate the start class on the callback function
-                        $mdDialog.hide([simulation, response, $girder.getTaskId(collectionName, taskName)]);
-                    };
-
-                    $scope.cancel = function() {
-                      $mdDialog.cancel();
-                    };
-                }],
+                locals: {
+                    title: title,
+                    taskName: taskName,
+                    hasLauncher: hasLauncher,
+                    machines: machines,
+                    collectionName: $scope.collection.name,
+                    simulation: $scope.simulation
+                },
+                controller: 'CmbSimulationLauncher',
                 template: $templateCache.get('cmb/core/tpls/cmb-run-task-dialog.html'),
                 targetEvent: event,
             })
