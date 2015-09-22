@@ -94,6 +94,13 @@ angular.module("kitware.cmb.core")
                         item: { id: simulation._id }
                     }
                 };
+
+                if (clusterData.type === 'trad') {
+                    config.hydraExecutablePath = args[3].hydraExecutablePath;
+                    if (config.parallelEnvironment) config.parallelEnvironment = args[3].parallelEnvironment;
+                    if (config.numberOfSlots) config.numberOfSlots = args[3].numberOfSlots;
+                }
+
                 console.log('Task spec ' + taskId);
                 console.log(config);
                 $girder.startTask(simulation, taskId, clusterData, config);
@@ -112,7 +119,7 @@ angular.module("kitware.cmb.core")
 
                 $girder.downloadContentFromItem(fetchedId, 'hydra.json', function(dataModelFromServer) {
                     if(fetchedId !== $scope.simulation._id) {
-                        fetchData();
+                        fetchData(); //looks dangerous
                     } else {
                         $scope.viewModel = dataModelFromServer || { external: {} };
                         if($scope.external) {

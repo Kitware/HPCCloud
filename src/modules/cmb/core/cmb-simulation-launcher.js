@@ -12,12 +12,13 @@ angular.module('kitware.cmb.core')
         $scope.machines = locals.machines;
         $scope.hasLauncher = locals.hasLauncher;
 
+        $scope.clusterData = {};
         $girder.getClusterProfiles()
             .success(function(data){
                 $scope.clusters = data.filter(function(el){
                     return el.status === 'running';
                 });
-                $scope.selectedCluster = $scope.clusters[0]._id;
+                $scope.clusterData.selectedCluster = $scope.clusters[0]._id;
             });
 
         $scope.updateCost = function() {
@@ -40,17 +41,36 @@ angular.module('kitware.cmb.core')
         };
         $scope.updateCost();
 
+        $scope.floorSlots = function(val) {
+            $scope.clusterData.numberOfSlots = Math.floor(val);
+        };
+
+        $scope.valid = function() {
+            if ($scope.serverSelection === 'Traditional') {
+                return $scope.clusterData.selectedCluster !== undefined &&
+                    $scope.clusterData.hydraExecutablePath !== undefined;
+            } else {
+                return true; //aws is already filled out and valid
+            }
+        };
+
         $scope.ok = function() {
             if ($scope.serverSelection === 'Traditional') {
-                $scope.data = {_id: $scope.selectedCluster, type:'trad'};
+                $scope.data = {_id: $scope.clusterData.selectedCluster, type:'trad'};
             }
 
-            // Delegate the start class on the callback function
-            $mdDialog.hide([
+            var args = [
                 locals.simulation,
                 $scope.data,
                 $girder.getTaskId(locals.collectionName, locals.taskName)
-            ]);
+            ];
+
+            if ($scope.serverSelection === 'Traditional') {
+                args.push($scope.clusterData);
+            }
+
+            // Delegate the start class on the callback function
+            $mdDialog.hide(args);
         };
 
         $scope.cancel = function() {

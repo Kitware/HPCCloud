@@ -53,16 +53,24 @@
             <div id="launcher-content" aria-labelledby="launcher" ng-switch-when="Traditional">
                 <form layout="column">
                     <label>Cluster</label>
-                    <select ng-model="selectedCluster">
+                    <select ng-model="clusterData.selectedCluster" required>
                         <option ng-repeat="cluster in clusters" ng-value="cluster._id">{{cluster.name}}</option>
                     </select>
+                    <label>Hydra executable path</label>
+                    <input type="text" ng-model="clusterData.hydraExecutablePath" placeholder="/home/user/absolute/path"
+                        pattern="^\/.+" required >
+                    <label>Parallel Environment</label>
+                    <input type="text" ng-model="clusterData.parallelEnviron" placeholder="(optional)">
+                    <label>Number of slots</label>
+                    <input type="number" min="1" step="1" ng-model="clusterData.numberOfSlots" placeholder="(optional)"
+                    ng-blur="floorSlots(clusterData.numberOfSlots)">
                 </form>
             </div>
         </div> <!-- end ngSwitch -->
         <div class="md-actions" layout="row">
             <span flex></span>
             <md-button ng-click="cancel()" class="md-raised md-warn">Cancel</md-button>
-            <md-button ng-click="ok()" class="md-raised md-primary">Ok</md-button>
+            <md-button ng-click="ok()" class="md-raised md-primary" ng-disabled="!valid()">Ok</md-button>
         </div>
     </md-content>
 </md-dialog>

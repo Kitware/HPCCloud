@@ -3,7 +3,7 @@
         <div flex layout="row" layout-align="start center">
         </div>
         <div flex layout="row" layout-align="center center">
-            {{ simulation.name }}
+            {{ simulation.name | unescape }}
         </div>
         <div flex layout="row" layout-align="end center">
             <md-button
