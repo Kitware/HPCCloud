@@ -100,6 +100,8 @@ angular.module("kitware.cmb.core")
                     .success(function(data) {
                         console.log('created aws profile');
                         $scope.awsProfiles[index].saved = true;
+                        $scope.awsProfiles[index]._id = data._id;
+                        $scope.awsProfiles[index].status = data.status;
                     })
                     .error(function(err){
                         showToast(err.message);
