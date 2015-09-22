@@ -33,7 +33,7 @@
         <md-button class="md-raised project-filter-button"
             aria-label="Toggle running simulations"
             ng-click="toggleSimulationFilter($event, 'running')">
-            <i class="fa fa-fw fa-line-chart"></i>
+            <i class="fa fa-fw fa-rocket"></i>
             <md-tooltip>Toggle running simulations</md-tooltip>
         </md-button>
         <md-button class="md-raised project-filter-button"
@@ -81,7 +81,7 @@
                     <i ng-hide="simulation.meta.task === 'failure'" class="fa fa-fw"
                         ng-class="{ 'fa-pencil-square-o': simulation.meta.status === 'incomplete',
                         'fa-check-square-o': simulation.meta.status === 'valid',
-                        'fa-line-chart': simulation.meta.status === 'running',
+                        'fa-rocket': simulation.meta.status === 'running',
                         'fa-warning': simulation.meta.status === 'error',
                         'fa-database': simulation.meta.status === 'completed' && !simulation.meta.task ,
                         'fa-dollar': simulation.meta.task }">

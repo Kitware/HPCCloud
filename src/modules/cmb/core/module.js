@@ -7,7 +7,8 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
             var day = str.split(' ')[0].split('-'),
                 time = str.split(' ')[1].split('.')[0].split(':'),
                 args = [].concat(day, time);
-            return new Date(args[0], args[1], args[2], args[3], args[4], args[5]).getTime();
+            //remember month is 1 based e.g. new Date(2015, 2) -> March 2015
+            return new Date(args[0], args[1]-1, args[2], args[3], args[4], args[5]).getTime();
         };
     })
     .filter('bytes', function() {
