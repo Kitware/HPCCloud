@@ -8,7 +8,6 @@ angular.module("kitware.cmb.core")
                     return i;
                 }
             }
-
             return -1;
         }
 
@@ -37,20 +36,6 @@ angular.module("kitware.cmb.core")
             $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
         };
 
-        function startTaskCallback (success) {
-            return function(data) {
-                if (success === true) {
-                    console.log("Task successfully started");
-                } else {
-
-                    // find id
-                    // change it's scope.status
-                    console.log("Error while starting Task");
-                    console.log(data);
-                }
-            };
-        }
-
         $scope.runVisualizationCallback = function(args) {
             var simulation = args[0],
                 clusterData = args[1],
@@ -72,7 +57,7 @@ angular.module("kitware.cmb.core")
             // console.log(clusterData);
 
             if(clusterData.selectedIndex === 0) {
-                $girder.startTask(simulation, taskId, clusterData, config, startTaskCallback);
+                $girder.startTask(simulation, taskId, clusterData, config);
             }
 
             // Move back to the project view
@@ -116,10 +101,9 @@ angular.module("kitware.cmb.core")
                     if (args[3].numberOfSlots) config.numberOfSlots = args[3].numberOfSlots;
                 }
 
-                //console.log('Task spec ' + taskId);
-                //console.log(config);
-                $girder.startTask(simulation, taskId, clusterData, config, startTaskCallback);
+                $girder.startTask(simulation, taskId, clusterData, config);
             });
+
 
             // Move back to the project view
             $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
