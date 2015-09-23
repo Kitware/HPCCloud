@@ -534,7 +534,7 @@ angular.module("kitware.girder", ["ngCookies"])
         this.updateItemMetadata = function (item, metadata) {
             return this.put(['item', item._id, 'metadata'].join('/'), metadata)
                 .success(function(){
-                    item.meta = metadata;
+                    // item.meta = metadata;
                     console.log('Success metadata updating');
                 }).error(function(){
                     console.log('Error when updating metadata');
@@ -607,10 +607,14 @@ angular.module("kitware.girder", ["ngCookies"])
                         }, function(error) {
                             console.log("Error while starting Task");
                             console.log(error);
+                            item.meta.status = 'error';
+                            self.updateItemMetadata(item, item.meta);
                         });
                 }, function(error) {
                     console.log("Error while task creation");
                     console.log(error);
+                    item.meta.status = 'error';
+                    self.updateItemMetadata(item, item.meta);
                 });
         };
 

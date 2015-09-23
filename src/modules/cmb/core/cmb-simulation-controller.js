@@ -100,6 +100,7 @@ angular.module("kitware.cmb.core")
                     if (args[3].parallelEnvironment) config.parallelEnvironment = args[3].parallelEnvironment;
                     if (args[3].numberOfSlots) config.numberOfSlots = args[3].numberOfSlots;
                 }
+                console.log(config);
 
                 $girder.startTask(simulation, taskId, clusterData, config);
             });

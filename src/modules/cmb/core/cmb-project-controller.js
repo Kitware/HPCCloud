@@ -40,10 +40,10 @@ angular.module("kitware.cmb.core")
         $scope.simulations = [];
         $scope.filters = {
             incomplete: true,
-            valid: true,
             running: true,
-            results: true,
-            errors: true
+            error: true,
+            valid: true,
+            completed: true,
         };
 
         $scope.toggleSimulationFilter = function (event, filter) {
@@ -53,7 +53,10 @@ angular.module("kitware.cmb.core")
 
         $scope.simulationFilter = function(filters) {
             return function(sim) {
-                return filters[sim.meta.status];
+                return filters[sim.meta.status] === true ||
+                    !filters.hasOwnProperty(sim.meta.status);
+                    //^ show the item if meta.status is _not_ in filters,
+                    // this was a good case of weird bugs with super easy solutions.
             };
         };
 
