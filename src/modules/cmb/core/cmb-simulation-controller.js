@@ -99,6 +99,7 @@ angular.module("kitware.cmb.core")
                     config.hydraExecutablePath = args[3].hydraExecutablePath;
                     if (args[3].parallelEnvironment) config.parallelEnvironment = args[3].parallelEnvironment;
                     if (args[3].numberOfSlots) config.numberOfSlots = args[3].numberOfSlots;
+                    if (args[3].jobOuputDir) config.jobOuputDir = args[3].jobOuputDir;
                 }
                 console.log(config);
 
