@@ -2,22 +2,23 @@ angular.module("kitware.cmb.core")
     .controller('CmbSimulationController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$http', '$timeout', '$interval', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $http, $timeout, $interval) {
         var timeoutId = 0;
 
+        function findSimulationIndexById(id) {
+            for (var i=0; i < $scope.simulations.length; i++) {
+                if ($scope.simulations[i].meta.taskId === id) {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
         $scope.template = null;
         $scope.viewModel = null;
 
         $scope.$on('task.status', function(data) {
             console.log('There was a job update');
-            var taskIndex;
-                notFound = $scope.simulations.every(function(el, index) {
-                    if (el.meta.taskId === data._id) {
-                        taskIndex = index;
-                        return false;
-                    }
-                    else {
-                        return true;
-                    }
-                });
-            if (notFound) {
+            var taskIndex = findSimulationIndexById(data._id);
+            if (taskIndex < 0) {
                 console.error('_id '+data._id+' not found');
             } else {
                 if ($scope.simulations[taskIndex].meta.task === 'terminated') {
@@ -36,6 +37,20 @@ angular.module("kitware.cmb.core")
             $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
         };
 
+        function startTaskCallback (success) {
+            return function(data) {
+                if (success === true) {
+                    console.log("Task successfully started");
+                } else {
+
+                    // find id
+                    // change it's scope.status
+                    console.log("Error while starting Task");
+                    console.log(data);
+                }
+            };
+        }
+
         $scope.runVisualizationCallback = function(args) {
             var simulation = args[0],
                 clusterData = args[1],
@@ -51,13 +66,13 @@ angular.module("kitware.cmb.core")
                     }
                 };
 
-            console.log(config);
-            console.log('Task spec ' + taskId);
-            console.log("Cluster provided for viz task");
-            console.log(clusterData);
+            // console.log(config);
+            // console.log('Task spec ' + taskId);
+            // console.log("Cluster provided for viz task");
+            // console.log(clusterData);
 
             if(clusterData.selectedIndex === 0) {
-                $girder.startTask(simulation, taskId, clusterData, config);
+                $girder.startTask(simulation, taskId, clusterData, config, startTaskCallback);
             }
 
             // Move back to the project view
@@ -70,7 +85,7 @@ angular.module("kitware.cmb.core")
                 taskId = args[2],
                 mesh = $scope.mesh;
 
-            console.log(simulation);
+            //console.log(simulation);
 
             $girder.extractMeshInformationFromProject(simulation.folderId, function(meshItem, meshFile){
                 var config = {
@@ -97,13 +112,13 @@ angular.module("kitware.cmb.core")
 
                 if (clusterData.type === 'trad') {
                     config.hydraExecutablePath = args[3].hydraExecutablePath;
-                    if (config.parallelEnvironment) config.parallelEnvironment = args[3].parallelEnvironment;
-                    if (config.numberOfSlots) config.numberOfSlots = args[3].numberOfSlots;
+                    if (args[3].parallelEnvironment) config.parallelEnvironment = args[3].parallelEnvironment;
+                    if (args[3].numberOfSlots) config.numberOfSlots = args[3].numberOfSlots;
                 }
 
-                console.log('Task spec ' + taskId);
-                console.log(config);
-                $girder.startTask(simulation, taskId, clusterData, config);
+                //console.log('Task spec ' + taskId);
+                //console.log(config);
+                $girder.startTask(simulation, taskId, clusterData, config, startTaskCallback);
             });
 
             // Move back to the project view

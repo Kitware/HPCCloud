@@ -60,7 +60,7 @@
                     <input type="text" ng-model="clusterData.hydraExecutablePath" placeholder="/home/user/absolute/path"
                         pattern="^\/.+" required >
                     <label>Parallel Environment</label>
-                    <input type="text" ng-model="clusterData.parallelEnviron" placeholder="(optional)">
+                    <input type="text" ng-model="clusterData.parallelEnvironment" placeholder="(optional)">
                     <label>Number of slots</label>
                     <input type="number" min="1" step="1" ng-model="clusterData.numberOfSlots" placeholder="(optional)"
                     ng-blur="floorSlots(clusterData.numberOfSlots)">
