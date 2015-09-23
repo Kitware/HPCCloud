@@ -53,8 +53,8 @@
             <div id="launcher-content" aria-labelledby="launcher" ng-switch-when="Traditional">
                 <form layout="column">
                     <label>Cluster</label>
-                    <select ng-model="clusterData.selectedCluster" required>
-                        <option ng-repeat="cluster in clusters" ng-value="cluster._id">{{cluster.name}}</option>
+                    <select ng-model="clusterData.selectedCluster" required="true"
+                        ng-options="cluster.name for cluster in clusters track by cluster._id">
                     </select>
                     <label>Hydra executable path</label>
                     <input type="text" ng-model="clusterData.hydraExecutablePath" placeholder="/home/user/absolute/path"

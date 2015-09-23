@@ -22,7 +22,7 @@ angular.module('kitware.cmb.core')
                     $scope.clusters = data.filter(function(el){
                         return el.status === 'running';
                     });
-                    $scope.clusterData.selectedCluster = $scope.clusters[0]._id;
+                    $scope.clusterData.selectedCluster = $scope.clusters[0];
                 });
         }
 
@@ -61,7 +61,7 @@ angular.module('kitware.cmb.core')
 
         $scope.ok = function() {
             if ($scope.serverSelection === 'Traditional') {
-                $scope.data = {_id: $scope.clusterData.selectedCluster, type:'trad'};
+                $scope.data = {_id: $scope.clusterData.selectedCluster._id, type:'trad'};
             }
 
             var args = [
