@@ -246,6 +246,7 @@ angular.module("kitware.cmb.core")
                                 return true;
                             }
                         });
+
                     if (notFound) {
                         console.error('_id "'+data._id+'" from SSE not found in ' + profileSet);
                     } else {
@@ -258,6 +259,8 @@ angular.module("kitware.cmb.core")
                                 .error(function(err) {
                                     console.error(err.message);
                                 });
+                        } else {
+                            $scope.$apply(); //we need to force $digest for aws profiles.
                         }
                     }
                 };

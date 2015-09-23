@@ -5,21 +5,26 @@ angular.module('kitware.cmb.core')
         function($scope, $window, $girder, $mdDialog, locals) {
         $scope.data = angular.copy($window.WorkflowHelper[locals.collectionName]['default-simulation-cluster']);
 
-        $scope.serverOptions = ['EC2', 'Traditional'];
-        $scope.serverSelection = 'EC2';
+        $scope.serverOptions = Object.keys(locals.availability).filter(
+            function(el) {
+                return locals.availability[el];
+            }); // ideally ['EC2', 'Traditional']
+        $scope.serverSelection = $scope.serverOptions[0];
 
         $scope.title = locals.title;
         $scope.machines = locals.machines;
         $scope.hasLauncher = locals.hasLauncher;
 
-        $scope.clusterData = {};
-        $girder.getClusterProfiles()
-            .success(function(data){
-                $scope.clusters = data.filter(function(el){
-                    return el.status === 'running';
+        if ($scope.serverOptions.indexOf('Traditional') >= 0) {
+            $scope.clusterData = {};
+            $girder.getClusterProfiles()
+                .success(function(data){
+                    $scope.clusters = data.filter(function(el){
+                        return el.status === 'running';
+                    });
+                    $scope.clusterData.selectedCluster = $scope.clusters[0]._id;
                 });
-                $scope.clusterData.selectedCluster = $scope.clusters[0]._id;
-            });
+        }
 
         $scope.updateCost = function() {
             var cost = 0,

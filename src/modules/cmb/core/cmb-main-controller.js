@@ -152,22 +152,50 @@ angular.module("kitware.cmb.core")
         };
 
         $scope.runTask = function (event, title, taskName, hasLauncher, callback) {
-            $mdDialog.show({
-                locals: {
-                    title: title,
-                    taskName: taskName,
-                    hasLauncher: hasLauncher,
-                    machines: machines,
-                    collectionName: $scope.collection.name,
-                    simulation: $scope.simulation
-                },
-                controller: 'CmbSimulationLauncher',
-                template: $templateCache.get('cmb/core/tpls/cmb-run-task-dialog.html'),
-                targetEvent: event,
-            })
-            .then(callback, function() {
-                // Nothing to do when cancel
-            });
+            var awsAvailable = true,
+                clusterAvailable = true,
+                actionForProfileAvailability = function() {
+                    if (!awsAvailable && !clusterAvailable) {
+                        $mdToast.show(
+                            $mdToast.simple()
+                                .content('You need at least one AWS or Cluster profile available.')
+                                .position('bottom right')
+                                .hideDelay(5000)
+                            );
+                    } else {
+                        $mdDialog.show({
+                            locals: {
+                                title: title,
+                                taskName: taskName,
+                                hasLauncher: hasLauncher,
+                                machines: machines,
+                                availability: {EC2: awsAvailable, Traditional: clusterAvailable},
+                                collectionName: $scope.collection.name,
+                                simulation: $scope.simulation
+                            },
+                            controller: 'CmbSimulationLauncher',
+                            template: $templateCache.get('cmb/core/tpls/cmb-run-task-dialog.html'),
+                            targetEvent: event,
+                        })
+                        .then(callback, function() {
+                            // Nothing to do when cancel
+                        });
+                    }
+                };
+
+            $girder.getAWSProfiles()
+                .then(function(data){
+                    if (data.data.length === 0) {
+                        awsAvailable = false;
+                    }
+                    return $girder.getClusterProfiles();
+                })
+                .then(function(data){
+                    if (data.data.length === 0) {
+                        clusterAvailable = false;
+                    }
+                    return actionForProfileAvailability();
+                });
         };
 
         $scope.goHome = function() {
