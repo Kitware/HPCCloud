@@ -45,6 +45,9 @@ angular.module("kitware.cmb.core")
             valid: true,
             completed: true,
         };
+        var aliasFilters = {
+            failure: 'error'
+        };
 
         $scope.toggleSimulationFilter = function (event, filter) {
             event.currentTarget.classList.toggle('md-raised');
@@ -54,6 +57,7 @@ angular.module("kitware.cmb.core")
         $scope.simulationFilter = function(filters) {
             return function(sim) {
                 return filters[sim.meta.status] === true ||
+                    filters[aliasFilters[sim.meta.status]] === true ||
                     !filters.hasOwnProperty(sim.meta.status);
                     //^ show the item if meta.status is _not_ in filters,
                     // this was a good case of weird bugs with super easy solutions.
