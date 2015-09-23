@@ -591,9 +591,9 @@ angular.module("kitware.girder", ["ngCookies"])
                 .then(function(response){
                     // Update Item metadata
                     var metadata = {
-                        taskId: response._id,
-                        spec: response.taskSpecId,
-                        task: response.status,
+                        taskId: response.data._id,
+                        spec: response.data.taskSpecId,
+                        task: response.data.status,
                         startTime: new Date().getTime(),
                         cost: cluster.cost,
                         totalCost: (item.meta.totalCost || 0)
@@ -601,7 +601,7 @@ angular.module("kitware.girder", ["ngCookies"])
                     self.updateItemMetadata(item, metadata);
 
                     // Start task
-                    return self.put(['tasks', response._id, 'run'].join('/'), taskConfig)
+                    return self.put(['tasks', response.data._id, 'run'].join('/'), taskConfig)
                         .then(function(){
                             console.log("Task successfully started");
                         }, function(error) {
