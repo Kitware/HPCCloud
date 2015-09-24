@@ -2,25 +2,32 @@ angular.module("kitware.cmb.core")
     .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$interval', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $interval) {
         var timeoutId = 0;
 
-        $scope.$on('task.status', function(data) {
-            console.log('There was a job update');
-            var taskIndex,
-                needUpdate = false,
-                notFound = $scope.simulations.every(function(el, index) {
-                    if (el.meta.taskId === data._id) {
-                        taskIndex = index;
-                        return false;
-                    } else {
-                        return true;
-                    }
-                });
-            if (notFound) {
+        function findSimulationIndexById(id) {
+            for (var i=0; i < $scope.simulations.length; i++) {
+                console.log($scope.simulations[i].meta.taskId, id);
+                if ($scope.simulations[i].meta.taskId === id || $scope.simulations[i].meta.taskId === undefined) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        $scope.$on('task.status', function(event, data) {
+            var simIndex = findSimulationIndexById(data._id),
+                needUpdate = false;
+
+            if (simIndex < 0) {
                 console.error('_id '+data._id+' not found');
             } else {
-                if ($scope.simulations[taskIndex].meta.status === 'terminated') {
-                    $girder.deleteTask($scope.simulations[taskIndex]);
+                if ($scope.simulations[simIndex].meta.status === 'terminated') {
+                    $girder.deleteTask($scope.simulations[simIndex]);
+                } else if ( $scope.simulations[simIndex].meta.taskId === undefined ){
+                    $scope.simulations[simIndex].meta.taskId = data._id
+                    $scope.simulations[simIndex].meta.status = data.status;
+                    $scope.$apply();
+                    $girder.patchItemMetadata($scope.simulations[simIndex]._id, {status: data.status, taskId: data._id});
                 } else {
-                    $scope.simulations[taskIndex].meta.status = data.status;
+                    $scope.simulations[simIndex].meta.status = data.status;
                     needUpdate = true;
                 }
             }
@@ -89,6 +96,7 @@ angular.module("kitware.cmb.core")
             })
             .then(function(simulation) {
                 // Move to the newly created simulation
+                console.log(simulation);
                 updateScope();
             }, function() {
                 // Nothing to do when close

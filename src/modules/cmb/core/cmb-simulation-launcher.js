@@ -62,6 +62,7 @@ angular.module('kitware.cmb.core')
         $scope.ok = function() {
             if ($scope.serverSelection === 'Traditional') {
                 $scope.data = {_id: $scope.clusterData.selectedCluster._id, type:'trad'};
+                locals.taskName += '_trad';
             }
 
             var args = [

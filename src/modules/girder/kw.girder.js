@@ -324,6 +324,10 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.get('item/' + id);
         };
 
+        this.patchItemMetadata = function(itemId, data) {
+            return this.put('item/' + itemId + '/metadata', data);
+        };
+
         this.deleteItem = function (id) {
             return this.delete('item/' + id);
         };

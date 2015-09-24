@@ -14,8 +14,7 @@ angular.module("kitware.cmb.core")
         $scope.template = null;
         $scope.viewModel = null;
 
-        $scope.$on('task.status', function(data) {
-            console.log('There was a job update');
+        $scope.$on('task.status', function(event, data) {
             var taskIndex = findSimulationIndexById(data._id);
             if (taskIndex < 0) {
                 console.error('_id '+data._id+' not found');
