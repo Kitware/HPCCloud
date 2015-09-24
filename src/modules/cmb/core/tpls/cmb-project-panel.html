@@ -38,7 +38,7 @@
         </md-button>
         <md-button class="md-raised project-filter-button"
             aria-label="Toggle simulations with results"
-            ng-click="toggleSimulationFilter($event, 'completed')">
+            ng-click="toggleSimulationFilter($event, 'complete')">
             <i class="fa fa-fw fa-database"></i>
             <md-tooltip>Toggle simulations with results</md-tooltip>
         </md-button>
@@ -83,7 +83,7 @@
                         'fa-check-square-o valid': simulation.meta.status === 'valid',
                         'fa-rocket running': simulation.meta.status === 'running',
                         'fa-warning error': simulation.meta.status === 'error' || simulation.meta.status === 'failure',
-                        'fa-database completed': simulation.meta.status === 'completed' && !simulation.meta.task}">
+                        'fa-database complete': simulation.meta.status === 'complete' && !simulation.meta.task}">
                     </i>
                     <i ng-show="simulation.meta.task === 'failure'" class="fa fa-fw fa-warning"></i>
                     <md-tooltip ng-if="simulation.meta.task">{{ simulation.meta.task }}</md-tooltip>

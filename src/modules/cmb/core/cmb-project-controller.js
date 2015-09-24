@@ -50,7 +50,7 @@ angular.module("kitware.cmb.core")
             running: true,
             error: true,
             valid: true,
-            completed: true,
+            complete: true,
         };
         var aliasFilters = {
             failure: 'error'
