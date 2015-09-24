@@ -103,69 +103,41 @@ angular.module("kitware.cmb.core")
             });
         };
 
-        $scope.manageSimulation = function(event, simulation) {
-            var projectId = $scope.getActiveProject(),
-                collectionName = $scope.collection.name,
-                cloneFunction = $scope.createSimulation;
+        // Simulation drop down controls
+        $scope.cloneSimulation = function(simulation) {
+            $mdDialog.hide(simulation);
+            $scope.gcreateSimulation(event, simulation);
+        };
+        $scope.downloadSimulation = function(simulation) {
+            $mdDialog.hide(simulation);
+            $girder.listItemFiles(simulation._id)
+                .success(function(fileList) {
+                    console.log('file list:', fileList);
+                    var downloadName = fileList.length > 1 ? simulation.name + '.zip' : fileList[0].name;
+                    $girder.downloadItem(simulation._id)
+                        .success(function(data) {
+                            $window.saveAs(new Blob([data], {type: "application/octet-stream"}), downloadName);
+                        })
+                        .error(function() {
+                            console.log("Download error");
+                        });
+                })
+                .error(function(){
+                    console.log("error in file listing");
+                });
 
-            $mdDialog.show({
-                controller: ['$scope', '$mdDialog', function($scope, $mdDialog) {
-                    $scope.simulation = simulation;
-                    $scope.activeCost = simulation.meta.taskId ? Number(simulation.meta.cost) * (1+Math.floor((new Date().getTime() - Number(simulation.meta.startTime))/3600000)) : 0;
-                    $scope.cancel = function() {
-                        $mdDialog.cancel();
-                    };
-                    $scope.terminateCluster = function(simulation) {
-                        $girder.terminateTask(simulation);
-                        $mdDialog.hide(simulation);
-                    };
-                    $scope.cloneSimulation = function(event, simulation) {
-                        $mdDialog.hide(simulation);
-                        cloneFunction(event, simulation);
-                    };
-                    $scope.downloadSimulation = function(simulation) {
-                        $mdDialog.hide(simulation);
-                        $girder.listItemFiles(simulation._id)
-                            .success(function(fileList) {
-                                console.log('file list:', fileList);
-                                var downloadName = fileList.length > 1 ? simulation.name + '.zip' : fileList[0].name;
-                                $girder.downloadItem(simulation._id)
-                                    .success(function(data) {
-                                        $window.saveAs(new Blob([data], {type: "application/octet-stream"}), downloadName);
-                                    })
-                                    .error(function() {
-                                        console.log("Download error");
-                                    });
-                            })
-                            .error(function(){
-                                console.log("error in file listing");
-                            });
-
-                    };
-                    $scope.deleteSimulation = function(simulation) {
-                        if (!confirm('Are you sure youw want to delete "' + simulation.name + '?"')) {
-                            return;
-                        }
-                        $girder.deleteItem(simulation._id)
-                            .success(function(){
-                                $mdDialog.hide(simulation);
-                            })
-                            .error(function(){
-                                $mdDialog.hide(simulation);
-                            });
-
-                    };
-
-                }],
-                template: $templateCache.get('cmb/core/tpls/cmb-simulation-control.html'),
-                targetEvent: event,
-            })
-            .then(function(simulation) {
-                // Move to the newly created simulation
-                updateScope();
-            }, function() {
-                // Nothing to do when close
-            });
+        };
+        $scope.terminateCluster = function(simulation) {
+            $girder.terminateTask(simulation);
+        };
+        $scope.deleteSimulation = function(simulation) {
+            if (!confirm('Are you sure youw want to delete "' + simulation.name + '?"')) {
+                return;
+            }
+            $girder.deleteItem(simulation._id)
+                .then(function() {
+                    updateScope();
+                });
         };
 
         $scope.taskCallback = function(simulationResponse) {
@@ -174,6 +146,8 @@ angular.module("kitware.cmb.core")
             console.log("taskCallback");
             console.log(simulationResponse[1]);
         };
+
+        $scope.editSimulation = $state.go;
 
         function extractExodusFile(files) {
             var exoFile = null,
