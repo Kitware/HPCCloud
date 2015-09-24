@@ -7,6 +7,11 @@ angular.module("kitware.cmb.core")
             $scope.awsProfiles = [];
             $scope.clusterProfiles = [];
 
+            var asyncToast = $mdToast.simple()
+                .content('')
+                .position('bottom right')
+                .hideDelay(0);
+
             $scope.statusClasses = {
                 //AWS
                 'creating': 'fa-circle-o-notch fa-spin',
@@ -175,13 +180,12 @@ angular.module("kitware.cmb.core")
                         $girder.getClusterStatus($scope.clusterProfiles[index]._id)
                             .success(function(data){
                                 $scope.clusterProfiles[index].status = data.status;
-                                if (data.status === 'running') {
-                                    showToast('Test succesfull');
-                                } else {
-                                    showToast('Test produced an error');
-                                }
+                                asyncToast.content('Testing...');
+                                $mdToast.show(asyncToast);
                             })
-                            .error(function(){});
+                            .error(function(err){
+                                showToast('Error: ' + err.message);
+                            });
                     })
                     .error(function(){});
             }
@@ -237,21 +241,23 @@ angular.module("kitware.cmb.core")
 
              function genericStatusUpdate(profileSet) {
                 return function(event, data) {
-                    var profileIndex,
-                        notFound = $scope[profileSet].every(function(el, index) {
-                            if (el._id === data._id) {
-                                profileIndex = index;
-                                return false; //break
-                            } else {
-                                return true;
-                            }
-                        });
+                    var profileIndex = -1;
+                    for (var i=0; i < $scope[profileSet].length; i++) {
+                        if ($scope[profileSet][i]._id === data._id){
+                            profileIndex = i;
+                            break;
+                        }
+                    }
 
-                    if (notFound) {
+                    if (profileIndex < 0) {
                         console.error('_id "'+data._id+'" from SSE not found in ' + profileSet);
                     } else {
                         $scope[profileSet][profileIndex].status = data.status;
                         if (/cluster/.test(event.name)) {
+                            $mdToast.updateContent('New status: ' + data.status);
+                            $timeout(function() {
+                                $mdToast.hide();
+                            }, 3000);
                             $girder.getSingleClusterProfile(data._id)
                                 .success(function(data) {
                                     $scope[profileSet][profileIndex].config = data.config;
