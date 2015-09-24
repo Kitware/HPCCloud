@@ -22,7 +22,7 @@ angular.module("kitware.cmb.core")
                 if ($scope.simulations[simIndex].meta.status === 'terminated') {
                     $girder.deleteTask($scope.simulations[simIndex]);
                 } else if ( $scope.simulations[simIndex].meta.taskId === undefined ){
-                    $scope.simulations[simIndex].meta.taskId = data._id
+                    $scope.simulations[simIndex].meta.taskId = data._id;
                     $scope.simulations[simIndex].meta.status = data.status;
                     $scope.$apply();
                     $girder.patchItemMetadata($scope.simulations[simIndex]._id, {status: data.status, taskId: data._id});
