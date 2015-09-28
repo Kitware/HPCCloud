@@ -51,7 +51,9 @@ angular.module("kitware.cmb.core")
             failure: 'error'
         });
 
-        var logging = false;
+        var logInterval = null;
+
+        $scope.taskLog = '';
         $scope.panelState = {index: -1, open: false};
 
         $scope.toggleSimulationFilter = function (event, filter) {
@@ -179,16 +181,31 @@ angular.module("kitware.cmb.core")
             //console.log('panel ' + $scope.panelState.index + ' is ' + ($scope.panelState.open ? 'open' : 'closed'));
             var simulation = $scope.simulations[index];
             if (simulation.meta.status === 'running' && $scope.panelState.open) {
-                //start logging
-                logging = true;
-                // $girder.getTask(simulation.meta.taskId)
-                //     .then(function(data) {
-                //         var cid = data.output.cluster
-                //         return $girder.getClusterLog()
-                //     });
-            } else if (!$scope.panelState.open && logging) {
-                //stop logging
-                logging = false;
+                if (!simulation.meta.taskId) {
+                    console.error('No taskId for simulation.');
+                    return;
+                }
+                $girder.getTask(simulation)
+                    .then(function(data) {
+                        if (data.$log) {
+                            var offset = 0;
+                            $scope.taskLog = '';
+                            logInterval = $interval(function() {
+                                $girder.getTaskLog(data.$log)
+                                    .then(function(logData) {
+                                        $scope.taskLog += '[' + logData.created + '] ' +
+                                            logData.name + ': ' + logData.msg + '\n';
+                                    });
+                            }, 2000);
+                        }
+                        else {
+                            console.log('No $log for task');
+                        }
+                    });
+            } else if (!$scope.panelState.open) {
+                if (logInterval !== null) {
+                    logInterval.clearInterval();
+                }
             }
         };
 

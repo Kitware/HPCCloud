@@ -237,6 +237,7 @@ angular.module("kitware.girder", ["ngCookies"])
         this.patch = function (url, data, config) {
             return $http(generateHttpConfig('PATCH', url, data, config));
         };
+
         /**
          * Annonymous HTTP get call on a given URL and
          * return a promise like on which could be
@@ -632,6 +633,10 @@ angular.module("kitware.girder", ["ngCookies"])
         this.getTask = function(item) {
             return this.get(['tasks/', item.meta.taskId].join(''));
         };
+
+        this.getTaskLog = function(url) {
+            return this.get(url);
+        }
 
         this.fetchTaskList = function() {
             var self = this;

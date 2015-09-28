@@ -93,13 +93,13 @@
                 </div>
             </accordion-heading>
             <md-content layout="column">
-                <div layout="row">
+                <div layout="row" ng-show="simulation.meta.taskId">
                     <span flex="50"><b>Total cost<b></span>
                     <span>$ {{ simulation.meta.totalCost }}</span>
                 </div>
                 <div layout="row" ng-show="simulation.meta.taskId">
                     <span flex="50"><b>Active cluster<b></span>
-                    <span>$ {{ simulation.meta.cost }} / hour => $ {{ activeCost }}</span>
+                    <span>$ {{ simulation.meta.cost }} / hour => $ {{ simulation.meta.cost * simulation.meta.startTime/60 }}</span>
                 </div>
                 <div layout="row" ng-show="simulation.meta.taskId">
                     <span flex="50"><b>Running time<b></span>
@@ -123,11 +123,11 @@
                         ng-disabled="simulation.meta.status === 'running'">Delete</md-button>
                     <md-button ng-click="terminateCluster(simulation)" class="md-raised md-warn"
                         ng-disabled="simulation.meta.status !== 'running' ||
-                            simulation.meta.status !== 'error'">Terminate</md-button>
+                            simulation.meta.status === 'error'">Terminate</md-button>
                 </div>
-                <div ng-show="simulation.meta.status === 'running' || simulation.meta.status === 'complete'">
+                <div ng-show="(simulation.meta.status === 'running') || simulation.meta.status === 'complete'">
                     <label>Log</label>
-                    <pre>Simulation log here</pre>
+                    <pre>{{taskLog}}</pre>
                 </div>
             </md-content>
     </accordion>
