@@ -92,19 +92,12 @@
                         <i ng-show="simulation.meta.task === 'failure'" class="fa fa-fw fa-warning"></i>
                         <md-tooltip ng-if="simulation.meta.task">{{ simulation.meta.task }}</md-tooltip>
                     </div>
-                    <div ng-click="editSimulation('simulation', { collectionName: getActiveCollection(), projectID: simulation.folderId, simulationID: simulation._id , mode: simulation.meta.status})">
-                        {{ simulation.name | unescape}}
-                    </div>
-                    <div ng-click="editSimulation('simulation', { collectionName: getActiveCollection(), projectID: simulation.folderId, simulationID: simulation._id , mode: simulation.meta.status})">
-                        {{ simulation.description | unescape}}
-                    </div>
-                    <div ng-click="editSimulation('simulation', { collectionName: getActiveCollection(), projectID: simulation.folderId, simulationID: simulation._id , mode: simulation.meta.status})">
-                        {{ simulation.created | toDateNumber | date : 'medium' }}
-                    </div>
+                    <div> {{ simulation.name | unescape}} </div>
+                    <div> {{ simulation.description | unescape}} </div>
+                    <div> {{ simulation.created | toDateNumber | date : 'medium' }} </div>
                 </div>
             </accordion-heading>
-            <md-content layout="row">
-                <div layout="column" flex>
+            <md-content layout="column">
                 <div layout="row">
                     <span flex="50"><b>Total cost<b></span>
                     <span>$ {{ simulation.meta.totalCost }}</span>
@@ -118,13 +111,21 @@
                     <span delta-time format="'hh:mm:ss'" start="simulation.meta.startTime"></span>
                 </div>
                 <div layout="row">
+                    <md-button class="md-raised md-primary" ng-click="editSimulation('simulation', {
+                        collectionName: getActiveCollection(),
+                        projectID: simulation.folderId,
+                        simulationID: simulation._id ,
+                        mode: simulation.meta.status})"
+                        ng-disabled="simulation.meta.status === 'running'">
+                        Annotate
+                    </md-button>
                     <md-button ng-click="cloneSimulation(simulation)" class="md-raised">Clone</md-button>
                     <md-button ng-click="downloadSimulation(simulation)" class="md-raised">Download</md-button>
                     <span flex></span>
                     <md-button ng-click="deleteSimulation(simulation)" class="md-raised md-warn"
                         ng-disabled="simulation.meta.status === 'running'">Delete</md-button>
                     <md-button ng-click="terminateCluster(simulation)" class="md-raised md-warn"
-                        ng-show="simulation.meta.taskId">Terminate</md-button>
+                        ng-disabled="simulation.meta.status !== 'running'">Terminate</md-button>
                 </div>
                 <div ng-show="simulation.meta.status === 'running' || simulation.meta.status === 'complete'">
                     <label>Log</label>

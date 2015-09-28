@@ -19,7 +19,7 @@ angular.module("kitware.cmb.core")
             if (taskIndex < 0) {
                 console.error('_id '+data._id+' not found');
             } else {
-                if ($scope.simulations[taskIndex].meta.task === 'terminated') {
+                if ($scope.simulations[taskIndex].meta.status === 'terminated') {
                     $girder.deleteTask($scope.simulations[taskIndex]);
                 } else {
                     $scope.simulations[taskIndex].meta.status = data.status;

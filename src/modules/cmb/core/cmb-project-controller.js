@@ -4,7 +4,6 @@ angular.module("kitware.cmb.core")
 
         function findSimulationIndexById(id) {
             for (var i=0; i < $scope.simulations.length; i++) {
-                console.log($scope.simulations[i].meta.taskId, id);
                 if ($scope.simulations[i].meta.taskId === id || $scope.simulations[i].meta.taskId === undefined) {
                     return i;
                 }
@@ -53,8 +52,12 @@ angular.module("kitware.cmb.core")
             complete: true,
         };
         var aliasFilters = {
+            terminated: 'error',
             failure: 'error'
         };
+
+        var logging = false;
+        $scope.panelState = {index: -1, open: false};
 
         $scope.toggleSimulationFilter = function (event, filter) {
             event.currentTarget.classList.toggle('md-raised');
@@ -106,7 +109,7 @@ angular.module("kitware.cmb.core")
         // Simulation drop down controls
         $scope.cloneSimulation = function(simulation) {
             $mdDialog.hide(simulation);
-            $scope.gcreateSimulation(event, simulation);
+            $scope.createSimulation(event, simulation);
         };
         $scope.downloadSimulation = function(simulation) {
             $mdDialog.hide(simulation);
@@ -134,7 +137,13 @@ angular.module("kitware.cmb.core")
             if (!confirm('Are you sure youw want to delete "' + simulation.name + '?"')) {
                 return;
             }
+
             $girder.deleteItem(simulation._id)
+                .then(function() {
+                    if (simulation.meta.hasOwnProperty('taskId')) {
+                        return $girder.deleteTask(simulation);
+                    }
+                })
                 .then(function() {
                     updateScope();
                 });
@@ -148,6 +157,31 @@ angular.module("kitware.cmb.core")
         };
 
         $scope.editSimulation = $state.go;
+
+        $scope.panelStateToggle = function(index) {
+            var state = angular.copy($scope.panelState);
+            if (index !== state.index) {
+                state.index = index;
+                state.open = true;
+            } else {
+                state.open = !state.open; //opening and closing the same panel
+            }
+            $scope.panelState = state;
+            //console.log('panel ' + $scope.panelState.index + ' is ' + ($scope.panelState.open ? 'open' : 'closed'));
+            var simulation = $scope.simulations[index];
+            if (simulation.meta.status === 'running' && $scope.panelState.open) {
+                //start logging
+                logging = true;
+                // $girder.getTask(simulation.meta.taskId)
+                //     .then(function(data) {
+                //         var cid = data.output.cluster
+                //         return $girder.getClusterLog()
+                //     });
+            } else if (!$scope.panelState.open && logging) {
+                //stop logging
+                logging = false;
+            }
+        };
 
         function extractExodusFile(files) {
             var exoFile = null,

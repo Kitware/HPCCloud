@@ -80,7 +80,6 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
             });
 
             scope.$watch(attrs.start, function(value) {
-                console.log(value);
                 startTime = Number(value);
                 updateTime();
             });

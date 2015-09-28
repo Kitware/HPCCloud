@@ -539,8 +539,8 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.put(['item', item._id, 'metadata'].join('/'), metadata)
                 .success(function(){
                     console.log('Success metadata updating');
-                }).error(function(){
-                    console.log('Error when updating metadata');
+                }).error(function(error){
+                    console.log('Error when updating metadata:', error.message);
                 });
         };
 
@@ -720,6 +720,7 @@ angular.module("kitware.girder", ["ngCookies"])
                 timings = {},
                 ready = 0;
 
+            console.log('deleting:', item);
             function extractTiming(obj) {
                 angular.extend(timings, obj.timings);
                 self.updateItemMetadata(item, {timings: timings});
@@ -745,8 +746,8 @@ angular.module("kitware.girder", ["ngCookies"])
                 }
             }
 
-            // Retrieve timing information first
-            self.get(['tasks', taskId].join('/'))
+            // Retrieve timing information first //WHY
+            self.get('tasks/' + taskId)
                 .success(function(task){
                     var clusterId = null,
                         jobId = null;
@@ -787,14 +788,13 @@ angular.module("kitware.girder", ["ngCookies"])
             self.put(['tasks', taskId, 'terminate'].join('/'))
                 .success(function(){
                     var metadata = angular.copy(item.meta);
-                    metadata.task = 'terminated';
+                    metadata.status = 'terminated';
                     metadata.totalCost += metadata.cost * Math.floor( 1 + (new Date().getTime() - metadata.startTime)/3600000);
                     metadata.startTime = null;
                     self.updateItemMetadata(item, metadata);
                 })
                 .error(function(error) {
-                    console.log("Error when terminating task " + taskId);
-                    console.log(error);
+                    console.log("Error when terminating task " + taskId, error.message);
                 });
         };
 
@@ -805,8 +805,7 @@ angular.module("kitware.girder", ["ngCookies"])
                     callback( ( $window.location.protocol === 'https:' ? "wss://" : "ws://") + $window.location.host + "/proxy?sessionId=" + sesssionId);
                 })
                 .error(function(error){
-                    console.log("Error when fetching task info for " + taskId);
-                    console.log(error);
+                    console.log("Error when fetching task info for " + taskId, error.message);
                 });
         };
 
@@ -838,6 +837,14 @@ angular.module("kitware.girder", ["ngCookies"])
 
         this.getClusterStatus = function(id) {
             return this.get('clusters/' + id + '/status');
+        };
+
+        this.getClusterLog = function(taskId, offset) {
+            if (offset === undefined || offset < 0) {
+                offset = 0;
+            }
+
+            return this.get('clusters/' + taskId + '/log');
         };
 
         this.testCluster = function(id) {
