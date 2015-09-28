@@ -12,9 +12,8 @@ angular.module("kitware.cmb.core")
         }
 
         $scope.$on('task.status', function(event, data) {
-            var simIndex = findSimulationIndexById(data._id),
-                needUpdate = false;
-
+            var simIndex = findSimulationIndexById(data._id);
+            console.log('event received: ', data.status);
             if (simIndex < 0) {
                 console.error('_id '+data._id+' not found');
             } else {
@@ -27,13 +26,9 @@ angular.module("kitware.cmb.core")
                     $girder.patchItemMetadata($scope.simulations[simIndex]._id, {status: data.status, taskId: data._id});
                 } else {
                     $scope.simulations[simIndex].meta.status = data.status;
-                    needUpdate = true;
+                    $girder.patchItemMetadata($scope.simulations[simIndex]._id, {status: data.status});
+                    $scope.$apply();
                 }
-            }
-
-            if(needUpdate) {
-                needUpdate = false;
-                updateScope();
             }
         });
 
@@ -51,10 +46,10 @@ angular.module("kitware.cmb.core")
             valid: true,
             complete: true,
         };
-        var aliasFilters = {
+        angular.extend($scope.filters, {
             terminated: 'error',
             failure: 'error'
-        };
+        });
 
         var logging = false;
         $scope.panelState = {index: -1, open: false};
@@ -67,11 +62,25 @@ angular.module("kitware.cmb.core")
         $scope.simulationFilter = function(filters) {
             return function(sim) {
                 return filters[sim.meta.status] === true ||
-                    filters[aliasFilters[sim.meta.status]] === true ||
                     !filters.hasOwnProperty(sim.meta.status);
                     //^ show the item if meta.status is _not_ in filters,
                     // this was a good case of weird bugs with super easy solutions.
             };
+        };
+
+        $scope.simulationClassByStatus = function(status) {
+            var base = {
+                incomplete: 'fa-pencil-square-o incomplete',
+                valid: 'fa-check-square-o valid',
+                running: 'fa-rocket running',
+                error: 'fa-warning error',
+                complete: 'fa-database complete'
+            };
+            angular.extend(base, {
+                failure: base.error,
+                terminated: base.error
+            });
+            return base[status];
         };
 
         $scope.createSimulation = function (event, simulation) {

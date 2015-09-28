@@ -38,8 +38,9 @@ angular.module("kitware.girder", ["ngCookies"])
             this.fetchUser();
         }
 
+        var notifications = null
         if ($window.EventSource) {
-            var notifications = new EventSource(apiBasePathURL + 'notification/stream');
+            notifications = new EventSource(apiBasePathURL + 'notification/stream');
             notifications.onmessage = function(e) {
                 var parsed = JSON.parse(e.data);
                 console.log('broadcasting SSE:', parsed.type, parsed.data.status);

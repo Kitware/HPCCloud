@@ -82,12 +82,7 @@
                 <div class="project-accordion-header" ng-click="panelStateToggle($index)">
                     <div>
                         <i class="fa fa-fw"
-                            ng-class="{ 'fa-pencil-square-o incomplete': simulation.meta.status === 'incomplete',
-                            'fa-check-square-o valid': simulation.meta.status === 'valid',
-                            'fa-rocket running': simulation.meta.status === 'running',
-                            'fa-warning error': simulation.meta.status === 'error' ||
-                                simulation.meta.status === 'failure' || simulation.meta.status === 'terminated',
-                            'fa-database complete': simulation.meta.status === 'complete' && !simulation.meta.task}">
+                            ng-class="simulationClassByStatus(simulation.meta.status)">
                         </i>
                         <i ng-show="simulation.meta.task === 'failure'" class="fa fa-fw fa-warning"></i>
                         <md-tooltip ng-if="simulation.meta.task">{{ simulation.meta.task }}</md-tooltip>

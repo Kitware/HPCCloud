@@ -12,9 +12,9 @@ gulp.task('process-js', function() {
         .pipe($.jshint.reporter('jshint-stylish'))
         .pipe($.sourcemaps.init())
         .pipe($.concat('chpc-min.js'))
-        .pipe($.ngAnnotate())
-        .pipe($.uglify())
-        .pipe($.sourcemaps.write())
+        // .pipe($.ngAnnotate())
+        // .pipe($.uglify())
+        // .pipe($.sourcemaps.write())
         .pipe(gulp.dest('dist/js'))
         .pipe($.size({title: "JS"}));
 });
