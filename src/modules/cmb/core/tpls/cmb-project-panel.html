@@ -112,11 +112,12 @@
                 </div>
                 <div layout="row">
                     <md-button class="md-raised md-primary" ng-click="editSimulation('simulation', {
-                        collectionName: getActiveCollection(),
-                        projectID: simulation.folderId,
-                        simulationID: simulation._id ,
-                        mode: simulation.meta.status})"
-                        ng-disabled="simulation.meta.status === 'running'">
+                            collectionName: getActiveCollection(),
+                            projectID: simulation.folderId,
+                            simulationID: simulation._id ,
+                            mode: simulation.meta.status})"
+                        ng-disabled="simulation.meta.status === 'running' ||
+                            simulation.meta.status === 'error'">
                         Annotate
                     </md-button>
                     <md-button ng-click="cloneSimulation(simulation)" class="md-raised">Clone</md-button>
@@ -125,7 +126,8 @@
                     <md-button ng-click="deleteSimulation(simulation)" class="md-raised md-warn"
                         ng-disabled="simulation.meta.status === 'running'">Delete</md-button>
                     <md-button ng-click="terminateCluster(simulation)" class="md-raised md-warn"
-                        ng-disabled="simulation.meta.status !== 'running'">Terminate</md-button>
+                        ng-disabled="simulation.meta.status !== 'running' ||
+                            simulation.meta.status !== 'error'">Terminate</md-button>
                 </div>
                 <div ng-show="simulation.meta.status === 'running' || simulation.meta.status === 'complete'">
                     <label>Log</label>
