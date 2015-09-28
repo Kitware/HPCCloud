@@ -112,7 +112,8 @@
                             simulationID: simulation._id ,
                             mode: simulation.meta.status})"
                         ng-disabled="simulation.meta.status === 'running' ||
-                            simulation.meta.status === 'error'">
+                            simulation.meta.status === 'error' ||
+                            simulation.meta.status === 'complete'">
                         Annotate
                     </md-button>
                     <md-button ng-click="cloneSimulation(simulation)" class="md-raised">Clone</md-button>
