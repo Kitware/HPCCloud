@@ -87,14 +87,33 @@
                             </i>
                             <span>{{ profile.name }}</span>
                         </accordion-heading>
-                        <form layout="column">
+                        <form name="clusterParams" layout="column">
                             <md-input-container>
                                 <label>Hostname</label>
-                                <input type="text" ng-model="profile.config.host" ng-disabled="profile.saved">
+                                <input type="text" ng-model="profile.config.host" ng-disabled="profile.saved" ng-required="true">
                             </md-input-container>
                             <md-input-container>
                                 <label>Username</label>
-                                <input type="text" value="" ng-model="profile.config.ssh.user" ng-disabled="profile.saved">
+                                <input type="text" value="" ng-model="profile.config.ssh.user" ng-disabled="profile.saved" ng-required="true">
+                            </md-input-container>
+                            <md-input-container>
+                                <label>Parallel Environment</label>
+                                <input type="text" ng-model="profile.config.parallelEnvironment" ng-disabled="profile.saved" placeholder="optional">
+                            </md-input-container>
+                            <md-input-container>
+                                <label>Number of slots per node</label>
+                                <input type="number" min="1" step="1" ng-model="profile.config.numberOfSlots" ng-disabled="profile.saved" placeholder="optional"
+                                       ng-blur="floorSlots(profile.config.numberOfSlots)">
+                            </md-input-container>
+                            <md-input-container>
+                                <label>Simulation Output Directory</label>
+                                <input type="text" ng-model="profile.config.jobOutputDir" ng-disabled="profile.saved" placeholder="absolute path, optional"
+                                       pattern="^\/.+">
+                            </md-input-container>
+                            <md-input-container>
+                                <label>Hydra executable path</label>
+                                <input type="text" ng-model="profile.config.hydra.executablePath" ng-disabled="profile.saved" placeholder="absolute path, required"
+                                       pattern="^\/.+" ng-required="true" >
                             </md-input-container>
                             <div ng-show="ableToTestCluster(profile)" class="ssh-key">
                                 <label>Public SSH key</label>
@@ -106,7 +125,7 @@ ssh {{profile.config.ssh.user}}@{{profile.config.host}} \
                             </div>
                         </form>
                         <section layout="row" layout-align="end center">
-                            <md-button class="md-primary" ng-click="clusterProfileAction($index, profile)">
+                            <md-button class="md-primary" ng-click="clusterProfileAction($index, profile)" ng-disabled="clusterParams.$invalid" >
                                 {{ableToTestCluster(profile) ? 'Test' : 'Save'}}
                             </md-button>
                             <md-button class="md-warn" ng-click="deleteClusterProfile($index)">Delete</md-button>
