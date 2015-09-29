@@ -189,11 +189,12 @@ angular.module("kitware.cmb.core")
                 }
                 $girder.getTask(simulation)
                     .then(function(data) {
-                        if (data.data.log.$ref) {
-                            var offset = 0;
+                        if (data.data.log[0].$ref) {
+                            var offset = 0,
+                                url = data.data.log[0].$ref;
                             $scope.taskLog = '';
                             logInterval = $interval(function() {
-                                $girder.getTaskLog(data.data.log.$ref)
+                                $girder.getTaskLog(url)
                                     .then(function(logData) {
                                         $scope.taskLog += '[' + logData.created + '] ' +
                                             logData.name + ': ' + logData.msg + '\n';

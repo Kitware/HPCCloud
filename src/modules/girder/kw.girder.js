@@ -68,14 +68,19 @@ angular.module("kitware.girder", ["ngCookies"])
 
         // Helper function use to generate $http argument base on
         // the targetted method and URL.
-        function generateHttpConfig (method, url, data, config) {
+        function generateHttpConfig (method, url, data, config, rawURL) {
             config = config || {};
 
             // Create basic request config
             var httpConfig = {
-                method: method,
-                url: apiBasePathURL + url
+                method: method
             };
+
+            if (rawURL === true) {
+                httpConfig.url = url;
+            } else {
+                httpConfig.url = apiBasePathURL + url;
+            }
 
             if (data) {
                 httpConfig.data = data;
@@ -635,7 +640,8 @@ angular.module("kitware.girder", ["ngCookies"])
         };
 
         this.getTaskLog = function(url) {
-            return this.get(url);
+            //generateHttpConfig (method, url, data, config, rawURL)
+            return $http(generateHttpConfig('GET', url, null, {}, true));
         };
 
         this.fetchTaskList = function() {
