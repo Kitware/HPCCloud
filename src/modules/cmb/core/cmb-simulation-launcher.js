@@ -18,13 +18,40 @@ angular.module('kitware.cmb.core')
         if ($scope.serverOptions.indexOf('Traditional') >= 0) {
             $scope.clusterData = {};
             $girder.getClusterProfiles()
-                .success(function(data){
-                    $scope.clusters = data.filter(function(el){
+                .then(function(data, status){
+                    $scope.clusters = data.data.filter(function(el){
                         return el.status === 'running';
                     });
                     $scope.clusterData.selectedCluster = $scope.clusters[0];
                 });
         }
+
+        if ($scope.serverOptions.indexOf('EC2') >= 0) {
+            $girder.getAWSProfiles()
+                .then(function(data){
+                    $scope.profiles = data.data;
+                    $scope.selectedProfile = $scope.profiles[0];
+                    return $girder.getAWSRunningInstances($scope.selectedProfile);
+                })
+                .then(function(data) {
+                    $scope.runningInstances = data.data.runninginstances;
+                    return $girder.getAWSMaxInstances($scope.selectedProfile);
+                })
+                .then(function(data) {
+                    $scope.availableMaxInstances = data.data.maxinstances;
+                });
+        }
+
+        $scope.updateAvailableAWSInstance = function() {
+            $girder.getAWSRunningInstances($scope.selectedProfile)
+                .then(function(data) {
+                    $scope.runningInstances = data.data.runninginstances;
+                    return $girder.getAWSMaxInstances($scope.profiles[0]);
+                })
+                .then(function(data) {
+                    $scope.availableMaxInstances = data.data.maxinstances;
+                });
+        };
 
         $scope.updateCost = function() {
             var cost = 0,
@@ -46,6 +73,7 @@ angular.module('kitware.cmb.core')
         };
         $scope.updateCost();
 
+        //the field is a number input, make sure it's an integer on blur.
         $scope.floorSlots = function(val) {
             $scope.clusterData.numberOfSlots = Math.floor(val);
         };

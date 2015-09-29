@@ -828,6 +828,14 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.patch('user/' + user._id + '/aws/profiles/' + prof._id, prof);
         };
 
+        this.getAWSRunningInstances = function(prof) {
+            return this.get('user/' + user._id + '/aws/profiles/' + prof._id + '/runninginstances');
+        };
+
+        this.getAWSMaxInstances = function(prof) {
+            return this.get('user/' + user._id + '/aws/profiles/' + prof._id + '/maxinstances');
+        };
+
         this.deleteAWSProfile = function(prof) {
             return this.delete('user/' + user._id + '/aws/profiles/' + prof._id);
         };

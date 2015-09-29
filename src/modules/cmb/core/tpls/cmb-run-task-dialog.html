@@ -12,6 +12,11 @@
         <div ng-switch="serverSelection">
             <div id="ec2-cluster-content" aria-labelledby="ec2-cluster" ng-switch-when="EC2" >
                 <form layout="column">
+                    <label>Profile</label>
+                    <select ng-model="selectedProfile" required="true"
+                        ng-options="profile.name for profile in profiles track by profile._id" ng-change="updateAvailableAWSInstance()">
+                    </select>
+                    <span>You are running {{runningInstances}} cluster{{runningInstances === 1 ? '' : 's'}} on this profile out of {{availableMaxInstances}}</span>
                     <div layout="row" style="margin: 10px 0;">
                         <label flex="20">
                             Machine type

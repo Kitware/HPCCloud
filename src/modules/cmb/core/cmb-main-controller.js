@@ -183,6 +183,7 @@ angular.module("kitware.cmb.core")
                     }
                 };
 
+            //make sure that there is at least one aws profile or cluster available.
             $girder.getAWSProfiles()
                 .then(function(data){
                     if (data.data.length === 0) {
