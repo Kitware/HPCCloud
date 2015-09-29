@@ -40,27 +40,32 @@ angular.module("kitware.cmb.core")
                 clusterData = args[1],
                 taskId = args[2],
                 config = {
-                    cluster: clusterData,
-                    input: {
-                        item: { id: simulation._id },
-                        data: "data"
-                    },
                     output: {
                         item: { id: simulation._id }
                     }
                 };
 
-            // console.log(config);
-            // console.log('Task spec ' + taskId);
-            // console.log("Cluster provided for viz task");
-            // console.log(clusterData);
+            $girder.getTask(simulation).then(function success(task) {
+                var hydraJob = task.output.hydra_job,
+                    dataDir = hydraJob._id;
 
-            if(clusterData.selectedIndex === 0) {
-                $girder.startTask(simulation, taskId, clusterData, config);
-            }
+                if ('jobOutputDir' in hydraJob.params) {
+                    dataDir = hydraJob.params.jobOutputDir + '/' + hydraJob._id;
+                }
 
-            // Move back to the project view
-            $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
+                config.dataDir = dataDir;
+
+                if(clusterData.selectedIndex === 0) {
+                    $girder.startTask(simulation, taskId, clusterData, config);
+                }
+
+                // Move back to the project view
+                $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
+
+            }, function error(err) {
+                // TODO Toast?
+                console.log(err);
+            });
         };
 
         $scope.runSimulationCallback = function(args) {
