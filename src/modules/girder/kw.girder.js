@@ -38,7 +38,7 @@ angular.module("kitware.girder", ["ngCookies"])
             this.fetchUser();
         }
 
-        var notifications = null
+        var notifications = null;
         if ($window.EventSource) {
             notifications = new EventSource(apiBasePathURL + 'notification/stream');
             notifications.onmessage = function(e) {
@@ -636,7 +636,7 @@ angular.module("kitware.girder", ["ngCookies"])
 
         this.getTaskLog = function(url) {
             return this.get(url);
-        }
+        };
 
         this.fetchTaskList = function() {
             var self = this;

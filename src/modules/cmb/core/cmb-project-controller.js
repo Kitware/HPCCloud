@@ -17,9 +17,8 @@ angular.module("kitware.cmb.core")
             if (simIndex < 0) {
                 console.error('_id '+data._id+' not found');
             } else {
-                if ($scope.simulations[simIndex].meta.status === 'terminated') {
-                    $girder.deleteTask($scope.simulations[simIndex]);
-                } else if ( $scope.simulations[simIndex].meta.taskId === undefined ){
+                // add task if it's missing, update status
+                if ($scope.simulations[simIndex].meta.taskId === undefined){
                     $scope.simulations[simIndex].meta.taskId = data._id;
                     $scope.simulations[simIndex].meta.status = data.status;
                     $scope.$apply();
@@ -63,7 +62,11 @@ angular.module("kitware.cmb.core")
 
         $scope.simulationFilter = function(filters) {
             return function(sim) {
-                return filters[sim.meta.status] === true ||
+                var key = sim.meta.status;
+                if (typeof filters[key] === 'string') {
+                    key = filters[key];
+                }
+                return filters[key] === true ||
                     !filters.hasOwnProperty(sim.meta.status);
                     //^ show the item if meta.status is _not_ in filters,
                     // this was a good case of weird bugs with super easy solutions.
