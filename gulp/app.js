@@ -47,7 +47,7 @@ gulp.task('partials', function () {
     .pipe($.size({title: "Partials"}));
 });
 
-gulp.task('html', ['process-css', 'process-js', 'partials', 'json', 'vtkweb-js', 'workflows'], function () {
+gulp.task('html', ['process-css', 'process-js', 'partials', 'json', 'workflows', 'pvw', 'vtk-web'], function () {
     return gulp.src('src/index.html')
         .pipe($.minifyHtml({
           empty: true,
@@ -76,4 +76,14 @@ gulp.task('images', function () {
 gulp.task('workflows', function () {
   return gulp.src('assets/workflows/**/*')
     .pipe(gulp.dest('dist/assets/wf'));
+});
+
+gulp.task('pvw', function () {
+  return gulp.src('assets/ng-pvw/**/*')
+    .pipe(gulp.dest('dist/assets/ng-pvw'));
+});
+
+gulp.task('vtk-web', function () {
+  return gulp.src('assets/vtk-web/**/*')
+    .pipe(gulp.dest('dist/assets/vtk-web'));
 });

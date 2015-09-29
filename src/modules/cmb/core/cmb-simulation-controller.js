@@ -139,39 +139,44 @@ angular.module("kitware.cmb.core")
 
                         while(count--) {
                             if(items[count].name === 'mesh') {
-                                var faces = items[count].meta.annotation,
-                                    tagMap = {},
-                                    processedTags = [],
-                                    faceCount = faces.length,
-                                    tagValues = [];
+                                var faces = items[count].meta.annotation.faces,
+                                    blocks = items[count].meta.annotation.blocks;
 
                                 // loop over faces
-                                while(faceCount--) {
-                                    var tags = faces[faceCount].tags,
-                                        tagCount = tags.length;
+                                function convertAnnotations(faces) {
+                                    var tagMap = {},
+                                        processedTags = [],
+                                        faceCount = faces.length,
+                                        tagValues = [];
 
-                                    while(tagCount--) {
-                                        if(tagMap[tags[tagCount]]) {
-                                            tagMap[tags[tagCount]].push(faces[faceCount].id);
-                                        } else {
-                                            tagMap[tags[tagCount]] = [ faces[faceCount].id ];
+                                    while(faceCount--) {
+                                        var tags = faces[faceCount].tags,
+                                            tagCount = tags.length;
+
+                                        while(tagCount--) {
+                                            if(tagMap[tags[tagCount]]) {
+                                                tagMap[tags[tagCount]].push(faces[faceCount].id);
+                                            } else {
+                                                tagMap[tags[tagCount]] = [ faces[faceCount].id ];
+                                            }
                                         }
                                     }
-                                }
 
-                                // Make enum structure
-                                for(var tag in tagMap) {
-                                    processedTags.push(tag);
-                                }
-                                processedTags.sort();
-                                for(var idx = 0; idx < processedTags.length; ++idx) {
-                                    tagValues.push(tagMap[processedTags[idx]]);
+                                    // Make enum structure
+                                    for(var tag in tagMap) {
+                                        processedTags.push(tag);
+                                    }
+                                    processedTags.sort();
+                                    for(var idx = 0; idx < processedTags.length; ++idx) {
+                                        tagValues.push(tagMap[processedTags[idx]]);
+                                    }
+                                    return {labels: processedTags, values: tagValues};
                                 }
 
                                 $scope.external = {
-                                    'face-tags': { labels: processedTags, values: tagValues },
-                                    'element-tags': { labels: ["Elements for Stats"], values: [ 3720242 ] },
-                                    'block-tags': { labels: ["Water"], values: [1] } // FIXME specific to hydra
+                                    'face-tags': convertAnnotations(faces),
+                                    'block-tags': convertAnnotations(blocks),
+                                    'element-tags': { labels: ["Elements for Stats"], values: [ 3720242 ] }
                                 };
 
                                 if($scope.viewModel) {

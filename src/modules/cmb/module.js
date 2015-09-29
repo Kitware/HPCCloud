@@ -4,5 +4,6 @@ angular.module("kitware.cmb",[
     "ui.bootstrap",
     "ngMaterial",
     "nvd3",
+    "pvweb-module",
     "pv.web"
 ]);
