@@ -76,7 +76,7 @@
         </thead>
     </table>
     <accordion>
-        <accordion-group ng-repeat="simulation in simulations | filter: simulationFilter(filters) | orderBy: simulation.name"
+        <accordion-group ng-repeat="simulation in simulations | filter: simulationFilter(filters)"
             class="project-block">
             <accordion-heading>
                 <div class="project-accordion-header" ng-click="panelStateToggle($index)">

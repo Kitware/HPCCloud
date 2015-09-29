@@ -16,7 +16,9 @@
                     <select ng-model="selectedProfile" required="true"
                         ng-options="profile.name for profile in profiles track by profile._id" ng-change="updateAvailableAWSInstance()">
                     </select>
-                    <span>You are running {{runningInstances}} cluster{{runningInstances === 1 ? '' : 's'}} on this profile out of {{availableMaxInstances}}</span>
+                    <span ng-class="{error: !valid()}">
+                        You are running {{runningInstances}} / {{availableMaxInstances}} cluster{{runningInstances === 1 ? '' : 's'}} on this profile.
+                    </span>
                     <div layout="row" style="margin: 10px 0;">
                         <label flex="20">
                             Machine type

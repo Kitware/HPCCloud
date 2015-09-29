@@ -82,8 +82,10 @@ angular.module('kitware.cmb.core')
             if ($scope.serverSelection === 'Traditional') {
                 return $scope.clusterData.selectedCluster !== undefined &&
                     $scope.clusterData.hydraExecutablePath !== undefined;
+            } else if ($scope.serverSelection === 'EC2'){
+                return $scope.runningInstances < $scope.availableMaxInstances;
             } else {
-                return true; //aws is already filled out and valid
+                return true; //should never get here.
             }
         };
 
@@ -91,6 +93,8 @@ angular.module('kitware.cmb.core')
             if ($scope.serverSelection === 'Traditional') {
                 $scope.data = {_id: $scope.clusterData.selectedCluster._id, type:'trad'};
                 locals.taskName += '_trad';
+            } else {
+                $scope.data._id = $scope.selectedProfile._id;
             }
 
             var args = [
