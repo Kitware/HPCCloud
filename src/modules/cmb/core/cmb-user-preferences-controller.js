@@ -160,6 +160,10 @@ angular.module("kitware.cmb.core")
                 }
             };
 
+            $scope.floorSlots = function(val) {
+                $scope.profile.config.numberOfSlots = Math.floor(val);
+            };
+
             function createClusterProfile(index) {
                 $girder.createClusterProfile($scope.clusterProfiles[index])
                     .success(function(data) {

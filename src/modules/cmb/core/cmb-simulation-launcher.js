@@ -73,15 +73,9 @@ angular.module('kitware.cmb.core')
         };
         $scope.updateCost();
 
-        //the field is a number input, make sure it's an integer on blur.
-        $scope.floorSlots = function(val) {
-            $scope.clusterData.numberOfSlots = Math.floor(val);
-        };
-
         $scope.valid = function() {
             if ($scope.serverSelection === 'Traditional') {
-                return $scope.clusterData.selectedCluster !== undefined &&
-                    $scope.clusterData.hydraExecutablePath !== undefined;
+                return $scope.clusterData.selectedCluster !== undefined;
             } else if ($scope.serverSelection === 'EC2'){
                 return $scope.runningInstances < $scope.availableMaxInstances;
             } else {
