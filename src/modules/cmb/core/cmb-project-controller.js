@@ -21,8 +21,8 @@ angular.module("kitware.cmb.core")
                 if ($scope.simulations[simIndex].meta.taskId === undefined){
                     $scope.simulations[simIndex].meta.taskId = data._id;
                     $scope.simulations[simIndex].meta.status = data.status;
-                    $scope.$apply();
                     $girder.patchItemMetadata($scope.simulations[simIndex]._id, {status: data.status, taskId: data._id});
+                    $scope.$apply();
                 } else {
                     $scope.simulations[simIndex].meta.status = data.status;
                     $girder.patchItemMetadata($scope.simulations[simIndex]._id, {status: data.status});
@@ -238,7 +238,12 @@ angular.module("kitware.cmb.core")
                     }
 
                     $scope.simulations = [];
-                    $scope.itemClusterType = [];
+                    $scope.itemClusterType = {};
+                    function populateClusterTypes(key) {
+                        return function (data) {
+                            $scope.itemClusterType[key] = data.data.output.cluster.type;
+                        };
+                    }
                     while(count--) {
                         if(items[count].name === 'mesh') {
                             $scope.meshItem = items[count];
@@ -248,9 +253,7 @@ angular.module("kitware.cmb.core")
                             $scope.simulations.push(items[count]);
                             if (items[count].meta.taskId) {
                                 $girder.getTask(items[count])
-                                    .then(function(data) {
-                                        $scope.itemClusterType.push(data.data.output.cluster.type);
-                                    });
+                                    .then(populateClusterTypes(items[count].name));
                             }
                         }
                     }

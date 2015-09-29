@@ -93,16 +93,16 @@
                 </div>
             </accordion-heading>
             <md-content layout="column">
-                <div ng-show="simulation.meta.taskId && itemClusterType[$index] === 'ec2'">
+                <div ng-show="simulation.meta.taskId && itemClusterType[simulation.name] === 'ec2'">
                     <div layout="row">
                         <span flex="50"><b>Total cost<b></span>
-                        <span>$ {{ simulation.meta.totalCost }}</span>
+                        <span>{{ simulation.meta.totalCost | currency:"$":2}}</span>
                     </div>
-                    <div layout="row">
+                    <div layout="row" ng-show="simulation.meta.status === 'running'">
                         <span flex="50"><b>Active cluster<b></span>
-                        <span>$ {{ simulation.meta.cost }} / hour => $ {{ calculateCost(simulation.meta.cost, simulation.meta.startTime)}}</span>
+                        <span>{{ simulation.meta.cost | currency:"$":3 }} / hour => $ {{ calculateCost(simulation.meta.cost, simulation.meta.startTime)}}</span>
                     </div>
-                    <div layout="row">
+                    <div layout="row" ng-show="simulation.meta.status === 'running'">
                         <span flex="50"><b>Running time<b></span>
                         <span delta-time start="simulation.meta.startTime"></span>
                     </div>
