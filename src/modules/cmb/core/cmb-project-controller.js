@@ -122,11 +122,10 @@ angular.module("kitware.cmb.core")
 
         // Simulation drop down controls
         $scope.cloneSimulation = function(simulation) {
-            $mdDialog.hide(simulation);
             $scope.createSimulation(event, simulation);
         };
+
         $scope.downloadSimulation = function(simulation) {
-            $mdDialog.hide(simulation);
             $girder.listItemFiles(simulation._id)
                 .success(function(fileList) {
                     console.log('file list:', fileList);
@@ -190,11 +189,11 @@ angular.module("kitware.cmb.core")
                 }
                 $girder.getTask(simulation)
                     .then(function(data) {
-                        if (data.$log) {
+                        if (data.data.log.$ref) {
                             var offset = 0;
                             $scope.taskLog = '';
                             logInterval = $interval(function() {
-                                $girder.getTaskLog(data.$log)
+                                $girder.getTaskLog(data.data.log.$ref)
                                     .then(function(logData) {
                                         $scope.taskLog += '[' + logData.created + '] ' +
                                             logData.name + ': ' + logData.msg + '\n';
@@ -202,14 +201,19 @@ angular.module("kitware.cmb.core")
                             }, 2000);
                         }
                         else {
-                            console.log('No $log for task');
+                            console.log('No $ref for task');
                         }
                     });
             } else if (!$scope.panelState.open) {
                 if (logInterval !== null) {
-                    logInterval.clearInterval();
+                    $interval.cancel(logInterval);
                 }
             }
+        };
+
+        $scope.calculateCost = function(cost, startTime) {
+            var now = new Date().getTime();
+            return (cost * (now - startTime) / 3600000).toFixed(3);
         };
 
         function extractExodusFile(files) {
@@ -230,10 +234,11 @@ angular.module("kitware.cmb.core")
                 .success(function (items) {
                     var count = items.length;
                     if (count === 0) {
-                        console.error("no item found");
+                        console.error("no items found");
                     }
 
                     $scope.simulations = [];
+                    $scope.itemClusterType = [];
                     while(count--) {
                         if(items[count].name === 'mesh') {
                             $scope.meshItem = items[count];
@@ -241,6 +246,12 @@ angular.module("kitware.cmb.core")
                         } else {
                             // Simulation
                             $scope.simulations.push(items[count]);
+                            if (items[count].meta.taskId) {
+                                $girder.getTask(items[count])
+                                    .then(function(data) {
+                                        $scope.itemClusterType.push(data.data.output.cluster.type);
+                                    });
+                            }
                         }
                     }
                 })

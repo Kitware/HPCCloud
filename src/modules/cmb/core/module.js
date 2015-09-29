@@ -64,20 +64,20 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
     .directive('deltaTime', ['$interval', 'dateFilter', function($interval, dateFilter) {
 
         function link(scope, element, attrs) {
-            var format,
-                startTime = 0,
+            var startTime = 0,
                 timeoutId;
 
             function updateTime() {
-                var deltaDate = new Date();
-                deltaDate.setTime(deltaDate.getTime() - startTime);
-                element.text(dateFilter(deltaDate, format));
-            }
+                var now = Date.now(),
+                    deltaHours = (now - startTime)/3600000,
+                    hours = Math.floor(deltaHours),
+                    minutes = Math.floor(60 * deltaHours) % 60,
+                    seconds = Math.floor(3600 * deltaHours) % 60;
 
-            scope.$watch(attrs.format, function(value) {
-                format = value;
-                updateTime();
-            });
+                minutes = minutes.toString().length === 1 ? '0' + minutes.toString() : minutes.toString();
+                seconds = seconds.toString().length === 1 ? '0' + seconds.toString() : seconds.toString();
+                element.text(hours + ':' + minutes + ':' + seconds);
+            }
 
             scope.$watch(attrs.start, function(value) {
                 startTime = Number(value);
