@@ -151,7 +151,7 @@ angular.module("kitware.cmb.core")
                 });
         };
 
-        $scope.runTask = function (event, title, taskName, hasLauncher, callback) {
+        $scope.runTask = function (event, title, taskName, hasLauncher, simulation, callback) {
             var awsAvailable = true,
                 clusterAvailable = true,
                 actionForProfileAvailability = function() {
@@ -171,7 +171,7 @@ angular.module("kitware.cmb.core")
                                 machines: machines,
                                 availability: {EC2: awsAvailable, Traditional: clusterAvailable},
                                 collectionName: $scope.collection.name,
-                                simulation: $scope.simulation
+                                simulation: simulation
                             },
                             controller: 'CmbSimulationLauncher',
                             template: $templateCache.get('cmb/core/tpls/cmb-run-task-dialog.html'),
@@ -197,6 +197,53 @@ angular.module("kitware.cmb.core")
                     }
                     return actionForProfileAvailability();
                 });
+        };
+
+        // This is typically the callback that is passed with
+        // the above `runTask(event, title, taskName, hasLauncher, callback)`
+        $scope.runSimulationCallback = function(args) {
+            var simulation = args[0],
+                clusterData = args[1],
+                taskId = args[2],
+                mesh = $scope.mesh;
+
+            $girder.extractMeshInformationFromProject(simulation.folderId, function(meshItem, meshFile){
+                var config = {
+                    cluster: clusterData,
+                    input: {
+                        data: {
+                            item: {
+                                id: meshItem._id
+                            }
+                        },
+                        config: {
+                            item: {
+                                id: simulation._id
+                            }
+                        }
+                    },
+                    mesh: {
+                        name: meshFile.name
+                    },
+                    output: {
+                        item: { id: simulation._id }
+                    }
+                };
+
+                if (clusterData.type === 'trad') {
+                    config.hydraExecutablePath = args[3].hydraExecutablePath;
+                    if (args[3].parallelEnvironment) config.parallelEnvironment = args[3].parallelEnvironment;
+                    if (args[3].numberOfSlots) config.numberOfSlots = args[3].numberOfSlots;
+                    if (args[3].jobOutputDir) config.jobOutputDir = args[3].jobOutputDir;
+                }
+                console.log(config);
+
+                $girder.startTask(simulation, taskId, clusterData, config);
+            });
+
+
+            // Move back to the project view
+            $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
         };
 
         $scope.goHome = function() {

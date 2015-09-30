@@ -108,6 +108,10 @@
                     </div>
                 </div>
                 <div layout="row">
+                    <md-button ng-click="runTask($event, 'Start simulation computation', 'hydra', false, simulation, runSimulationCallback)"
+                        class="md-raised md-primary" ng-disabled="simulation.meta.status !== 'valid'">
+                        Run
+                    </md-button>
                     <md-button class="md-raised md-primary" ng-click="editSimulation('simulation', {
                             collectionName: getActiveCollection(),
                             projectID: simulation.folderId,

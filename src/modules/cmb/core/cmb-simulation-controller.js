@@ -68,53 +68,6 @@ angular.module("kitware.cmb.core")
             });
         };
 
-        $scope.runSimulationCallback = function(args) {
-            var simulation = args[0],
-                clusterData = args[1],
-                taskId = args[2],
-                mesh = $scope.mesh;
-
-            //console.log(simulation);
-
-            $girder.extractMeshInformationFromProject(simulation.folderId, function(meshItem, meshFile){
-                var config = {
-                    cluster: clusterData,
-                    input: {
-                        data: {
-                            item: {
-                                id: meshItem._id
-                            }
-                        },
-                        config: {
-                            item: {
-                                id: simulation._id
-                            }
-                        }
-                    },
-                    mesh: {
-                        name: meshFile.name
-                    },
-                    output: {
-                        item: { id: simulation._id }
-                    }
-                };
-
-                if (clusterData.type === 'trad') {
-                    config.hydraExecutablePath = args[3].hydraExecutablePath;
-                    if (args[3].parallelEnvironment) config.parallelEnvironment = args[3].parallelEnvironment;
-                    if (args[3].numberOfSlots) config.numberOfSlots = args[3].numberOfSlots;
-                    if (args[3].jobOutputDir) config.jobOutputDir = args[3].jobOutputDir;
-                }
-                console.log(config);
-
-                $girder.startTask(simulation, taskId, clusterData, config);
-            });
-
-
-            // Move back to the project view
-            $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
-        };
-
         function fetchData() {
             if($scope.collection && $scope.collection.name && $scope.simulation) {
                 $scope.template = SimPut.getTemplate($scope.collection.name);
