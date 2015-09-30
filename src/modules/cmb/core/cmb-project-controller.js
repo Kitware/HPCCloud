@@ -31,7 +31,11 @@ angular.module("kitware.cmb.core")
             }
         });
 
-        // END - Refresh simulation status base on task progress every 10s
+        $scope.$on('$destroy', function() {
+            if (logInterval) {
+                $interval.cancel(logInterval);
+            }
+        });
 
         $scope.parameterDataTemplate = {};
 
@@ -202,10 +206,14 @@ angular.module("kitware.cmb.core")
                                 url = data.data.log[0].$ref;
                             $scope.taskLog = '';
                             logInterval = $interval(function() {
-                                $girder.getTaskLog(url)
+                                $girder.getTaskLog(url, offset)
                                     .then(function(logData) {
-                                        $scope.taskLog += '[' + logData.created + '] ' +
-                                            logData.name + ': ' + logData.msg + '\n';
+                                        var log = logData.data.log;
+                                        for (var i=0; i < log.length; i++) {
+                                            $scope.taskLog += '[' + log[i].created + '] ' +
+                                                log[i].name + ': ' + log[i].msg + '\n';
+                                            offset += 1;
+                                        }
                                     });
                             }, 2000);
                         }
