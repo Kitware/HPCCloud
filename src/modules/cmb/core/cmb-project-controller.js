@@ -1,5 +1,5 @@
 angular.module("kitware.cmb.core")
-    .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$interval', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $interval) {
+    .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$interval', '$q', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $interval, $q) {
         var timeoutId = 0;
 
         function findSimulationIndexById(id) {
@@ -49,11 +49,13 @@ angular.module("kitware.cmb.core")
             terminated: 'error',
             failure: 'error'
         });
+        $scope.finishedStates = ['error', 'complete', 'failure', 'terminated'];
 
         var logInterval = null;
 
         $scope.taskLog = '';
         $scope.panelState = {index: -1, open: false};
+        $scope.apiBase = $girder.getApiBase();
 
         $scope.toggleSimulationFilter = function (event, filter) {
             event.currentTarget.classList.toggle('md-raised');
@@ -70,6 +72,12 @@ angular.module("kitware.cmb.core")
                     !filters.hasOwnProperty(sim.meta.status);
                     //^ show the item if meta.status is _not_ in filters,
                     // this was a good case of weird bugs with super easy solutions.
+            };
+        };
+
+        $scope.fileFilter = function() {
+            return function(file) {
+                return file.size > 0;
             };
         };
 
@@ -205,6 +213,12 @@ angular.module("kitware.cmb.core")
                             console.log('No $ref for task');
                         }
                     });
+            } else if ($scope.isFinished(simulation) && $scope.panelState.open && !$scope.taskOutput) {
+                $girder.listItemFiles(simulation._id).then(function(response) {
+                    $scope.taskOutput = response.data;
+                 }, function(error) {
+                    console.log(error);
+                });
             } else if (!$scope.panelState.open) {
                 if (logInterval !== null) {
                     $interval.cancel(logInterval);
@@ -215,6 +229,10 @@ angular.module("kitware.cmb.core")
         $scope.calculateCost = function(cost, startTime) {
             var now = new Date().getTime();
             return (cost * (now - startTime) / 3600000).toFixed(3);
+        };
+
+        $scope.isFinished = function (simulation) {
+            return $scope.finishedStates.indexOf(simulation.meta.status) != -1;
         };
 
         function extractExodusFile(files) {
