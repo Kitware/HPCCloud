@@ -268,7 +268,9 @@ angular.module("kitware.cmb.core")
                     $scope.itemClusterType = {};
                     function populateClusterTypes(key) {
                         return function (data) {
-                            $scope.itemClusterType[key] = data.data.output.cluster.type;
+                            if (data.data.output.cluster) {
+                                $scope.itemClusterType[key] = data.data.output.cluster.type;
+                            }
                         };
                     }
                     while(count--) {
