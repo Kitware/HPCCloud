@@ -57,24 +57,20 @@
     </div>
 </md-toolbar>
 <md-content>
-    <table  class='table table-striped table-hover table-condensed'>
-        <thead>
-            <tr>
-                <th class="text-center" style="padding-left: 15px;">
-                    <i class="fa fa-crosshairs fa-fw"></i>
-                </th>
-                <th style='width: 20%;'>
-                    Simulation name
-                </th>
-                <th style='width: 60%;'>
-                    Description
-                </th>
-                <th class="text-center" style='width: 20%;'>
-                    <i class="fa fa-clock-o"></i>
-                </th>
-            </tr>
-        </thead>
-    </table>
+    <div layout="row" layout-align="center center" class="faux-toolbar">
+        <div class="text-center" style="padding-left: 12px; padding-right: 12px;">
+            <i class="fa fa-crosshairs fa-fw"></i>
+        </div>
+        <div style='width: 20%;'>
+            Simulation name
+        </div>
+        <div style='width: 60%;'>
+            Description
+        </div>
+        <div class="text-center" style='width: 20%;'>
+            <i class="fa fa-clock-o"></i>
+        </div>
+    </div>
     <accordion>
         <accordion-group ng-repeat="simulation in simulations | filter: simulationFilter(filters)"
             class="project-block">

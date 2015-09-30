@@ -17,6 +17,9 @@ running-color  = #4CAF50 //green
 md-toolbar
     min-height 32px
 
+    .gray
+        background-color grey
+
     .md-toolbar-tools
         padding 5px 0 5px 5px
         height 32px
@@ -62,6 +65,10 @@ md-toolbar
             .md-button
                 margin 0 2px
                 padding 2px 5px
+
+.faux-toolbar
+    @extend md-toolbar
+    font-size: 1.2em;
 
 md-list-item:nth-child(2n)
     background-color #eeeeee
