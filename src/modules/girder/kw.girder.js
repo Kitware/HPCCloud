@@ -334,8 +334,11 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.put('item/' + itemId + '/metadata', data);
         };
 
-        this.deleteItem = function (id) {
-            return this.delete('item/' + id);
+        this.deleteItem = function (item) {
+            if (item.meta.volumeId) {
+                this.deleteVolume(item);
+            }
+            return this.delete('item/' + item._id);
         };
 
         this.createItem = function (folderId, name, description, metadata) {
@@ -542,9 +545,10 @@ angular.module("kitware.girder", ["ngCookies"])
         };
 
         this.updateItemMetadata = function (item, metadata) {
+            console.log(item.name, metadata);
             return this.put(['item', item._id, 'metadata'].join('/'), metadata)
                 .success(function(){
-                    console.log('Success metadata updating');
+                    console.log('Success metadata updating to ', metadata);
                 }).error(function(error){
                     console.log('Error when updating metadata:', error.message);
                 });
@@ -607,21 +611,19 @@ angular.module("kitware.girder", ["ngCookies"])
                         cost: cluster.cost,
                         totalCost: (item.meta.totalCost || 0)
                     };
-                    self.updateItemMetadata(item, metadata);
 
                     // Start task
                     return self.put(['tasks', response.data._id, 'run'].join('/'), taskConfig)
                         .then(function(){
                             console.log("Task successfully started");
+                            self.updateItemMetadata(item, metadata);
                         }, function(error) {
-                            console.log("Error while starting Task");
-                            console.log(error);
+                            console.log("Error while starting Task", error.data.message);
                             item.meta.status = 'error';
                             self.updateItemMetadata(item, item.meta);
                         });
                 }, function(error) {
-                    console.log("Error while task creation");
-                    console.log(error);
+                    console.log("Error while task creation", error.data.message);
                     item.meta.status = 'error';
                     self.updateItemMetadata(item, item.meta);
                 });
@@ -749,9 +751,7 @@ angular.module("kitware.girder", ["ngCookies"])
                             });
                         })
                         .error(function(error){
-                            console.log("Error when deleting task " + taskId);
-                            console.log(error);
-                            console.log(item);
+                            console.log("Error when deleting task " + taskId, error.message || error.data.message);
                             self.updateItemMetadata(item, {
                                 task: null, spec: null
                             });
@@ -774,7 +774,7 @@ angular.module("kitware.girder", ["ngCookies"])
                         jobId = task.output.hydra_job._id;
                     }
                     if(ready === 0) {
-                        extractTiming({timing:{"info": "nothing to get"}});
+                        extractTiming({timings:{"info": "nothing to get"}});
                     }
 
                     if(clusterId) {
@@ -878,6 +878,23 @@ angular.module("kitware.girder", ["ngCookies"])
 
         this.deleteClusterProfile = function(prof) {
             return this.delete('clusters/' + prof._id);
+        };
+
+        // Volumes
+        this.getVolume = function(id) {
+            return this.get('volumes/' + id);
+        };
+
+        this.createVolume = function(data) {
+            return this.post('volumes', data);
+        };
+
+        this.detachVolume = function(id) {
+            return this.get('volumes/' + id + '/detach');
+        };
+
+        this.deleteVolume = function(item) {
+            return this.delete('volumes/' + item.meta.volumeId);
         };
 
     }]);

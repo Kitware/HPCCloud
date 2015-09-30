@@ -10,6 +10,7 @@
             </select>
         </div>
         <div ng-switch="serverSelection">
+            <!-- EC2 CONFIG -->
             <div id="ec2-cluster-content" aria-labelledby="ec2-cluster" ng-switch-when="EC2" >
                 <form layout="column">
                     <label>Profile</label>
@@ -36,15 +37,8 @@
                             Cluster size
                         </label>
                         <div flex>
-                          <input type="number"
-                            ng-change="updateCost()"
-                            ng-model='data.size'
-                            value='1'
-                            min='1'
-                            max='100'
-                            step='1'
-                            class="form-control"
-                            ></textarea>
+                          <input type="number" ng-change="updateCost()" ng-model='data.size'
+                            value='1' min='1' max='100' step='1' class="form-control">
                         </div>
                     </div>
                     <div layout="row" style="margin: 10px 0;" >
@@ -55,8 +49,17 @@
                             {{ data.cost | currency : $ : 2 }} / hour
                         </label>
                     </div>
+                    <div layout="row" style="margin: 10px 0;" >
+                        <label flex="20">
+                            Volume Size
+                        </label>
+                        <input type="number" ng-model="volume.size" ng-value="volume.size"
+                            min="1" max="16384" step="1">
+                        <span>&nbsp; gigabytes</span>
+                    </div>
                 </form>
             </div>
+            <!-- TRADITIONAL CLUSTER CONFIG -->
             <div id="launcher-content" aria-labelledby="launcher" ng-switch-when="Traditional">
                 <form layout="column">
                     <label>Cluster</label>

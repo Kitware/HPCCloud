@@ -163,14 +163,18 @@ angular.module("kitware.cmb.core")
                 return;
             }
 
-            $girder.deleteItem(simulation._id)
+            $girder.deleteItem(simulation)
                 .then(function() {
                     if (simulation.meta.hasOwnProperty('taskId')) {
                         return $girder.deleteTask(simulation);
                     }
+                }, function(error) {
+                    console.error('error deleting item:', error.message || error.data.message);
                 })
                 .then(function() {
                     updateScope();
+                }, function(error) {
+                    console.error('error deleting task:', error.message || error.data.message);
                 });
         };
 
@@ -201,7 +205,7 @@ angular.module("kitware.cmb.core")
                 }
                 $girder.getTask(simulation)
                     .then(function(data) {
-                        if (data.data.log[0].$ref) {
+                        if (data.data.log.length > 0 && data.data.log.length[0].$ref) {
                             var offset = 0,
                                 url = data.data.log[0].$ref;
                             $scope.taskLog = '';
