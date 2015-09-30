@@ -1,3 +1,8 @@
+valid-color    = #263238 //biscally black
+error-color    = #F44336 //red
+complete-color = #2196F3 //blue
+running-color  = #4CAF50 //green
+
 .simput-welcome
     display none
 
@@ -74,7 +79,7 @@ md-list-item:nth-child(2n)
 
     &:hover:enabled
         color white
-        background-color #F44336
+        background-color error-color
 
 [ng-click], [ui-sref]
     cursor pointer
@@ -219,7 +224,7 @@ a.accordion-toggle
         text-align right
 
 input:invalid
-    border 1px solid #F44336
+    border-bottom 2px solid error-color
     padding 2px 0
 
 .ssh-key
@@ -238,14 +243,14 @@ input:invalid
         width 100%
 
 .valid, .incomplete
-    color #263238 //biscally black
+    color valid-color
 
 .error
-    color #F44336 //red
+    color error-color
 
 .complete
-    color #2196F3 //blue
+    color complete-color
 
 .running
-    color #4CAF50 //green
+    color running-color
 
