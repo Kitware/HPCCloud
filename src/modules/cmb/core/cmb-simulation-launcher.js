@@ -88,7 +88,7 @@ angular.module('kitware.cmb.core')
                 $scope.data = $scope.clusterData.selectedCluster;
                 locals.taskName += '_trad';
             } else {
-                $scope.data._id = $scope.selectedProfile._id;
+                $scope.data.profileId = $scope.selectedProfile._id;
             }
 
             var args = [
