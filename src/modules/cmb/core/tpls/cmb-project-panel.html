@@ -113,7 +113,8 @@
                             projectID: simulation.folderId,
                             simulationID: simulation._id ,
                             mode: simulation.meta.status})"
-                        ng-disabled="!(simulation.meta.status === 'incomplete' || simulation.meta.status === 'valid')">
+                        ng-disabled="!hasStatus(simulation.meta.status,
+                            ['incomplete', 'valid'])">
                         Annotate
                     </md-button>
                     <md-button ng-click="cloneSimulation(simulation)" class="md-raised">Clone</md-button>
@@ -125,9 +126,8 @@
                         ng-disabled="simulation.meta.status !== 'running' ||
                             simulation.meta.status === 'error'">Terminate</md-button>
                 </div>
-                <div ng-show="simulation.meta.status === 'running' ||
-                    simulation.meta.status === 'complete' ||
-                    simulation.meta.status === 'terminated'">
+                <div ng-show="hasStatus(simulation.meta.status,
+                    ['running', 'complete', 'terminated', 'error', 'failure'])" >
                     <label>Log</label>
                     <pre>{{taskLog}}</pre>
                 </div>

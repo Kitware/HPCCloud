@@ -11,7 +11,7 @@ angular.module("kitware.cmb.core")
             return -1;
         }
 
-        function fetchOuput(simulation) {
+        function fetchOutput(simulation) {
             $girder.listItemFiles(simulation._id).then(function(response) {
                 $scope.taskOutput = response.data;
              }, function(error) {
@@ -42,7 +42,7 @@ angular.module("kitware.cmb.core")
 
                 $scope.$apply();
 
-                if ($scope.isFinished(simulation) && !$scope.taskOutput) {
+                if ($scope.hasStatus(simulation.meta.status, finishedStates) && !$scope.taskOutput) {
                     fetchOuput(simulation);
                 }
             }
@@ -70,9 +70,9 @@ angular.module("kitware.cmb.core")
             terminated: 'error',
             failure: 'error'
         });
-        $scope.finishedStates = ['error', 'complete', 'failure', 'terminated'];
 
-        var logInterval = null;
+        var logInterval = null,
+            finishedStates = ['error', 'complete', 'failure', 'terminated'];
 
         $scope.taskLog = '';
         $scope.panelState = {index: -1, open: false};
@@ -224,7 +224,7 @@ angular.module("kitware.cmb.core")
                     return;
                 }
                 startLoggingTask(simulation);
-            } else if ($scope.isFinished(simulation) && $scope.panelState.open && !$scope.taskOutput) {
+            } else if ($scope.hasStatus(simulation.meta.status, finishedStates) && $scope.panelState.open && !$scope.taskOutput) {
                 fetchOutput(simulation);
             } else if (!$scope.panelState.open) {
                 if (logInterval !== null) {
@@ -263,8 +263,8 @@ angular.module("kitware.cmb.core")
             return (cost * (now - startTime) / 3600000).toFixed(3);
         };
 
-        $scope.isFinished = function (simulation) {
-            return $scope.finishedStates.indexOf(simulation.meta.status) != -1;
+        $scope.hasStatus = function(status, arr) {
+            return arr.indexOf(status) != 0;
         };
 
         function extractExodusFile(files) {
