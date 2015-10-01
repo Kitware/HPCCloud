@@ -15,6 +15,12 @@ angular.module('kitware.cmb.core')
         $scope.machines = locals.machines;
         $scope.hasLauncher = locals.hasLauncher;
 
+        $scope.volume = {
+            size: 1,
+            type: 'ebs',
+            name: Math.floor(Math.random() * 0xffff).toString()
+        };
+
         if ($scope.serverOptions.indexOf('Traditional') >= 0) {
             $scope.clusterData = {};
             $girder.getClusterProfiles()
@@ -87,8 +93,16 @@ angular.module('kitware.cmb.core')
             if ($scope.serverSelection === 'Traditional') {
                 $scope.data = $scope.clusterData.selectedCluster;
                 locals.taskName += '_trad';
-            } else {
+            } else { //ec2
                 $scope.data.profileId = $scope.selectedProfile._id;
+                $scope.volume.aws = {profileId: $scope.selectedProfile._id};
+                $girder.createVolume($scope.volume)
+                    .then(function(data) {
+                        console.log('volume created: ', data.data._id);
+                        return $girder.updateItemMetadata(locals.simulation, {volumeId: data.data._id});
+                    }, function(error) {
+                        console.error('error creating volume', error.message);
+                    });
             }
 
             var args = [

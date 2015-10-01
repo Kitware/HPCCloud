@@ -31,6 +31,10 @@ angular.module("kitware.cmb.core")
                     simulation.meta.taskId = data._id;
                     simulation.meta.status = data.status;
                     $girder.patchItemMetadata(simulation._id, {status: data.status, taskId: data._id});
+
+                    if (data.status === 'running' && $scope.panelState.index === simIndex) {
+                        startLoggingTask($scope.simulations[simIndex]);
+                    }
                 } else {
                     simulation.meta.status = data.status;
                     $girder.patchItemMetadata(simulation._id, {status: data.status});
@@ -170,20 +174,27 @@ angular.module("kitware.cmb.core")
         };
         $scope.terminateCluster = function(simulation) {
             $girder.terminateTask(simulation);
+            if (logInterval && simulation._id === $scope.simulations[$scope.panelState.index]._id) {
+                $interval.cancel(logInterval);
+            }
         };
         $scope.deleteSimulation = function(simulation) {
             if (!confirm('Are you sure youw want to delete "' + simulation.name + '?"')) {
                 return;
             }
 
-            $girder.deleteItem(simulation._id)
+            $girder.deleteItem(simulation)
                 .then(function() {
                     if (simulation.meta.hasOwnProperty('taskId')) {
                         return $girder.deleteTask(simulation);
                     }
+                }, function(error) {
+                    console.error('error deleting item:', error.message || error.data.message);
                 })
                 .then(function() {
                     updateScope();
+                }, function(error) {
+                    console.error('error deleting task:', error.message || error.data.message);
                 });
         };
 
@@ -212,28 +223,7 @@ angular.module("kitware.cmb.core")
                     console.error('No taskId for simulation.');
                     return;
                 }
-                $girder.getTask(simulation)
-                    .then(function(data) {
-                        if (data.data.log[0].$ref) {
-                            var offset = 0,
-                                url = data.data.log[0].$ref;
-                            $scope.taskLog = '';
-                            logInterval = $interval(function() {
-                                $girder.getTaskLog(url, offset)
-                                    .then(function(logData) {
-                                        var log = logData.data.log;
-                                        for (var i=0; i < log.length; i++) {
-                                            $scope.taskLog += '[' + log[i].created + '] ' +
-                                                log[i].name + ': ' + log[i].msg + '\n';
-                                            offset += 1;
-                                        }
-                                    });
-                            }, 2000);
-                        }
-                        else {
-                            console.log('No $ref for task');
-                        }
-                    });
+                startLoggingTask(simulation);
             } else if ($scope.isFinished(simulation) && $scope.panelState.open && !$scope.taskOutput) {
                 fetchOutput(simulation);
             } else if (!$scope.panelState.open) {
@@ -242,6 +232,31 @@ angular.module("kitware.cmb.core")
                 }
             }
         };
+
+        function startLoggingTask(simulation) {
+            $girder.getTask(simulation)
+                .then(function(data) {
+                    if (data.data.log.length === 0 || !data.data.log.length[0].$ref) {
+                        console.log('No $ref for task');
+                        return;
+                    }
+
+                    var offset = 0,
+                        url = data.data.log[0].$ref;
+                    $scope.taskLog = '';
+                    logInterval = $interval(function() {
+                        $girder.getTaskLog(url, offset)
+                            .then(function(logData) {
+                                var log = logData.data.log;
+                                for (var i=0; i < log.length; i++) {
+                                    $scope.taskLog += '[' + log[i].created + '] ' +
+                                        log[i].name + ': ' + log[i].msg + '\n';
+                                    offset += 1;
+                                }
+                            });
+                    }, 2000);
+                });
+        }
 
         $scope.calculateCost = function(cost, startTime) {
             var now = new Date().getTime();
@@ -277,7 +292,9 @@ angular.module("kitware.cmb.core")
                     $scope.itemClusterType = {};
                     function populateClusterTypes(key) {
                         return function (data) {
-                            $scope.itemClusterType[key] = data.data.output.cluster.type;
+                            if (data.data.output.cluster) {
+                                $scope.itemClusterType[key] = data.data.output.cluster.type;
+                            }
                         };
                     }
                     while(count--) {
