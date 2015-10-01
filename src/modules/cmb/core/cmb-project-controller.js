@@ -11,27 +11,39 @@ angular.module("kitware.cmb.core")
             return -1;
         }
 
+        function fetchOuput(simulation) {
+            $girder.listItemFiles(simulation._id).then(function(response) {
+                $scope.taskOutput = response.data;
+             }, function(error) {
+                console.log(error);
+            });
+        }
+
         $scope.$on('task.status', function(event, data) {
-            var simIndex = findSimulationIndexById(data._id);
+            var simIndex = findSimulationIndexById(data._id), simulation;
             console.log('event received: ', data.status);
             if (simIndex < 0) {
                 console.error('_id '+data._id+' not found');
             } else {
+                simulation = $scope.simulations[simIndex];
                 // add task if it's missing, update status
-                if ($scope.simulations[simIndex].meta.taskId === undefined){
-                    $scope.simulations[simIndex].meta.taskId = data._id;
-                    $scope.simulations[simIndex].meta.status = data.status;
-                    $girder.patchItemMetadata($scope.simulations[simIndex]._id, {status: data.status, taskId: data._id});
-                    $scope.$apply();
+                if (simulation.meta.taskId === undefined){
+                    simulation.meta.taskId = data._id;
+                    simulation.meta.status = data.status;
+                    $girder.patchItemMetadata(simulation._id, {status: data.status, taskId: data._id});
 
                     if (data.status === 'running' && $scope.panelState.index === simIndex) {
                         startLoggingTask($scope.simulations[simIndex]);
                     }
-
                 } else {
-                    $scope.simulations[simIndex].meta.status = data.status;
-                    $girder.patchItemMetadata($scope.simulations[simIndex]._id, {status: data.status});
-                    $scope.$apply();
+                    simulation.meta.status = data.status;
+                    $girder.patchItemMetadata(simulation._id, {status: data.status});
+                }
+
+                $scope.$apply();
+
+                if ($scope.isFinished(simulation) && !$scope.taskOutput) {
+                    fetchOuput(simulation);
                 }
             }
         });
@@ -213,12 +225,7 @@ angular.module("kitware.cmb.core")
                 }
                 startLoggingTask(simulation);
             } else if ($scope.isFinished(simulation) && $scope.panelState.open && !$scope.taskOutput) {
-                $girder.listItemFiles(simulation._id)
-                    .then(function(response) {
-                        $scope.taskOutput = response.data;
-                     }, function(error) {
-                        console.log(error);
-                    });
+                fetchOutput(simulation);
             } else if (!$scope.panelState.open) {
                 if (logInterval !== null) {
                     $interval.cancel(logInterval);
@@ -228,14 +235,14 @@ angular.module("kitware.cmb.core")
 
         function startLoggingTask(simulation) {
             $girder.getTask(simulation)
-                .then(function(data) {
-                    if (data.data.log.length === 0 || !data.data.log.length[0].$ref) {
+                .then(function(res) {
+                    if (res.data.log.length === 0 || !res.data.log[0].hasOwnProperty('$ref')) {
                         console.log('No $ref for task');
                         return;
                     }
 
                     var offset = 0,
-                        url = data.data.log[0].$ref;
+                        url = res.data.log[0].$ref;
                     $scope.taskLog = '';
                     logInterval = $interval(function() {
                         $girder.getTaskLog(url, offset)
@@ -284,9 +291,9 @@ angular.module("kitware.cmb.core")
                     $scope.simulations = [];
                     $scope.itemClusterType = {};
                     function populateClusterTypes(key) {
-                        return function (data) {
-                            if (data.data.output.cluster) {
-                                $scope.itemClusterType[key] = data.data.output.cluster.type;
+                        return function (res) {
+                            if (res.data.output.cluster) {
+                                $scope.itemClusterType[key] = res.data.output.cluster.type;
                             }
                         };
                     }
