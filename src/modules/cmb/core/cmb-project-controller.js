@@ -226,6 +226,7 @@ angular.module("kitware.cmb.core")
                 startLoggingTask(simulation);
             } else if ($scope.hasStatus(simulation.meta.status, finishedStates) && $scope.panelState.open && !$scope.taskOutput) {
                 fetchOutput(simulation);
+                fetchLog(simulation);
             } else if (!$scope.panelState.open) {
                 if (logInterval !== null) {
                     $interval.cancel(logInterval);
@@ -249,13 +250,52 @@ angular.module("kitware.cmb.core")
                             .then(function(logData) {
                                 var log = logData.data.log;
                                 for (var i=0; i < log.length; i++) {
-                                    $scope.taskLog += '[' + log[i].created + '] ' +
-                                        log[i].name + ': ' + log[i].msg + '\n';
+                                    $scope.taskLog += logFormatter(log[i]);
                                     offset += 1;
                                 }
                             });
                     }, 2000);
                 });
+        }
+
+        function fetchLog(simulation) {
+            $girder.getTask(simulation)
+                .then(function(res) {
+                    if (res.data.log.length === 0 || !res.data.log[0].hasOwnProperty('$ref')) {
+                        console.log('No $ref for task');
+                        return;
+                    }
+
+                    var url = res.data.log[0].$ref;
+                    $scope.taskLog = '';
+                    $girder.getTaskLog(url, 0)
+                        .then(function(logData) {
+                            var log = logData.data.log;
+                            for (var i=0; i < log.length; i++) {
+                                $scope.taskLog += logFormatter(log[i]);
+                            }
+                        });
+                });
+        }
+
+        function logFormatter(l) {
+            var created
+            return '[' + formatTime(l.created) + '] ' + l.levelname + ': ' + l.msg + '\n';
+        }
+
+        function formatTime(time) {
+            var date = new Date(time),
+                hours = date.getHours().toString(),
+                minutes = date.getMinutes().toString(),
+                seconds = date.getSeconds().toString(),
+                ms = date.getMilliseconds().toString();
+
+            hours = hours.length === 1 ? '0' + hours : hours;
+            minutes = minutes.length === 1 ? '0' + minutes : minutes;
+            seconds = seconds.length === 1 ? '0' + seconds : seconds;
+            ms.length < 3 ? function(){while(ms.length < 3) {ms = '0'+ms}; return ms;}() : ms;
+
+            return hours + ':' + minutes + ':' + seconds + '.' + ms;
         }
 
         $scope.calculateCost = function(cost, startTime) {
