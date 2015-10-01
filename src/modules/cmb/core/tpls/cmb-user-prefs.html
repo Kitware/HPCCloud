@@ -101,11 +101,6 @@
                                 <input type="text" ng-model="profile.config.parallelEnvironment" ng-disabled="profile.saved" placeholder="optional">
                             </md-input-container>
                             <md-input-container>
-                                <label>Number of slots per node</label>
-                                <input type="number" min="1" step="1" ng-model="profile.config.numberOfSlots" ng-disabled="profile.saved" placeholder="optional"
-                                       ng-blur="floorSlots(profile.config.numberOfSlots)">
-                            </md-input-container>
-                            <md-input-container>
                                 <label>Simulation Output Directory</label>
                                 <input type="text" ng-model="profile.config.jobOutputDir" ng-disabled="profile.saved" placeholder="absolute path, optional"
                                        pattern="^\/.+">
