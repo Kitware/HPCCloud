@@ -362,6 +362,10 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.post(['item', simulationToClone._id, 'copy?folderId=' + projectId + '&name=' + escape(name) + '&description=' + escape(description)].join('/'));
         };
 
+        this.copyFile = function (fileId, itemId) {
+            return this.post(['file', fileId, 'copy?itemId=' + itemId].join('/'));
+        };
+
         this.uploadChunk = function (uploadId, offset, blob) {
             var formdata = new FormData();
             formdata.append('offset', offset);

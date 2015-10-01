@@ -25,37 +25,51 @@
                 });
         },
         'create-simulation' : function (projectId, $girder, $data, $mdDialog, simulationToClone) {
+            $q = angular.injector(['ng']).get('$q');
+
             if(simulationToClone) {
-                $girder.copyItem(simulationToClone, projectId, $data.name, $data.description)
-                    .success(function (simulation) {
-                        // Reset meta-data
-                        var defaultMetadata = {
-                            taskId: null,
-                            task: null,
-                            status: 'incomplete',
-                            startTime: null,
-                            cost: null,
-                            totalCost: null
-                        };
-                        $girder.updateItemMetadata(simulation, defaultMetadata)
-                            .success(function(item) {
-                                $mdDialog.hide(item);
-                            })
-                            .error(function(){
-                                $mdDialog.hide();
+                $girder.createItem(projectId,
+                        $data.name,
+                        $data.description,
+                        { type: $data.type, status: 'incomplete' }).then(function(response) {
+                            return response.data;
+                        }, function(error) {
+                            console.log(error);
+                            $mdDialog.cancel();
+                        }).then(function(item) {
+                            // Now fetch list of file associated with the simulation to copy
+                            return $girder.listItemFiles(simulationToClone._id).then(function(response) {
+                                return {
+                                    files: response.data,
+                                    item: item
+                                };
+                            }, function(error) {
+                                console.log(error);
+                                $mdDialog.cancel();
+                            });
+                        }).then(function(data) {
+                            // Copy over hydra.json and hydra.cntl
+                            var promises = [];
+                            angular.forEach(data.files, function(file) {
+                                if (file.name == 'hydra.json' ||
+                                    file.name == 'hydra.cntl') {
+
+                                    var promise = $girder.copyFile(file._id, data.item._id).then(function(response) {
+
+                                    }, function(error) {
+                                        console.log(error);
+                                        $mdDialog.cancel();
+                                    });
+
+                                    promises.push(promise);
+                                }
                             });
 
-                        // Remove unwanted files
-                        // TODO / FIXME
-                    })
-                    .error(function (data, status, headers, config) {
-                        console.log('clone failed');
-                        console.log(data);
-                        console.log(status);
-                        console.log(headers);
-                        console.log(config);
-                        $mdDialog.cancel();
-                    });
+                            // Wait for copy to complete
+                            return $q.all(promises).then(function() {
+                                $mdDialog.hide(data.item);
+                            });
+                        });
             } else {
                 $girder.createItem(projectId, $data.name, $data.description, { type: $data.type, status: 'incomplete' })
                     .success(function (item) {
