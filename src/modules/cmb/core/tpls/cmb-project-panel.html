@@ -125,7 +125,9 @@
                         ng-disabled="simulation.meta.status !== 'running' ||
                             simulation.meta.status === 'error'">Terminate</md-button>
                 </div>
-                <div ng-show="(simulation.meta.status === 'running') || simulation.meta.status === 'complete'">
+                <div ng-show="simulation.meta.status === 'running' ||
+                    simulation.meta.status === 'complete' ||
+                    simulation.meta.status === 'terminated'">
                     <label>Log</label>
                     <pre>{{taskLog}}</pre>
                 </div>

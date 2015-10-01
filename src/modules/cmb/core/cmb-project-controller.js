@@ -23,6 +23,11 @@ angular.module("kitware.cmb.core")
                     $scope.simulations[simIndex].meta.status = data.status;
                     $girder.patchItemMetadata($scope.simulations[simIndex]._id, {status: data.status, taskId: data._id});
                     $scope.$apply();
+
+                    if (data.status === 'running' && $scope.panelState.index === simIndex) {
+                        startLoggingTask($scope.simulations[simIndex]);
+                    }
+
                 } else {
                     $scope.simulations[simIndex].meta.status = data.status;
                     $girder.patchItemMetadata($scope.simulations[simIndex]._id, {status: data.status});
@@ -206,40 +211,45 @@ angular.module("kitware.cmb.core")
                     console.error('No taskId for simulation.');
                     return;
                 }
-                $girder.getTask(simulation)
-                    .then(function(data) {
-                        if (data.data.log.length > 0 && data.data.log.length[0].$ref) {
-                            var offset = 0,
-                                url = data.data.log[0].$ref;
-                            $scope.taskLog = '';
-                            logInterval = $interval(function() {
-                                $girder.getTaskLog(url, offset)
-                                    .then(function(logData) {
-                                        var log = logData.data.log;
-                                        for (var i=0; i < log.length; i++) {
-                                            $scope.taskLog += '[' + log[i].created + '] ' +
-                                                log[i].name + ': ' + log[i].msg + '\n';
-                                            offset += 1;
-                                        }
-                                    });
-                            }, 2000);
-                        }
-                        else {
-                            console.log('No $ref for task');
-                        }
-                    });
+                startLoggingTask(simulation);
             } else if ($scope.isFinished(simulation) && $scope.panelState.open && !$scope.taskOutput) {
-                $girder.listItemFiles(simulation._id).then(function(response) {
-                    $scope.taskOutput = response.data;
-                 }, function(error) {
-                    console.log(error);
-                });
+                $girder.listItemFiles(simulation._id)
+                    .then(function(response) {
+                        $scope.taskOutput = response.data;
+                     }, function(error) {
+                        console.log(error);
+                    });
             } else if (!$scope.panelState.open) {
                 if (logInterval !== null) {
                     $interval.cancel(logInterval);
                 }
             }
         };
+
+        function startLoggingTask(simulation) {
+            $girder.getTask(simulation)
+                .then(function(data) {
+                    if (data.data.log.length === 0 || !data.data.log.length[0].$ref) {
+                        console.log('No $ref for task');
+                        return;
+                    }
+
+                    var offset = 0,
+                        url = data.data.log[0].$ref;
+                    $scope.taskLog = '';
+                    logInterval = $interval(function() {
+                        $girder.getTaskLog(url, offset)
+                            .then(function(logData) {
+                                var log = logData.data.log;
+                                for (var i=0; i < log.length; i++) {
+                                    $scope.taskLog += '[' + log[i].created + '] ' +
+                                        log[i].name + ': ' + log[i].msg + '\n';
+                                    offset += 1;
+                                }
+                            });
+                    }, 2000);
+                });
+        }
 
         $scope.calculateCost = function(cost, startTime) {
             var now = new Date().getTime();
