@@ -235,14 +235,14 @@ angular.module("kitware.cmb.core")
 
         function startLoggingTask(simulation) {
             $girder.getTask(simulation)
-                .then(function(data) {
-                    if (data.data.log.length === 0 || !data.data.log.length[0].$ref) {
+                .then(function(res) {
+                    if (res.data.log.length === 0 || !res.data.log[0].hasOwnProperty('$ref')) {
                         console.log('No $ref for task');
                         return;
                     }
 
                     var offset = 0,
-                        url = data.data.log[0].$ref;
+                        url = res.data.log[0].$ref;
                     $scope.taskLog = '';
                     logInterval = $interval(function() {
                         $girder.getTaskLog(url, offset)
@@ -291,9 +291,9 @@ angular.module("kitware.cmb.core")
                     $scope.simulations = [];
                     $scope.itemClusterType = {};
                     function populateClusterTypes(key) {
-                        return function (data) {
-                            if (data.data.output.cluster) {
-                                $scope.itemClusterType[key] = data.data.output.cluster.type;
+                        return function (res) {
+                            if (res.data.output.cluster) {
+                                $scope.itemClusterType[key] = res.data.output.cluster.type;
                             }
                         };
                     }
