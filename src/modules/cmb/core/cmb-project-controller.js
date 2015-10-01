@@ -11,22 +11,35 @@ angular.module("kitware.cmb.core")
             return -1;
         }
 
+        function fetchOuput(simulation) {
+            $girder.listItemFiles(simulation._id).then(function(response) {
+                $scope.taskOutput = response.data;
+             }, function(error) {
+                console.log(error);
+            });
+        }
+
         $scope.$on('task.status', function(event, data) {
-            var simIndex = findSimulationIndexById(data._id);
+            var simIndex = findSimulationIndexById(data._id), simulation;
             console.log('event received: ', data.status);
             if (simIndex < 0) {
                 console.error('_id '+data._id+' not found');
             } else {
+                simulation = $scope.simulations[simIndex];
                 // add task if it's missing, update status
-                if ($scope.simulations[simIndex].meta.taskId === undefined){
-                    $scope.simulations[simIndex].meta.taskId = data._id;
-                    $scope.simulations[simIndex].meta.status = data.status;
-                    $girder.patchItemMetadata($scope.simulations[simIndex]._id, {status: data.status, taskId: data._id});
-                    $scope.$apply();
+                if (simulation.meta.taskId === undefined){
+                    simulation.meta.taskId = data._id;
+                    simulation.meta.status = data.status;
+                    $girder.patchItemMetadata(simulation._id, {status: data.status, taskId: data._id});
                 } else {
-                    $scope.simulations[simIndex].meta.status = data.status;
-                    $girder.patchItemMetadata($scope.simulations[simIndex]._id, {status: data.status});
-                    $scope.$apply();
+                    simulation.meta.status = data.status;
+                    $girder.patchItemMetadata(simulation._id, {status: data.status});
+                }
+
+                $scope.$apply();
+
+                if ($scope.isFinished(simulation) && !$scope.taskOutput) {
+                    fetchOuput(simulation);
                 }
             }
         });
@@ -222,11 +235,7 @@ angular.module("kitware.cmb.core")
                         }
                     });
             } else if ($scope.isFinished(simulation) && $scope.panelState.open && !$scope.taskOutput) {
-                $girder.listItemFiles(simulation._id).then(function(response) {
-                    $scope.taskOutput = response.data;
-                 }, function(error) {
-                    console.log(error);
-                });
+                fetchOutput(simulation);
             } else if (!$scope.panelState.open) {
                 if (logInterval !== null) {
                     $interval.cancel(logInterval);
