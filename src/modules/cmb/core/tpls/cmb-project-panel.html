@@ -129,7 +129,7 @@
                 <div ng-show="hasStatus(simulation.meta.status,
                     ['running', 'complete', 'terminated', 'error', 'failure'])" >
                     <label>Log</label>
-                    <pre>{{taskLog}}</pre>
+                    <pre class="task-log">{{taskLog[simulation._id]}}</pre>
                 </div>
                 <div ng-show="hasStatus(simulation.meta.status,
                     ['error', 'complete', 'failure', 'terminated'])">

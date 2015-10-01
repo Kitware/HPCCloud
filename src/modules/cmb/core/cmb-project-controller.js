@@ -74,7 +74,7 @@ angular.module("kitware.cmb.core")
         var logInterval = null,
             finishedStates = ['error', 'complete', 'failure', 'terminated'];
 
-        $scope.taskLog = '';
+        $scope.taskLog = {};
         $scope.panelState = {index: -1, open: false};
         $scope.apiBase = $girder.getApiBase();
 
@@ -224,7 +224,7 @@ angular.module("kitware.cmb.core")
                     return;
                 }
                 startLoggingTask(simulation);
-            } else if ($scope.hasStatus(simulation.meta.status, finishedStates) && $scope.panelState.open && !$scope.taskOutput) {
+            } else if ($scope.hasStatus(simulation.meta.status, finishedStates) && $scope.panelState.open) {
                 fetchOutput(simulation);
                 fetchLog(simulation);
             } else if (!$scope.panelState.open) {
@@ -244,13 +244,13 @@ angular.module("kitware.cmb.core")
 
                     var offset = 0,
                         url = res.data.log[0].$ref;
-                    $scope.taskLog = '';
+                    $scope.taskLog[simulation._id] = '';
                     logInterval = $interval(function() {
                         $girder.getTaskLog(url, offset)
                             .then(function(logData) {
                                 var log = logData.data.log;
                                 for (var i=0; i < log.length; i++) {
-                                    $scope.taskLog += logFormatter(log[i]);
+                                    scope.taskLog[simulation._id] += logFormatter(log[i]);
                                     offset += 1;
                                 }
                             });
@@ -267,12 +267,12 @@ angular.module("kitware.cmb.core")
                     }
 
                     var url = res.data.log[0].$ref;
-                    $scope.taskLog = '';
+                    $scope.taskLog[simulation._id] = '';
                     $girder.getTaskLog(url, 0)
                         .then(function(logData) {
                             var log = logData.data.log;
                             for (var i=0; i < log.length; i++) {
-                                $scope.taskLog += logFormatter(log[i]);
+                                $scope.taskLog[simulation._id] += logFormatter(log[i]);
                             }
                         });
                 });
