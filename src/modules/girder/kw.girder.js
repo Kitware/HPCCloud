@@ -600,6 +600,9 @@ angular.module("kitware.girder", ["ngCookies"])
             var self = this;
             // Create task instance
             taskConfig.cluster.name = item._id;
+            if (item.meta.hasOwnProperty('volumeId')) {
+                taskConfig.cluster.volumeId = item.meta.volumeId;
+            }
             self.post('tasks', { taskSpecId: taskDefId })
                 .then(function(response){
                     // Update Item metadata
