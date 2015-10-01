@@ -157,6 +157,9 @@ angular.module("kitware.cmb.core")
         };
         $scope.terminateCluster = function(simulation) {
             $girder.terminateTask(simulation);
+            if (logInterval && simulation._id === $scope.simulations[$scope.panelState.index]._id) {
+                $interval.cancel(logInterval);
+            }
         };
         $scope.deleteSimulation = function(simulation) {
             if (!confirm('Are you sure youw want to delete "' + simulation.name + '?"')) {
