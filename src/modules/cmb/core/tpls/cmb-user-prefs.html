@@ -115,6 +115,11 @@
                                 <input type="text" ng-model="profile.config.hydra.executablePath" ng-disabled="profile.saved" placeholder="absolute path, required"
                                        pattern="^\/.+" ng-required="true" >
                             </md-input-container>
+                            <md-input-container>
+                                <label>ParaView install directory</label>
+                                <input type="text" ng-model="profile.config.paraview.installDir" ng-disabled="profile.saved" placeholder="absolute path, required"
+                                       pattern="^\/.+" ng-required="true" >
+                            </md-input-container>
                             <div ng-show="ableToTestCluster(profile)" class="ssh-key">
                                 <label>Public SSH key</label>
                                 <pre>{{profile.config.ssh.publicKey}}</pre>
