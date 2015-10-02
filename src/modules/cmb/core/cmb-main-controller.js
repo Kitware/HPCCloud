@@ -52,17 +52,6 @@ angular.module("kitware.cmb.core")
                 });
             }
 
-            if(simulationId && previousActiveId.simulationID !== simulationId) {
-               $girder.getItem(simulationId).success(function(simulation){
-                    $scope.simulation = simulation;
-                    previousActiveId.simulationID = simulationId;
-                }).error(function(){
-                    console.log('Error while fetching collection');
-                    previousActiveId.simulationID = '';
-                    $scope.simulation = null;
-                });
-            }
-
             if(projectId && previousActiveId.projectID !== projectId) {
                 $girder.getFolder(projectId).success(function(project){
                     $scope.project = project;
@@ -74,7 +63,25 @@ angular.module("kitware.cmb.core")
                     $scope.project = null;
                     previousActiveId.projectID = '';
                 });
+            } else if ($scope.subTitle) {
+                $scope.subTitle = $scope.subTitle.split(' ')[0];
             }
+
+            if(simulationId && previousActiveId.simulationID !== simulationId) {
+               $girder.getItem(simulationId).success(function(simulation){
+                    $scope.simulation = simulation;
+                    previousActiveId.simulationID = simulationId;
+                    if (/simulation/.test($state.current.url)) {
+                        $scope.subTitle += ' / ' + simulation.name;
+                    }
+                }).error(function(){
+                    console.log('Error while fetching simulation');
+                    previousActiveId.simulationID = '';
+                    $scope.simulation = null;
+                });
+            }
+
+
 
             if(!projectId) {
                 $scope.subTitle = null;
