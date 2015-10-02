@@ -304,7 +304,7 @@ angular.module("kitware.cmb.core")
         };
 
         $scope.hasStatus = function(status, arr) {
-            return arr.indexOf(status) != 0;
+            return arr.indexOf(status) != -1;
         };
 
         function extractExodusFile(files) {
