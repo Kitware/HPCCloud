@@ -43,7 +43,7 @@ angular.module("kitware.cmb.core")
                 $scope.$apply();
 
                 if ($scope.hasStatus(simulation.meta.status, finishedStates) && !$scope.taskOutput) {
-                    fetchOuput(simulation);
+                    fetchOutput(simulation);
                 }
             }
         });
