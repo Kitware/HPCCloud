@@ -192,7 +192,11 @@ angular.module("kitware.cmb.core")
 
         if($girder.getUser() === null) {
             $state.go('login');
-        } else {
-            fetchData();
         }
+
+        $scope.$watch('simulation._id', function(newValue, oldValue) {
+            if (newValue !== oldValue) {
+                fetchData();
+            }
+        });
     }]);
