@@ -43,7 +43,7 @@ angular.module("kitware.cmb.core")
                 $scope.$apply();
 
                 if ($scope.hasStatus(simulation.meta.status, finishedStates) && !$scope.taskOutput) {
-                    fetchOuput(simulation);
+                    fetchOutput(simulation);
                 }
             }
         });
@@ -250,7 +250,7 @@ angular.module("kitware.cmb.core")
                             .then(function(logData) {
                                 var log = logData.data.log;
                                 for (var i=0; i < log.length; i++) {
-                                    scope.taskLog[simulation._id] += logFormatter(log[i]);
+                                    $scope.taskLog[simulation._id] += logFormatter(log[i]);
                                     offset += 1;
                                 }
                             });
@@ -304,7 +304,7 @@ angular.module("kitware.cmb.core")
         };
 
         $scope.hasStatus = function(status, arr) {
-            return arr.indexOf(status) != 0;
+            return arr.indexOf(status) != -1;
         };
 
         function extractExodusFile(files) {
