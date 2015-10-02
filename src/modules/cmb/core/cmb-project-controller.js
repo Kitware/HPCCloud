@@ -250,7 +250,7 @@ angular.module("kitware.cmb.core")
                             .then(function(logData) {
                                 var log = logData.data.log;
                                 for (var i=0; i < log.length; i++) {
-                                    scope.taskLog[simulation._id] += logFormatter(log[i]);
+                                    $scope.taskLog[simulation._id] += logFormatter(log[i]);
                                     offset += 1;
                                 }
                             });
