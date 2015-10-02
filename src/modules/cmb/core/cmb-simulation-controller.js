@@ -97,8 +97,15 @@ angular.module("kitware.cmb.core")
 
                         while(count--) {
                             if(items[count].name === 'mesh') {
-                                var faces = items[count].meta.annotation.faces,
+                                var item = items[count],
+                                    faces, blocks;
+
+                                if (item.hasOwnProperty('meta') && item.meta.hasOwnProperty('annotation')) {
+                                    faces = items[count].meta.annotation.faces;
                                     blocks = items[count].meta.annotation.blocks;
+                                } else {
+                                    return;
+                                }
 
                                 // loop over faces
                                 function convertAnnotations(faces) {

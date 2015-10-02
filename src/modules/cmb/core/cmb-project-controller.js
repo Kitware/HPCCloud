@@ -185,6 +185,9 @@ angular.module("kitware.cmb.core")
 
             $girder.deleteItem(simulation)
                 .then(function() {
+                    var tmp = angular.copy($scope.simulations);
+                    tmp.splice(tmp.length-1, 1);
+                    $scope.simulations = tmp;
                     if (simulation.meta.hasOwnProperty('taskId')) {
                         return $girder.deleteTask(simulation);
                     }
@@ -321,6 +324,21 @@ angular.module("kitware.cmb.core")
         }
 
         function updateScope() {
+
+            function getTaskCallback(item, index) {
+                return function(res) {
+                    if (res.data.output.cluster) {
+                        $scope.itemClusterType[item.name] = res.data.output.cluster.type;
+                    }
+                    if (res.data.status !== item.meta.status && res.data.status !== 'complete') {
+                        //console.log('status for "' + item.name + '", '+ index +' change, ' + item.meta.status + ' -> ' + res.data.status);
+                        item.meta.status = res.data.status;
+                        $scope.simulations[index] = item;
+                        $girder.patchItemMetadata(item._id, {status: res.data.status});
+                    }
+                }
+            }
+
             $girder.listItems($scope.getActiveProject())
                 .success(function (items) {
                     var count = items.length;
@@ -330,13 +348,6 @@ angular.module("kitware.cmb.core")
 
                     $scope.simulations = [];
                     $scope.itemClusterType = {};
-                    function populateClusterTypes(key) {
-                        return function (res) {
-                            if (res.data.output.cluster) {
-                                $scope.itemClusterType[key] = res.data.output.cluster.type;
-                            }
-                        };
-                    }
                     while(count--) {
                         if(items[count].name === 'mesh') {
                             $scope.meshItem = items[count];
@@ -344,9 +355,11 @@ angular.module("kitware.cmb.core")
                         } else {
                             // Simulation
                             $scope.simulations.push(items[count]);
+                            var index = $scope.simulations.length-1;
                             if (items[count].meta.taskId) {
                                 $girder.getTask(items[count])
-                                    .then(populateClusterTypes(items[count].name));
+                                    //we need to isolate some vars so they don't get messed up in async.
+                                    .then(getTaskCallback(items[count], index));
                             }
                         }
                     }
