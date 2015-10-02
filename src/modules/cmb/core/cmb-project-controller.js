@@ -282,7 +282,6 @@ angular.module("kitware.cmb.core")
         }
 
         function logFormatter(l) {
-            var created
             return '[' + formatTime(l.created) + '] ' + l.levelname + ': ' + l.msg + '\n';
         }
 
@@ -296,7 +295,11 @@ angular.module("kitware.cmb.core")
             hours = hours.length === 1 ? '0' + hours : hours;
             minutes = minutes.length === 1 ? '0' + minutes : minutes;
             seconds = seconds.length === 1 ? '0' + seconds : seconds;
-            ms.length < 3 ? function(){while(ms.length < 3) {ms = '0'+ms}; return ms;}() : ms;
+            if (ms.length < 3) {
+                while(ms.length < 3) {
+                    ms = '0' + ms;
+                }
+            }
 
             return hours + ':' + minutes + ':' + seconds + '.' + ms;
         }
@@ -336,7 +339,7 @@ angular.module("kitware.cmb.core")
                         $scope.simulations[index] = item;
                         $girder.patchItemMetadata(item._id, {status: res.data.status});
                     }
-                }
+                };
             }
 
             $girder.listItems($scope.getActiveProject())
