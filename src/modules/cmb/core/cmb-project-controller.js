@@ -209,6 +209,7 @@ angular.module("kitware.cmb.core")
         };
 
         $scope.editSimulation = $state.go;
+        $scope.visualizeSimulation = $state.go;
 
         $scope.panelStateToggle = function(index) {
             var state = angular.copy($scope.panelState);
@@ -309,8 +310,12 @@ angular.module("kitware.cmb.core")
             return (cost * (now - startTime) / 3600000).toFixed(3);
         };
 
-        $scope.hasStatus = function(status, arr) {
-            return arr.indexOf(status) != -1;
+        $scope.hasStatus = function(status, set) {
+            if (!Array.isArray(set)) {
+                return status === set;
+            } else {
+                return set.indexOf(status) !== -1;
+            }
         };
 
         function extractExodusFile(files) {
