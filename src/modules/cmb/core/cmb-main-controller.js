@@ -24,7 +24,6 @@ angular.module("kitware.cmb.core")
         // Authentication / User handling -------------------------------------
 
         $scope.user = $girder.getUser();
-        $scope.title = "Cloud HPC";
         $scope.subTitle = "";
         $scope.collection = null;
         $scope.project = null;
