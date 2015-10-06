@@ -268,6 +268,7 @@ angular.module("kitware.cmb.core")
                     dataDir = hydraJob._id,
                     sessionId = clusterData._id + '/' + hydraJob._id;
 
+                    config.simulationJobId = hydraJob._id;
                     config.dataDir = dataDir;
                     config.cluster = clusterData;
 
