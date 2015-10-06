@@ -104,17 +104,13 @@
                     </div>
                 </div>
                 <div layout="row">
-                    <md-button ng-hide="hasStatus(simulation.meta.status, 'complete')" ng-click="runTask($event, 'Start simulation
-                        computation', 'hydra', false, simulation,
-                        runSimulationCallback)"
+                    <md-button ng-hide="hasStatus(simulation.meta.status, 'complete')" ng-click="runTask($event,
+                        'Start simulation computation', 'hydra', false, simulation, runSimulationCallback)"
                         class="md-raised md-primary" ng-disabled="!hasStatus(simulation.meta.status, 'valid')">
                         Run
                     </md-button>
-                    <md-button ng-show="hasStatus(simulation.meta.status, 'complete')" ng-click="visualizeSimulation('viewer', {
-                        collectionName: getActiveCollection(),
-                        projectID: simulation.folderId,
-                        simulationID: simulation._id ,
-                        mode: simulation.meta.status})"
+                    <md-button ng-show="hasStatus(simulation.meta.status, 'complete')" ng-click="runTask($event,
+                        'Start result viewer', 'pvw', false, simulation, runVisualizationCallback)"
                         class="md-raised md-primary">
                         Visualize
                     </md-button>

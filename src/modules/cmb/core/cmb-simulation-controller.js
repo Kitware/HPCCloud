@@ -35,39 +35,6 @@ angular.module("kitware.cmb.core")
             $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
         };
 
-        $scope.runVisualizationCallback = function(args) {
-            var simulation = args[0],
-                clusterData = args[1],
-                taskId = args[2],
-                config = {
-                    output: {
-                        item: { id: simulation._id }
-                    }
-                };
-
-            $girder.getTask(simulation).then(function success(task) {
-                var hydraJob = task.output.hydra_job,
-                    dataDir = hydraJob._id;
-
-                if ('jobOutputDir' in hydraJob.params) {
-                    dataDir = hydraJob.params.jobOutputDir + '/' + hydraJob._id;
-                }
-
-                config.dataDir = dataDir;
-
-                if(clusterData.selectedIndex === 0) {
-                    $girder.startTask(simulation, taskId, clusterData, config);
-                }
-
-                // Move back to the project view
-                $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
-
-            }, function error(err) {
-                // TODO Toast?
-                console.log(err);
-            });
-        };
-
         function fetchData() {
             if($scope.collection && $scope.collection.name && $scope.simulation) {
                 $scope.template = SimPut.getTemplate($scope.collection.name);
