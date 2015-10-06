@@ -234,12 +234,20 @@ angular.module("kitware.cmb.core")
 
             function genericDelete(profileSet, index, girderDeleteFunc) {
                 return function() {
-                    var tmpProfile = $scope[profileSet],
-                        removed = tmpProfile.splice(index, 1)[0];
-                    $scope[profileSet] = tmpProfile;
-                    if (removed.saved || removed._id) {
-                        $girder[girderDeleteFunc](removed);
+                    if (!$scope[profileSet][index]._id || !$scope[profileSet][index].saved ) {
+                        var tmpProfile = $scope[profileSet],
+                            removed = tmpProfile.splice(index, 1)[0];
+                        $scope[profileSet] = tmpProfile;
+                        return;
                     }
+                    $girder[girderDeleteFunc]($scope[profileSet][index])
+                        .then(function(res){
+                            var tmpProfile = $scope[profileSet],
+                                removed = tmpProfile.splice(index, 1)[0];
+                            $scope[profileSet] = tmpProfile;
+                        }, function(err) {
+                            showToast(err.data.message);
+                        });
                 };
             }
 
