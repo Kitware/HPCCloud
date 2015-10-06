@@ -266,14 +266,12 @@ angular.module("kitware.cmb.core")
             $girder.getTask(simulation).then(function (task) {
                 var hydraJob = task.data.output.hydra_job,
                     dataDir = hydraJob._id,
-                    sessionId = clusterData._id + '/' + hydraJob._id,
-                    config  = {
-                        dataDir: dataDir,
-                        cluster: {
-                            name: ''
-                        }
-                    };
+                    sessionId = clusterData._id + '/' + hydraJob._id;
 
+                    config.dataDir = dataDir;
+                    config.cluster = clusterData;
+
+                console.log(config);
                 $girder.startTask(simulation, taskId, clusterData, config)
                 $state.go('viewer', { collectionName: $stateParams.collectionName,
                     projectID: simulation.folderId,
