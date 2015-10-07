@@ -200,6 +200,7 @@ angular.module("kitware.cmb.core")
                 });
         };
 
+        //unused?
         $scope.taskCallback = function(simulationResponse) {
             // Handle mesh viewer state
             // goTo ...
@@ -208,7 +209,12 @@ angular.module("kitware.cmb.core")
         };
 
         $scope.editSimulation = $state.go;
-        $scope.visualizeSimulation = $state.go;
+        $scope.visualizeSimulation = function(location, params, simulation) {
+            // run task
+
+            // then go.
+            $state.go(location, params);
+        };
 
         $scope.panelStateToggle = function(index) {
             var state = angular.copy($scope.panelState);

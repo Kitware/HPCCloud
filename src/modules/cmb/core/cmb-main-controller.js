@@ -252,6 +252,46 @@ angular.module("kitware.cmb.core")
             $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
         };
 
+        $scope.runVisualizationCallback = function(args) {
+            var simulation = args[0],
+                clusterData = args[1],
+                taskId = args[2],
+                config = {
+                    output: {
+                        item: { id: simulation._id }
+                    }
+                };
+
+            $girder.getTask(simulation).then(function (task) {
+                var hydraJob = task.data.output.hydra_job,
+                    dataDir = hydraJob._id,
+                    sessionId = clusterData._id + '/' + hydraJob._id;
+
+                    if (hydraJob.params && hydraJob.params.jobOutputDir) {
+                        dataDir = hydraJob.params.jobOutputDir;
+                        if (dataDir[dataDir.length-1] !== '/') {
+                            dataDir += '/'
+                        }
+                        dataDir += hydraJob._id
+                    }
+
+                    config.simulationJobId = hydraJob._id;
+                    config.dataDir = dataDir;
+                    config.cluster = clusterData;
+
+                console.log(config);
+                $girder.startTask(simulation, taskId, clusterData, config)
+                $state.go('viewer', { collectionName: $stateParams.collectionName,
+                    projectID: simulation.folderId,
+                    sessionId: sessionId
+                });
+
+            }, function (err) {
+                // TODO Toast?
+                console.log(err);
+            });
+        };
+
         $scope.goHome = function() {
             $state.go('home');
         };

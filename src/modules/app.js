@@ -62,7 +62,7 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb', 'kitware.SimPut'])
         controller: 'CmbSimulationController'
     })
     .state('viewer', {
-        url: "/viewer/:collectionName/:projectID/:simulationID/:mode",
+        url: "/viewer/:collectionName/:projectID/:simulationID/:sessionId",
         templateProvider: ['$templateCache', '$stateParams', function ($templateCache, $stateParams) {
             return $templateCache.get('cmb/core/tpls/cmb-viewer-panel.html');
         }],
