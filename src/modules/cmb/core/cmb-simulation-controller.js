@@ -14,21 +14,6 @@ angular.module("kitware.cmb.core")
         $scope.template = null;
         $scope.viewModel = null;
 
-        $scope.$on('task.status', function(event, data) {
-            var taskIndex = findSimulationIndexById(data._id);
-            if (taskIndex < 0) {
-                console.error('_id '+data._id+' not found');
-            } else {
-                if ($scope.simulations[taskIndex].meta.status === 'terminated') {
-                    $girder.deleteTask($scope.simulations[taskIndex]);
-                } else {
-                    $scope.simulations[taskIndex].meta.status = data.status;
-                }
-            }
-        });
-
-        // END - Refresh simulation status base on task progress every 10s
-
         $scope.taskCallback = function(simulationResponse) {
             // Move to the newly created simulation
             var simulation = simulationResponse[0];
@@ -195,7 +180,7 @@ angular.module("kitware.cmb.core")
         }
 
         $scope.$watch('simulation._id', function(newValue, oldValue) {
-            if (newValue !== oldValue) {
+            if (newValue !== undefined) {
                 fetchData();
             }
         });

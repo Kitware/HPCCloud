@@ -76,7 +76,6 @@ angular.module("kitware.cmb.core")
 
         $scope.taskLog = {};
         $scope.panelState = {index: -1, open: false};
-        $scope.apiBase = $girder.getApiBase();
 
         $scope.toggleSimulationFilter = function (event, filter) {
             event.currentTarget.classList.toggle('md-raised');
