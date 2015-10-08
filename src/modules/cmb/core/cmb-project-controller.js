@@ -43,23 +43,18 @@ angular.module("kitware.cmb.core")
             if (simIndex < 0) {
                 console.error('_id '+data._id+' not found');
             } else {
-                var simulation = $scope.simulations[simIndex],
-                    activeTask = simulation.meta.task;
-                simulationMeta = simulation.meta[activeTask];
+                var simulation = $scope.simulations[simIndex];
                 // add task if it's missing, update status
-                if (simulationMeta.taskId === undefined){
-                    simulationMeta.taskId = data._id;
-                    simulationMeta.status = data.status;
-                    var newMeta = {};
-                    newMeta[activeTask] = simulationMeta;
+                if (itemAttr(simulation, 'taskId') === undefined){
+                    var newMeta = itemAttr(simulation, '_id', data._id);
+                        newMeta = itemAttr(simulation, 'status', data.status);
                     $girder.patchItemMetadata(simulation._id, newMeta);
 
                     if (data.status === 'running' && $scope.panelState.index === simIndex) {
                         startLoggingTask(simulation);
                     }
                 } else {
-                    simulationMeta.status = data.status;
-                    $girder.patchItemMetadata(simulation._id, simulationMeta);
+                    $girder.patchItemMetadata(simulation._id, itemAttr(simulation, 'status', data.status));
                 }
 
                 $scope.$apply();
