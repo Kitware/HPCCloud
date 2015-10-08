@@ -78,10 +78,8 @@
                 <div class="project-accordion-header" ng-click="panelStateToggle($index)">
                     <div>
                         <i class="fa fa-fw"
-                            ng-class="simulationClassByStatus(simulation.meta.status)">
+                            ng-class="simulationClassByStatus(simulation)">
                         </i>
-                        <i ng-show="simulation.meta.task === 'failure'" class="fa fa-fw fa-warning"></i>
-                        <md-tooltip ng-if="simulation.meta.task">{{ simulation.meta.task }}</md-tooltip>
                     </div>
                     <div> {{ simulation.name | unescape}} </div>
                     <div> {{ simulation.description | unescape}} </div>
@@ -104,12 +102,12 @@
                     </div>
                 </div>
                 <div layout="row">
-                    <md-button ng-hide="hasStatus(simulation.meta.status, 'complete')" ng-click="runTask($event,
+                    <md-button ng-hide="hasStatus(simulation, 'complete')" ng-click="runTask($event,
                         'Start simulation computation', 'hydra', false, simulation, runSimulationCallback)"
-                        class="md-raised md-primary" ng-disabled="!hasStatus(simulation.meta.status, 'valid')">
+                        class="md-raised md-primary" ng-disabled="!hasStatus(simulation, 'valid')">
                         Run
                     </md-button>
-                    <md-button ng-show="hasStatus(simulation.meta.status, 'complete')" ng-click="runTask($event,
+                    <md-button ng-show="hasStatus(simulation, 'complete')" ng-click="runTask($event,
                         'Start result viewer', 'pvw', false, simulation, runVisualizationCallback)"
                         class="md-raised md-primary">
                         Visualize
@@ -118,8 +116,8 @@
                         collectionName: getActiveCollection(),
                         projectID: simulation.folderId,
                         simulationID: simulation._id ,
-                        mode: simulation.meta.status})"
-                        ng-disabled="!hasStatus(simulation.meta.status,
+                        mode: simulation.meta[simulation.meta.task].status})"
+                        ng-disabled="!hasStatus(simulation,
                         ['incomplete', 'valid'])">
                         Annotate
                     </md-button>
@@ -132,12 +130,12 @@
                         ng-disabled="simulation.meta.status !== 'running' ||
                             simulation.meta.status === 'error'">Terminate</md-button>
                 </div>
-                <div ng-show="hasStatus(simulation.meta.status,
+                <div ng-show="hasStatus(simulation,
                     ['running', 'complete', 'terminated', 'error', 'failure'])" >
                     <label>Log</label>
                     <pre class="task-log">{{taskLog[simulation._id]}}</pre>
                 </div>
-                <div ng-show="hasStatus(simulation.meta.status,
+                <div ng-show="hasStatus(simulation,
                     ['error', 'complete', 'failure', 'terminated'])">
                     <label>Output</label>
                     <div ng-repeat="file in taskOutput | filter: fileFilter()">

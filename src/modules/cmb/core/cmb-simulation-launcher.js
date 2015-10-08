@@ -90,6 +90,8 @@ angular.module('kitware.cmb.core')
         };
 
         $scope.ok = function() {
+            var taskTypeName = locals.taskName; //store it unmodified.
+
             if ($scope.serverSelection === 'Traditional') {
                 $scope.data = $scope.clusterData.selectedCluster;
                 locals.taskName += '_trad';
@@ -108,7 +110,8 @@ angular.module('kitware.cmb.core')
             var args = [
                 locals.simulation,
                 $scope.data,
-                $girder.getTaskId(locals.collectionName, locals.taskName)
+                $girder.getTaskId(locals.collectionName, locals.taskName),
+                taskTypeName
             ];
 
             if ($scope.serverSelection === 'Traditional') {

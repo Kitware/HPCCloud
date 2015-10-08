@@ -24,6 +24,7 @@ angular.module("kitware.cmb.core")
         // Authentication / User handling -------------------------------------
 
         $scope.user = $girder.getUser();
+        $scope.title = "Cloud HPC";
         $scope.subTitle = "";
         $scope.collection = null;
         $scope.project = null;
@@ -233,7 +234,8 @@ angular.module("kitware.cmb.core")
                     },
                     output: {
                         item: { id: simulation._id }
-                    }
+                    },
+                    taskName: args[3]
                 };
 
                 if (clusterData.type === 'trad') {
@@ -266,14 +268,6 @@ angular.module("kitware.cmb.core")
                 var hydraJob = task.data.output.hydra_job,
                     dataDir = hydraJob._id,
                     sessionId = clusterData._id + '/' + hydraJob._id;
-
-                    if (hydraJob.params && hydraJob.params.jobOutputDir) {
-                        dataDir = hydraJob.params.jobOutputDir;
-                        if (dataDir[dataDir.length-1] !== '/') {
-                            dataDir += '/'
-                        }
-                        dataDir += hydraJob._id
-                    }
 
                     config.simulationJobId = hydraJob._id;
                     config.dataDir = dataDir;

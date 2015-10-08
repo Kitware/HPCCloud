@@ -2,15 +2,6 @@ angular.module("kitware.cmb.core")
     .controller('CmbSimulationController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$http', '$timeout', '$interval', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $http, $timeout, $interval) {
         var timeoutId = 0;
 
-        function findSimulationIndexById(id) {
-            for (var i=0; i < $scope.simulations.length; i++) {
-                if ($scope.simulations[i].meta.taskId === id) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
         $scope.template = null;
         $scope.viewModel = null;
 
@@ -113,9 +104,25 @@ angular.module("kitware.cmb.core")
             }
         }
 
+        /* itemStatus(item, hasStatus)
+        *   if hasStatus, set the new status in the item and return the meta object.
+        *   else get the status for the item's active task
+        */
+        function itemStatus(item, newStatus) {
+            if (newStatus) {
+                item.meta[item.meta.task].status = newStatus;
+                var ret = {};
+                ret[item.meta.task] = item.meta[item.meta.task]
+                return ret;
+            }
+            else {
+                return item.meta[item.meta.task].status;
+            }
+        }
+
         $scope.$on('simput-error', function(event) {
-            if($scope.simulation.meta.status === 'valid') {
-                $girder.updateItemMetadata($scope.simulation, { status: 'incomplete' });
+            if( itemStatus($scope.simulation) === 'valid') {
+                $girder.updateItemMetadata($scope.simulation, itemStatus($scope.simulation, 'incomplete'));
 
                 // Move to the incomplete page
                 $state.go('simulation', { collectionName: $stateParams.collectionName, projectID: $scope.simulation.folderId, mode: 'incomplete', simulationID: $scope.simulation._id });
@@ -125,8 +132,8 @@ angular.module("kitware.cmb.core")
         $scope.$on('save-file', function(event, arg) {
             if(arg.name.indexOf('.json') === -1) {
                 // Update item state
-                if($scope.simulation.meta.status !== 'valid') {
-                    $girder.updateItemMetadata($scope.simulation, { status: 'valid' });
+                if(itemStatus($scope.simulation) !== 'valid') {
+                    $girder.updateItemMetadata($scope.simulation, itemStatus($scope.simulation, 'valid'));
                 }
 
                 // Update input deck
@@ -147,8 +154,8 @@ angular.module("kitware.cmb.core")
         }
 
         $scope.$watch('simulation._id', function(newValue, oldValue) {
-            if (newValue !== undefined) {
+            // if (newValue !== undefined) {
                 fetchData();
-            }
+            // }
         });
     }]);

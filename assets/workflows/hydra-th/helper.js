@@ -29,49 +29,49 @@
 
             if(simulationToClone) {
                 $girder.createItem(projectId,
-                        $data.name,
-                        $data.description,
-                        { type: $data.type, status: 'incomplete' }).then(function(response) {
-                            return response.data;
+                    $data.name,
+                    $data.description,
+                    { task: 'hydra', hydra: {status: 'incomplete'}}).then(function(response) {
+                        return response.data;
+                    }, function(error) {
+                        console.log(error);
+                        $mdDialog.cancel();
+                    }).then(function(item) {
+                        // Now fetch list of file associated with the simulation to copy
+                        return $girder.listItemFiles(simulationToClone._id).then(function(response) {
+                            return {
+                                files: response.data,
+                                item: item
+                            };
                         }, function(error) {
                             console.log(error);
                             $mdDialog.cancel();
-                        }).then(function(item) {
-                            // Now fetch list of file associated with the simulation to copy
-                            return $girder.listItemFiles(simulationToClone._id).then(function(response) {
-                                return {
-                                    files: response.data,
-                                    item: item
-                                };
-                            }, function(error) {
-                                console.log(error);
-                                $mdDialog.cancel();
-                            });
-                        }).then(function(data) {
-                            // Copy over hydra.json and hydra.cntl
-                            var promises = [];
-                            angular.forEach(data.files, function(file) {
-                                if (file.name == 'hydra.json' ||
-                                    file.name == 'hydra.cntl') {
-
-                                    var promise = $girder.copyFile(file._id, data.item._id).then(function(response) {
-
-                                    }, function(error) {
-                                        console.log(error);
-                                        $mdDialog.cancel();
-                                    });
-
-                                    promises.push(promise);
-                                }
-                            });
-
-                            // Wait for copy to complete
-                            return $q.all(promises).then(function() {
-                                $mdDialog.hide(data.item);
-                            });
                         });
+                    }).then(function(data) {
+                        // Copy over hydra.json and hydra.cntl
+                        var promises = [];
+                        angular.forEach(data.files, function(file) {
+                            if (file.name == 'hydra.json' ||
+                                file.name == 'hydra.cntl') {
+
+                                var promise = $girder.copyFile(file._id, data.item._id).then(function(response) {
+
+                                }, function(error) {
+                                    console.log(error);
+                                    $mdDialog.cancel();
+                                });
+
+                                promises.push(promise);
+                            }
+                        });
+
+                        // Wait for copy to complete
+                        return $q.all(promises).then(function() {
+                            $mdDialog.hide(data.item);
+                        });
+                    });
             } else {
-                $girder.createItem(projectId, $data.name, $data.description, { type: $data.type, status: 'incomplete' })
+                $girder.createItem(projectId, $data.name, $data.description, { task: 'hydra', hydra: {status: 'incomplete'}})
                     .success(function (item) {
                         // Fill that item with default configuration
                         // FIXME TODO

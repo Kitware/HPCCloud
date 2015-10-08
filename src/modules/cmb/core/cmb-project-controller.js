@@ -4,7 +4,8 @@ angular.module("kitware.cmb.core")
 
         function findSimulationIndexById(id) {
             for (var i=0; i < $scope.simulations.length; i++) {
-                if ($scope.simulations[i].meta.taskId === id || $scope.simulations[i].meta.taskId === undefined) {
+                var meta = $scope.simulations[i].meta;
+                if (meta[meta.task]._id === id || meta[meta.task]._id === undefined) {
                     return i;
                 }
             }
@@ -19,30 +20,51 @@ angular.module("kitware.cmb.core")
             });
         }
 
+        /* itemStatus(item, hasStatus)
+        *   if hasStatus, set the new status in the item and return the meta object.
+        *   else get the status for the item's active task
+        */
+        function itemAttr(item, attr, newAttr) {
+            if (newAttr) {
+                item.meta[item.meta.task][attr] = newAttr;
+                var ret = {};
+                ret[item.meta.task] = item.meta[item.meta.task]
+                return ret;
+            }
+            else {
+                return item.meta[item.meta.task][newAttr];
+            }
+        }
+
         $scope.$on('task.status', function(event, data) {
-            var simIndex = findSimulationIndexById(data._id), simulation;
+            var simIndex = findSimulationIndexById(data._id),
+                simulationMeta;
             console.log('event received: ', data.status);
             if (simIndex < 0) {
                 console.error('_id '+data._id+' not found');
             } else {
-                simulation = $scope.simulations[simIndex];
+                var simulation = $scope.simulations[simIndex],
+                    activeTask = simulation.meta.task;
+                simulationMeta = simulation.meta[activeTask];
                 // add task if it's missing, update status
-                if (simulation.meta.taskId === undefined){
-                    simulation.meta.taskId = data._id;
-                    simulation.meta.status = data.status;
-                    $girder.patchItemMetadata(simulation._id, {status: data.status, taskId: data._id});
+                if (simulationMeta.taskId === undefined){
+                    simulationMeta.taskId = data._id;
+                    simulationMeta.status = data.status;
+                    var newMeta = {};
+                    newMeta[activeTask] = simulationMeta;
+                    $girder.patchItemMetadata(simulation._id, newMeta);
 
                     if (data.status === 'running' && $scope.panelState.index === simIndex) {
-                        startLoggingTask($scope.simulations[simIndex]);
+                        startLoggingTask(simulation);
                     }
                 } else {
-                    simulation.meta.status = data.status;
-                    $girder.patchItemMetadata(simulation._id, {status: data.status});
+                    simulationMeta.status = data.status;
+                    $girder.patchItemMetadata(simulation._id, simulationMeta);
                 }
 
                 $scope.$apply();
 
-                if ($scope.hasStatus(simulation.meta.status, finishedStates) && !$scope.taskOutput) {
+                if ($scope.hasStatus(simulation, finishedStates) && !$scope.taskOutput) {
                     fetchOutput(simulation);
                 }
             }
@@ -101,7 +123,11 @@ angular.module("kitware.cmb.core")
             };
         };
 
-        $scope.simulationClassByStatus = function(status) {
+        $scope.getActiveMeta = function(item) {
+            return item.meta[item.meta.task];
+        };
+
+        $scope.simulationClassByStatus = function(item) {
             var base = {
                 incomplete: 'fa-pencil-square-o incomplete',
                 valid: 'fa-check-square-o valid',
@@ -113,7 +139,7 @@ angular.module("kitware.cmb.core")
                 failure: base.error,
                 terminated: base.error
             });
-            return base[status];
+            return base[item.meta[item.meta.task].status];
         };
 
         $scope.createSimulation = function (event, simulation) {
@@ -233,7 +259,7 @@ angular.module("kitware.cmb.core")
                     return;
                 }
                 startLoggingTask(simulation);
-            } else if ($scope.hasStatus(simulation.meta.status, finishedStates) && $scope.panelState.open) {
+            } else if ($scope.hasStatus(simulation, finishedStates) && $scope.panelState.open) {
                 fetchOutput(simulation);
                 fetchLog(simulation);
             } else if (!$scope.panelState.open) {
@@ -315,7 +341,8 @@ angular.module("kitware.cmb.core")
             return (cost * (now - startTime) / 3600000).toFixed(3);
         };
 
-        $scope.hasStatus = function(status, set) {
+        $scope.hasStatus = function(simulation, set) {
+            var status = simulation.meta[simulation.meta.task].status;
             if (!Array.isArray(set)) {
                 return status === set;
             } else {

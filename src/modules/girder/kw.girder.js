@@ -345,7 +345,7 @@ angular.module("kitware.girder", ["ngCookies"])
             var that = this,
                 obj = {folderId: folderId, name: name, description: description},
                 promise = this.post('item' + objectArgumentSerializer(obj));
-            if(metadata) {
+            if (metadata) {
                 promise
                 .success(function(newItem) {
                     return that.put('item/' + newItem._id + '/metadata', metadata);
@@ -479,7 +479,8 @@ angular.module("kitware.girder", ["ngCookies"])
                 if(fileId) {
                     self.put(['file/', fileId, '/contents',
                                '?size=', content.length].join(''))
-                        .success(uploadFunction).error(function (data) {
+                        .success(uploadFunction)
+                        .error(function (data) {
                             console.warn("Could not upload content");
                             console.warn(data);
                         });
@@ -490,7 +491,8 @@ angular.module("kitware.girder", ["ngCookies"])
                                '&name=', name,
                                '&size=', content.length,
                                '&mimeType=txt/plain'].join(''))
-                        .success(uploadFunction).error(function (data) {
+                        .success(uploadFunction)
+                        .error(function (data) {
                             console.warn("Could not upload content");
                             console.warn(data);
                         });
@@ -549,7 +551,13 @@ angular.module("kitware.girder", ["ngCookies"])
         };
 
         this.updateItemMetadata = function (item, metadata) {
-            console.log(item.name, metadata);
+            console.log('new meta data:', item.name, metadata);
+            // status needs to be nested with it's task
+            if (metadata.status) {
+                var newMeta = {};
+                newMeta[item.meta.task] = metadata;
+                metadata = newMeta;
+            }
             return this.put(['item', item._id, 'metadata'].join('/'), metadata)
                 .success(function(){
                     console.log('Success metadata updating to ', metadata);
@@ -610,7 +618,8 @@ angular.module("kitware.girder", ["ngCookies"])
             self.post('tasks', { taskSpecId: taskDefId })
                 .then(function(response){
                     // Update Item metadata
-                    var metadata = {
+                    var metadata = {};
+                    metadata[taskConfig.taskName] = {
                         taskId: response.data._id,
                         spec: response.data.taskSpecId,
                         task: response.data.status,
@@ -626,12 +635,12 @@ angular.module("kitware.girder", ["ngCookies"])
                             self.updateItemMetadata(item, metadata);
                         }, function(error) {
                             console.log("Error while starting Task", error.data.message);
-                            item.meta.status = 'error';
+                            item.meta[taskConfig.taskName].status = 'error';
                             self.updateItemMetadata(item, item.meta);
                         });
                 }, function(error) {
                     console.log("Error while task creation", error.data.message);
-                    item.meta.status = 'error';
+                    item.meta[taskConfig.taskName].status = 'error';
                     self.updateItemMetadata(item, item.meta);
                 });
         };
@@ -686,25 +695,25 @@ angular.module("kitware.girder", ["ngCookies"])
         this.updateTaskStatus = function (item) {
             var self = this;
 
-            self.get(['tasks/', item.meta.taskId].join(''))
+            self.get(['tasks/', item.meta[item.meta.task].taskId].join(''))
                 .success(function(response) {
                     if(item.meta.status !== response.status) {
-                        console.log('update status to ' + response.status + ' from: ' + item.meta.task);
+                        console.log('update status to ' + response.status + ' from: ' + item.meta[item.meta.task].task);
                         var sesssionId = (response.output && response.output.pvw_job) ? response.output.cluster._id + '%2F' + response.output.pvw_job._id : '',
                             connectionURL = ( $window.location.protocol === 'https:' ? "wss://" : "ws://") + $window.location.host + "/proxy?sessionId=" + sesssionId,
-                            meta = angular.copy(item.meta);
+                            meta = angular.copy(item.meta[item.meta.task]);
 
-                        meta.task = response.status;
-                        meta.connectionURL = connectionURL;
+                        meta[item.meta.task].task = response.status;
+                        meta[item.meta.task].connectionURL = connectionURL;
 
                         // FIXME
-                        if(meta.task === 'running' && meta.status === 'valid') {
-                            meta.status = 'running';
+                        if(meta[item.meta.task].task === 'running' && meta[item.meta.task].status === 'valid') {
+                            meta[meta.task].status = 'running';
                             console.log('wf => running');
                         }
-                        if(meta.task === 'complete' && meta.status === 'running') {
-                            meta.status = 'completed';
-                            meta.task = 'terminated';
+                        if(meta[item.meta.task].task === 'complete' && meta[item.meta.task].status === 'running') {
+                            meta[meta.task].status = 'completed';
+                            meta[meta.task].task = 'terminated';
                             console.log('wf => completed(terminated)');
                         }
 
@@ -714,14 +723,14 @@ angular.module("kitware.girder", ["ngCookies"])
                             newMeta = angular.copy(item.meta);
 
                         // FIXME
-                        if(newMeta.task === 'running' && newMeta.status === 'valid') {
-                            newMeta.status = 'running';
+                        if(newMeta[newMeta.task].task === 'running' && newMeta[newMeta.task].status === 'valid') {
+                            newMeta[newMeta.task].status = 'running';
                             changeDetected = true;
                             console.log('wf => running');
                         }
-                        if(newMeta.task === 'complete' && newMeta.status === 'running') {
-                            newMeta.status = 'completed';
-                            newMeta.task = 'terminated';
+                        if(newMeta[newMeta.task].task === 'complete' && newMeta[newMeta.task].status === 'running') {
+                            newMeta[newMeta.task].status = 'completed';
+                            newMeta[newMeta.task].task = 'terminated';
                             console.log('wf => completed(terminated)');
                             changeDetected = true;
                         }
@@ -738,7 +747,7 @@ angular.module("kitware.girder", ["ngCookies"])
 
         this.deleteTask = function (item) {
             var self = this,
-                taskId = item.meta.taskId,
+                taskId = item.meta[item.meta.task].taskId,
                 timings = {},
                 ready = 0;
 
@@ -750,18 +759,18 @@ angular.module("kitware.girder", ["ngCookies"])
 
                 if(ready === 0){
                     // Execute the delete
+                    var toUpdate = {
+                        task: null
+                    };
+                    toUpdate[item.meta.task] = null;
                     self.delete(['tasks', taskId].join('/'))
                         .success(function(){
                             // Remove item metadata
-                            self.updateItemMetadata(item, {
-                                task: null, spec: null, taskId: null
-                            });
+                            self.updateItemMetadata(item, toUpdate);
                         })
                         .error(function(error){
                             console.log("Error when deleting task " + taskId, error.message || error.data.message);
-                            self.updateItemMetadata(item, {
-                                task: null, spec: null
-                            });
+                            self.updateItemMetadata(item, toUpdate);
                         });
                 }
             }
@@ -801,17 +810,16 @@ angular.module("kitware.girder", ["ngCookies"])
 
         this.terminateTask = function (item) {
             var self = this,
-                taskId = item.meta.taskId;
+                taskId = item.meta[item.meta.task].taskId;
 
             // PUT /task/<_id from above>/terminate
             // DELETE /task/<_id from above>
             self.put(['tasks', taskId, 'terminate'].join('/'))
                 .success(function(){
-                    var metadata = angular.copy(item.meta);
-                    metadata.status = 'terminated';
-                    metadata.totalCost += metadata.cost * Math.floor( 1 + (new Date().getTime() - metadata.startTime)/3600000);
-                    metadata.startTime = null;
-                    self.updateItemMetadata(item, metadata);
+                    item.meta[item.meta.task].status = 'terminated';
+                    item.meta[item.meta.task].totalCost += item.meta[item.meta.task].cost * Math.floor( 1 + (new Date().getTime() - item.meta[item.meta.task].startTime)/3600000);
+                    item.meta[item.meta.task].startTime = null;
+                    self.updateItemMetadata(item, item.meta);
                 })
                 .error(function(error) {
                     console.log("Error when terminating task " + taskId, error.message);
