@@ -137,6 +137,21 @@ angular.module("kitware.cmb.core")
             return base[item.meta[item.meta.task].status];
         };
 
+        $scope.projectInfo = function(ev) {
+            var mesh = $scope.mesh;
+            $mdDialog.show({
+                controller: function($scope, $mdDialog) {
+                    $scope.mesh = mesh;
+                    $scope.ok = function() {
+                        $mdDialog.hide();
+                    };
+                },
+                template: $templateCache.get('cmb/core/tpls/cmb-project-info-panel.html'),
+                targetEvent: ev,
+                clickOutsideToClose: true
+            });
+        };
+
         $scope.createSimulation = function (event, simulation) {
             var projectId = $scope.getActiveProject(),
                 collectionName = $scope.collection.name;

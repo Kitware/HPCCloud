@@ -1,16 +1,8 @@
 <md-toolbar class="cmb-subsubheader" layout="row" layout-align="space-between center">
     <div flex layout="row" layout-align="start center" class="info-buttons">
-        <md-button class="md-flat" aria-label="Mesh file name">
+        <md-button class="md-flat" aria-label="Mesh file name"
+            ng-click="projectInfo($event)">
             <i class="fa fa-file-text-o"></i>
-            <md-tooltip>{{ mesh.name }}</md-tooltip>
-        </md-button>
-        <md-button class="md-flat" aria-label="Mesh file size">
-            <i class="fa fa-database"></i>
-            <md-tooltip>{{ mesh.size | bytes }}</md-tooltip>
-        </md-button>
-        <md-button class="md-flat" aria-label="Mesh file upload date">
-            <i class="fa fa-clock-o"></i>
-            <md-tooltip>{{ mesh.created | toDateNumber | date : 'medium' }}</md-tooltip>
         </md-button>
         <md-button aria-label="Tag mesh faces" ui-sref="mesh({ collectionName: getActiveCollection(), projectID: meshItem.folderId, itemID: meshItem._id, fileID: mesh._id })">
             <i class="fa fa-tags"></i>
