@@ -46,7 +46,7 @@ angular.module("kitware.cmb.core")
                 var simulation = $scope.simulations[simIndex];
                 // add task if it's missing, update status
                 if (itemAttr(simulation, 'taskId') === undefined){
-                    var newMeta = itemAttr(simulation, '_id', data._id);
+                    var newMeta = itemAttr(simulation, 'taskId', data._id);
                         newMeta = itemAttr(simulation, 'status', data.status);
                     $girder.patchItemMetadata(simulation._id, newMeta);
 
