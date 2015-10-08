@@ -32,7 +32,7 @@ angular.module("kitware.cmb.core")
                 return ret;
             }
             else {
-                return item.meta[item.meta.task][newAttr];
+                return item.meta[item.meta.task][attr];
             }
         }
 
@@ -242,12 +242,12 @@ angular.module("kitware.cmb.core")
             $scope.panelState = state;
             //console.log('panel ' + $scope.panelState.index + ' is ' + ($scope.panelState.open ? 'open' : 'closed'));
             var simulation = $scope.simulations[index];
-            if (simulation.meta.status === 'running' && $scope.panelState.open) {
-                if (!simulation.meta.taskId) {
+            if ($scope.hasStatus(simulation, 'running') && $scope.panelState.open) {
+                if (!itemAttr(simulation, 'taskId')) {
                     console.error('No taskId for simulation.');
-                    return;
+                } else {
+                    startLoggingTask(simulation);
                 }
-                startLoggingTask(simulation);
             } else if ($scope.hasStatus(simulation, finishedStates) && $scope.panelState.open) {
                 fetchOutput(simulation);
                 fetchLog(simulation);

@@ -125,10 +125,11 @@
                     <md-button ng-click="downloadSimulation(simulation)" class="md-raised">Download</md-button>
                     <span flex></span>
                     <md-button ng-click="deleteSimulation(simulation)" class="md-raised md-warn"
-                        ng-disabled="simulation.meta.status === 'running'">Delete</md-button>
+                        ng-disabled="hasStatus(simulation, 'running')">Delete</md-button>
                     <md-button ng-click="terminateCluster(simulation)" class="md-raised md-warn"
-                        ng-disabled="simulation.meta.status !== 'running' ||
-                            simulation.meta.status === 'error'">Terminate</md-button>
+                        ng-disabled="!hasStatus(simulation, 'running') || hasStatus(simulation, 'error')">
+                        Terminate
+                    </md-button>
                 </div>
                 <div ng-show="hasStatus(simulation,
                     ['running', 'complete', 'terminated', 'error', 'failure'])" >
