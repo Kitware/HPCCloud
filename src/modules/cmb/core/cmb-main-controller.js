@@ -261,7 +261,8 @@ angular.module("kitware.cmb.core")
                 config = {
                     output: {
                         item: { id: simulation._id }
-                    }
+                    },
+                    taskName: 'pvw'
                 };
 
             $girder.getTask(simulation).then(function (task) {
