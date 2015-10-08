@@ -3,7 +3,7 @@ angular.module("kitware.girder", ["ngCookies"])
      * The girder.net.GirderConnector service simplify management
      * and interaction with a Girder server using its Restful API.
      */
-    .service('kw.Girder', [ '$window', '$http', '$rootScope', '$cookies', function ($window, $http, $rootScope, $cookies) {
+    .service('kw.Girder', [ '$window', '$http', '$rootScope', '$cookies', '$timeout',  function ($window, $http, $rootScope, $cookies, $timeout) {
         'use strict';
 
         // Internal state
@@ -39,16 +39,33 @@ angular.module("kitware.girder", ["ngCookies"])
         }
 
         var notifications = null;
-        if ($window.EventSource) {
-            notifications = new EventSource(apiBasePathURL + 'notification/stream');
-            notifications.onmessage = function(e) {
-                var parsed = JSON.parse(e.data);
-                console.log('broadcasting SSE:', parsed.type, parsed.data.status);
-                $rootScope.$broadcast(parsed.type, parsed.data);
-            };
-        } else {
-            console.error('No Server Side Event notifications available');
+
+        function connectToNotificationStream() {
+            if ($window.EventSource) {
+                notifications = new EventSource(apiBasePathURL + 'notification/stream');
+                notifications.onmessage = function(e) {
+                    var parsed = JSON.parse(e.data);
+                    console.log('broadcasting SSE:', parsed.type, parsed.data.status);
+                    $rootScope.$broadcast(parsed.type, parsed.data);
+                };
+
+                notifications.onerror = function(e) {
+                    // Wait 10 seconds if the browser hasn't reconnected then
+                    // reinitialize.
+                    $timeout(function() {
+                        // If the EventSource in CLOSED state start again
+                        if (notifications.readyState == 2) {
+                            connectToNotificationStream();
+                        }
+                    }, 10000);
+                };
+
+            } else {
+                console.error('No Server Side Event notifications available');
+            }
         }
+
+        connectToNotificationStream();
 
         // takes an object returns a parameterized url suffix
         // e.g. {profile: 'Joe', id: 12345, zone: 'west'} =>
