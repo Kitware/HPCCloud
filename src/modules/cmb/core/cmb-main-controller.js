@@ -81,8 +81,6 @@ angular.module("kitware.cmb.core")
                 });
             }
 
-
-
             if(!projectId) {
                 $scope.subTitle = null;
                 $scope.project = null;
@@ -248,7 +246,6 @@ angular.module("kitware.cmb.core")
 
                 $girder.startTask(simulation, taskId, clusterData, config);
             });
-
 
             // Move back to the project view
             $state.go('project', { collectionName: $stateParams.collectionName, projectID: simulation.folderId });
