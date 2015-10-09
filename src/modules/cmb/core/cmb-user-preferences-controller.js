@@ -1,7 +1,7 @@
 angular.module("kitware.cmb.core")
-    .controller('CmbUserPreferencesController', ['$scope', 'kw.Girder', '$state', '$stateParams',
-        '$templateCache', '$window', '$http', '$timeout', '$interval', '$mdToast', '$mdDialog',
-        function ($scope, $girder, $state, $stateParams, $templateCache, $window, $http, $timeout, $interval, $mdToast, $mdDialog) {
+    .controller('CmbUserPreferencesController', ['$scope', 'kw.Girder',
+        '$templateCache', '$timeout', '$mdToast', '$mdDialog',
+        function ($scope, $girder, $templateCache, $timeout, $mdToast, $mdDialog) {
             $scope.password = {oldPass: '', newPass: '', confirmPass: ''};
 
             $scope.awsProfiles = [];

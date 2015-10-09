@@ -1,5 +1,7 @@
 angular.module("kitware.cmb.core")
-    .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$interval', '$q', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $interval, $q) {
+    .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog',
+        '$templateCache', '$window', '$interval',
+        function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $interval) {
         var timeoutId = 0;
 
         //from https://github.com/tjmehta/101/blob/master/is-object.js

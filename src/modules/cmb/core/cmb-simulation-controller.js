@@ -1,5 +1,7 @@
 angular.module("kitware.cmb.core")
-    .controller('CmbSimulationController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$http', '$timeout', '$interval', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $http, $timeout, $interval) {
+    .controller('CmbSimulationController', ['$scope', 'kw.Girder', '$state', '$stateParams',
+        '$mdDialog', '$templateCache', '$timeout',
+        function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $timeout) {
         var timeoutId = 0;
 
         $scope.template = null;

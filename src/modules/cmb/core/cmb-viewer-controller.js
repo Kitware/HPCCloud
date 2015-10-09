@@ -1,5 +1,6 @@
 angular.module("kitware.cmb.core")
-    .controller('CmbViewerController', ['$scope', '$state', '$stateParams', '$window', function ($scope, $state, $stateParams, $window) {
+    .controller('CmbViewerController', ['$scope', '$stateParams', '$window',
+    	function ($scope, $stateParams, $window) {
         var hostPort = $window.location.host;
          hostPort = 'ulex';
         $scope.connectionURL = ($stateParams.mode === 'launcher') ? "/paraview" : ("ws://"+hostPort+"/proxy?sessionId=" + encodeURIComponent($stateParams.sessionId));

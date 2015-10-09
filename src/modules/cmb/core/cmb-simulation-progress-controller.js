@@ -1,5 +1,7 @@
 angular.module("kitware.cmb.core")
-.controller('CmbSimulationProgressController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$http', '$interval', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $http, $interval) {
+.controller('CmbSimulationProgressController', ['$scope', 'kw.Girder', '$state', '$stateParams',
+    '$mdDialog', '$templateCache', '$interval',
+    function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $interval) {
     var timoutId = 0;
 
     $scope.outputStats = [];
@@ -22,10 +24,7 @@ angular.module("kitware.cmb.core")
                     }
 
                     while(idx < count) {
-                        var line = lines[idx].replace(/  /g, ' ')
-                            .replace(/  /g, ' ')
-                            .replace(/  /g, ' ')
-                            .replace(/  /g, ' ')
+                        var line = lines[idx].replace(/ +/g, ' ')
                             .replace(/RMS Div/g, 'RMS-Div')
                             .replace(/# /g, '').split(' ');
                         $scope.outputStats.push(line);
