@@ -636,6 +636,7 @@ angular.module("kitware.girder", ["ngCookies"])
                 .then(function(response){
                     // Update Item metadata
                     var metadata = {};
+                    metadata.task = taskConfig.taskName
                     metadata[taskConfig.taskName] = {
                         taskId: response.data._id,
                         spec: response.data.taskSpecId,

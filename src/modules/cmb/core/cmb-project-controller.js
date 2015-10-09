@@ -5,7 +5,7 @@ angular.module("kitware.cmb.core")
         function findSimulationIndexById(id) {
             for (var i=0; i < $scope.simulations.length; i++) {
                 var meta = $scope.simulations[i].meta;
-                if (meta[meta.task]._id === id || meta[meta.task]._id === undefined) {
+                if (meta[meta.task].taskId === id || meta[meta.task].taskId === undefined) {
                     return i;
                 }
             }
@@ -374,9 +374,9 @@ angular.module("kitware.cmb.core")
                     if (res.data.output.cluster) {
                         $scope.itemClusterType[item.name] = res.data.output.cluster.type;
                     }
-                    if (res.data.status !== item.meta.status && res.data.status !== 'complete') {
+                    if (res.data.status !== itemAttr(item, status)) {
                         //console.log('status for "' + item.name + '", '+ index +' change, ' + item.meta.status + ' -> ' + res.data.status);
-                        item.meta.status = res.data.status;
+                        item.meta[item.meta.task].status = res.data.status;
                         $scope.simulations[index] = item;
                         $girder.patchItemMetadata(item._id, {status: res.data.status});
                     }
