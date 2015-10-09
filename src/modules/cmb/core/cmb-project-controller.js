@@ -2,6 +2,17 @@ angular.module("kitware.cmb.core")
     .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog', '$templateCache', '$window', '$interval', '$q', function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $interval, $q) {
         var timeoutId = 0;
 
+        //from https://github.com/tjmehta/101/blob/master/is-object.js
+        function isObject (val) {
+          return typeof val === 'object' &&
+            val !== undefined && val !== null &&
+            !Array.isArray(val) &&
+            !(val instanceof RegExp) &&
+            !(val instanceof String) &&
+            !(val instanceof Number);
+        }
+
+        //searches just the meta[meta.task]
         function findSimulationIndexById(id) {
             for (var i=0; i < $scope.simulations.length; i++) {
                 var meta = $scope.simulations[i].meta;
@@ -10,6 +21,23 @@ angular.module("kitware.cmb.core")
                 }
             }
             return -1;
+        }
+
+        //searches in all of meta.task, so meta.hydra *and* meta.pvw for example
+        function findTaskIndexById(id) {
+            for (var i=0; i < $scope.simulations.length; i++) {
+                var meta = $scope.simulations[i].meta,
+                    keys = Object.keys(meta);
+                for (var j=0; j < keys.length; j++) {
+                    if (isObject(meta[keys[j]])){
+                        if (meta[keys[j]].taskId === id) {
+                            console.log('found it.');
+                            return {index: i, key: keys[j]};
+                        }
+                    }
+                }
+            }
+            return {index: -1};
         }
 
         function fetchOutput(simulation) {
@@ -24,11 +52,15 @@ angular.module("kitware.cmb.core")
         *   if hasStatus, set the new status in the item and return the meta object.
         *   else get the status for the item's active task
         */
-        function itemAttr(item, attr, newAttr) {
+        function itemAttr(item, attr, newAttr, taskName) {
+            if (!taskName) {
+                taskName = item.meta.task;
+            }
+
             if (newAttr) {
-                item.meta[item.meta.task][attr] = newAttr;
+                item.meta[taskName][attr] = newAttr;
                 var ret = {};
-                ret[item.meta.task] = item.meta[item.meta.task]
+                ret[taskName] = item.meta[taskName];
                 return ret;
             }
             else {
@@ -36,32 +68,56 @@ angular.module("kitware.cmb.core")
             }
         }
 
+        function handleNewTaskStatus(simulation, data, taskName) {
+            if (!taskName) {
+                taskName = simulation.meta.task;
+            }
+
+            // add task if it's missing, update status
+            if (itemAttr(simulation, 'taskId') === undefined){
+                var newMeta = itemAttr(simulation, 'taskId', data._id, taskName);
+                    newMeta = itemAttr(simulation, 'status', data.status, taskName);
+                $girder.patchItemMetadata(simulation._id, newMeta);
+
+                if (data.status === 'running' && $scope.panelState.index === data.simIndex) {
+                    startLoggingTask(simulation);
+                }
+            //simply update status.
+            } else {
+                $girder.patchItemMetadata(simulation._id, itemAttr(simulation, 'status', data.status, taskName));
+            }
+
+            //force $digest
+            $scope.$apply();
+
+            //show log if finished.
+            if ($scope.hasStatus(simulation, finishedStates) && !$scope.taskOutput) {
+                fetchOutput(simulation);
+            }
+        }
+
+        /* This seems convoluted... well it is.
+         * 'task.status' receives a data object with {_id, status}. _id refers to the taskId
+         * which the status is for. We initially try to find it in meta[meta.task],
+         * if we don't find it there we look in the other task meta objects in sim.meta
+         * If we find the task we update its status, and possibly its taskId if === null.
+         */
         $scope.$on('task.status', function(event, data) {
             var simIndex = findSimulationIndexById(data._id),
                 simulationMeta;
             console.log('event received: ', data.status);
             if (simIndex < 0) {
-                console.error('_id '+data._id+' not found');
-            } else {
-                var simulation = $scope.simulations[simIndex];
-                // add task if it's missing, update status
-                if (itemAttr(simulation, 'taskId') === undefined){
-                    var newMeta = itemAttr(simulation, 'taskId', data._id);
-                        newMeta = itemAttr(simulation, 'status', data.status);
-                    $girder.patchItemMetadata(simulation._id, newMeta);
-
-                    if (data.status === 'running' && $scope.panelState.index === simIndex) {
-                        startLoggingTask(simulation);
-                    }
+                console.log('_id '+data._id+' not found, looking in other objects...');
+                simIndex = findTaskIndexById(data._id);
+                if (simIndex.index < 0) {
+                    console.error('_id '+data._id+' not found');
                 } else {
-                    $girder.patchItemMetadata(simulation._id, itemAttr(simulation, 'status', data.status));
+                    data.simIndex = simIndex.index;
+                    handleNewTaskStatus($scope.simulations[simIndex.index], data, simIndex.key);
                 }
-
-                $scope.$apply();
-
-                if ($scope.hasStatus(simulation, finishedStates) && !$scope.taskOutput) {
-                    fetchOutput(simulation);
-                }
+            } else {
+                data.simIndex = simIndex;
+                handleNewTaskStatus($scope.simulations[simIndex], data);
             }
         });
 

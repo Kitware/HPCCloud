@@ -643,13 +643,14 @@ angular.module("kitware.girder", ["ngCookies"])
                         task: response.data.status,
                         startTime: new Date().getTime(),
                         cost: cluster.cost,
-                        totalCost: (item.meta.totalCost || 0)
+                        totalCost: (item.meta.totalCost || 0),
                     };
 
                     // Start task
                     return self.put(['tasks', response.data._id, 'run'].join('/'), taskConfig)
                         .then(function(){
                             console.log("Task successfully started");
+                            metadata[taskConfig.taskName].status = 'running';
                             self.updateItemMetadata(item, metadata);
                         }, function(error) {
                             console.log("Error while starting Task", error.data.message);
@@ -838,6 +839,16 @@ angular.module("kitware.girder", ["ngCookies"])
                     item.meta[item.meta.task].status = 'terminated';
                     item.meta[item.meta.task].totalCost += item.meta[item.meta.task].cost * Math.floor( 1 + (new Date().getTime() - item.meta[item.meta.task].startTime)/3600000);
                     item.meta[item.meta.task].startTime = null;
+                    // flip the active task back to the simulation if paraview is being terminated.
+                    if (item.meta.task === 'pvw') {
+                        var keys = Object.keys(item.meta);
+                        for (var i=0; i < keys.length; i++) {
+                            if (keys[i] !== 'task' && keys[i] !== item.meta.task) {
+                                item.meta.task = keys[i];
+                                break;
+                            }
+                        }
+                    }
                     self.updateItemMetadata(item, item.meta);
                 })
                 .error(function(error) {
