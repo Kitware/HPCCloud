@@ -1,5 +1,7 @@
 angular.module("kitware.cmb.core")
-    .controller('cmb.CoreController', ['$scope', 'kw.Girder', '$modal', '$templateCache', '$state', '$stateParams', '$mdDialog', '$window', '$mdToast', function ($scope, $girder, $modal, $templateCache, $state, $stateParams, $mdDialog, $window, $mdToast) {
+    .controller('cmb.CoreController', ['$scope', 'kw.Girder', '$window', '$templateCache',
+        '$state', '$stateParams', '$mdDialog', '$mdToast',
+        function ($scope, $girder, $window, $templateCache, $state, $stateParams, $mdDialog, $mdToast) {
         var machines = [
             { "id": "m3.medium",    "label": "Basic Small",       "cpu": 1, "gpu": 0, "memory": 3.75, "cost": 0.07, "storage": [4] },
             { "id": "m3.large",     "label": "Basic Medium",      "cpu": 2, "gpu": 0, "memory": 7.5,  "cost": 0.14, "storage": [32] },
@@ -35,6 +37,15 @@ angular.module("kitware.cmb.core")
             projectID: '',
             simulationID: ''
         };
+
+        function showToast(message) {
+            $mdToast.show(
+                $mdToast.simple()
+                    .content(message)
+                    .position('bottom right')
+                    .hideDelay(3000)
+            );
+        }
 
         $scope.$on('$stateChangeSuccess', function(event) {
             var projectId = $stateParams.projectID,
@@ -279,8 +290,8 @@ angular.module("kitware.cmb.core")
                 });
 
             }, function (err) {
-                // TODO Toast?
                 console.log(err);
+                showToast(err.message);
             });
         };
 

@@ -292,14 +292,6 @@ angular.module("kitware.cmb.core")
                 });
         };
 
-        //unused?
-        $scope.taskCallback = function(simulationResponse) {
-            // Handle mesh viewer state
-            // goTo ...
-            console.log("taskCallback");
-            console.log(simulationResponse[1]);
-        };
-
         $scope.editSimulation = $state.go;
 
         $scope.panelStateToggle = function(index) {
