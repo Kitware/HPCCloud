@@ -307,7 +307,8 @@ angular.module("kitware.cmb.core")
 
             $girder.startTaggerTask(mesh, taskSpecId, clusterData, config)
                 .then(function(res) {
-                    var taskId = res.config.url.split('/')[3], // /api/v1/tasks/[taskID]
+                    // there's no res.data so we get the taskId from the url.
+                    var taskId = res.config.url.split('/')[4], // /api/v1/tasks/[taskID]
                         sessionId = clusterData._id + '/' + taskId;
                     $state.go('mesh', { collectionName: $stateParams.collectionName,
                         projectID: mesh.folderId,
