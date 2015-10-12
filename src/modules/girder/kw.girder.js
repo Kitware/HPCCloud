@@ -686,19 +686,20 @@ angular.module("kitware.girder", ["ngCookies"])
         this.fetchTaskList = function() {
             var self = this;
 
+        //callback hell, with loops, doesn't work with .then()'s
             self.listCollections()
                 .success(function(collections) {
                     angular.forEach(collections, function(collection) {
                         collectionMap[collection.name] = collection;
                         taskList[collection.name] = {};
-                        self.listFolders(collection._id, 'collection')
+        /*list folders*/self.listFolders(collection._id, 'collection')
                             .success(function(folders){
                                 angular.forEach(folders, function(folder) {
                                     if (folder.name === 'tasks') {
                                         self.listItems(folder._id)
-                                            .success(function(items) {
+        /* list items for folders -------*/ .success(function(items) {
                                                 angular.forEach(items, function(item) {
-                                                    self.listItemFiles(item._id).success(function(files){
+        /* list files in items ----------------- */ self.listItemFiles(item._id).success(function(files){
                                                         angular.forEach(files, function(file) {
                                                             taskList[collection.name][file.name] = file._id;
                                                         });
