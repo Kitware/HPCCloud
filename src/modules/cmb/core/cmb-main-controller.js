@@ -302,8 +302,10 @@ angular.module("kitware.cmb.core")
                     output: {
                         item: { id: mesh._id }
                     },
+                    fileId: mesh.meshFile._id,
+                    itemId: mesh._id,
                     taskName: 'meshtagger'
-            };
+                };
 
             $girder.startTaggerTask(mesh, taskSpecId, clusterData, config)
                 .then(function(res) {

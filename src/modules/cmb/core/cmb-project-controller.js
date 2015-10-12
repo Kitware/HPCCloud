@@ -424,6 +424,7 @@ angular.module("kitware.cmb.core")
             }
 
             $scope.mesh = exoFile;
+            $scope.meshItem.meshFile = exoFile;
         }
 
         function updateScope() {
