@@ -219,7 +219,7 @@ angular.module("kitware.cmb.core")
         $scope.runSimulationCallback = function(args) {
             var simulation = args[0],
                 clusterData = args[1],
-                taskId = args[2],
+                taskSpecId = args[2],
                 mesh = $scope.mesh;
 
             $girder.extractMeshInformationFromProject(simulation.folderId, function(meshItem, meshFile){
@@ -254,7 +254,7 @@ angular.module("kitware.cmb.core")
                 }
                 console.log(config);
 
-                $girder.startTask(simulation, taskId, clusterData, config);
+                $girder.startTask(simulation, taskSpecId, clusterData, config);
             });
 
             // Move back to the project view
@@ -264,7 +264,7 @@ angular.module("kitware.cmb.core")
         $scope.runVisualizationCallback = function(args) {
             var simulation = args[0],
                 clusterData = args[1],
-                taskId = args[2],
+                taskSpecId = args[2],
                 config = {
                     output: {
                         item: { id: simulation._id }
@@ -281,8 +281,7 @@ angular.module("kitware.cmb.core")
                     config.dataDir = dataDir;
                     config.cluster = clusterData;
 
-                console.log(config);
-                $girder.startTask(simulation, taskId, clusterData, config)
+                $girder.startTask(simulation, taskSpecId, clusterData, config)
                 $state.go('viewer', { collectionName: $stateParams.collectionName,
                     projectID: simulation.folderId,
                     sessionId: sessionId
@@ -290,8 +289,32 @@ angular.module("kitware.cmb.core")
 
             }, function (err) {
                 console.log(err);
-                showToast(err.message);
+                showToast(err.data.message);
             });
+        };
+
+        $scope.runTaggerCallback = function(args) {
+            var mesh = args[0],
+                clusterData = args[1],
+                taskSpecId = args[2],
+                config = {
+                    cluster: clusterData,
+                    output: {
+                        item: { id: mesh._id }
+                    },
+                    taskName: 'meshtagger'
+            };
+
+            $girder.startTaggerTask(mesh, taskSpecId, clusterData, config)
+                .then(function(res) {
+                    var taskId = res.config.url.split('/')[3], // /api/v1/tasks/[taskID]
+                        sessionId = clusterData._id + '/' + taskId;
+                    $state.go('mesh', { collectionName: $stateParams.collectionName,
+                        projectID: mesh.folderId,
+                        meshItemId: mesh._id,
+                        sessionId: sessionId
+                    });
+                });
         };
 
         $scope.goHome = function() {

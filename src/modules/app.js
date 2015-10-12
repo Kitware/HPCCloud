@@ -69,7 +69,7 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb', 'kitware.SimPut'])
         controller: 'CmbViewerController'
     })
     .state('mesh', {
-        url: "/mesh/:collectionName/:projectID/:itemID/:fileID",
+        url: "/mesh/:collectionName/:meshItemId/:sessionId",
         templateProvider: ['$templateCache', '$stateParams', function ($templateCache, $stateParams) {
             return $templateCache.get('pv/tpls/pv-exo-mesh-viewer.html');
         }],

@@ -4,7 +4,11 @@
             ng-click="projectInfo($event)">
             <i class="fa fa-file-text-o"></i>
         </md-button>
-        <md-button aria-label="Tag mesh faces" ui-sref="mesh({ collectionName: getActiveCollection(), projectID: meshItem.folderId, itemID: meshItem._id, fileID: mesh._id })">
+        <!-- ui-sref="mesh({ collectionName: getActiveCollection(), projectID: meshItem.folderId, itemID: meshItem._id, fileID: mesh._id })" -->
+        <md-button aria-label="Tag mesh faces"
+            ng-click="runTask($event,
+                'Start mesh tagger', 'meshtagger', false,
+                meshItem, runTaggerCallback)">
             <i class="fa fa-tags"></i>
             <md-tooltip>Tag mesh faces using mesh viewer</md-tooltip>
         </md-button>
