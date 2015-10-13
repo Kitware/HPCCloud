@@ -432,18 +432,17 @@ angular.module("kitware.girder", ["ngCookies"])
                         if (offset + chunkSize >= file.size) {
                             blob = file.slice(offset);
                             that.uploadChunk(upload._id, offset, blob)
-                                .success(function (data) {
+                                .then(function (data) {
                                     $rootScope.$broadcast('file-uploaded', parentId, data);
                                     $rootScope.$broadcast('notification-message', null);
-                                })
-                                .error(function (data) {
+                                }, function (data) {
                                     console.warn('could not upload data');
                                     console.warn(data);
                                 });
                         } else {
                             blob = file.slice(offset, offset + chunkSize);
                             that.uploadChunk(upload._id, offset, blob)
-                                .success(function (data) {
+                                .then(function (data) {
                                     var msg;
 
                                     i += 1;
@@ -457,8 +456,7 @@ angular.module("kitware.girder", ["ngCookies"])
                                     });
 
                                     uploadNextChunk(offset + chunkSize);
-                                })
-                                .error(function (data) {
+                                }, function (data) {
                                     console.warn('could not upload data');
                                     console.warn(data);
                                 });

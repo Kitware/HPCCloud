@@ -1,7 +1,7 @@
 angular.module("kitware.cmb.core")
-    .controller('cmb.CoreController', ['$scope', 'kw.Girder', '$window', '$templateCache',
+    .controller('cmb.CoreController', ['$scope', 'kw.Girder', '$window', '$templateCache', '$timeout',
         '$state', '$stateParams', '$mdDialog', '$mdToast',
-        function ($scope, $girder, $window, $templateCache, $state, $stateParams, $mdDialog, $mdToast) {
+        function ($scope, $girder, $window, $templateCache, $timeout, $state, $stateParams, $mdDialog, $mdToast) {
         var machines = [
             { "id": "m3.medium",    "label": "Basic Small",       "cpu": 1, "gpu": 0, "memory": 3.75, "cost": 0.07, "storage": [4] },
             { "id": "m3.large",     "label": "Basic Medium",      "cpu": 2, "gpu": 0, "memory": 7.5,  "cost": 0.14, "storage": [32] },
@@ -328,17 +328,35 @@ angular.module("kitware.cmb.core")
             $state.go('login');
         }
 
+        var uploadToast = null;
         $scope.$on('notification-message', function (evt, message) {
-            if(message === null) {
-                $mdToast.hide();
+            if(message === null) { //upload complete, see kw.girder.js:@uploadNextChunk
+                $mdToast.updateContent('Upload Complete');
+                $timeout(function() {
+                    $mdToast.hide();
+                    uploadToast = null;
+                }, 2000);
+            } else if (uploadToast === null) {
+                var percentage = message.type === 'upload' ? Math.floor(100 * message.done / message.total) : 0;
+
+                uploadToast = $mdToast.simple()
+                    .position('bottom left right')
+                    .hideDelay(0); //stay open
+
+                if (message.type === 'upload') {
+                    uploadToast.content(message.file + '  ' + percentage + ' %');
+                } else {
+                    uploadToast.content(message.message);
+                }
+
+                $mdToast.show(uploadToast);
             } else {
                 var percentage = message.type === 'upload' ? Math.floor(100 * message.done / message.total) : 0;
-                $mdToast.show(
-                    $mdToast.simple()
-                        .content( message.type === 'upload' ? (message.file + '  ' + percentage + ' %') : (message.message))
-                        .position('bottom left right')
-                        .hideDelay(5000)
-                );
+                if (message.type === 'upload') {
+                    $mdToast.updateContent(message.file + '  ' + percentage + ' %');
+                } else {
+                    $mdToast.updateContent(message.message);
+                }
             }
         });
 
