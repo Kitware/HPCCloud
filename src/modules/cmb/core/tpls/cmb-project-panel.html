@@ -132,7 +132,7 @@
                     ['error', 'complete', 'failure', 'terminated'])">
                     <label>Output</label>
                     <div ng-repeat="file in taskOutput | filter: fileFilter()">
-                        <a ng-href="{{ apiBase }}file/{{file._id}}/download">{{file.name}}</a>
+                        <a ng-href="/api/v1/file/{{file._id}}/download">{{file.name}}</a>
                     </div>
                 </div>
             </md-content>
