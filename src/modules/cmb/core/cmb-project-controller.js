@@ -145,6 +145,7 @@ angular.module("kitware.cmb.core")
             terminated: 'error',
             failure: 'error'
         });
+        $scope.loading = { cloning: false, deleting: false};
 
         var logInterval = null,
             finishedStates = ['error', 'complete', 'failure', 'terminated'];
@@ -236,14 +237,20 @@ angular.module("kitware.cmb.core")
             .then(function(simulation) {
                 // Move to the newly created simulation
                 console.log(simulation);
+                if ($scope.loading.cloning === true) {
+                    $scope.loading.cloning = false;
+                }
                 updateScope();
             }, function() {
-                // Nothing to do when close
+                if ($scope.loading.cloning === true) {
+                    $scope.loading.cloning = false;
+                }
             });
         };
 
         // Simulation drop down controls
         $scope.cloneSimulation = function(simulation) {
+            $scope.loading.cloning = true;
             $scope.createSimulation(event, simulation);
         };
 
@@ -275,17 +282,19 @@ angular.module("kitware.cmb.core")
             if (!confirm('Are you sure youw want to delete "' + simulation.name + '?"')) {
                 return;
             }
-
+            $scope.loading.deleting = true;
             $girder.deleteItem(simulation)
                 .then(function() {
                     var tmp = angular.copy($scope.simulations);
                     tmp.splice(tmp.length-1, 1);
                     $scope.simulations = tmp;
+                    $scope.loading.deleting = false;
                     if (simulation.meta.hasOwnProperty('taskId')) {
                         return $girder.deleteTask(simulation);
                     }
                 }, function(error) {
                     console.error('error deleting item:', error.message || error.data.message);
+                    $scope.loading.deleting = false;
                 })
                 .then(function() {
                     updateScope();

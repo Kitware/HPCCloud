@@ -97,4 +97,47 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
         return {
           link: link
         };
-    }]);
+    }])
+    .directive('loading', function($interval) {
+        return {
+            restrict: 'A',
+            scope: {
+                isLoading: '=',
+                completeText: '@'
+            },
+            link: function(scope, element, attrs) {
+                var inc,
+                    originalText = element.text(),
+                    interval = null;
+
+                scope.$on('$destroy', function() {
+                    if (interval) {
+                        $interval.cancel(interval);
+                    }
+                });
+
+                scope.$watch('isLoading', function(newVal, oldVal) {
+                    if (newVal === false) {
+                        $interval.cancel(interval);
+                        if (scope.completeText) {
+                            element.text(scope.completeText);
+                        } else {
+                            element.text(originalText);
+                        }
+                    } else {
+                        inc = 0;
+                        interval = $interval(animate, 200);
+                    }
+                });
+
+                function animate() {
+                    var elipses = '';
+                    for (var i = 0; i < inc; i++) {
+                        elipses += '.';
+                    }
+                    inc = inc >= 3 ? inc = 0 : inc + 1;
+                    element.text(originalText + elipses);
+                }
+            } //close link
+        }; //close directive function return
+    });
