@@ -94,13 +94,16 @@ class _MeshViewer(pv_wamp.PVServerProtocol):
         headers = {
             'Girder-Token': _MeshViewer.token
         }
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, stream=True)
 
         if r.status_code != 200:
             print >> sys.stderr, r.json()
 
         r.raise_for_status()
-        mesh_file.write(r.content)
+
+        for chunk in r.iter_content(1024):
+            mesh_file.write(chunk)
+
         mesh_file.close()
 
         # register for cleanup
