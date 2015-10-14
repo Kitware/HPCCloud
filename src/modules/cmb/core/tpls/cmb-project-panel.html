@@ -117,17 +117,17 @@
                         ['incomplete', 'valid'])">
                         Annotate
                     </md-button>
-                    <md-button loading is-loading="loading.cloning"
-                        ng-disabled="loading.cloning"
+                    <md-button loading is-loading="isLoading(simulation, 'cloning')"
+                        ng-disabled="isLoading(simulation, 'cloning')"
                         ng-click="cloneSimulation(simulation)"
                         class="md-raised">
                         Clone
                     </md-button>
                     <md-button ng-click="downloadSimulation(simulation)" class="md-raised">Download</md-button>
                     <span flex></span>
-                    <md-button loading is-loading="loading.deleting"
+                    <md-button loading is-loading="isLoading(simulation, 'deleting')"
                         ng-click="deleteSimulation(simulation)" class="md-raised md-warn"
-                        ng-disabled="hasStatus(simulation, 'running') || loading.deleting">Delete</md-button>
+                        ng-disabled="hasStatus(simulation, 'running') || isLoading(simulation, 'deleting')">Delete</md-button>
                     <md-button ng-click="terminateCluster(simulation)" class="md-raised md-warn"
                         ng-disabled="!hasStatus(simulation, 'running') || hasStatus(simulation, 'error')">
                         Terminate
