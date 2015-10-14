@@ -160,14 +160,13 @@ angular.module("kitware.cmb.core")
 
         $scope.simulationFilter = function(filters) {
             return function(sim) {
-                var key = sim.meta.status;
+                var key = sim.meta[sim.meta.task].status;
                 if (typeof filters[key] === 'string') {
                     key = filters[key];
                 }
                 return filters[key] === true ||
-                    !filters.hasOwnProperty(sim.meta.status);
-                    //^ show the item if meta.status is _not_ in filters,
-                    // this was a good case of weird bugs with super easy solutions.
+                    !filters.hasOwnProperty(sim.meta[sim.meta.task].status);
+                    //^ show the item if meta.status is _not_ in filters
             };
         };
 
