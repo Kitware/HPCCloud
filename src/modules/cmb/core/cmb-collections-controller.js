@@ -3,7 +3,7 @@ angular.module("kitware.cmb.core")
 
         $scope.collections = [];
 
-        if($scope.user === null) {
+        if(!$girder.hasToken()) {
             $state.go('login');
         } else {
             $girder.listCollections()

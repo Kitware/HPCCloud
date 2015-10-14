@@ -1,11 +1,5 @@
 angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb', 'kitware.SimPut'])
 .config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
-  var goToHome = ["$state", "$scope", function ($state, $scope) {
-        if($scope.user !== null) {
-            $state.go('home');
-        }
-    }];
-
 
   // For any unmatched url, redirect to /state1
   $urlRouterProvider.otherwise("/login");
@@ -16,15 +10,13 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb', 'kitware.SimPut'])
         url: "/login",
         templateProvider: ['$templateCache', function ($templateCache) {
             return $templateCache.get('cmb/core/tpls/cmb-login-panel.html');
-        }],
-        controller: goToHome
+        }]
     })
     .state('register', {
         url: "/register",
         templateProvider: ['$templateCache', function ($templateCache) {
             return $templateCache.get('cmb/core/tpls/cmb-register-panel.html');
-        }],
-        controller: goToHome
+        }]
     })
     .state('home', {
         url: "/home",

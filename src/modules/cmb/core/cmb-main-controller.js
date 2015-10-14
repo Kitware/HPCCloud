@@ -326,7 +326,11 @@ angular.module("kitware.cmb.core")
 
         $scope.$on('login', function (event, user) {
             $scope.user = user;
-            $state.go('home');
+            if ($state.$current.toString() === 'login') {
+                $state.go('home');
+            } else {
+                $state.go($state.$current.toString(), $stateParams);
+            }
         });
 
         $scope.$on('login-error', function (event) {
@@ -350,7 +354,7 @@ angular.module("kitware.cmb.core")
             $state.go('login');
         });
 
-        if($girder.getUser() === null) {
+        if(!$girder.hasToken()) {
             $state.go('login');
         }
 

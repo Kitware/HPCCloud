@@ -151,7 +151,7 @@ angular.module("kitware.cmb.core")
             }
         });
 
-        if($girder.getUser() === null) {
+        if(!$girder.getAuth()) {
             $state.go('login');
         }
 

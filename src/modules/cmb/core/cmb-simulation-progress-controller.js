@@ -62,7 +62,7 @@ angular.module("kitware.cmb.core")
         $interval.cancel(timeoutId);
     });
 
-    if($girder.getUser() === null) {
+    if(!girder.getAuth()) {
         $state.go('login');
     }
 }]);

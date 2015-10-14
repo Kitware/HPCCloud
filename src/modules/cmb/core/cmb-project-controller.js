@@ -478,7 +478,7 @@ angular.module("kitware.cmb.core")
 
         // $scope.$on('$stateChangeSuccess', updateScope);
 
-        if($girder.getUser() === null) {
+        if(!$girder.hasToken()) {
             $state.go('login');
         } else {
             updateScope();

@@ -121,7 +121,7 @@ angular.module("kitware.cmb.core")
             });
         };
 
-        if($girder.getUser() === null) {
+        if(!$girder.hasToken()) {
             $state.go('login');
         } else {
             updateProjectList();
