@@ -97,7 +97,7 @@
 	angular.module(moduleName, [angularMaterial]).directive(directiveName, function () {
 	    return {
 	        scope: {
-	            url: '@url',
+	            url: '=',
 	            appKey: '@appkey',
 	            state: '=',
 	            config: '=',
@@ -260,7 +260,7 @@
 	            session.call('toggle.visibility', [-1, $scope.outlineVisible]).then(function () {
 	                rerender();
 	            });
-	        } else if (index < 0) {
+	        } else if (index < 0 && $scope.elements.length) {
 	            var count = $scope.elements.length,
 	                allVisible = index === -2 ? true : false;
 	            while (count--) {

@@ -662,6 +662,16 @@ angular.module("kitware.girder", ["ngCookies"])
                 });
         };
 
+        this.startTaggerTask = function (item, taskDefId, cluster, taskConfig) {
+            var self = this;
+            // Create task instance
+            taskConfig.cluster.name = item._id;
+            return self.post('tasks', { taskSpecId: taskDefId })
+                .then(function(res) {
+                    return self.put(['tasks', res.data._id, 'run'].join('/'), taskConfig);
+                });
+        };
+
         this.getTaskId = function(workflow, taskName) {
             if(workflow && taskName) {
                 return taskList[workflow][taskName];

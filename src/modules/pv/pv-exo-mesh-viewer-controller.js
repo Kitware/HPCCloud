@@ -3,16 +3,21 @@ angular.module('pv.web')
          function($scope, $girder, $stateParams, $window, $templateCache) {
 
       $scope.config = {
-         token: $girder.getAuthToken(),
-         item: $stateParams.itemID,
-         file: $stateParams.fileID
+         fileId: $stateParams.fileID
       };
 
-      var itemId = $stateParams.itemID;
+      var itemId = $stateParams.meshItemID,
+         hostPort = $window.location.host;
+
+      hostPort = 'ulex';
+      $scope.url = "ws://"+hostPort+"/proxy?sessionId=" +
+         encodeURIComponent($stateParams.sessionId);
 
       function save(data) {
          $girder.updateItemMetadata({_id: itemId}, {annotation: data});
       }
+
+      //itemID: meshItem._id, fileID: mesh._id
 
       function load(callback) {
          $girder.getItem(itemId)
