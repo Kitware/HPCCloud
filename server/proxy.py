@@ -15,7 +15,7 @@ class Proxy(Resource):
     def __init__(self):
         self.resourceName = 'proxy'
         self.route('POST', (), self.add_entry)
-        self.route('DELETE', (':cluster_id', ':job_id'), self.delete_entry)
+        self.route('DELETE', (':key'), self.delete_entry)
         self._proxy_file_path = self.model('setting').get(
             constants.PluginSettings.PROXY_FILE_PATH, '/tmp/proxy')
 
@@ -23,27 +23,14 @@ class Proxy(Resource):
     def add_entry(self, params):
         body = getBodyJson()
 
-        if 'clusterId' not in body:
-            raise RestException('clusterId is required', code=400)
-        if 'jobId' not in body:
-            raise RestException('jobId is required', code=400)
+        if 'key' not in body:
+            raise RestException('key is required', code=400)
         if 'host' not in body:
             raise RestException('host is required', code=400)
         if 'port' not in body:
             raise RestException('port is required', code=400)
 
-        cluster_id = body['clusterId']
-        job_id = body['jobId']
-
-        # Check that the cluster and job exist
-        cluster = self.model('cluster', 'cumulus').load(cluster_id, force=True)
-        if not cluster:
-            raise RestException('Invalid clusterId', code=400)
-
-        job = self.model('job', 'cumulus').load(job_id, force=True)
-        if not job:
-            raise RestException('Invalid jobId', code=400)
-
+        key = body['key']
         host = body['host']
         port = body['port']
 
@@ -51,9 +38,7 @@ class Proxy(Resource):
             db = None
             try:
                 db = dbm.open(self._proxy_file_path, 'c')
-                key = '%s/%s' % (cluster_id, job_id)
                 # Encode the slash
-                key =  urllib.quote_plus(key)
                 db[key] = '%s:%s' % (host, port)
             finally:
                 if db:
@@ -61,14 +46,9 @@ class Proxy(Resource):
 
     addModel('ProxyEntry', {
         'id':'ProxyEntry',
-        'required': ['commands', 'name', 'outputCollectionId'],
+        'required': ['key', 'host', 'port'],
         'properties':{
-            'clusterId': {
-                'pattern': '^[0-9a-fA-F]{24}$',
-                'type': 'string'
-            },
-            'jobId': {
-                'pattern': '^[0-9a-fA-F]{24}$',
+            'key': {
                 'type': 'string'
             },
            'host': {
@@ -88,23 +68,12 @@ class Proxy(Resource):
             'The proxy entry parameters.', dataType='ProxyEntry', paramType='body', required=True))
 
     @access.public
-    def delete_entry(self, cluster_id, job_id, params):
-        # Check that the cluster and job exist
-        cluster = self.model('cluster', 'cumulus').load(cluster_id, force=True)
-        if not cluster:
-            raise RestException('Invalid cluster_id', code=400)
-
-        job = self.model('job', 'cumulus').load(job_id, force=True)
-        if not job:
-            raise RestException('Invalid job_id', code=400)
+    def delete_entry(self, key):
 
         with LockFile(self._proxy_file_path):
             db = None
             try:
                 db = dbm.open(self._proxy_file_path, 'c')
-                key = '%s/%s' % (cluster_id, job_id)
-                # Encode the slash
-                key =  urllib.quote_plus(key)
                 if key in db:
                     del db[key]
             finally:
@@ -115,9 +84,6 @@ class Proxy(Resource):
             'Delete entry'
         )
         .param(
-            'cluster_id',
-            'The cluster the job was submitted to.', dataType='string',
-            paramType='path', required=True)
-        .param('job_id',
-            'The job the proxy entry was create for.', dataType='string',
+            'key',
+            'The key to delete.', dataType='string',
             paramType='path', required=True))

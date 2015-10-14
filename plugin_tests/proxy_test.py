@@ -114,8 +114,7 @@ class ProxyTestCase(base.TestCase):
         host = 'some.com'
         port = 8080
         body = {
-            'clusterId': self._cluster_id,
-            'jobId': self._job_id,
+            'key': self._cluster_id + '%2F' + self._job_id,
             'host': host,
             'port': port
         }
@@ -135,46 +134,6 @@ class ProxyTestCase(base.TestCase):
         expected_value = '%s:%s' % (host, port)
         self.assertEquals(db[keys[0]], expected_value)
 
-    def test_add_entry_invalid(self):
-        host = 'some.com'
-        port = 8080
-        body = {
-            'clusterId': 'bogus',
-            'jobId': self._job_id,
-            'host': host,
-            'port': port
-        }
-
-        json_body = json.dumps(body)
-        r = self.request('/proxy', method='PATCH',
-                         type='application/json', body=json_body, user=self._user)
-
-        self.assertStatus(r, 400)
-
-        body = {
-            'jobId': self._job_id,
-            'host': host,
-            'port': port
-        }
-
-        json_body = json.dumps(body)
-        r = self.request('/proxy', method='PATCH',
-                         type='application/json', body=json_body, user=self._user)
-
-        self.assertStatus(r, 400)
-
-        body = {
-            'clusterId': self._cluster_id,
-            'jobId': 'bogus',
-            'host': host,
-            'port': port
-        }
-
-        json_body = json.dumps(body)
-        r = self.request('/proxy', method='PATCH',
-                         type='application/json', body=json_body, user=self._user)
-
-        self.assertStatus(r, 400)
 
 
 
