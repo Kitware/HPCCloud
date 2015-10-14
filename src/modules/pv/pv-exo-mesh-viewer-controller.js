@@ -9,7 +9,6 @@ angular.module('pv.web')
       var itemId = $stateParams.meshItemID,
          hostPort = $window.location.host;
 
-      hostPort = 'ulex';
       $scope.url = "ws://"+hostPort+"/proxy?sessionId=" +
          encodeURIComponent($stateParams.sessionId);
 
