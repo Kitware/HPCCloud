@@ -66,10 +66,27 @@ angular.module("kitware.cmb.core")
                                 return $girder.getCollectionFromName($stateParams.collectionName).then(function(result) {
                                     var collectionId = result.data[0]._id;
                                     return $girder.createFolder(collectionId, $girder.getUser().login,
-                                        $girder.getUser().login + "'s projects", "collection")
-                                        .success(function (folder) {
-                                            processGroups(groups.concat(folder));
+                                        $girder.getUser().login + "'s projects", "collection").then(function(result) {
+                                            return result.data;
+                                        }, function(error) {
+                                            console.log(error);
                                         });
+                                })
+                                .then(function(folder) {
+                                    var access = {
+                                            users: [{
+                                                id: $girder.getUser()._id,
+                                                level: 2
+                                            }]
+                                        }
+                                    return $girder.setFolderAccess(folder._id, access).then(function() {
+                                        return folder;
+                                    }, function(error) {
+                                        console.log(error);
+                                    });
+                                })
+                                .then(function (folder) {
+                                    processGroups(groups.concat(folder));
                                 });
                             } else {
                                 processGroups(groups);
