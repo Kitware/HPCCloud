@@ -171,7 +171,7 @@ angular.module("kitware.cmb.core")
                     if (!awsAvailable && !clusterAvailable) {
                         $mdToast.show(
                             $mdToast.simple()
-                                .content('You need at least one AWS or Cluster profile available.')
+                                .content('You need at least one valid AWS profile or running Cluster available.')
                                 .position('bottom right')
                                 .hideDelay(5000)
                             );
@@ -196,7 +196,7 @@ angular.module("kitware.cmb.core")
                     }
                 };
 
-            //make sure that there is at least one aws profile or cluster available.
+            //make sure that there is at least one aws profile or running cluster available.
             $girder.getAWSProfiles()
                 .then(function(data){
                     if (data.data.length === 0) {
@@ -205,7 +205,9 @@ angular.module("kitware.cmb.core")
                     return $girder.getClusterProfiles();
                 })
                 .then(function(data){
-                    if (data.data.length === 0) {
+                    if (data.data.length === 0 || data.data.every(function(el) {
+                        return el.status !== 'running'; //are there any running?
+                    })) {
                         clusterAvailable = false;
                     }
                     return actionForProfileAvailability();
