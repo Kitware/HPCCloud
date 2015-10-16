@@ -4,31 +4,31 @@
         <section layout="column" layout-sm="column" layout-align="space-around center">
             <md-input-container flex class="width-100">
                 <label>Choose a login name</label>
-                <input ng-model="user.login">
+                <input ng-model="user.login" required>
             </md-input-container>
             <md-input-container flex class="width-100">
                 <label>Enter your email address</label>
-                <input ng-model="user.email" type="email">
+                <input ng-model="user.email" type="email" required>
             </md-input-container>
         </section>
         <section layout="row" layout-sm="column" layout-align="space-around center">
             <md-input-container flex>
                 <label>First name</label>
-                <input ng-model="user.firstName">
+                <input ng-model="user.firstName" required>
             </md-input-container>
             <md-input-container flex>
                 <label>Last name</label>
-                <input ng-model="user.lastName">
+                <input ng-model="user.lastName" required>
             </md-input-container>
         </section>
         <section layout="row" layout-sm="column" layout-align="space-around center">
             <md-input-container flex>
                 <label>Choose a password</label>
-                <input ng-model="user.password" type="password">
+                <input ng-model="user.password" type="password" required>
             </md-input-container>
             <md-input-container flex>
                 <label>Retype your password</label>
-                <input ng-model="user.passwordConf" type="password">
+                <input ng-model="user.passwordConf" type="password" required>
             </md-input-container>
         </section>
         <section layout="row" layout="column" layout-align="space-between center">

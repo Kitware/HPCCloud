@@ -152,17 +152,15 @@ angular.module("kitware.cmb.core")
             }
 
             $girder.registerUser(user)
-                .success(function() {
+                .then(function() {
                     $girder.login(user.login, user.password);
-                })
-                .error(function(err) {
+                }, function(err) {
                     $mdToast.show(
                         $mdToast.simple()
-                            .content(err.message)
+                            .content(err.data.message)
                             .position('bottom left right')
                             .hideDelay(3000)
                     );
-                    return;
                 });
         };
 
@@ -326,7 +324,8 @@ angular.module("kitware.cmb.core")
 
         $scope.$on('login', function (event, user) {
             $scope.user = user;
-            if ($state.$current.toString() === 'login') {
+            if ($state.$current.toString() === 'login' ||
+                $state.$current.toString() === 'register') {
                 $state.go('home');
             } else {
                 $state.go($state.$current.toString(), $stateParams);
