@@ -48,8 +48,8 @@ angular.module("kitware.cmb.core")
         }
 
         $scope.$on('$destroy', function() {
-            if ($window.onbeforeunload) {
-                delete $window.onbeforeunload;
+            if (window.onbeforeunload) {
+                delete window.onbeforeunload;
             }
         });
 
@@ -377,7 +377,7 @@ angular.module("kitware.cmb.core")
                     $mdToast.hide();
                     uploadToast = null;
                 }, 2000);
-                delete $window.onbeforeunload;
+                window.onbeforeunload = null;
                 $scope.uploading = false;
             } else if (uploadToast === null) {
                 $window.onbeforeunload = function(e) {
