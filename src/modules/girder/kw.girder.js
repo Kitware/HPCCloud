@@ -335,6 +335,10 @@ angular.module("kitware.girder", ["ngCookies"])
                 '&description=', escape(description)].join(''));
         };
 
+        this.setFolderAccess = function (folderId, access) {
+            return this.put('folder/' + folderId + '/access?access=' + JSON.stringify(access));
+        };
+
         this.deleteFolder = function (id) {
             return this.delete('folder/' + id);
         };
