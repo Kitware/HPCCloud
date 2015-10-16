@@ -1,14 +1,14 @@
 <md-toolbar class="cmb-subsubheader" layout="row" layout-align="space-between center">
     <div flex layout="row" layout-align="start center" class="info-buttons">
         <md-button class="md-flat" aria-label="Mesh file name"
-            ng-click="projectInfo($event)">
+            ng-click="projectInfo($event)" ng-disabled="uploading">
             <i class="fa fa-info-circle"></i>
         </md-button>
         <!-- ui-sref="mesh({ collectionName: getActiveCollection(), projectID: meshItem.folderId, itemID: meshItem._id, fileID: mesh._id })" -->
         <md-button aria-label="Tag mesh faces"
             ng-click="runTask($event,
                 'Start mesh tagger', 'meshtagger', false,
-                meshItem, runTaggerCallback)">
+                meshItem, runTaggerCallback)" ng-disabled="uploading">
             <i class="fa fa-tags"></i>
             <md-tooltip>Tag mesh faces using mesh viewer</md-tooltip>
         </md-button>
@@ -46,7 +46,8 @@
         </md-button>
     </div>
     <div flex layout="row" layout-align="end center">
-        <md-button aria-label="Create simulation" ng-click="createSimulation($event)">
+        <md-button aria-label="Create simulation"
+            ng-click="createSimulation($event)" ng-disabled="uploading">
             <i class="fa fa-fw fa-plus"></i>
             <md-tooltip>Create new simulations</md-tooltip>
         </md-button>

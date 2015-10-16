@@ -30,6 +30,7 @@ angular.module("kitware.cmb.core")
         $scope.collection = null;
         $scope.project = null;
         $scope.simulation = null;
+        $scope.uploading = false;
 
         var previousActiveId = {
             collectionName: '',
@@ -45,6 +46,12 @@ angular.module("kitware.cmb.core")
                     .hideDelay(3000)
             );
         }
+
+        $scope.$on('$destroy', function() {
+            if ($window.onbeforeunload) {
+                delete $window.onbeforeunload;
+            }
+        });
 
         $scope.$on('$stateChangeSuccess', function(event) {
             var projectId = $stateParams.projectID,
@@ -359,7 +366,9 @@ angular.module("kitware.cmb.core")
             $state.go('login');
         }
 
+        //uploading
         var uploadToast = null;
+
         $scope.$on('notification-message', function (evt, message) {
             var percentage;
             if(message === null) { //upload complete, see kw.girder.js:@uploadNextChunk
@@ -368,15 +377,21 @@ angular.module("kitware.cmb.core")
                     $mdToast.hide();
                     uploadToast = null;
                 }, 2000);
+                delete $window.onbeforeunload;
+                $scope.uploading = false;
             } else if (uploadToast === null) {
-                percentage = message.type === 'upload' ? Math.floor(100 * message.done / message.total) : 0;
+                $window.onbeforeunload = function(e) {
+                    return 'You are uploading a file are you sure you want to leave the page?';
+                };
+                $scope.uploading = true;
 
+                percentage = message.type === 'upload' ? Math.floor(100 * message.done / message.total) : 0;
                 uploadToast = $mdToast.simple()
                     .position('bottom left right')
                     .hideDelay(0); //stay open
 
                 if (message.type === 'upload') {
-                    uploadToast.content(message.file + '  ' + percentage + ' %');
+                    uploadToast.content('Uploading "' + message.file + '"  ' + percentage + '%');
                 } else {
                     uploadToast.content(message.message);
                 }
@@ -385,7 +400,7 @@ angular.module("kitware.cmb.core")
             } else {
                 percentage = message.type === 'upload' ? Math.floor(100 * message.done / message.total) : 0;
                 if (message.type === 'upload') {
-                    $mdToast.updateContent(message.file + '  ' + percentage + ' %');
+                    $mdToast.updateContent('Uploading "' + message.file + '"  ' + percentage + '%');
                 } else {
                     $mdToast.updateContent(message.message);
                 }
