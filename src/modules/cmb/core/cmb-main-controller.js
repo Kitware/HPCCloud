@@ -281,7 +281,7 @@ angular.module("kitware.cmb.core")
                     config.dataDir = dataDir;
                     config.cluster = clusterData;
 
-                $girder.startTask(simulation, taskSpecId, clusterData, config)
+                $girder.startTask(simulation, taskSpecId, clusterData, config);
                 $state.go('viewer', { collectionName: $stateParams.collectionName,
                     projectID: simulation.folderId,
                     sessionId: sessionId
@@ -360,6 +360,7 @@ angular.module("kitware.cmb.core")
 
         var uploadToast = null;
         $scope.$on('notification-message', function (evt, message) {
+            var percentage;
             if(message === null) { //upload complete, see kw.girder.js:@uploadNextChunk
                 $mdToast.updateContent('Upload Complete');
                 $timeout(function() {
@@ -367,7 +368,7 @@ angular.module("kitware.cmb.core")
                     uploadToast = null;
                 }, 2000);
             } else if (uploadToast === null) {
-                var percentage = message.type === 'upload' ? Math.floor(100 * message.done / message.total) : 0;
+                percentage = message.type === 'upload' ? Math.floor(100 * message.done / message.total) : 0;
 
                 uploadToast = $mdToast.simple()
                     .position('bottom left right')
@@ -381,7 +382,7 @@ angular.module("kitware.cmb.core")
 
                 $mdToast.show(uploadToast);
             } else {
-                var percentage = message.type === 'upload' ? Math.floor(100 * message.done / message.total) : 0;
+                percentage = message.type === 'upload' ? Math.floor(100 * message.done / message.total) : 0;
                 if (message.type === 'upload') {
                     $mdToast.updateContent(message.file + '  ' + percentage + ' %');
                 } else {

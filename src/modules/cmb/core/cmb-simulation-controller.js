@@ -40,6 +40,37 @@ angular.module("kitware.cmb.core")
                             console.error("no item found");
                         }
 
+                        // loop over faces
+                        function convertAnnotations(faces) {
+                            var tagMap = {},
+                                processedTags = [],
+                                faceCount = faces.length,
+                                tagValues = [];
+
+                            while(faceCount--) {
+                                var tags = faces[faceCount].tags,
+                                    tagCount = tags.length;
+
+                                while(tagCount--) {
+                                    if(tagMap[tags[tagCount]]) {
+                                        tagMap[tags[tagCount]].push(faces[faceCount].id);
+                                    } else {
+                                        tagMap[tags[tagCount]] = [ faces[faceCount].id ];
+                                    }
+                                }
+                            }
+
+                            // Make enum structure
+                            for(var tag in tagMap) {
+                                processedTags.push(tag);
+                            }
+                            processedTags.sort();
+                            for(var idx = 0; idx < processedTags.length; ++idx) {
+                                tagValues.push(tagMap[processedTags[idx]]);
+                            }
+                            return {labels: processedTags, values: tagValues};
+                        }
+
                         while(count--) {
                             if(items[count].name === 'mesh') {
                                 var item = items[count],
@@ -50,37 +81,6 @@ angular.module("kitware.cmb.core")
                                     blocks = items[count].meta.annotation.blocks;
                                 } else {
                                     return;
-                                }
-
-                                // loop over faces
-                                function convertAnnotations(faces) {
-                                    var tagMap = {},
-                                        processedTags = [],
-                                        faceCount = faces.length,
-                                        tagValues = [];
-
-                                    while(faceCount--) {
-                                        var tags = faces[faceCount].tags,
-                                            tagCount = tags.length;
-
-                                        while(tagCount--) {
-                                            if(tagMap[tags[tagCount]]) {
-                                                tagMap[tags[tagCount]].push(faces[faceCount].id);
-                                            } else {
-                                                tagMap[tags[tagCount]] = [ faces[faceCount].id ];
-                                            }
-                                        }
-                                    }
-
-                                    // Make enum structure
-                                    for(var tag in tagMap) {
-                                        processedTags.push(tag);
-                                    }
-                                    processedTags.sort();
-                                    for(var idx = 0; idx < processedTags.length; ++idx) {
-                                        tagValues.push(tagMap[processedTags[idx]]);
-                                    }
-                                    return {labels: processedTags, values: tagValues};
                                 }
 
                                 $scope.external = {
@@ -114,7 +114,7 @@ angular.module("kitware.cmb.core")
             if (newStatus) {
                 item.meta[item.meta.task].status = newStatus;
                 var ret = {};
-                ret[item.meta.task] = item.meta[item.meta.task]
+                ret[item.meta.task] = item.meta[item.meta.task];
                 return ret;
             }
             else {
@@ -151,7 +151,7 @@ angular.module("kitware.cmb.core")
             }
         });
 
-        if(!$girder.getAuth()) {
+        if(!$girder.hasToken()) {
             $state.go('login');
         }
 
