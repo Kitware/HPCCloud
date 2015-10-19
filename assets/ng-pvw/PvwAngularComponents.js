@@ -235,6 +235,8 @@
 
 	                    if (needToFetch) {
 	                        getFacesAndBlock();
+	                    } else {
+	                        setupColoring();
 	                    }
 	                });
 	            }
