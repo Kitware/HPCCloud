@@ -20,7 +20,6 @@
             <tr ng-repeat="project in projects"
                 ng-if="project.parentId === group._id"
                 class="project-block">
-                <td></td>
                 <td ui-sref="project({ collectionName: getActiveCollection(), projectID: project._id })">
                     {{ project.name | unescape}}
                 </td>
@@ -31,7 +30,11 @@
                     {{ project.created | toDateNumber | date : 'medium' }}
                 </td>
                 <td class='text-right' ng-click='deleteProject(project._id)'>
-                    <i class='fa fa-trash' ng-if='project._accessLevel == 2'></i>
+                    <md-button class="md-icon-button clickable project-button"
+                        md-no-ink ng-disabled="uploading"
+                        ng-if='project._accessLevel == 2'>
+                        <i class='fa fa-trash'></i>
+                    </md-icon-button>
                 </td>
             </tr>
         </tbody>

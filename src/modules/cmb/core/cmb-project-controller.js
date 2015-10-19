@@ -475,6 +475,12 @@ angular.module("kitware.cmb.core")
                 });
         }
 
+        $scope.$on('notification-message', function (evt, message) {
+            if(message === null) { //upload complete, see kw.girder.js:@uploadNextChunk
+                updateScope(); //update current scope
+            }
+        });
+
         // $scope.$on('$stateChangeSuccess', updateScope);
 
         if(!$girder.hasToken()) {
