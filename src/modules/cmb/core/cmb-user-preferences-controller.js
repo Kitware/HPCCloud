@@ -226,8 +226,7 @@ angular.module("kitware.cmb.core")
                         $scope.namePlaceHolder = inputLabel;
                         $scope.data = {name: ''};
                     }],
-                    template: $templateCache.get('cmb/core/tpls/cmb-create-input-view-dialog.html'),
-                    targetEvent: event,
+                    template: $templateCache.get('cmb/core/tpls/cmb-create-input-view-dialog.html')
                 })
                 .then(succesCallback, failureCallback);
             }
