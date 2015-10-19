@@ -125,6 +125,29 @@
 	    $scope.faces = [];
 	    $scope.blocks = [];
 
+	    function acquireElements(scopeArray, subsetArray) {
+	        var size = subsetArray.length;
+	        for (var i = 0; i < size; ++i) {
+	            var elt = subsetArray[i];
+	            scopeArray.push({
+	                visible: elt.visible,
+	                id: elt.id,
+	                name: elt.name,
+	                tags: [],
+	                color: colorPalette[i % colorPalette.length]
+	            });
+	        }
+	    }
+
+	    function getFacesAndBlock() {
+	        setBusy();
+	        session.call('extract.subsets', []).then(function (subsets) {
+	            acquireElements($scope.faces, subsets.faces);
+	            acquireElements($scope.blocks, subsets.blocks);
+	            setupColoring();
+	        });
+	    }
+
 	    function setBusy() {
 	        $('.busy-spinner-indicator').css('display', 'block');
 	    }
@@ -171,15 +194,23 @@
 	            if ($scope.state) {
 	                stateLoaded = true;
 	                $scope.state.load(function (myState) {
-	                    if (myState.hasOwnProperty('faces')) {
+	                    var needToFetch = false;
+	                    if (myState && myState.hasOwnProperty('faces')) {
 	                        $scope.faces = angular.copy(myState.faces);
 	                        $scope.elements = $scope.faces;
+	                    } else {
+	                        needToFetch = true;
 	                    }
-	                    if (myState.hasOwnProperty('blocks')) {
+	                    if (myState && myState.hasOwnProperty('blocks')) {
 	                        $scope.blocks = myState.blocks;
+	                    } else {
+	                        needToFetch = true;
 	                    }
-	                    stateLoaded = false;
 	                    unsetBusy();
+
+	                    if (needToFetch) {
+	                        getFacesAndBlock();
+	                    }
 	                });
 	            }
 
@@ -210,28 +241,7 @@
 
 	            // Get faces and blocks lists from the server if we don't have them already.
 	            if (stateLoaded === false) {
-	                (function () {
-	                    var acquireElements = function acquireElements(scopeArray, subsetArray) {
-	                        var size = subsetArray.length;
-	                        for (var i = 0; i < size; ++i) {
-	                            var elt = subsetArray[i];
-	                            scopeArray.push({
-	                                visible: elt.visible,
-	                                id: elt.id,
-	                                name: elt.name,
-	                                tags: [],
-	                                color: colorPalette[i % colorPalette.length]
-	                            });
-	                        }
-	                    };
-
-	                    setBusy();
-	                    session.call('extract.subsets', []).then(function (subsets) {
-	                        acquireElements($scope.faces, subsets.faces);
-	                        acquireElements($scope.blocks, subsets.blocks);
-	                        setupColoring();
-	                    });
-	                })();
+	                getFacesAndBlock();
 	            } else {
 	                // If we did receive stored state, then just color the faces and blocks
 	                setBusy();
