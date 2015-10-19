@@ -1,6 +1,6 @@
 angular.module('pv.web')
-   .controller('pvExoMeshViewerController', ['$scope', 'kw.Girder', '$stateParams', '$window', '$templateCache',
-         function($scope, $girder, $stateParams, $window, $templateCache) {
+   .controller('pvExoMeshViewerController', ['$rootScope', '$scope', 'kw.Girder', '$stateParams', '$window', '$templateCache',
+         function($rootScope, $scope, $girder, $stateParams, $window, $templateCache) {
 
       $scope.config = {
          fileId: $stateParams.fileID
@@ -20,11 +20,16 @@ angular.module('pv.web')
 
       function load(callback) {
          $girder.getItem(itemId)
-            .success(function(item) {
-               $scope.item = item;
+            .then(function(item) {
+               $scope.data.item = item;
                if(item.meta && item.meta.annotation) {
                   callback(item.meta.annotation);
+               } else {
+                  callback(null);
                }
+            }, function(err) {
+               console.log(err.data.message);
+               callback(null);
             });
       }
 
@@ -32,5 +37,11 @@ angular.module('pv.web')
          save: save,
          load: load
       };
+
+      $scope.status = '';
+      $rootScope.$on('job.status', function(event, data) {
+         console.log('new status:', data.status);
+         $scope.status = data.status;
+      });
 
    }]);

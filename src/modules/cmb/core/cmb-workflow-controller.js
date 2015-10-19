@@ -78,7 +78,7 @@ angular.module("kitware.cmb.core")
                                                 id: $girder.getUser()._id,
                                                 level: 2
                                             }]
-                                        }
+                                        };
                                     return $girder.setFolderAccess(folder._id, access).then(function() {
                                         return folder;
                                     }, function(error) {
