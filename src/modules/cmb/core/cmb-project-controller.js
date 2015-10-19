@@ -235,12 +235,12 @@ angular.module("kitware.cmb.core")
             })
             .then(function(newSimulation) {
                 // Move to the newly created simulation
-                if (loading[simulation._id].cloning === true) {
+                if (simulation && loading[simulation._id].cloning === true) {
                     loading[simulation._id].cloning = false;
                 }
                 updateScope();
             }, function() {
-                if (loading[simulation._id].cloning === true) {
+                if (simulation && loading[simulation._id].cloning === true) {
                     loading[simulation._id].cloning = false;
                 }
             });
