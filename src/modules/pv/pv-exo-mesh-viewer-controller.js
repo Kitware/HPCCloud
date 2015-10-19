@@ -6,7 +6,7 @@ angular.module('pv.web')
          fileId: $stateParams.fileID
       };
 
-      var itemId = $stateParams.meshItemID,
+      var itemId = $stateParams.meshItemId,
          hostPort = $window.location.host;
 
       $scope.url = "ws://"+hostPort+"/proxy?sessionId=" +
