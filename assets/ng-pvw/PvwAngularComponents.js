@@ -148,6 +148,31 @@
 	        });
 	    }
 
+	    // Take the faces and blocks and color each one according to it's internal color property
+	    function setupColoring() {
+	        var totalNumberOfElements = $scope.faces.length + $scope.blocks.length,
+	            currentlyRecoloredCount = 0;
+
+	        function rerenderAfterAll() {
+	            currentlyRecoloredCount += 1;
+	            if (currentlyRecoloredCount === totalNumberOfElements) {
+	                rerender();
+	            }
+	        }
+
+	        function initColors(scopeArray, type, updateLut) {
+	            for (var index = 0; index < scopeArray.length; ++index) {
+	                session.call('toggle.color', [type, index, scopeArray[index].color, updateLut]).then(rerenderAfterAll);
+	            }
+	        }
+
+	        initColors($scope.blocks, 'blocks', false);
+	        initColors($scope.faces, 'faces', true);
+
+	        $scope.elements = $scope.faces;
+	        $scope.$apply();
+	    }
+
 	    function setBusy() {
 	        $('.busy-spinner-indicator').css('display', 'block');
 	    }
@@ -212,31 +237,6 @@
 	                        getFacesAndBlock();
 	                    }
 	                });
-	            }
-
-	            // Take the faces and blocks and color each one according to it's internal color property
-	            function setupColoring() {
-	                var totalNumberOfElements = $scope.faces.length + $scope.blocks.length,
-	                    currentlyRecoloredCount = 0;
-
-	                function rerenderAfterAll() {
-	                    currentlyRecoloredCount += 1;
-	                    if (currentlyRecoloredCount === totalNumberOfElements) {
-	                        rerender();
-	                    }
-	                }
-
-	                function initColors(scopeArray, type, updateLut) {
-	                    for (var index = 0; index < scopeArray.length; ++index) {
-	                        session.call('toggle.color', [type, index, scopeArray[index].color, updateLut]).then(rerenderAfterAll);
-	                    }
-	                }
-
-	                initColors($scope.blocks, 'blocks', false);
-	                initColors($scope.faces, 'faces', true);
-
-	                $scope.elements = $scope.faces;
-	                $scope.$apply();
 	            }
 
 	            // Get faces and blocks lists from the server if we don't have them already.
