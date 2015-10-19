@@ -22,8 +22,8 @@ angular.module('pv.web')
          $girder.getItem(itemId)
             .then(function(item) {
                $scope.item = item.data;
-               if(item.meta && item.meta.annotation) {
-                  callback(item.meta.annotation);
+               if(item.data.meta && item.data.meta.annotation) {
+                  callback(item.data.meta.annotation);
                } else {
                   callback(null);
                }
