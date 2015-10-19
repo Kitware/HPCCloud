@@ -1,3 +1,7 @@
 <div class="hydra-mesh-viewer-container">
-   <pvw-mesh-tagger url="url" appKey="meshtagger" state="control" config="config">
+    <pvw-mesh-tagger url="url" appKey="meshtagger" state="control" config="config"
+        ng-if="status === 'complete'">
+    </pvw-mesh-tagger>
+    <pv-job-status ng-if="status !== 'complete'">
+    </pv-job-status>
 </div>

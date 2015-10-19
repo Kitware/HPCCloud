@@ -38,10 +38,10 @@ angular.module('pv.web')
          load: load
       };
 
-      $scope.status = '';
+      $scope.status = 'loading';
       $rootScope.$on('job.status', function(event, data) {
-         console.log('new status:', data.status);
          $scope.status = data.status;
+         $scope.$apply();
       });
 
    }]);
