@@ -10,13 +10,15 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb', 'kitware.SimPut'])
         url: "/login",
         templateProvider: ['$templateCache', function ($templateCache) {
             return $templateCache.get('cmb/core/tpls/cmb-login-panel.html');
-        }]
+        }],
+        controller: 'CmbLoginController'
     })
     .state('register', {
         url: "/register",
         templateProvider: ['$templateCache', function ($templateCache) {
             return $templateCache.get('cmb/core/tpls/cmb-register-panel.html');
-        }]
+        }],
+        controller: 'CmbLoginController'
     })
     .state('home', {
         url: "/home",

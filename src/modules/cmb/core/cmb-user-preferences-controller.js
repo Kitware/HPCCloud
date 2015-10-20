@@ -42,29 +42,33 @@ angular.module("kitware.cmb.core")
             };
             $scope.regions = Object.keys($scope.ec2);
 
-            $girder.getAWSProfiles()
-                .success(function(data){
-                    data = data.map(function(el) {
-                        el.saved = true;
-                        return el;
-                    });
-                    $scope.awsProfiles = angular.copy(data);
-                })
-                .error(function(err){
-                    showToast(err.message);
-                });
+            $scope.$watch('user', function(newVal, oldVal) {
+                if (!Boolean(newVal)) {
+                    return;
+                }
 
-            $girder.getClusterProfiles()
-                .success(function(data){
-                    data = data.map(function(el) {
-                        el.saved = true;
-                        return el;
+                $girder.getAWSProfiles()
+                    .then(function(res){
+                        data = res.data.map(function(el) {
+                            el.saved = true;
+                            return el;
+                        });
+                        $scope.awsProfiles = angular.copy(data);
+                    }, function(err){
+                        showToast(err.data.message);
                     });
-                    $scope.clusterProfiles = angular.copy(data);
-                })
-                .error(function(err) {
-                    showToast(err.message);
-                });
+
+                $girder.getClusterProfiles()
+                    .then(function(res){
+                        data = res.data.map(function(el) {
+                            el.saved = true;
+                            return el;
+                        });
+                        $scope.clusterProfiles = angular.copy(data);
+                    }, function(err) {
+                        showToast(err.data.message);
+                    });
+            });
 
             $scope.$on('profile.status', genericStatusUpdate('awsProfiles'));
             $scope.$on('cluster.status', genericStatusUpdate('clusterProfiles'));

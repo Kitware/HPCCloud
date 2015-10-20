@@ -35,7 +35,7 @@ angular.module("kitware.girder", ["ngCookies"])
         };
 
         this.hasToken = function() {
-            return authToken !== null && authToken !== undefined;
+            return !!authToken; //boolean cast
         };
 
         if (authToken) {

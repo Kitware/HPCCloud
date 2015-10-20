@@ -31,6 +31,7 @@
                 </td>
                 <td class='text-right' ng-click='deleteProject(project._id)'>
                     <md-button class="md-icon-button clickable project-button"
+                        aria-label="delete project"
                         md-no-ink ng-disabled="uploading"
                         ng-if='project._accessLevel == 2'>
                         <i class='fa fa-trash'></i>
