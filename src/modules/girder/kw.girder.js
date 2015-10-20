@@ -9,7 +9,7 @@ angular.module("kitware.girder", ["ngCookies"])
         // Internal state
         var apiBasePathURL = '/api/v1/',
             user = null,
-            authToken = $cookies.girderToken,
+            authToken = null,
             taskList = {},
             collectionMap = {};
 
