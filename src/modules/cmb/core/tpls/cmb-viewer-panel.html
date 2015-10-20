@@ -1,7 +1,8 @@
 <div class="hydra-mesh-viewer-container">
-	<div pvw-visualizer url="{{ connectionURL }}" appKey="visualizer"> ng-if="status === 'complete'">
+	<div pvw-visualizer url="{{ connectionURL }}" appKey="visualizer"
+		ng-if="jobStatusDone">
 	    ParaViewWeb Visualizer directive
 	</div>
-    <pv-job-status ng-if="status !== 'complete'">
+    <pv-job-status>
     </pv-job-status>
 </div>

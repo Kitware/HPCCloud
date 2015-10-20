@@ -1,9 +1,16 @@
-<div class="dialog">
+<div class="dialog" ng-hide="done">
     <dl>
         <dt>Job Status</dt>
-        <dd>
-            {{status}}
-            <span><i class="fa fa-circle-o-notch fa-spin"></i></span>
+        <dd ng-repeat="job in jobs" ng-hide="jobs.length === 0">
+        	{{job.name}}:
+            {{statuses[job._id]}}
+            <span ng-switch="statuses[job._id]">
+            	<i ng-switch-when="running" class="fa fa-check"></i>
+            	<i ng-switch-default class="fa fa-circle-o-notch fa-spin"></i>
+            </span>
+        </dd>
+        <dd ng-hide="jobs.length !== 0" loading is-loading="true">
+        	Waiting for job creation
         </dd>
     </dl>
 </div>

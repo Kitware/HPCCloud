@@ -280,6 +280,7 @@ angular.module("kitware.cmb.core")
                 };
 
             $girder.getTask(simulation).then(function (task) {
+                console.log('hydra?', task.data.output);
                 var hydraJob = task.data.output.hydra_job,
                     dataDir = hydraJob._id,
                     sessionId = clusterData._id + '/' + hydraJob._id;
