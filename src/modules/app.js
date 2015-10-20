@@ -60,6 +60,7 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb', 'kitware.SimPut'])
             templateProvider: ['$templateCache', '$stateParams', function ($templateCache, $stateParams) {
                 return $templateCache.get('cmb/core/tpls/cmb-viewer-panel.html');
             }],
+            params: {'taskId': undefined},
             controller: 'CmbViewerController'
         })
         .state('mesh', {
@@ -67,6 +68,7 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb', 'kitware.SimPut'])
             templateProvider: ['$templateCache', '$stateParams', function ($templateCache, $stateParams) {
                 return $templateCache.get('pv/tpls/pv-exo-mesh-viewer.html');
             }],
+            params: {'taskId': undefined},
             controller: 'pvExoMeshViewerController'
         });
     }]);

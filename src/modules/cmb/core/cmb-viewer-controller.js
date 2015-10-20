@@ -9,4 +9,6 @@ angular.module("kitware.cmb.core")
         $rootScope.$on('job-status-done', function() {
             $scope.jobStatusDone = true;
         });
+
+        $scope.taskId = $stateParams.taskId;
     }]);

@@ -5,10 +5,9 @@ angular.module('pv.web')
             restrict: 'AE',
             template: $templateCache.get('pv/tpls/pv-job-status.html'),
             scope: {
-                status: '@',
+                taskId: '=taskId'
             },
             link: function(scope, element, attrs) {
-                var parentTask = null;
                 scope.statuses = {}; // formatted {[_id]: 'status', ...}
                 scope.jobs = [];
                 scope.done = false;
@@ -62,21 +61,17 @@ angular.module('pv.web')
                             $rootScope.$broadcast('job-status-done');
                         }
                     }
-                    updateJobsList(parentTask, cb);
+                    updateJobsList(scope.taskId, cb);
                 });
 
-                //set the parentTaskId, update the jobs list
+                //update the jobs list it the event has the right taskId
                 $rootScope.$on('task.status', function(event, data) {
-                    if (!parentTask) {
-                        //only set this once, there could be multiple ones flying around
-                        parentTask = data._id;
-                        updateJobsList(parentTask);
-                    } else if (data._id === parentTask && data._status === 'error') {
+                    if (data._id === scope.taskId) {
+                        updateJobsList(scope.taskId);
+                    } else if (data._id === scope.taskId && data.status === 'error') {
                         $window.alert('parent task has errored');
                     }
                 });
-
-
             }
          };
     }]);

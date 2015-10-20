@@ -627,7 +627,7 @@ angular.module("kitware.girder", ["ngCookies"])
         };
 
         // Tasks
-        this.startTask = function (item, taskDefId, cluster, taskConfig) {
+        this.startTask = function (item, taskDefId, cluster, taskConfig, cb) {
             var self = this;
             // Create task instance
             taskConfig.cluster.name = item._id;
@@ -650,10 +650,13 @@ angular.module("kitware.girder", ["ngCookies"])
 
                     // Start task
                     return self.put(['tasks', response.data._id, 'run'].join('/'), taskConfig)
-                        .then(function(){
+                        .then(function(response){
                             console.log("Task successfully started");
                             metadata[taskConfig.taskName].status = 'running';
                             self.updateItemMetadata(item, metadata);
+                            if (cb) {
+                                cb(metadata[metadata.task].taskId);
+                            }
                         }, function(error) {
                             console.log("Error while starting Task", error.data.message);
                             item.meta[taskConfig.taskName].status = 'error';

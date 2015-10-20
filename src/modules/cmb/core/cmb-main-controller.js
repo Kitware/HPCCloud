@@ -280,7 +280,6 @@ angular.module("kitware.cmb.core")
                 };
 
             $girder.getTask(simulation).then(function (task) {
-                console.log('hydra?', task.data.output);
                 var hydraJob = task.data.output.hydra_job,
                     dataDir = hydraJob._id,
                     sessionId = clusterData._id + '/' + hydraJob._id;
@@ -289,11 +288,13 @@ angular.module("kitware.cmb.core")
                     config.dataDir = dataDir;
                     config.cluster = clusterData;
 
-                $girder.startTask(simulation, taskSpecId, clusterData, config);
-                $state.go('viewer', { collectionName: $stateParams.collectionName,
-                    projectID: simulation.folderId,
-                    sessionId: sessionId
-                });
+                $girder.startTask(simulation, taskSpecId, clusterData, config, function(newTaskId) {
+                    $state.go('viewer', { collectionName: $stateParams.collectionName,
+                        projectID: simulation.folderId,
+                        sessionId: sessionId,
+                        taskId: newTaskId
+                    });
+                })
 
             }, function (err) {
                 console.log(err);
@@ -323,7 +324,8 @@ angular.module("kitware.cmb.core")
                     $state.go('mesh', { collectionName: $stateParams.collectionName,
                         projectID: mesh.folderId,
                         meshItemId: mesh._id,
-                        sessionId: sessionId
+                        sessionId: sessionId,
+                        taskId: taskId
                     });
                 });
         };

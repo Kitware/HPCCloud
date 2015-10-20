@@ -43,4 +43,5 @@ angular.module('pv.web')
          $scope.jobStatusDone = true;
       });
 
+      $scope.taskId = $stateParams.taskId;
    }]);
