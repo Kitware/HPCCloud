@@ -295,7 +295,7 @@ angular.module("kitware.cmb.core")
                         sessionId: sessionId,
                         taskId: newTaskId
                     });
-                })
+                });
 
             }, function (err) {
                 console.log(err);
