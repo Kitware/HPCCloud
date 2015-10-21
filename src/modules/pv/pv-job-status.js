@@ -5,12 +5,13 @@ angular.module('pv.web')
             restrict: 'AE',
             template: $templateCache.get('pv/tpls/pv-job-status.html'),
             scope: {
-                taskId: '=taskId'
+                taskId: '=taskId',
+                done: '=?'
             },
             link: function(scope, element, attrs) {
                 scope.statuses = {}; // formatted {[_id]: 'status', ...}
                 scope.jobs = [];
-                scope.done = false;
+                scope.done = angular.isDefined(scope.done) ? scope.done : false;
 
                 //pass an object and a regex, get an array of keys which match the regex
                 function pick(obj, regexp) {
