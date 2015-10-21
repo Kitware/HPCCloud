@@ -1,4 +1,4 @@
-# CMB-Web project
+# HPC Cloud
 =====================
 
 ## Introduction
