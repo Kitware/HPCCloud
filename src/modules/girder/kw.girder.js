@@ -38,10 +38,6 @@ angular.module("kitware.girder", ["ngCookies"])
             return !!authToken; //boolean cast
         };
 
-        if (authToken) {
-            this.fetchUser();
-        }
-
         var notifications = null;
 
         function connectToNotificationStream() {
@@ -963,4 +959,23 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.delete('volumes/' + item.meta.volumeId);
         };
 
+        this.getToken = function() {
+            return this.get('token/current');
+        };
+
+        this.getToken().then(angular.bind(this, function(response) {
+            if (response.data && response.data._id) {
+                authToken = response.data._id;
+
+                if (authToken) {
+                    this.fetchUser();
+                }
+            }
+            else {
+                authToken = null;
+            }
+        }), function(error) {
+            console.log(error);
+            authToken = null;
+        });
     }]);
