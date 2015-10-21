@@ -287,6 +287,7 @@ angular.module("kitware.cmb.core")
                     config.simulationJobId = hydraJob._id;
                     config.dataDir = dataDir;
                     config.cluster = clusterData;
+                    config.sessionId = sessionId;
 
                 $girder.startTask(simulation, taskSpecId, clusterData, config, function(newTaskId) {
                     $state.go('viewer', { collectionName: $stateParams.collectionName,

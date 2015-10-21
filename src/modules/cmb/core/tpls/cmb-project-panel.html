@@ -99,13 +99,13 @@
                     </div>
                 </div>
                 <div layout="row">
-                    <md-button ng-hide="hasStatus(simulation, 'complete')" ng-click="runTask($event,
+                    <md-button ng-hide="hasStatus(simulation, 'complete') || (simulation.meta.task === 'pvw' && hasStatus(simulation, 'running'))" ng-click="runTask($event,
                         'Start simulation computation', 'hydra', false, simulation, runSimulationCallback)"
                         class="md-raised md-primary" ng-disabled="!hasStatus(simulation, 'valid')">
                         Run
                     </md-button>
-                    <md-button ng-show="hasStatus(simulation, 'complete')" ng-click="runTask($event,
-                        'Start result viewer', 'pvw', false, simulation, runVisualizationCallback)"
+                    <md-button ng-show="hasStatus(simulation, 'complete') || (simulation.meta.task === 'pvw' && hasStatus(simulation, 'running'))"
+                        ng-click="goToVisualization($event, simulation)"
                         class="md-raised md-primary">
                         Visualize
                     </md-button>

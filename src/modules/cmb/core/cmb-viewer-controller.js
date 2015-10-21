@@ -5,7 +5,7 @@ angular.module("kitware.cmb.core")
         $scope.connectionURL = ($stateParams.mode === 'launcher') ? "/paraview" : ("ws://"+hostPort+"/proxy?sessionId=" + encodeURIComponent($stateParams.sessionId));
         $scope.itemId = $stateParams.simulationID;
 
-        $scope.jobStatusDone = false;
+        $scope.jobStatusDone = $stateParams.done;
         $rootScope.$on('job-status-done', function() {
             $scope.jobStatusDone = true;
         });

@@ -628,7 +628,13 @@ angular.module("kitware.girder", ["ngCookies"])
 
         // Tasks
         this.startTask = function (item, taskDefId, cluster, taskConfig, cb) {
-            var self = this;
+            var self = this,
+                sessionId = null;
+
+            if (taskConfig.hasOwnProperty('sessionId')) {
+                sessionId = taskConfig.sessionId;
+            }
+
             // Create task instance
             taskConfig.cluster.name = item._id;
             if (item.meta.hasOwnProperty('volumeId')) {
@@ -647,6 +653,10 @@ angular.module("kitware.girder", ["ngCookies"])
                         cost: cluster.cost,
                         totalCost: (item.meta.totalCost || 0),
                     };
+
+                    if (sessionId !== null) {
+                        metadata.sessionId = sessionId;
+                    }
 
                     // Start task
                     return self.put(['tasks', response.data._id, 'run'].join('/'), taskConfig)

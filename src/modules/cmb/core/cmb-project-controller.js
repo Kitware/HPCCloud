@@ -1,7 +1,7 @@
 angular.module("kitware.cmb.core")
     .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog',
-        '$templateCache', '$window', '$interval',
-        function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $interval) {
+        '$templateCache', '$window', '$timeout', '$interval',
+        function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $timeout, $interval) {
         var timeoutId = 0;
 
         //from https://github.com/tjmehta/101/blob/master/is-object.js
@@ -327,6 +327,23 @@ angular.module("kitware.cmb.core")
                 if (logInterval !== null) {
                     $interval.cancel(logInterval);
                 }
+            }
+        };
+
+        $scope.goToVisualization = function($event, simulation) {
+            if (simulation.meta[simulation.meta.task].status === 'running') {
+                $state.go('viewer', { collectionName: $stateParams.collectionName,
+                    projectID: simulation.folderId,
+                    sessionId: simulation.meta.sessionId,
+                    taskId: simulation.meta[simulation.meta.task].taskId,
+                    done: true
+                });
+
+            } else {
+                console.log('start anew');
+                $scope.runTask($event,
+                    'Start result viewer', 'pvw',
+                    false, simulation, $scope.runVisualizationCallback);
             }
         };
 

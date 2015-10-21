@@ -38,7 +38,7 @@ angular.module('pv.web')
          load: load
       };
 
-      $scope.jobStatusDone = false;
+      $scope.jobStatusDone = $stateParams.done;
       $rootScope.$on('job-status-done', function() {
          $scope.jobStatusDone = true;
       });
