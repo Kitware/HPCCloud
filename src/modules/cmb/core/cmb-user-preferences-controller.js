@@ -164,8 +164,8 @@ angular.module("kitware.cmb.core")
                 }
             };
 
-            $scope.floorSlots = function(val) {
-                $scope.profile.config.numberOfSlots = Math.floor(val);
+            $scope.floorSlots = function(index, val) {
+                $scope.clusterProfiles[index].config.numberOfSlots = Math.floor(val);
             };
 
             function createClusterProfile(index) {

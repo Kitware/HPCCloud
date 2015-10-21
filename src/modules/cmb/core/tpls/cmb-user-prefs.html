@@ -102,8 +102,10 @@
                             </md-input-container>
                             <md-input-container>
                                 <label>Number of slots</label>
-                                <input type="number" min="1" step="1" ng-model="profile.config.numberOfSlots" ng-disabled="profile.saved" placeholder="optional"
-                                       ng-blur="floorSlots(profile.config.numberOfSlots)">
+                                <input type="number" min="1" step="1"
+                                    ng-model="profile.config.numberOfSlots"
+                                    ng-disabled="profile.saved" placeholder="optional"
+                                    ng-blur="floorSlots($index, profile.config.numberOfSlots)">
                             </md-input-container>
                             <md-input-container>
                                 <label>Simulation output directory</label>
