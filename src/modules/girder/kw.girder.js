@@ -986,9 +986,11 @@ angular.module("kitware.girder", ["ngCookies"])
             }
             else {
                 authToken = null;
+                $rootScope.$broadcast('logout');
             }
         }), function(error) {
             console.log(error);
             authToken = null;
+            $rootScope.$broadcast('logout');
         });
     }]);
