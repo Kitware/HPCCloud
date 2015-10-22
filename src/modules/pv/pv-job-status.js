@@ -6,7 +6,7 @@ angular.module('pv.web')
             template: $templateCache.get('pv/tpls/pv-job-status.html'),
             scope: {
                 taskId: '=taskId',
-                done: '=?'
+                done: '=?' //optional, defaults to false
             },
             link: function(scope, element, attrs) {
                 scope.statuses = {}; // formatted {[_id]: 'status', ...}
@@ -18,15 +18,6 @@ angular.module('pv.web')
                     return Object.keys(obj).filter(function(el) {
                         return regexp.test(el);
                     });
-                }
-
-                function indexWithJobId(id) {
-                    for (var i=0; i < scope.jobs.length; i++) {
-                        if (scope.jobs[i]._id === id) {
-                            return i;
-                        }
-                    }
-                    return -1;
                 }
 
                 function updateJobsList(taskId, callback) {
