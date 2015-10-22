@@ -6,6 +6,7 @@ angular.module('pv.web')
             template: $templateCache.get('pv/tpls/pv-job-status.html'),
             scope: {
                 taskId: '=taskId',
+                expectedRunningCount: '=expectedRunningCount',
                 done: '=?' //optional, defaults to false
             },
             link: function(scope, element, attrs) {
@@ -18,6 +19,16 @@ angular.module('pv.web')
                     return Object.keys(obj).filter(function(el) {
                         return regexp.test(el);
                     });
+                }
+
+                function count(obj, attr) {
+                    var out = 0;
+                    Object.keys(obj).forEach(function(key) {
+                        if (obj[key] === attr) {
+                            out += 1;
+                        }
+                    });
+                    return out;
                 }
 
                 function updateJobsList(taskId, callback) {
@@ -46,9 +57,7 @@ angular.module('pv.web')
                     function cb() {
                         scope.statuses[data._id] = data.status;
                         //if all the jobs are running, we're done here.
-                        if (Object.keys(scope.statuses).every(function(el) {
-                            return scope.statuses[el] === 'running';
-                        })) {
+                        if (count(scope.statuses, 'running') === scope.expectedRunningCount) {
                             scope.done = true;
                             $rootScope.$broadcast('job-status-done');
                         }

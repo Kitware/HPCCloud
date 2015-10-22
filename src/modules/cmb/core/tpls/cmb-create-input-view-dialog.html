@@ -4,7 +4,8 @@
     </md-subheader>
     <md-content>
     <form layout="column">
-        <md-input-container flex>
+        <md-input-container flex
+            ng-keypress="(data.name && $event.keyCode === 13) ? ok(data) : null">
             <label>{{ namePlaceHolder }}</label>
             <input ng-model="data.name">
         </md-input-container>
@@ -12,7 +13,7 @@
 </md-content>
   <div class="md-actions" layout="row">
     <span flex></span>
-    <md-button ng-click="ok(data)" class="md-raised md-primary">Ok</md-button>
     <md-button ng-click="cancel()" class="md-raised md-warn">Cancel</md-button>
+    <md-button ng-click="ok(data)" class="md-raised md-primary">Ok</md-button>
   </div>
 </md-dialog>
