@@ -1,8 +1,23 @@
 var gulp = require('gulp'),
     $ = require('gulp-load-plugins')({
             pattern: ['gulp-*', 'main-bower-files', 'uglify-save-license', 'del', 'browser-sync', 'proxy']
-    });
+    }),
+    jsHintOptions = {
+        eqeqeq: true
+    };
 
+gulp.task('test', function() {
+    return gulp.src(['src/modules/**/module.js', 'src/modules/**/*.js', 'assets/workflows/*/helper.js'])
+        .pipe($.jshint(jsHintOptions))
+        .pipe($.jshint.reporter('jshint-stylish'))
+        .pipe($.jshint.reporter('fail'))
+        .pipe($.sourcemaps.init())
+        .pipe($.concat('chpc-min.js'))
+        .pipe($.uglify())
+        .pipe($.sourcemaps.write())
+        .pipe(gulp.dest('dist/js'))
+        .pipe($.size({title: "JS"}));
+});
 
 gulp.task('watch', ['build'] ,function () {
   gulp.watch('src/**/*', ['jade','html', $.browserSync.reload]);
