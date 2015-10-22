@@ -1,26 +1,30 @@
 # HPC Cloud
-=====================
 
-## Introduction
-===============
+## Related/Companion Repositories
 
+- [HPC Cloud VM deploy](https://github.com/Kitware/HPCCloud-deploy)*
+- [Cumulus](https://github.com/Kitware/cumulus)
+- [Girder](https://github.com/girder/girder)
+
+\* most important
+
+## Installation
+Consult the setup instructions on the README of [HPCCloud-deploy repository](https://github.com/Kitware/HPCCloud-deploy)
 
 ## Configuration
-================
 
 Install system wide the following application
 
     $ brew install node
     $ npm install -g gulp
 
-Project specific configuration and setup
+Project specific configuration and setup after cloning this repository
 
-    $ git clone git@... src
-    $ cd src
+	$ cd HPCCloud/
     $ npm install
+    $ gulp watch
 
-NGINX configuration file used for blending Girder with "gulp serve" into
-http://localhost:8888/
+If you're not using the VM you can use this NGINX configuration file to blend Girder with server running from `gulp serve` into http://localhost:8888/
 
 Comments:
     By default, the configuration file is named nginx.conf and placed
@@ -73,7 +77,6 @@ Comments:
     | }
 
 ## Girder initial structure
-===========================
 
 OSX Side notes:
 
@@ -144,7 +147,7 @@ Here is an example hierarchy that can be used:
       - hydra-ne-members: user001, user002
       - mpas-ocean-members: user001, user003
 
-Comments:
-    The name of the collections should be part of the file {repo}/src/workflows.json
+### Comments:
+The name of the collections should be part of the file {repo}/src/workflows.json
 
 
