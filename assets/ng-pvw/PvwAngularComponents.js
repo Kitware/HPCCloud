@@ -117,7 +117,7 @@
 	        launcher = false,
 	        stateLoaded = false;
 
-	    $scope.showingControlTab = true;
+	    $scope.showingControlTab = false;
 	    $scope.outlineVisible = true;
 	    $scope.showingFaces = true;
 	    $scope.activeElement = 0;
@@ -150,6 +150,7 @@
 
 	    // Take the faces and blocks and color each one according to it's internal color property
 	    function setupColoring() {
+	        setBusy();
 	        var totalNumberOfElements = $scope.faces.length + $scope.blocks.length,
 	            currentlyRecoloredCount = 0;
 
@@ -170,7 +171,10 @@
 	        initColors($scope.faces, 'faces', true);
 
 	        $scope.elements = $scope.faces;
-	        $scope.$apply();
+	        $scope.$apply(function () {
+	            $('.busy-spinner-indicator').css('color', 'white');
+	            $scope.toggleControlTab();
+	        });
 	    }
 
 	    function setBusy() {
@@ -336,8 +340,6 @@
 	    $scope.toggleBackgroundColor = function () {
 	        setBusy();
 	        session.call('toggle.bg.color', []).then(function (newBgColor) {
-	            console.log("New background color:");
-	            console.log(newBgColor);
 	            if (newBgColor[0] < 0.5) {
 	                $('.busy-spinner-indicator').css('color', 'white');
 	                $('.hydra-mesh-viewer > .control-panel').css('background-color', '#aaaaaa').css('color', 'black');
@@ -497,6 +499,7 @@
 	        });
 	    });
 
+	    setBusy();
 	    $scope.connect($scope.url, $scope.appKey);
 	}]);
 	module.exports = exports['default'];
@@ -536,7 +539,7 @@
 
 
 	// module
-	exports.push([module.id, ".hydra-mesh-viewer {\n    position: absolute;\n    left: 0;\n    right: 0;\n    top: 0;\n    bottom: 0;\n}\n\n.hydra-mesh-viewer > .control-panel {\n    position: absolute;\n    top: 30px;\n    left: 30px;\n    z-index: 50;\n    border-radius: 5px 5px 0 0;\n    color: black;\n    background-color: #aaaaaa;\n    width: 350px;\n    height: 32px;\n}\n\n.hydra-mesh-viewer > .control-panel > div > div.faces-blocks-label {\n    font-family: sans-serif;\n    font-size: larger;\n}\n\n.hydra-mesh-viewer > .control-panel > span {\n    text-align: center;\n    margin: 2px;\n}\n\n.hydra-mesh-viewer > .control-panel > span.left {\n    float: left;\n}\n\n.hydra-mesh-viewer > .control-panel > span.right {\n    float: right;\n}\n\n.hydra-mesh-viewer > .control-tab.open {\n    position: absolute;\n    left: 30px;\n    top: 62px;\n    width: 350px;\n    bottom: 30px;\n    display: block;\n    border-radius: 0 0 5px 5px;\n    background-color: white;\n    z-index: 50;\n    overflow-x: hidden;\n    overflow-y: auto;\n}\n\n.hydra-mesh-viewer > .control-tab.closed {\n    display: none;\n}\n\n.hydra-mesh-viewer > .renderer {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n}\n\n.hydra-mesh-viewer > .width-100 {\n    width: 100%;\n}\n\n.busy-spinner-container {\n    position: absolute;\n    left: 56%;\n    top: 45%;\n}\n\n.busy-spinner-indicator {\n    display: none;\n    color: white;\n}\n\n.clickable {\n    cursor: pointer;\n}\n", ""]);
+	exports.push([module.id, ".hydra-mesh-viewer {\n    position: absolute;\n    left: 0;\n    right: 0;\n    top: 0;\n    bottom: 0;\n}\n\n.hydra-mesh-viewer > .control-panel {\n    position: absolute;\n    top: 30px;\n    left: 30px;\n    z-index: 50;\n    border-radius: 5px;\n    color: black;\n    background-color: #aaaaaa;\n    width: 350px;\n    height: 32px;\n}\n\n.hydra-mesh-viewer > .control-panel > div > div.faces-blocks-label {\n    font-family: sans-serif;\n    font-size: larger;\n}\n\n.hydra-mesh-viewer > .control-panel > span {\n    text-align: center;\n    margin: 2px;\n}\n\n.hydra-mesh-viewer > .control-panel > span.left {\n    float: left;\n}\n\n.hydra-mesh-viewer > .control-panel > span.right {\n    float: right;\n}\n\n.hydra-mesh-viewer > .control-tab.open {\n    position: absolute;\n    left: 30px;\n    top: 62px;\n    width: 350px;\n    bottom: 30px;\n    display: block;\n    border-radius: 0 0 5px 5px;\n    background-color: white;\n    z-index: 50;\n    overflow-x: hidden;\n    overflow-y: auto;\n}\n\n.hydra-mesh-viewer > .control-tab.closed {\n    display: none;\n}\n\n.hydra-mesh-viewer > .renderer {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n}\n\n.hydra-mesh-viewer > .width-100 {\n    width: 100%;\n}\n\n.busy-spinner-container {\n    position: absolute;\n    left: 56%;\n    top: 45%;\n}\n\n.busy-spinner-indicator {\n    display: block;\n    color: black;\n}\n\n.clickable {\n    cursor: pointer;\n}\n", ""]);
 
 	// exports
 
@@ -844,7 +847,7 @@
 /* 11 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"hydra-mesh-viewer\">\n   <div class=\"control-tab open\">\n      <table class='table table-striped table-hover table-condensed'>\n         <tbody>\n            <tr ng-repeat=\"elt in elements\" ng-class=\"{ info: ($index === activeElement)}\" ng-click=\"updateActiveElement( $index)\">\n               <td ng-click=\"toggleVisibility($index)\"><i class=\"fa\" ng-class=\"{ 'fa-eye' : elt.visible, 'fa-eye-slash': !elt.visible }\"></i></td>\n               <td>{{ elt.name }}</td>\n               <td>\n                  <div class=\"fa\" ng-class=\"{ 'fa-tags' : elt.tags.length > 0}\">\n                     <md-tooltip>{{ elt.tags.join(', ') }}</md-tooltip>\n                  </div>\n               </td>\n               <td style=\"color: {{ elt.color }};\" ng-click=\"changeColor($index)\"><i class=\"fa fa-circle clickable\"></i></td>\n            </tr>\n         </tbody>\n      </table>\n   </div>\n   <div class=\"control-panel\">\n      <span class=\"fa-stack fa left clickable\" ng-click=\"toggleControlTab()\">\n         <i class=\"fa fa-stack-1x\" ng-class=\"{ 'fa-caret-down': showingControlTab, 'fa-caret-right': !showingControlTab }\">\n            <md-tooltip>Toggle Element List</md-tooltip>\n         </i>\n      </span>\n      <div class=\"fa-stack fa\" style=\"position: relative; margin-top: 3px; width: 55px; float: left\">\n         <div class=\"faces-blocks-label left clickable\" ng-click=\"toggleElementType()\">\n            {{ showingFaces ? \"Faces\" : \"Blocks\" }}\n         </div>\n         <md-tooltip>Display {{ showingFaces ? \"Block\" : \"Face\" }} List</md-tooltip>\n      </div>\n      <span class=\"fa-stack fa right clickable\" ng-click=\"tag($event)\">\n         <i class=\"fa fa-tags fa-stack-1x\">\n            <md-tooltip>Tag Visible {{ showingFaces ? \"Faces\" : \"Blocks\" }}</md-tooltip>\n         </i>\n      </span>\n      <span class=\"fa-stack fa right clickable\" ng-click=\"resetCamera()\">\n         <i class=\"fa fa-arrows-alt fa-stack-1x\">\n            <md-tooltip>Reset Camera</md-tooltip>\n         </i>\n      </span>\n      <span class=\"fa-stack fa right clickable\" ng-click=\"toggleVisibility(-1)\">\n         <i class=\"fa fa-cube fa-stack-1x\">\n            <md-tooltip>Toggle Outline Visibility</md-tooltip>\n         </i>\n      </span>\n      <span class=\"fa-stack fa right clickable\" ng-click=\"toggleBackgroundColor()\">\n         <i class=\"fa fa-paint-brush fa-stack-1x\">\n            <md-tooltip>Toggle Background Color</md-tooltip>\n         </i>\n      </span>\n      <span class=\"fa-stack fa right clickable\" ng-click=\"toggleVisibility(-2)\">\n         <i class=\"fa fa-eye fa-stack-1x\">\n            <md-tooltip>Show All {{ showingFaces ? \"Faces\" : \"Blocks\" }}</md-tooltip>\n         </i>\n      </span>\n      <span class=\"fa-stack fa right clickable\" ng-click=\"toggleVisibility(-3)\">\n         <i class=\"fa fa-eye-slash fa-stack-1x\">\n            <md-tooltip>Hide All {{ showingFaces ? \"Faces\" : \"Blocks\" }}</md-tooltip>\n         </i>\n      </span>\n   </div>\n   <div class=\"renderer\">\n   </div>\n   <div class=\"busy-spinner-container\">\n      <i class=\"fa fa-spinner fa-5x fa-spin busy-spinner-indicator\"></i>\n   </div>\n</div>"
+	module.exports = "<div class=\"hydra-mesh-viewer\">\n   <div class=\"control-tab closed\">\n      <table class='table table-striped table-hover table-condensed'>\n         <tbody>\n            <tr ng-repeat=\"elt in elements\" ng-class=\"{ info: ($index === activeElement)}\" ng-click=\"updateActiveElement( $index)\">\n               <td ng-click=\"toggleVisibility($index)\"><i class=\"fa\" ng-class=\"{ 'fa-eye' : elt.visible, 'fa-eye-slash': !elt.visible }\"></i></td>\n               <td>{{ elt.name }}</td>\n               <td>\n                  <div class=\"fa\" ng-class=\"{ 'fa-tags' : elt.tags.length > 0}\">\n                     <md-tooltip>{{ elt.tags.join(', ') }}</md-tooltip>\n                  </div>\n               </td>\n               <td style=\"color: {{ elt.color }};\" ng-click=\"changeColor($index)\"><i class=\"fa fa-circle clickable\"></i></td>\n            </tr>\n         </tbody>\n      </table>\n   </div>\n   <div class=\"control-panel\">\n      <span class=\"fa-stack fa left clickable\" ng-click=\"toggleControlTab()\">\n         <i class=\"fa fa-stack-1x\" ng-class=\"{ 'fa-caret-down': showingControlTab, 'fa-caret-right': !showingControlTab }\">\n            <md-tooltip>Toggle Element List</md-tooltip>\n         </i>\n      </span>\n      <div class=\"fa-stack fa\" style=\"position: relative; margin-top: 3px; width: 55px; float: left\">\n         <div class=\"faces-blocks-label left clickable\" ng-click=\"toggleElementType()\">\n            {{ showingFaces ? \"Faces\" : \"Blocks\" }}\n         </div>\n         <md-tooltip>Display {{ showingFaces ? \"Block\" : \"Face\" }} List</md-tooltip>\n      </div>\n      <span class=\"fa-stack fa right clickable\" ng-click=\"tag($event)\">\n         <i class=\"fa fa-tags fa-stack-1x\">\n            <md-tooltip>Tag Visible {{ showingFaces ? \"Faces\" : \"Blocks\" }}</md-tooltip>\n         </i>\n      </span>\n      <span class=\"fa-stack fa right clickable\" ng-click=\"resetCamera()\">\n         <i class=\"fa fa-arrows-alt fa-stack-1x\">\n            <md-tooltip>Reset Camera</md-tooltip>\n         </i>\n      </span>\n      <span class=\"fa-stack fa right clickable\" ng-click=\"toggleVisibility(-1)\">\n         <i class=\"fa fa-cube fa-stack-1x\">\n            <md-tooltip>Toggle Outline Visibility</md-tooltip>\n         </i>\n      </span>\n      <span class=\"fa-stack fa right clickable\" ng-click=\"toggleBackgroundColor()\">\n         <i class=\"fa fa-paint-brush fa-stack-1x\">\n            <md-tooltip>Toggle Background Color</md-tooltip>\n         </i>\n      </span>\n      <span class=\"fa-stack fa right clickable\" ng-click=\"toggleVisibility(-2)\">\n         <i class=\"fa fa-eye fa-stack-1x\">\n            <md-tooltip>Show All {{ showingFaces ? \"Faces\" : \"Blocks\" }}</md-tooltip>\n         </i>\n      </span>\n      <span class=\"fa-stack fa right clickable\" ng-click=\"toggleVisibility(-3)\">\n         <i class=\"fa fa-eye-slash fa-stack-1x\">\n            <md-tooltip>Hide All {{ showingFaces ? \"Faces\" : \"Blocks\" }}</md-tooltip>\n         </i>\n      </span>\n   </div>\n   <div class=\"renderer\">\n   </div>\n   <div class=\"busy-spinner-container\">\n      <i class=\"fa fa-spinner fa-5x fa-spin busy-spinner-indicator\"></i>\n   </div>\n</div>\n"
 
 /***/ },
 /* 12 */
