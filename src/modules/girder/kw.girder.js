@@ -54,7 +54,7 @@ angular.module("kitware.girder", ["ngCookies"])
                     // reinitialize.
                     $timeout(function() {
                         // If the EventSource in CLOSED state start again
-                        if (notifications.readyState == 2) {
+                        if (notifications.readyState === 2) {
                             connectToNotificationStream();
                         }
                     }, 10000);
