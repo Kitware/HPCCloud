@@ -881,7 +881,8 @@
 	   return {
 	      scope: {
 	         url: '@url',
-	         appKey: '@appkey'
+	         appKey: '@appkey',
+	         closeOnDestroy: '=closeOnDestroy'
 	      },
 	      template: __webpack_require__(19),
 	      replace: true,
@@ -926,9 +927,11 @@
 	   };
 
 	   $scope.$on("$destroy", function () {
-	      session.call('application.exit.later', []).then(function () {
-	         autobahnConnection.close();
-	      });
+	      if ($scope.closeOnDestroy === true) {
+	         session.call('application.exit.later', []).then(function () {
+	            autobahnConnection.close();
+	         });
+	      }
 	   });
 
 	   $scope.connect($scope.url, $scope.appKey);
