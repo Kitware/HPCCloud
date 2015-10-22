@@ -32,13 +32,12 @@ angular.module('pv.web')
                 }
 
                 function updateJobsList(taskId, callback) {
-                    console.log('task :: ', taskId);
+                    // console.log('task :: ', tasskId);
                     $girder.getTaskWithId(taskId)
                         .then(function(res) {
                             scope.jobs = [];
                             pick(res.data.output, /_job$/)
                                 .forEach(function(el) {
-                                    console.log('_job', el, res.data.output[el]);
                                     scope.jobs.push(res.data.output[el]);
                                     if (!scope.statuses.hasOwnProperty(res.data.output[el]._id)){
                                         scope.statuses[res.data.output[el]._id] = 'created';
@@ -53,7 +52,7 @@ angular.module('pv.web')
                 }
 
                 //fetch the task incase there are any new jobs, update jobs scope.statuses
-                $rootScope.$on('job.status', function(event, data) {
+                scope.$on('job.status', function(event, data) {
                     function cb() {
                         scope.statuses[data._id] = data.status;
                         //if all the jobs are running, we're done here.
@@ -66,7 +65,7 @@ angular.module('pv.web')
                 });
 
                 //update the jobs list it the event has the right taskId
-                $rootScope.$on('task.status', function(event, data) {
+                scope.$on('task.status', function(event, data) {
                     if (data._id === scope.taskId) {
                         updateJobsList(scope.taskId);
                     } else if (data._id === scope.taskId && data.status === 'error') {
