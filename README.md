@@ -1,5 +1,7 @@
 # HPC Cloud
 
+[![Build Status](https://travis-ci.org/Kitware/HPCCloud.svg?branch=master)](https://travis-ci.org/Kitware/HPCCloud)
+
 ## Related/Companion Repositories
 
 - [HPC Cloud VM deploy](https://github.com/Kitware/HPCCloud-deploy)*
