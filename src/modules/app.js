@@ -73,7 +73,8 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb', 'kitware.SimPut'])
             }],
             params: {
                 'done': false,
-                'taskId': undefined
+                'taskId': undefined,
+                'projectID': undefined
             },
             controller: 'pvExoMeshViewerController'
         });

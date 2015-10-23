@@ -106,7 +106,7 @@ angular.module("kitware.cmb.core")
         });
 
         $scope.getActiveCollection = function() {
-            if (!/project/.test($state.current.url)) {
+            if (!/project/.test($state.current.url) && !$stateParams.hasOwnProperty('collectionName')) {
                 return null;
             }
             else if($stateParams.collectionName) {
@@ -116,7 +116,7 @@ angular.module("kitware.cmb.core")
         };
 
         $scope.getActiveProject = function() {
-            if (!/projectID/.test($state.current.url)) {
+            if (!/projectID/.test($state.current.url) && !$stateParams.hasOwnProperty('projectID')) {
                 return null;
             }
             else if($stateParams.projectID) {
