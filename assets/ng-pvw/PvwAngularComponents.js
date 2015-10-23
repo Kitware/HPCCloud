@@ -931,6 +931,8 @@
 	         session.call('application.exit.later', []).then(function () {
 	            autobahnConnection.close();
 	         });
+	      } else {
+	         autobahnConnection.close();
 	      }
 	   });
 
