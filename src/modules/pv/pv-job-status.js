@@ -1,6 +1,6 @@
 angular.module('pv.web')
-    .directive('pvJobStatus', ['$rootScope', '$templateCache', 'kw.Girder',
-        function($rootScope, $templateCache, $girder) {
+    .directive('pvJobStatus', ['$rootScope', '$state', '$stateParams', '$templateCache', 'kw.Girder',
+        function($rootScope, $state, $stateParams, $templateCache, $girder) {
         return {
             restrict: 'AE',
             template: $templateCache.get('pv/tpls/pv-job-status.html'),
@@ -59,6 +59,12 @@ angular.module('pv.web')
                         if (count(scope.statuses, 'running') === scope.expectedRunningCount) {
                             scope.done = true;
                             $rootScope.$broadcast('job-status-done');
+                        } else if (data.status === 'error') {
+                            alert('job has errored');
+                            $state.go('project', {
+                                collectionName: $stateParams.collectionName,
+                                projectID: $stateParams.projectID
+                            });
                         }
                     }
                     updateJobsList(scope.taskId, cb);
@@ -68,8 +74,12 @@ angular.module('pv.web')
                 scope.$on('task.status', function(event, data) {
                     if (data._id === scope.taskId) {
                         updateJobsList(scope.taskId);
-                    } else if (data._id === scope.taskId && data.status === 'error') {
-                        $window.alert('parent task has errored');
+                    } else if (data._id === scope.taskId && (data.status === 'error' || data.status === 'failure')) {
+                        alert('parent task has errored');
+                        $state.go('project', {
+                            collectionName: $stateParams.collectionName,
+                            projectID: $stateParams.projectID
+                        });
                     }
                 });
             }
