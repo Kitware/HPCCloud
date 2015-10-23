@@ -63,7 +63,8 @@
   "scripts": {
     "build": "gulp",
     "postinstall": "./node_modules/.bin/bower install --config.interactive=false && ./node_modules/.bin/gulp",
-    "test": "gulp test"
+    "test": "gulp test",
+    "watch": "gulp watch"
   },
   "pre-commit": [
     "test"

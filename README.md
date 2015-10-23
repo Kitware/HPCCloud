@@ -14,20 +14,13 @@
 Consult the setup instructions on the README of [HPCCloud-deploy repository](https://github.com/Kitware/HPCCloud-deploy)
 
 ## Configuration
-
-Install system wide the following application
-
-```bash
-brew install node
-npm install -g gulp
-```
-
-Project specific configuration and setup after cloning this repository
+The project requires node 0.12 and npm 2.10. (It has not been tested on the latest node 4.0 or greater). The following snippet will get you started however it's recommended to have `gulp` installed system wide.
 
 ```bash
+git clone https://github.com/Kitware/HPCCloud.git
 cd HPCCloud/
-npm install
-gulp watch
+npm install # postinstall is `bower install && gulp build`
+npm run watch
 ```
 
 If you're not using the VM you can use this NGINX configuration file to blend Girder with server running from `gulp serve` into http://localhost:8888/
@@ -75,33 +68,6 @@ http {
 
 ## Girder initial structure
 
-OSX Side notes:
-
-```bash
-mkdir -p girder-data/asset-store girder-data/mongo-db
-cd girder-data
-sudo easy_install pip
-sudo pip install virtualenv
-virtualenv cmb-web
-source cmb-web/bin/activate
-
-emacs start-girder.sh
-
-mongod --dbpath /.../girder-data/mongo-db &
-cd /.../Girder/src
-/.../girder-data/cmb-web/bin/python -m girder
-
-cd [...]/Girder
-git clone https://github.com/girder/girder.git src
-cd src
-export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.0.13/lib/pkgconfig
-pip install -r requirements.txt
-npm install -g grunt-cli
-npm install
-grunt init
-grunt
-```
-
 Using the Girder interface a set of users, collections, folders and groups
 should be created.
 
@@ -147,6 +113,34 @@ Here is an example hierarchy that can be used:
       - mpas-ocean-members: user001, user003
 
 ### Comments:
+
 The name of the collections should be part of the file {repo}/src/workflows.json
+
+### OSX Side notes:
+
+```bash
+mkdir -p girder-data/asset-store girder-data/mongo-db
+cd girder-data
+sudo easy_install pip
+sudo pip install virtualenv
+virtualenv cmb-web
+source cmb-web/bin/activate
+
+emacs start-girder.sh
+# ^^ add:
+# mongod --dbpath /.../girder-data/mongo-db &
+# cd /.../Girder/src
+# /.../girder-data/cmb-web/bin/python -m girder
+
+cd [...]/Girder
+git clone https://github.com/girder/girder.git src
+cd src
+export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.0.13/lib/pkgconfig
+pip install -r requirements.txt
+npm install -g grunt-cli
+npm install
+grunt init
+grunt
+```
 
 
