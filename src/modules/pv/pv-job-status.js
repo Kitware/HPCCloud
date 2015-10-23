@@ -1,16 +1,18 @@
 angular.module('pv.web')
-    .directive('pvJobStatus', ['$rootScope', '$templateCache', 'kw.Girder',
-        function($rootScope, $templateCache, $girder) {
+    .directive('pvJobStatus', ['$rootScope', '$state', '$stateParams', '$templateCache', 'kw.Girder',
+        function($rootScope, $state, $stateParams, $templateCache, $girder) {
         return {
             restrict: 'AE',
             template: $templateCache.get('pv/tpls/pv-job-status.html'),
             scope: {
-                taskId: '=taskId'
+                taskId: '=taskId',
+                expectedRunningCount: '=expectedRunningCount',
+                done: '=?' //optional, defaults to false
             },
             link: function(scope, element, attrs) {
                 scope.statuses = {}; // formatted {[_id]: 'status', ...}
                 scope.jobs = [];
-                scope.done = false;
+                scope.done = angular.isDefined(scope.done) ? scope.done : false;
 
                 //pass an object and a regex, get an array of keys which match the regex
                 function pick(obj, regexp) {
@@ -19,23 +21,23 @@ angular.module('pv.web')
                     });
                 }
 
-                function indexWithJobId(id) {
-                    for (var i=0; i < scope.jobs.length; i++) {
-                        if (scope.jobs[i]._id === id) {
-                            return i;
+                function count(obj, attr) {
+                    var out = 0;
+                    Object.keys(obj).forEach(function(key) {
+                        if (obj[key] === attr) {
+                            out += 1;
                         }
-                    }
-                    return -1;
+                    });
+                    return out;
                 }
 
                 function updateJobsList(taskId, callback) {
-                    console.log('task :: ', taskId);
+                    // console.log('task :: ', tasskId);
                     $girder.getTaskWithId(taskId)
                         .then(function(res) {
                             scope.jobs = [];
                             pick(res.data.output, /_job$/)
                                 .forEach(function(el) {
-                                    console.log('_job', el, res.data.output[el]);
                                     scope.jobs.push(res.data.output[el]);
                                     if (!scope.statuses.hasOwnProperty(res.data.output[el]._id)){
                                         scope.statuses[res.data.output[el]._id] = 'created';
@@ -50,26 +52,34 @@ angular.module('pv.web')
                 }
 
                 //fetch the task incase there are any new jobs, update jobs scope.statuses
-                $rootScope.$on('job.status', function(event, data) {
+                scope.$on('job.status', function(event, data) {
                     function cb() {
                         scope.statuses[data._id] = data.status;
                         //if all the jobs are running, we're done here.
-                        if (Object.keys(scope.statuses).every(function(el) {
-                            return scope.statuses[el] === 'running';
-                        })) {
+                        if (count(scope.statuses, 'running') === scope.expectedRunningCount) {
                             scope.done = true;
                             $rootScope.$broadcast('job-status-done');
+                        } else if (data.status === 'error') {
+                            alert('job has errored');
+                            $state.go('project', {
+                                collectionName: $stateParams.collectionName,
+                                projectID: $stateParams.projectID
+                            });
                         }
                     }
                     updateJobsList(scope.taskId, cb);
                 });
 
                 //update the jobs list it the event has the right taskId
-                $rootScope.$on('task.status', function(event, data) {
+                scope.$on('task.status', function(event, data) {
                     if (data._id === scope.taskId) {
                         updateJobsList(scope.taskId);
-                    } else if (data._id === scope.taskId && data.status === 'error') {
-                        $window.alert('parent task has errored');
+                    } else if (data._id === scope.taskId && (data.status === 'error' || data.status === 'failure')) {
+                        alert('parent task has errored');
+                        $state.go('project', {
+                            collectionName: $stateParams.collectionName,
+                            projectID: $stateParams.projectID
+                        });
                     }
                 });
             }

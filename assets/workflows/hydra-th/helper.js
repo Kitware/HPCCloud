@@ -51,8 +51,8 @@
                         // Copy over hydra.json and hydra.cntl
                         var promises = [];
                         angular.forEach(data.files, function(file) {
-                            if (file.name == 'hydra.json' ||
-                                file.name == 'hydra.cntl') {
+                            if (file.name === 'hydra.json' ||
+                                file.name === 'hydra.cntl') {
 
                                 var promise = $girder.copyFile(file._id, data.item._id).then(function(response) {
 

@@ -116,7 +116,7 @@ angular.module("kitware.cmb.core")
 
                         var xy = line.split(',');
 
-                        if (xy.length != 2) {
+                        if (xy.length !== 2) {
                             throw new ParseError(i);
                         }
 

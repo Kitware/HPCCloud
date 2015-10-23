@@ -1,104 +1,106 @@
 # HPC Cloud
-=====================
 
-## Introduction
-===============
+[![Build Status](https://travis-ci.org/Kitware/HPCCloud.svg?branch=master)](https://travis-ci.org/Kitware/HPCCloud)
 
+## Related/Companion Repositories
+
+- [HPC Cloud VM deploy](https://github.com/Kitware/HPCCloud-deploy)*
+- [Cumulus](https://github.com/Kitware/cumulus)
+- [Girder](https://github.com/girder/girder)
+
+\* most important
+
+## Installation
+Consult the setup instructions on the README of [HPCCloud-deploy repository](https://github.com/Kitware/HPCCloud-deploy)
 
 ## Configuration
-================
 
 Install system wide the following application
 
-    $ brew install node
-    $ npm install -g gulp
+```bash
+brew install node
+npm install -g gulp
+```
 
-Project specific configuration and setup
+Project specific configuration and setup after cloning this repository
 
-    $ git clone git@... src
-    $ cd src
-    $ npm install
+```bash
+cd HPCCloud/
+npm install
+gulp watch
+```
 
-NGINX configuration file used for blending Girder with "gulp serve" into
-http://localhost:8888/
+If you're not using the VM you can use this NGINX configuration file to blend Girder with server running from `gulp serve` into http://localhost:8888/
 
 Comments:
     By default, the configuration file is named nginx.conf and placed
     in the directory /usr/local/nginx/conf, /etc/nginx, or /usr/local/etc/nginx/nginx.conf.
 
-    | worker_processes  1;
-    |
-    | events {
-    |     worker_connections  1024;
-    | }
-    |
-    | http {
-    |     include       mime.types;
-    |     default_type  application/octet-stream;
-    |
-    |     sendfile        on;
-    |
-    |     keepalive_timeout  65;
-    |
-    |     server {
-    |         listen       8888;
-    |         server_name  localhost;
-    |
-    |         client_max_body_size 32M;
-    |
-    |         location / {
-    |             proxy_pass http://localhost:3000;
-    |         }
-    |
-    |         location /paraview {
-    |             proxy_pass http://localhost:8889/paraview;
-    |         }
-    |
-    |         location /api/v1 {
-    |             proxy_pass http://localhost:8080/api/v1;
-    |         }
-    |
-    |         location /browser-sync {
-    |             proxy_pass http://localhost:3000/browser-sync;
-    |             proxy_http_version 1.1;
-    |             proxy_set_header Upgrade $http_upgrade;
-    |             proxy_set_header Connection "upgrade";
-    |         }
-    |
-    |         error_page   500 502 503 504  /50x.html;
-    |         location = /50x.html {
-    |             root   html;
-    |         }
-    |     }
-    | }
+```nginx
+worker_processes  1;
+events {
+    worker_connections  1024;
+}
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    sendfile        on;
+    keepalive_timeout  65;
+    server {
+        listen       8888;
+        server_name  localhost;
+        client_max_body_size 32M;
+        location / {
+            proxy_pass http://localhost:3000;
+        }
+        location /paraview {
+            proxy_pass http://localhost:8889/paraview;
+        }
+        location /api/v1 {
+            proxy_pass http://localhost:8080/api/v1;
+        }
+        location /browser-sync {
+            proxy_pass http://localhost:3000/browser-sync;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+        }
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }
+}
+```
 
 ## Girder initial structure
-===========================
 
 OSX Side notes:
 
-    $ mkdir -p girder-data/asset-store girder-data/mongo-db
-    $ cd girder-data
-    $ sudo easy_install pip
-    $ sudo pip install virtualenv
-    $ virtualenv cmb-web
-    $ source cmb-web/bin/activate
+```bash
+mkdir -p girder-data/asset-store girder-data/mongo-db
+cd girder-data
+sudo easy_install pip
+sudo pip install virtualenv
+virtualenv cmb-web
+source cmb-web/bin/activate
 
-    emacs start-girder.sh
+emacs start-girder.sh
 
-    | mongod --dbpath /.../girder-data/mongo-db &
-    | cd /.../Girder/src
-    | /.../girder-data/cmb-web/bin/python -m girder
+mongod --dbpath /.../girder-data/mongo-db &
+cd /.../Girder/src
+/.../girder-data/cmb-web/bin/python -m girder
 
-    $ cd [...]/Girder
-    $ git clone https://github.com/girder/girder.git src
-    $ cd src
-    $ export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.0.13/lib/pkgconfig
-    $ pip install -r requirements.txt
-    $ npm install -g grunt-cli
-    $ npm install
-    $ grunt init
-    $ grunt
+cd [...]/Girder
+git clone https://github.com/girder/girder.git src
+cd src
+export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.0.13/lib/pkgconfig
+pip install -r requirements.txt
+npm install -g grunt-cli
+npm install
+grunt init
+grunt
+```
 
 Using the Girder interface a set of users, collections, folders and groups
 should be created.
@@ -144,7 +146,7 @@ Here is an example hierarchy that can be used:
       - hydra-ne-members: user001, user002
       - mpas-ocean-members: user001, user003
 
-Comments:
-    The name of the collections should be part of the file {repo}/src/workflows.json
+### Comments:
+The name of the collections should be part of the file {repo}/src/workflows.json
 
 

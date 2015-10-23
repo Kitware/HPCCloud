@@ -1,8 +1,11 @@
 <div class="hydra-mesh-viewer-container">
 	<div pvw-visualizer url="{{ connectionURL }}" appKey="visualizer"
-		ng-if="jobStatusDone">
+		ng-if="jobStatusDone"
+		close-on-destroy="false">
 	    ParaViewWeb Visualizer directive
 	</div>
-    <pv-job-status task-id="taskId">
+    <pv-job-status task-id="taskId"
+    	done="jobStatusDone"
+    	expected-running-count="2">
     </pv-job-status>
 </div>
