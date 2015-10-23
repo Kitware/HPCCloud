@@ -1,3 +1,4 @@
 language: node_js
-engine: 0.12
+node_js:
+  - "0.12"
 sudo: false
