@@ -315,13 +315,27 @@ angular.module("kitware.cmb.core")
                     fileId: mesh.meshFile._id,
                     itemId: mesh._id,
                     taskName: 'meshtagger'
-                };
+                },
+                taskId, sessionId;
+
 
             $girder.startTaggerTask(mesh, taskSpecId, clusterData, config)
                 .then(function(res) {
                     // there's no res.data so we get the taskId from the url.
-                    var taskId = res.config.url.split('/')[4], // /api/v1/tasks/[taskID]
-                        sessionId = clusterData._id + '/' + taskId;
+                    taskId = res.config.url.split('/')[4]; // /api/v1/tasks/[taskID]
+                    sessionId = clusterData._id + '/' + taskId;
+
+                    //update project metadata for the mesh tagger specifically
+                    var metadata = {
+                        sessionId: sessionId,
+                        taskId: taskId,
+                        status: 'running'
+                    };
+                    $scope.project.meta = metadata;
+
+                    return $girder.updateFolderMetadata($scope.getActiveProject(), metadata);
+                })
+                .then(function() {
                     $state.go('mesh', { collectionName: $stateParams.collectionName,
                         projectID: mesh.folderId,
                         meshItemId: mesh._id,

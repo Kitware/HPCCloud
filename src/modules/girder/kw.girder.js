@@ -347,6 +347,10 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.get('folder/' + id);
         };
 
+        this.updateFolderMetadata = function(id, meta) {
+            return this.put('folder/' + id + '/metadata', meta);
+        };
+
         this.getItem = function (id) {
             return this.get('item/' + id);
         };

@@ -100,11 +100,18 @@ angular.module("kitware.cmb.core")
 
         /* This seems convoluted... well it is.
          * 'task.status' receives a data object with {_id, status}. _id refers to the taskId
-         * which the status is for. We initially try to find it in meta[meta.task],
+         * which the status is for. We see if it's a meta object related to the meshtagger,
+         * then we try to find it in simulations[n].meta[...meta.task],
          * if we don't find it there we look in the other task meta objects in sim.meta
          * If we find the task we update its status, and possibly its taskId if === null.
          */
         $scope.$on('task.status', function(event, data) {
+            if ($scope.project.meta && $scope.project.meta.taskId &&
+                    data._id === $scope.project.meta.taskId) {
+                $girder.updateFolderMetadata($scope.project._id, {status: data.status});
+                $scope.project.meta.status = data.status;
+                return;
+            }
             var simIndex = findSimulationIndexById(data._id),
                 simulationMeta;
             console.log('event received: ', data.status);
@@ -338,12 +345,28 @@ angular.module("kitware.cmb.core")
                     taskId: simulation.meta[simulation.meta.task].taskId,
                     done: true
                 });
-
             } else {
-                console.log('start anew');
+                console.log('start new viz task');
                 $scope.runTask($event,
                     'Start result viewer', 'pvw',
                     false, simulation, $scope.runVisualizationCallback);
+            }
+        };
+
+        $scope.goToMeshTagger = function($event) {
+            if ($scope.project.meta.status === 'running') {
+                //go to mesh
+                $state.go('mesh', {
+                    collectionName: $stateParams.collectionName,
+                    projectID: $scope.meshItem.folderId,
+                    meshItemId: $scope.mesh._id,
+                    sessionId: $scope.project.meta.sessionId,
+                    taskId: $scope.project.meta.taskId,
+                    done: true
+                });
+            } else {
+                console.log('start new mesh_t task');
+                $scope.runTask($event, 'Start mesh tagger', 'meshtagger', false, $scope.meshItem, $scope.runTaggerCallback);
             }
         };
 

@@ -6,9 +6,7 @@
         </md-button>
         <!-- ui-sref="mesh({ collectionName: getActiveCollection(), projectID: meshItem.folderId, itemID: meshItem._id, fileID: mesh._id })" -->
         <md-button aria-label="Tag mesh faces"
-            ng-click="runTask($event,
-                'Start mesh tagger', 'meshtagger', false,
-                meshItem, runTaggerCallback)" ng-disabled="uploading">
+            ng-click="goToMeshTagger($event)" ng-disabled="uploading">
             <i class="fa fa-tags"></i>
             <md-tooltip>Tag mesh faces using mesh viewer</md-tooltip>
         </md-button>
