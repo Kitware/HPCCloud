@@ -15,7 +15,7 @@ class Proxy(Resource):
     def __init__(self):
         self.resourceName = 'proxy'
         self.route('POST', (), self.add_entry)
-        self.route('DELETE', (':key'), self.delete_entry)
+        self.route('DELETE', (':key',), self.delete_entry)
         self._proxy_file_path = self.model('setting').get(
             constants.PluginSettings.PROXY_FILE_PATH, '/tmp/proxy')
 
@@ -68,7 +68,7 @@ class Proxy(Resource):
             'The proxy entry parameters.', dataType='ProxyEntry', paramType='body', required=True))
 
     @access.public
-    def delete_entry(self, key):
+    def delete_entry(self, key, params):
 
         with LockFile(self._proxy_file_path):
             db = None
