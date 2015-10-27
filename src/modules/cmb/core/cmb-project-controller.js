@@ -354,7 +354,8 @@ angular.module("kitware.cmb.core")
         };
 
         $scope.goToMeshTagger = function($event) {
-            if ($scope.project.meta.status === 'running') {
+            if ($scope.project.meta && $scope.project.meta.status &&
+                    $scope.project.meta.status === 'running') {
                 //go to mesh
                 $state.go('mesh', {
                     collectionName: $stateParams.collectionName,
