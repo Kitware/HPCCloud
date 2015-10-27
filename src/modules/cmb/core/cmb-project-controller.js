@@ -50,7 +50,7 @@ angular.module("kitware.cmb.core")
             });
         }
 
-        /* itemStatus(item, hasStatus)
+        /* itemAttr(item, hasStatus, newAttr, taskName)
         *   if hasStatus, set the new status in the item and return the meta object.
         *   else get the status for the item's active task
         */
@@ -110,6 +110,7 @@ angular.module("kitware.cmb.core")
                     data._id === $scope.project.meta.taskId) {
                 $girder.updateFolderMetadata($scope.project._id, {status: data.status});
                 $scope.project.meta.status = data.status;
+                console.log('new project status: ', data.status);
                 return;
             }
             var simIndex = findSimulationIndexById(data._id),

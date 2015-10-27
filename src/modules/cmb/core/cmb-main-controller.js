@@ -70,16 +70,27 @@ angular.module("kitware.cmb.core")
             }
 
             if(projectId && previousActiveId.projectID !== projectId) {
-                $girder.getFolder(projectId).success(function(project){
-                    $scope.project = project;
-                    $scope.subTitle = project.name;
-                    previousActiveId.projectID = projectId;
-                }).error(function(){
-                    console.log('Error while fetching project');
-                    $scope.subTitle = null;
-                    $scope.project = null;
-                    previousActiveId.projectID = '';
-                });
+                $girder.getFolder(projectId)
+                    .then(function(res){
+                        $scope.project = res.data;
+                        $scope.subTitle = res.data.name;
+                        previousActiveId.projectID = projectId;
+                        if (res.data.meta && res.data.meta.taskId) {
+                            return $girder.getTaskWithId(res.data.meta.taskId);
+                        }
+                    }, function(err){
+                        console.log('Error while fetching project', err.data.message);
+                        $scope.subTitle = null;
+                        $scope.project = null;
+                        previousActiveId.projectID = '';
+                    })
+                    .then(function(res) {
+                        var oldStatus = $scope.project.meta.status;
+                        $scope.project.meta.status = res.data.status;
+                        if (oldStatus !== res.data.status) { //update metadata if different
+                            $girder.updateFolderMetadata($scope.project._id, $scope.project.meta);
+                        }
+                    });
             } else if ($scope.subTitle) {
                 $scope.subTitle = $scope.subTitle.split(' ')[0];
             }
