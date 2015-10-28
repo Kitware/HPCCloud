@@ -12,6 +12,7 @@ angular.module('pv.web')
             link: function(scope, element, attrs) {
                 scope.statuses = {}; // formatted {[_id]: 'status', ...}
                 scope.jobs = [];
+                scope.taskLog = '';
                 scope.done = angular.isDefined(scope.done) ? scope.done : false;
 
                 //pass an object and a regex, get an array of keys which match the regex
@@ -51,6 +52,57 @@ angular.module('pv.web')
                         });
                 }
 
+                function taskFailure(taskId) {
+                    scope.activeCollection = $stateParams.collectionName;
+                    scope.activeProject = $stateParams.projectID;
+                    $girder.patchTask(taskId, {status: 'failure'})
+                        .then(function(res) {
+                            if (res.data.log.length === 0 || !res.data.log[0].hasOwnProperty('$ref')) {
+                                throw new Error('no $ref for task: ' + taskId);
+                            } else {
+                                return $girder.getTaskLog(res.data.log[0].$ref, 0);
+                            }
+                        }, function(err) {
+                            console.log('error patching task: ', err.data.message);
+                        })
+                        .then(function(res) {
+                            var log = res.data.log;
+                            for (var i=0; i < log.length; i++) {
+                                scope.taskLog += logFormatter(log[i]);
+                            }
+                        }, function(err) {
+                            if (err instanceof Error) { //might be the error thrown above.
+                                console.log(err.message);
+                            } else {
+                                console.log('error fetching task log: ', err.data.message);
+                            }
+                            scope.fail = true;
+                        });
+                }
+
+                function logFormatter(l) {
+                    return '[' + formatTime(l.created) + '] ' + l.levelname + ': ' + l.msg + '\n';
+                }
+
+                function formatTime(time) {
+                    var date = new Date(time),
+                        hours = date.getHours().toString(),
+                        minutes = date.getMinutes().toString(),
+                        seconds = date.getSeconds().toString(),
+                        ms = date.getMilliseconds().toString();
+
+                    hours = hours.length === 1 ? '0' + hours : hours;
+                    minutes = minutes.length === 1 ? '0' + minutes : minutes;
+                    seconds = seconds.length === 1 ? '0' + seconds : seconds;
+                    if (ms.length < 3) {
+                        while(ms.length < 3) {
+                            ms = '0' + ms;
+                        }
+                    }
+
+                    return hours + ':' + minutes + ':' + seconds + '.' + ms;
+                }
+
                 //fetch the task incase there are any new jobs, update jobs scope.statuses
                 scope.$on('job.status', function(event, data) {
                     function cb() {
@@ -60,11 +112,13 @@ angular.module('pv.web')
                             scope.done = true;
                             $rootScope.$broadcast('job-status-done');
                         } else if (data.status === 'error') {
-                            alert('job has errored');
-                            $state.go('project', {
-                                collectionName: $stateParams.collectionName,
-                                projectID: $stateParams.projectID
-                            });
+                            // alert('job has errored');
+                            $girder.updateFolderMetadata($stateParams.projectID, {status: 'failure'});
+                            taskFailure(scope.taskId);
+                        } else if (data.status === 'complete') {
+                            // alert('job already completed');
+                            $girder.updateFolderMetadata($stateParams.projectID, {status: 'failure'});
+                            taskFailure(scope.taskId);
                         }
                     }
                     updateJobsList(scope.taskId, cb);
@@ -76,6 +130,7 @@ angular.module('pv.web')
                         updateJobsList(scope.taskId);
                     } else if (data._id === scope.taskId && (data.status === 'error' || data.status === 'failure')) {
                         alert('parent task has errored');
+                        $girder.updateFolderMetaData($stateParams.projectID, {status: 'failure'});
                         $state.go('project', {
                             collectionName: $stateParams.collectionName,
                             projectID: $stateParams.projectID

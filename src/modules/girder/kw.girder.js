@@ -716,6 +716,10 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.get(url + '?offset=' + offset);
         };
 
+        this.patchTask = function(taskId, obj) {
+            return this.patch('tasks/' + taskId, obj);
+        };
+
         this.fetchTaskList = function() {
             var self = this;
 
