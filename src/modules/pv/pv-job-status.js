@@ -7,12 +7,14 @@ angular.module('pv.web')
             scope: {
                 taskId: '=taskId',
                 expectedRunningCount: '=expectedRunningCount',
+                itemId: '=?itemId',
                 done: '=?' //optional, defaults to false
             },
             link: function(scope, element, attrs) {
                 scope.statuses = {}; // formatted {[_id]: 'status', ...}
                 scope.jobs = [];
                 scope.taskLog = '';
+                scope.itemId = angular.isDefined(scope.itemId) ? scope.itemId : null;
                 scope.done = angular.isDefined(scope.done) ? scope.done : false;
 
                 //pass an object and a regex, get an array of keys which match the regex
@@ -65,10 +67,15 @@ angular.module('pv.web')
                         }, function(err) {
                             console.log('error patching task: ', err.data.message);
                         })
-                        .then(function(res) {
+                        .then(function(res) { //promise for log fetching
                             var log = res.data.log;
                             for (var i=0; i < log.length; i++) {
                                 scope.taskLog += logFormatter(log[i]);
+                            }
+                            if (angular.isDefined(scope.itemId)) {
+                                return $girder.listItemFiles(scope.itemId);
+                            } else {
+                                throw new Error('no item to fetch output from');
                             }
                         }, function(err) {
                             if (err instanceof Error) { //might be the error thrown above.
@@ -77,6 +84,17 @@ angular.module('pv.web')
                                 console.log('error fetching task log: ', err.data.message);
                             }
                             scope.fail = true;
+                        })
+                        .then(function(res) { //promise for listing itemFiles
+                            if (res && res.hasOwnProperty('data')) {
+                                scope.taskOutput = res.data;
+                            }
+                        }, function(err) {
+                            if (err instanceof Error) {
+                                console.log(err.message);
+                            } else {
+                                console.log('error fetching item files: ', err.data.message);
+                            }
                         });
                 }
 
@@ -126,15 +144,11 @@ angular.module('pv.web')
 
                 //update the jobs list it the event has the right taskId
                 scope.$on('task.status', function(event, data) {
-                    if (data._id === scope.taskId) {
+                    if (data._id === scope.taskId && !(data.status === 'error' || data.status === 'failure')) {
                         updateJobsList(scope.taskId);
                     } else if (data._id === scope.taskId && (data.status === 'error' || data.status === 'failure')) {
-                        alert('parent task has errored');
-                        $girder.updateFolderMetaData($stateParams.projectID, {status: 'failure'});
-                        $state.go('project', {
-                            collectionName: $stateParams.collectionName,
-                            projectID: $stateParams.projectID
-                        });
+                        $girder.updateFolderMetadata($stateParams.projectID, {status: 'failure'});
+                        taskFailure(scope.taskId);
                     }
                 });
             }

@@ -178,12 +178,6 @@ angular.module("kitware.cmb.core")
             };
         };
 
-        $scope.fileFilter = function() {
-            return function(file) {
-                return file.size > 0;
-            };
-        };
-
         $scope.getActiveMeta = function(item) {
             return item.meta[item.meta.task];
         };

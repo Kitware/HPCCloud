@@ -15,7 +15,14 @@
         	Waiting for job creation
         </dd>
         <dd ng-show="taskLog.length > 0">
+            <label>Log</label>
             <pre>{{taskLog}}</pre>
+        </dd>
+        <dd ng-show="angular.isDefined(taskOutput)">
+            <label>Output</label>
+            <div ng-repeat="file in taskOutput | filter: fileFilter">
+                <a ng-href="/api/v1/file/{{file._id}}/download">{{file.name}}</a>
+            </div>
         </dd>
         <dd class="clickable" ng-show="taskLog.length > 0 || fail"
             ui-sref="project({

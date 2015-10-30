@@ -29,6 +29,11 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
             }
         };
     })
+    .filter('fileFilter', function() {
+        return function(file) {
+            return file.hasOwnProperty('size') && file.size > 0;
+        };
+    })
     .directive("fileread", [function () {
         return {
             scope: {
