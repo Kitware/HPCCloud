@@ -2,12 +2,12 @@ angular.module('pv.web')
    .controller('pvExoMeshViewerController', ['$rootScope', '$scope', 'kw.Girder', '$stateParams', '$window', '$templateCache',
          function($rootScope, $scope, $girder, $stateParams, $window, $templateCache) {
 
+      var hostPort = $window.location.host;
+
       $scope.itemId = $stateParams.meshItemId;
       $scope.config = {
          fileId: $stateParams.fileID
       };
-
-      var hostPort = $window.location.host;
 
       $scope.url = "ws://"+hostPort+"/proxy?sessionId=" +
          encodeURIComponent($stateParams.sessionId);
@@ -15,8 +15,6 @@ angular.module('pv.web')
       function save(data) {
          $girder.updateItemMetadata({_id: $scope.itemId}, {annotation: data});
       }
-
-      //$scope.itemID: meshItem._id, fileID: mesh._id
 
       function load(callback) {
          $girder.getItem($scope.itemId)

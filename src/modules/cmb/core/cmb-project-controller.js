@@ -350,7 +350,7 @@ angular.module("kitware.cmb.core")
 
         $scope.goToMeshTagger = function($event) {
             if ($scope.project.meta && $scope.project.meta.status &&
-                    $scope.project.meta.status === 'running') {
+                $scope.project.meta.status === 'running') {
                 //go to mesh
                 $state.go('mesh', {
                     collectionName: $stateParams.collectionName,
@@ -361,8 +361,19 @@ angular.module("kitware.cmb.core")
                     done: true
                 });
             } else {
-                console.log('start new mesh_t task');
-                $scope.runTask($event, 'Start mesh tagger', 'meshtagger', false, $scope.meshItem, $scope.runTaggerCallback);
+                $girder.getItemFiles($scope.meshItem._id)
+                    .then(function(res) {
+                        res.data.forEach(function(file) {
+                            if (!/\.exo$/.test(file.name)) {
+                                $girder.deleteFile(file._id);
+                            }
+                        });
+                    })
+                    .then( function() {
+                        $scope.runTask($event, 'Start mesh tagger', 'meshtagger', false,
+                            $scope.meshItem,
+                            $scope.runTaggerCallback);
+                    });
             }
         };
 

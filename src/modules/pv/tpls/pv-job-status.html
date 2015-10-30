@@ -2,27 +2,28 @@
     <dl>
         <dt>Job Status</dt>
         <dd ng-repeat="job in jobs" ng-hide="jobs.length === 0">
-        	{{job.name}}:
+            {{job.name}}:
             {{statuses[job._id]}}
             <span ng-switch="statuses[job._id]">
                 <i ng-switch-when="running" class="fa fa-check"></i>
                 <i ng-switch-when="complete" class="fa fa-warning"></i>
-            	<i ng-switch-when="failure" class="fa fa-warning"></i>
-            	<i ng-switch-default class="fa fa-circle-o-notch fa-spin"></i>
+                <i ng-switch-when="error" class="fa fa-warning"></i>
+                <i ng-switch-when="failure" class="fa fa-warning"></i>
+                <i ng-switch-default class="fa fa-circle-o-notch fa-spin"></i>
             </span>
         </dd>
-        <dd ng-hide="jobs.length !== 0" loading is-loading="true">
-        	Waiting for job creation
+        <dd ng-hide="jobs.length !== 0" loading is-loading="jobs.length === 0">
+            Waiting for job creation
         </dd>
         <dd ng-show="taskLog.length > 0">
-            <label>Log</label>
             <pre>{{taskLog}}</pre>
         </dd>
-        <dd ng-show="angular.isDefined(taskOutput)">
-            <label>Output</label>
-            <div ng-repeat="file in taskOutput | filter: fileFilter">
-                <a ng-href="/api/v1/file/{{file._id}}/download">{{file.name}}</a>
-            </div>
+        <dd ng-show="taskOutput.length > 0">
+            <ul>
+                <li ng-repeat="file in taskOutput | filter: fileFilter">
+                    <a ng-href="/api/v1/file/{{file._id}}/download">{{file.name}}</a>
+                </li>
+            </ul>
         </dd>
         <dd class="clickable" ng-show="taskLog.length > 0 || fail"
             ui-sref="project({

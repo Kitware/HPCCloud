@@ -14,6 +14,7 @@ angular.module('pv.web')
                 scope.statuses = {}; // formatted {[_id]: 'status', ...}
                 scope.jobs = [];
                 scope.taskLog = '';
+                scope.taskOutput = [];
                 scope.itemId = angular.isDefined(scope.itemId) ? scope.itemId : null;
                 scope.done = angular.isDefined(scope.done) ? scope.done : false;
 
@@ -57,7 +58,7 @@ angular.module('pv.web')
                 function taskFailure(taskId) {
                     scope.activeCollection = $stateParams.collectionName;
                     scope.activeProject = $stateParams.projectID;
-                    $girder.patchTask(taskId, {status: 'failure'})
+                    $girder.getTaskWithId(taskId)
                         .then(function(res) {
                             if (res.data.log.length === 0 || !res.data.log[0].hasOwnProperty('$ref')) {
                                 throw new Error('no $ref for task: ' + taskId);
@@ -72,7 +73,7 @@ angular.module('pv.web')
                             for (var i=0; i < log.length; i++) {
                                 scope.taskLog += logFormatter(log[i]);
                             }
-                            if (angular.isDefined(scope.itemId)) {
+                            if (scope.itemId !== null) {
                                 return $girder.listItemFiles(scope.itemId);
                             } else {
                                 throw new Error('no item to fetch output from');
@@ -86,6 +87,7 @@ angular.module('pv.web')
                             scope.fail = true;
                         })
                         .then(function(res) { //promise for listing itemFiles
+                            console.log('itemFiles? ', res.data);
                             if (res && res.hasOwnProperty('data')) {
                                 scope.taskOutput = res.data;
                             }
@@ -146,9 +148,6 @@ angular.module('pv.web')
                 scope.$on('task.status', function(event, data) {
                     if (data._id === scope.taskId && !(data.status === 'error' || data.status === 'failure')) {
                         updateJobsList(scope.taskId);
-                    } else if (data._id === scope.taskId && (data.status === 'error' || data.status === 'failure')) {
-                        $girder.updateFolderMetadata($stateParams.projectID, {status: 'failure'});
-                        taskFailure(scope.taskId);
                     }
                 });
             }

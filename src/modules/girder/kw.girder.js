@@ -339,6 +339,10 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.delete('folder/' + id);
         };
 
+        this.deleteFile = function (id) {
+            return this.delete('file/' + id);
+        };
+
         this.getCollectionFromName = function (name) {
             return this.get('collection?text=' + name);
         };
@@ -355,12 +359,16 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.get('item/' + id);
         };
 
+        this.getItemFiles = function(id) {
+            return this.get('item/' + id + '/files');
+        };
+
         this.patchItemMetadata = function(itemId, data) {
             return this.put('item/' + itemId + '/metadata', data);
         };
 
         this.deleteItem = function (item) {
-            if (item.meta.volumeId) {
+            if (item.meta && item.meta.volumeId) {
                 this.deleteVolume(item);
             }
             return this.delete('item/' + item._id);

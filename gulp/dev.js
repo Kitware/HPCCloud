@@ -3,7 +3,8 @@ var gulp = require('gulp'),
             pattern: ['gulp-*', 'main-bower-files', 'uglify-save-license', 'del', 'browser-sync', 'proxy']
     }),
     jsHintOptions = {
-        eqeqeq: true
+        eqeqeq: true,
+        curly: true
     };
 
 gulp.task('test', function() {

@@ -85,6 +85,10 @@ angular.module("kitware.cmb.core")
                         previousActiveId.projectID = '';
                     })
                     .then(function(res) {
+                        if (!$scope.project.meta) {
+                            return;
+                        }
+
                         var oldStatus = $scope.project.meta.status;
                         $scope.project.meta.status = res.data.status;
                         if (oldStatus !== res.data.status) { //update metadata if different
@@ -266,9 +270,9 @@ angular.module("kitware.cmb.core")
 
                 if (clusterData.type === 'trad') {
                     config.hydraExecutablePath = args[3].hydraExecutablePath;
-                    if (args[3].parallelEnvironment) config.parallelEnvironment = args[3].parallelEnvironment;
-                    if (args[3].numberOfSlots) config.numberOfSlots = args[3].numberOfSlots;
-                    if (args[3].jobOutputDir) config.jobOutputDir = args[3].jobOutputDir;
+                    if (args[3].parallelEnvironment) { config.parallelEnvironment = args[3].parallelEnvironment; }
+                    if (args[3].numberOfSlots) { config.numberOfSlots = args[3].numberOfSlots; }
+                    if (args[3].jobOutputDir) { config.jobOutputDir = args[3].jobOutputDir; }
                 }
                 console.log(config);
 
