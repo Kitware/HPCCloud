@@ -134,10 +134,12 @@ angular.module('pv.web')
                         } else if (data.status === 'error') {
                             // alert('job has errored');
                             $girder.updateFolderMetadata($stateParams.projectID, {status: 'failure'});
+                            $scope.project.meta.status = 'failure';
                             taskFailure(scope.taskId);
                         } else if (data.status === 'complete') {
                             // alert('job already completed');
                             $girder.updateFolderMetadata($stateParams.projectID, {status: 'failure'});
+                            $scope.project.meta.status = 'failure';
                             taskFailure(scope.taskId);
                         }
                     }
