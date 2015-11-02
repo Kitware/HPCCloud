@@ -349,18 +349,7 @@ angular.module("kitware.cmb.core")
         };
 
         $scope.goToMeshTagger = function($event) {
-            if ($scope.project.meta && $scope.project.meta.status &&
-                $scope.project.meta.status === 'running') {
-                //go to mesh
-                $state.go('mesh', {
-                    collectionName: $stateParams.collectionName,
-                    projectID: $scope.meshItem.folderId,
-                    meshItemId: $scope.mesh._id,
-                    sessionId: $scope.project.meta.sessionId,
-                    taskId: $scope.project.meta.taskId,
-                    done: true
-                });
-            } else {
+            function cleanAndGotoTagger() {
                 $girder.getItemFiles($scope.meshItem._id)
                     .then(function(res) {
                         res.data.forEach(function(file) {
@@ -374,6 +363,30 @@ angular.module("kitware.cmb.core")
                             $scope.meshItem,
                             $scope.runTaggerCallback);
                     });
+            }
+
+            if ($scope.project.meta && $scope.project.meta.status &&
+                    $scope.project.meta.status === 'running') {
+                $girder.getTaskWithId($scope.project.meta.taskId)
+                    .then(function(res) {
+                        if (res.data.status !== 'running') {
+                            $scope.project.meta.status = res.data.status;
+                            return $girder.updateFolderMetadata($scope.projectID, res.data.status)
+                                .then(cleanAndGotoTagger);
+                        } else {
+                            //go to mesh
+                            $state.go('mesh', {
+                                collectionName: $stateParams.collectionName,
+                                projectID: $scope.meshItem.folderId,
+                                meshItemId: $scope.mesh._id,
+                                sessionId: $scope.project.meta.sessionId,
+                                taskId: $scope.project.meta.taskId,
+                                done: true
+                            });
+                        }
+                    });
+            } else {
+                cleanAndGotoTagger();
             }
         };
 

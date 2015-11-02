@@ -149,7 +149,6 @@ angular.module("kitware.cmb.core")
 
         $scope.enterPressed = function(event) {
             if (event.keyCode === 13) {
-                console.log($scope.userLogin, $scope.userPassword);
                 $scope.login($scope.userLogin, $scope.userPassword);
             }
         };
