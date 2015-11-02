@@ -371,7 +371,7 @@ angular.module("kitware.cmb.core")
                     .then(function(res) {
                         if (res.data.status !== 'running') {
                             $scope.project.meta.status = res.data.status;
-                            return $girder.updateFolderMetadata($scope.projectID, res.data.status)
+                            $girder.updateFolderMetadata($scope.projectID, res.data.status)
                                 .then(cleanAndGotoTagger);
                         } else {
                             //go to mesh
@@ -384,6 +384,9 @@ angular.module("kitware.cmb.core")
                                 done: true
                             });
                         }
+                    }, function(err) {
+                        console.log('error getting getTaskWithId: ', $scope.project.meta.taskId, err.data.message);
+                        cleanAndGotoTagger();
                     });
             } else {
                 cleanAndGotoTagger();
