@@ -103,12 +103,12 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
           link: link
         };
     }])
-    .directive('loading', function($interval) {
+    .directive('loading', ['$interval', function($interval) {
         return {
             restrict: 'A',
             scope: {
                 isLoading: '=',
-                completeText: '@'
+                completeText: '@?'
             },
             link: function(scope, element, attrs) {
                 var inc,
@@ -145,4 +145,4 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
                 }
             } //close link
         }; //close directive function return
-    });
+    }]);

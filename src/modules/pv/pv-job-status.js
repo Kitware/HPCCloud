@@ -131,13 +131,7 @@ angular.module('pv.web')
                         if (count(scope.statuses, 'running') === scope.expectedRunningCount) {
                             scope.done = true;
                             $rootScope.$broadcast('job-status-done');
-                        } else if (data.status === 'error') {
-                            // alert('job has errored');
-                            $girder.updateFolderMetadata($stateParams.projectID, {status: 'failure'});
-                            $scope.project.meta.status = 'failure';
-                            taskFailure(scope.taskId);
-                        } else if (data.status === 'complete') {
-                            // alert('job already completed');
+                        } else if (data.status === 'error' || data.status === 'complete') {
                             $girder.updateFolderMetadata($stateParams.projectID, {status: 'failure'});
                             $scope.project.meta.status = 'failure';
                             taskFailure(scope.taskId);
