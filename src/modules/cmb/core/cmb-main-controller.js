@@ -70,16 +70,31 @@ angular.module("kitware.cmb.core")
             }
 
             if(projectId && previousActiveId.projectID !== projectId) {
-                $girder.getFolder(projectId).success(function(project){
-                    $scope.project = project;
-                    $scope.subTitle = project.name;
-                    previousActiveId.projectID = projectId;
-                }).error(function(){
-                    console.log('Error while fetching project');
-                    $scope.subTitle = null;
-                    $scope.project = null;
-                    previousActiveId.projectID = '';
-                });
+                $girder.getFolder(projectId)
+                    .then(function(res){
+                        $scope.project = res.data;
+                        $scope.subTitle = res.data.name;
+                        previousActiveId.projectID = projectId;
+                        if (res.data.meta && res.data.meta.taskId) {
+                            return $girder.getTaskWithId(res.data.meta.taskId);
+                        }
+                    }, function(err){
+                        console.log('Error while fetching project', err.data.message);
+                        $scope.subTitle = null;
+                        $scope.project = null;
+                        previousActiveId.projectID = '';
+                    })
+                    .then(function(res) {
+                        if (!$scope.project.meta) {
+                            return;
+                        }
+
+                        var oldStatus = $scope.project.meta.status;
+                        $scope.project.meta.status = res.data.status;
+                        if (oldStatus !== res.data.status) { //update metadata if different
+                            $girder.updateFolderMetadata($scope.project._id, $scope.project.meta);
+                        }
+                    });
             } else if ($scope.subTitle) {
                 $scope.subTitle = $scope.subTitle.split(' ')[0];
             }
@@ -134,7 +149,6 @@ angular.module("kitware.cmb.core")
 
         $scope.enterPressed = function(event) {
             if (event.keyCode === 13) {
-                console.log($scope.userLogin, $scope.userPassword);
                 $scope.login($scope.userLogin, $scope.userPassword);
             }
         };
@@ -255,9 +269,9 @@ angular.module("kitware.cmb.core")
 
                 if (clusterData.type === 'trad') {
                     config.hydraExecutablePath = args[3].hydraExecutablePath;
-                    if (args[3].parallelEnvironment) config.parallelEnvironment = args[3].parallelEnvironment;
-                    if (args[3].numberOfSlots) config.numberOfSlots = args[3].numberOfSlots;
-                    if (args[3].jobOutputDir) config.jobOutputDir = args[3].jobOutputDir;
+                    if (args[3].parallelEnvironment) { config.parallelEnvironment = args[3].parallelEnvironment; }
+                    if (args[3].numberOfSlots) { config.numberOfSlots = args[3].numberOfSlots; }
+                    if (args[3].jobOutputDir) { config.jobOutputDir = args[3].jobOutputDir; }
                 }
                 console.log(config);
 
@@ -315,13 +329,27 @@ angular.module("kitware.cmb.core")
                     fileId: mesh.meshFile._id,
                     itemId: mesh._id,
                     taskName: 'meshtagger'
-                };
+                },
+                taskId, sessionId;
+
 
             $girder.startTaggerTask(mesh, taskSpecId, clusterData, config)
                 .then(function(res) {
                     // there's no res.data so we get the taskId from the url.
-                    var taskId = res.config.url.split('/')[4], // /api/v1/tasks/[taskID]
-                        sessionId = clusterData._id + '/' + taskId;
+                    taskId = res.config.url.split('/')[4]; // /api/v1/tasks/[taskID]
+                    sessionId = clusterData._id + '/' + taskId;
+
+                    //update project metadata for the mesh tagger specifically
+                    var metadata = {
+                        sessionId: sessionId,
+                        taskId: taskId,
+                        status: 'running'
+                    };
+                    $scope.project.meta = metadata;
+
+                    return $girder.updateFolderMetadata($scope.getActiveProject(), metadata);
+                })
+                .then(function() {
                     $state.go('mesh', { collectionName: $stateParams.collectionName,
                         projectID: mesh.folderId,
                         meshItemId: mesh._id,

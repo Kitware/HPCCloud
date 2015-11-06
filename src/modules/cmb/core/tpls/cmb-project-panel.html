@@ -6,9 +6,7 @@
         </md-button>
         <!-- ui-sref="mesh({ collectionName: getActiveCollection(), projectID: meshItem.folderId, itemID: meshItem._id, fileID: mesh._id })" -->
         <md-button aria-label="Tag mesh faces"
-            ng-click="runTask($event,
-                'Start mesh tagger', 'meshtagger', false,
-                meshItem, runTaggerCallback)" ng-disabled="uploading">
+            ng-click="goToMeshTagger($event)" ng-disabled="uploading">
             <i class="fa fa-tags"></i>
             <md-tooltip>Tag mesh faces using mesh viewer</md-tooltip>
         </md-button>
@@ -99,12 +97,12 @@
                     </div>
                 </div>
                 <div layout="row">
-                    <md-button ng-hide="hasStatus(simulation, 'complete') || (simulation.meta.task === 'pvw' && hasStatus(simulation, 'running'))" ng-click="runTask($event,
+                    <md-button ng-hide="hasStatus(simulation, 'complete') || simulation.meta.task === 'pvw'" ng-click="runTask($event,
                         'Start simulation computation', 'hydra', false, simulation, runSimulationCallback)"
                         class="md-raised md-primary" ng-disabled="!hasStatus(simulation, 'valid')">
                         Run
                     </md-button>
-                    <md-button ng-show="hasStatus(simulation, 'complete') || (simulation.meta.task === 'pvw' && hasStatus(simulation, 'running'))"
+                    <md-button ng-show="hasStatus(simulation, 'complete') || simulation.meta.task === 'pvw'"
                         ng-click="goToVisualization($event, simulation)"
                         class="md-raised md-primary">
                         Visualize
@@ -142,7 +140,7 @@
                 <div ng-show="hasStatus(simulation,
                     ['error', 'complete', 'failure', 'terminated'])">
                     <label>Output</label>
-                    <div ng-repeat="file in taskOutput | filter: fileFilter()">
+                    <div ng-repeat="file in taskOutput | filter:fileFilter">
                         <a ng-href="/api/v1/file/{{file._id}}/download">{{file.name}}</a>
                     </div>
                 </div>

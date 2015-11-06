@@ -339,6 +339,10 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.delete('folder/' + id);
         };
 
+        this.deleteFile = function (id) {
+            return this.delete('file/' + id);
+        };
+
         this.getCollectionFromName = function (name) {
             return this.get('collection?text=' + name);
         };
@@ -347,8 +351,16 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.get('folder/' + id);
         };
 
+        this.updateFolderMetadata = function(id, meta) {
+            return this.put('folder/' + id + '/metadata', meta);
+        };
+
         this.getItem = function (id) {
             return this.get('item/' + id);
+        };
+
+        this.getItemFiles = function(id) {
+            return this.get('item/' + id + '/files');
         };
 
         this.patchItemMetadata = function(itemId, data) {
@@ -356,7 +368,7 @@ angular.module("kitware.girder", ["ngCookies"])
         };
 
         this.deleteItem = function (item) {
-            if (item.meta.volumeId) {
+            if (item.meta && item.meta.volumeId) {
                 this.deleteVolume(item);
             }
             return this.delete('item/' + item._id);
@@ -710,6 +722,10 @@ angular.module("kitware.girder", ["ngCookies"])
                 offset = 0;
             }
             return this.get(url + '?offset=' + offset);
+        };
+
+        this.patchTask = function(taskId, obj) {
+            return this.patch('tasks/' + taskId, obj);
         };
 
         this.fetchTaskList = function() {

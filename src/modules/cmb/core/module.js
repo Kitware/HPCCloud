@@ -13,8 +13,8 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
     })
     .filter('bytes', function() {
         return function(bytes, precision) {
-            if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '-';
-            if (typeof precision === 'undefined') precision = 1;
+            if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) { return '-'; }
+            if (typeof precision === 'undefined') { precision = 1; }
             var units = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'],
                 number = Math.floor(Math.log(bytes) / Math.log(1024));
             return (bytes / Math.pow(1024, Math.floor(number))).toFixed(precision) +  ' ' + units[number];
@@ -27,6 +27,11 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
             } else {
                 return unescape(str);
             }
+        };
+    })
+    .filter('fileFilter', function() {
+        return function(file) {
+            return file.hasOwnProperty('size') && file.size > 0;
         };
     })
     .directive("fileread", [function () {
@@ -98,12 +103,12 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
           link: link
         };
     }])
-    .directive('loading', function($interval) {
+    .directive('loading', ['$interval', function($interval) {
         return {
             restrict: 'A',
             scope: {
                 isLoading: '=',
-                completeText: '@'
+                completeText: '@?'
             },
             link: function(scope, element, attrs) {
                 var inc,
@@ -140,4 +145,4 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
                 }
             } //close link
         }; //close directive function return
-    });
+    }]);

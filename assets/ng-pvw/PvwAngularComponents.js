@@ -101,7 +101,8 @@
 	            appKey: '@appkey',
 	            state: '=',
 	            config: '=',
-	            fileToLoad: '=loadfile'
+	            fileToLoad: '=loadfile',
+	            closeOnDestroy: '=closeOnDestroy'
 	        },
 	        template: __webpack_require__(11),
 	        replace: true,
@@ -145,6 +146,7 @@
 	            acquireElements($scope.faces, subsets.faces);
 	            acquireElements($scope.blocks, subsets.blocks);
 	            setupColoring();
+	            $scope.$apply();
 	        });
 	    }
 
@@ -171,10 +173,8 @@
 	        initColors($scope.faces, 'faces', true);
 
 	        $scope.elements = $scope.faces;
-	        $scope.$apply(function () {
-	            $('.busy-spinner-indicator').css('color', 'white');
-	            $scope.toggleControlTab();
-	        });
+	        $('.busy-spinner-indicator').css('color', 'white');
+	        $scope.toggleControlTab();
 	    }
 
 	    function setBusy() {
@@ -494,9 +494,15 @@
 	    };
 
 	    $scope.$on("$destroy", function () {
-	        session.call('application.exit.later', []).then(function () {
-	            autobahnConnection.close();
-	        });
+	        if (!session) {
+	            return;
+	        }
+
+	        if ($scope.closeOnDestroy) {
+	            session.call('application.exit.later', []).then(function () {
+	                autobahnConnection.close();
+	            });
+	        }
 	    });
 
 	    setBusy();
@@ -539,7 +545,7 @@
 
 
 	// module
-	exports.push([module.id, ".hydra-mesh-viewer {\n    position: absolute;\n    left: 0;\n    right: 0;\n    top: 0;\n    bottom: 0;\n}\n\n.hydra-mesh-viewer > .control-panel {\n    position: absolute;\n    top: 30px;\n    left: 30px;\n    z-index: 50;\n    border-radius: 5px;\n    color: black;\n    background-color: #aaaaaa;\n    width: 350px;\n    height: 32px;\n}\n\n.hydra-mesh-viewer > .control-panel > div > div.faces-blocks-label {\n    font-family: sans-serif;\n    font-size: larger;\n}\n\n.hydra-mesh-viewer > .control-panel > span {\n    text-align: center;\n    margin: 2px;\n}\n\n.hydra-mesh-viewer > .control-panel > span.left {\n    float: left;\n}\n\n.hydra-mesh-viewer > .control-panel > span.right {\n    float: right;\n}\n\n.hydra-mesh-viewer > .control-tab.open {\n    position: absolute;\n    left: 30px;\n    top: 62px;\n    width: 350px;\n    bottom: 30px;\n    display: block;\n    border-radius: 0 0 5px 5px;\n    background-color: white;\n    z-index: 50;\n    overflow-x: hidden;\n    overflow-y: auto;\n}\n\n.hydra-mesh-viewer > .control-tab.closed {\n    display: none;\n}\n\n.hydra-mesh-viewer > .renderer {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n}\n\n.hydra-mesh-viewer > .width-100 {\n    width: 100%;\n}\n\n.busy-spinner-container {\n    position: absolute;\n    left: 56%;\n    top: 45%;\n}\n\n.busy-spinner-indicator {\n    display: block;\n    color: black;\n}\n\n.clickable {\n    cursor: pointer;\n}\n", ""]);
+	exports.push([module.id, ".hydra-mesh-viewer {\n    position: absolute;\n    left: 0;\n    right: 0;\n    top: 0;\n    bottom: 0;\n}\n\n.hydra-mesh-viewer > .control-panel {\n    position: absolute;\n    top: 30px;\n    left: 30px;\n    z-index: 50;\n    border-radius: 5px;\n    color: black;\n    background-color: #aaaaaa;\n    width: 350px;\n    height: 32px;\n}\n\n.hydra-mesh-viewer > .control-panel > div > div.faces-blocks-label {\n    font-family: sans-serif;\n    font-size: larger;\n}\n\n.hydra-mesh-viewer > .control-panel > span {\n    text-align: center;\n    margin: 2px;\n}\n\n.hydra-mesh-viewer > .control-panel > span.left {\n    float: left;\n}\n\n.hydra-mesh-viewer > .control-panel > span.right {\n    float: right;\n}\n\n.hydra-mesh-viewer > .control-tab.open {\n    position: absolute;\n    left: 30px;\n    top: 62px;\n    width: 350px;\n    bottom: 30px;\n    display: block;\n    border-radius: 0 0 5px 5px;\n    background-color: white;\n    z-index: 50;\n    overflow-x: hidden;\n    overflow-y: auto;\n}\n\n.hydra-mesh-viewer > .control-tab.closed {\n    display: none;\n}\n\n.hydra-mesh-viewer > .renderer {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n}\n\n.hydra-mesh-viewer > .width-100 {\n    width: 100%;\n}\n\n.busy-spinner-container {\n    position: absolute;\n    left: calc(50vw - 31px); /* width of spinner is ~62 */\n    top: calc(50vh - 125px); /* height of toolbars: ~60px, height of spinner: 70px; */\n}\n\n.busy-spinner-indicator {\n    display: block;\n    color: black;\n}\n\n.clickable {\n    cursor: pointer;\n}\n", ""]);
 
 	// exports
 
@@ -862,7 +868,7 @@
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
-	   value: true
+	    value: true
 	});
 
 	__webpack_require__(14);
@@ -878,65 +884,70 @@
 	exports['default'] = moduleName;
 
 	angular.module(moduleName, []).directive(directiveName, function () {
-	   return {
-	      scope: {
-	         url: '@url',
-	         appKey: '@appkey',
-	         closeOnDestroy: '=closeOnDestroy'
-	      },
-	      template: __webpack_require__(19),
-	      replace: true,
-	      controller: controllerName
-	   };
+	    return {
+	        scope: {
+	            url: '@url',
+	            appKey: '@appkey',
+	            closeOnDestroy: '=closeOnDestroy'
+	        },
+	        template: __webpack_require__(19),
+	        replace: true,
+	        controller: controllerName
+	    };
 	}).controller(controllerName, ['$scope', function ($scope) {
 
-	   // Some internal variables that do not need to be attached to the $scope
-	   var autobahnConnection = null,
-	       session = null,
-	       launcher = false;
+	    // Some internal variables that do not need to be attached to the $scope
+	    var autobahnConnection = null,
+	        session = null,
+	        launcher = false;
 
-	   $scope.connect = function (url, appKey) {
-	      if (url === undefined) {
-	         url = '/paraview';
-	      }
+	    $scope.connect = function (url, appKey) {
+	        if (url === undefined) {
+	            url = '/paraview';
+	        }
 
-	      var configObject = {
-	         application: appKey
-	      };
+	        var configObject = {
+	            application: appKey
+	        };
 
-	      if (url.indexOf("ws") === 0) {
-	         configObject.sessionURL = url;
-	      } else {
-	         launcher = true;
-	         configObject.sessionManagerURL = url;
-	      }
+	        if (url.indexOf("ws") === 0) {
+	            configObject.sessionURL = url;
+	        } else {
+	            launcher = true;
+	            configObject.sessionManagerURL = url;
+	        }
 
-	      vtkWeb.smartConnect(configObject, function (connection) {
-	         autobahnConnection = connection.connection;
-	         session = connection.session;
+	        vtkWeb.smartConnect(configObject, function (connection) {
+	            autobahnConnection = connection.connection;
+	            session = connection.session;
 
-	         $('.app-wait-start-page').remove();
-	         $('.hide-on-start').removeClass('hide-on-start');
+	            $('.app-wait-start-page').remove();
+	            $('.hide-on-start').removeClass('hide-on-start');
 
-	         pv.initializeVisualizer(session, '.pv-viewport', '.pv-pipeline', '.pv-proxy-editor', '.pv-files', '.pv-source-list', '.pv-filter-list', '.pv-data-info', '.pv-global-settings-editor', '.pv-savedata-options');
+	            pv.initializeVisualizer(session, '.pv-viewport', '.pv-pipeline', '.pv-proxy-editor', '.pv-files', '.pv-source-list', '.pv-filter-list', '.pv-data-info', '.pv-global-settings-editor', '.pv-savedata-options');
 
-	         $('[data-toggle="tooltip"]').tooltip({ container: '.pv-visualizer-app' });
-	      }, function (code, error) {
-	         console.log('Autobahn error ' + error);
-	      });
-	   };
+	            $('[data-toggle="tooltip"]').tooltip({ container: '.pv-visualizer-app' });
+	        }, function (code, error) {
+	            console.log('Autobahn error ' + error);
+	        });
+	    };
 
-	   $scope.$on("$destroy", function () {
-	      if ($scope.closeOnDestroy === true) {
-	         session.call('application.exit.later', []).then(function () {
+	    $scope.$on("$destroy", function () {
+
+	        if (!autobahnConnection) {
+	            return;
+	        }
+
+	        if ($scope.closeOnDestroy === true) {
+	            session.call('application.exit.later', []).then(function () {
+	                autobahnConnection.close();
+	            });
+	        } else {
 	            autobahnConnection.close();
-	         });
-	      } else {
-	         autobahnConnection.close();
-	      }
-	   });
+	        }
+	    });
 
-	   $scope.connect($scope.url, $scope.appKey);
+	    $scope.connect($scope.url, $scope.appKey);
 	}]);
 	module.exports = exports['default'];
 

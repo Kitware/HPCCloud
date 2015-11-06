@@ -24,9 +24,9 @@
 
     <md-toolbar class="cmb-header">
       <div class="md-toolbar-tools">
-        <h3 ng-click="goHome()">HPC Cloud</h3>
+        <h3 ng-click="goHome()" class="cmb-home clickable">HPC Cloud</h3>
         <span flex></span>
-        <h4 ui-sref="preferences" ng-if="user" class="cmb-username"
+        <h4 ui-sref="preferences" ng-if="user" class="cmb-username clickable"
           ng-bind="user.firstName + ' ' + user.lastName">
         </h4>
         <span ng-if="user">
