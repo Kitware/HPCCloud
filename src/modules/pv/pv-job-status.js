@@ -133,7 +133,7 @@ angular.module('pv.web')
                             $rootScope.$broadcast('job-status-done');
                         } else if (data.status === 'error' || data.status === 'complete') {
                             $girder.updateFolderMetadata($stateParams.projectID, {status: 'failure'});
-                            $scope.project.meta.status = 'failure';
+                            scope.project.meta.status = 'failure';
                             taskFailure(scope.taskId);
                         }
                     }
