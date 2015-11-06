@@ -378,7 +378,7 @@ angular.module("kitware.cmb.core")
                             $state.go('mesh', {
                                 collectionName: $stateParams.collectionName,
                                 projectID: $scope.meshItem.folderId,
-                                meshItemId: $scope.mesh._id,
+                                meshItemId: $scope.meshItem._id,
                                 sessionId: $scope.project.meta.sessionId,
                                 taskId: $scope.project.meta.taskId,
                                 done: true
