@@ -1,6 +1,8 @@
 valid-color    = #263238 //biscally black
 error-color    = #F44336 //red
 complete-color = #2196F3 //blue
+material-blue  = #106CC8
+light-material-blue = #5bacef
 running-color  = #4CAF50 //green
 
 .simput-welcome
@@ -44,8 +46,8 @@ md-toolbar
             padding 0 15px
             margin 0
 
-            li
-                cursor pointer
+            li > span:hover
+                color material-blue
 
     &.cmb-header
         background #0a0a0a
@@ -173,8 +175,17 @@ md-sidenav
     .active
         font-weight bold
 
+top-nav-hover()
+    &:hover
+        text-decoration underline
+        color light-material-blue
+
+.cmb-home
+    top-nav-hover()
+
 .cmb-username
     padding-right 7px
+    top-nav-hover()
 
 .no-padding
     padding 0
