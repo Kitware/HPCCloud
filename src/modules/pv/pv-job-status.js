@@ -134,7 +134,6 @@ angular.module('pv.web')
                         } else if (data.status === 'error' || data.status === 'complete') {
                             if (/mesh/.test($state.current.url)) { //update folder metadata for 'mesh' only.
                                 $girder.updateFolderMetadata($stateParams.projectID, {status: 'failure'});
-                                scope.project.meta.status = 'failure';
                             }
                             taskFailure(scope.taskId);
                         }
