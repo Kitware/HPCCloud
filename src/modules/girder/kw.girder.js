@@ -713,6 +713,11 @@ angular.module("kitware.girder", ["ngCookies"])
             return this.getTaskWithId(taskId);
         };
 
+        this.getTaskWithMetaTask = function(item, metaTask) {
+            var taskId = item.meta[metaTask].taskId;
+            return this.getTaskWithId(taskId);
+        };
+
         this.getTaskWithId = function(taskId) {
             return this.get(['tasks/', taskId].join(''));
         };

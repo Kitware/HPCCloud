@@ -293,7 +293,8 @@ angular.module("kitware.cmb.core")
                     taskName: 'pvw'
                 };
 
-            $girder.getTask(simulation).then(function (task) {
+            // BEWARE, 'hydra' is hardcoded here, if you're running other sim tasks this has to change
+            $girder.getTaskWithMetaTask(simulation, 'hydra').then(function (task) {
                 var hydraJob = task.data.output.hydra_job,
                     dataDir = hydraJob._id,
                     sessionId = clusterData._id + '/' + hydraJob._id;
