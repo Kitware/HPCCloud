@@ -132,7 +132,7 @@ angular.module('pv.web')
                             scope.done = true;
                             $rootScope.$broadcast('job-status-done');
                         } else if (data.status === 'error' || data.status === 'complete') {
-                            if (/mesh/.test($state.current.url)) { //updae folder metadata for 'mesh' only.
+                            if (/mesh/.test($state.current.url)) { //update folder metadata for 'mesh' only.
                                 $girder.updateFolderMetadata($stateParams.projectID, {status: 'failure'});
                                 scope.project.meta.status = 'failure';
                             }
@@ -145,6 +145,15 @@ angular.module('pv.web')
                 //update the jobs list it the event has the right taskId
                 scope.$on('task.status', function(event, data) {
                     if (data._id === scope.taskId && !(data.status === 'error' || data.status === 'failure')) {
+                        if (/viewer/.test($state.current.url) && scope.itemId) {
+                            $girder.getItem(scope.itemId)
+                                .then(function(res){
+                                    var newMeta = {},
+                                        item = res.data;
+                                    newMeta[item.meta.task].status = data.status;
+                                    return $girder.updateItemMetadata(item, newMeta);
+                                });
+                        }
                         updateJobsList(scope.taskId);
                     }
                 });
