@@ -233,7 +233,7 @@ angular.module('kitware.cmb.core')
                     };
                 }],
                 template: $templateCache.get(collectionName + '/tpls/create-simulation.html'),
-                targetEvent: event,
+                targetEvent: event
             })
             .then(function(newSimulation) {
                 // Move to the newly created simulation
@@ -249,9 +249,9 @@ angular.module('kitware.cmb.core')
         };
 
         // Simulation drop down controls
-        $scope.cloneSimulation = function(simulation) {
+        $scope.cloneSimulation = function(event, simulation) {
             loading[simulation._id] = {cloning: true};
-            $scope.createSimulation(null, simulation);
+            $scope.createSimulation(event, simulation);
         };
 
         $scope.downloadSimulation = function(simulation) {

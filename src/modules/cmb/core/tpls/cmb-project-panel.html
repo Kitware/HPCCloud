@@ -97,8 +97,8 @@
                     </div>
                 </div>
                 <div layout="row">
-                    <md-button ng-hide="hasStatus(simulation, 'complete') || simulation.meta.task === 'pvw'" ng-click="runTask($event,
-                        'Start simulation computation', 'hydra', false, simulation, runSimulationCallback)"
+                    <md-button ng-hide="hasStatus(simulation, 'complete') || simulation.meta.task === 'pvw'"
+                        ng-click="runTask($event, 'Start simulation computation', 'hydra', false, simulation, runSimulationCallback)"
                         class="md-raised md-primary" ng-disabled="!hasStatus(simulation, 'valid')">
                         Run
                     </md-button>
@@ -118,7 +118,7 @@
                     </md-button>
                     <md-button loading is-loading="isLoading(simulation, 'cloning')"
                         ng-disabled="isLoading(simulation, 'cloning')"
-                        ng-click="cloneSimulation(simulation)"
+                        ng-click="cloneSimulation($event, simulation)"
                         class="md-raised">
                         Clone
                     </md-button>
