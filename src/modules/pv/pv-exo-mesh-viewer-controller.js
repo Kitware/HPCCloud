@@ -1,6 +1,6 @@
 angular.module('pv.web')
-   .controller('pvExoMeshViewerController', ['$rootScope', '$scope', 'kw.Girder', '$stateParams', '$window', '$templateCache',
-         function($rootScope, $scope, $girder, $stateParams, $window, $templateCache) {
+   .controller('pvExoMeshViewerController', ['$rootScope', '$scope', 'kw.Girder', '$stateParams', '$window',
+         function($rootScope, $scope, $girder, $stateParams, $window) {
 
       var hostPort = $window.location.host;
 

@@ -57,7 +57,7 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb', 'kitware.SimPut'])
         })
         .state('viewer', {
             url: '/viewer/:collectionName/:projectID/:sessionId',
-            templateProvider: ['$templateCache', '$stateParams', function ($templateCache, $stateParams) {
+            templateProvider: ['$templateCache', function ($templateCache) {
                 return $templateCache.get('cmb/core/tpls/cmb-viewer-panel.html');
             }],
             params: {
@@ -68,7 +68,7 @@ angular.module('kw.cmb.app', ['ui.router', 'kitware.cmb', 'kitware.SimPut'])
         })
         .state('mesh', {
             url: '/mesh/:collectionName/:meshItemId/:sessionId',
-            templateProvider: ['$templateCache', '$stateParams', function ($templateCache, $stateParams) {
+            templateProvider: ['$templateCache', function ($templateCache) {
                 return $templateCache.get('pv/tpls/pv-exo-mesh-viewer.html');
             }],
             params: {

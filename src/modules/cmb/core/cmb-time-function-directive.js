@@ -186,7 +186,7 @@ angular.module('kitware.cmb.core')
                     var dataTransfer = de.originalEvent.dataTransfer,
                         file = dataTransfer.files[0], reader = new FileReader();
 
-                    reader.onload = function(le) {
+                    reader.onload = function() {
                         var text = this.result;
 
                         scope.update(text);

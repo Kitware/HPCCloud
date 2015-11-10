@@ -240,8 +240,7 @@ angular.module('kitware.cmb.core')
         $scope.runSimulationCallback = function(args) {
             var simulation = args[0],
                 clusterData = args[1],
-                taskSpecId = args[2],
-                mesh = $scope.mesh;
+                taskSpecId = args[2];
 
             $girder.extractMeshInformationFromProject(simulation.folderId, function(meshItem, meshFile){
                 var config = {

@@ -66,7 +66,7 @@ angular.module('kitware.cmb.core',['kitware.cmb.core.tpls'])
             }
         };
     }])
-    .directive('deltaTime', ['$interval', 'dateFilter', function($interval, dateFilter) {
+    .directive('deltaTime', ['$interval', function($interval) {
 
         function link(scope, element, attrs) {
             var startTime = 0,

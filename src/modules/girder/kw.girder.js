@@ -23,12 +23,11 @@ angular.module('kitware.girder', ['ngCookies'])
                     'Girder-Token': authToken
                 }
             })
-            .success(function(data, status, headers, config) {
-                user = data;
+            .then(function(res) {
+                user = res.data;
                 $rootScope.$broadcast('login', user);
                 self.fetchTaskList();
-            })
-            .error(function(data, status, headers, config) {
+            }, function(err) {
                 user = null;
                 authToken = null;
             });
@@ -153,8 +152,7 @@ angular.module('kitware.girder', ['ngCookies'])
           *   - 'login-error'
           */
         this.login = function (login, password) {
-            var authString = $window.btoa(login + ':' + password),
-                self = this;
+            var authString = $window.btoa(login + ':' + password);
             $http({
                 method: 'GET',
                 url: apiBasePathURL + 'user/authentication',
@@ -162,16 +160,16 @@ angular.module('kitware.girder', ['ngCookies'])
                     'Authorization': 'Basic ' + authString
                 }
             })
-            .success(function(data, status, headers, config) {
-                user = data.user;
-                authToken = data.authToken.token;
+            .then(function(res) {
+                user = res.data.user;
+                authToken = res.data.authToken.token;
                 $rootScope.$broadcast('login', user);
 
                 $cookies.girderToken = authToken;
 
-                self.fetchTaskList();
-            })
-            .error(function(data, status, headers, config) {
+                this.fetchTaskList();
+            }.bind(this),
+            function(err) {
                 user = null;
                 authToken = null;
                 $rootScope.$broadcast('login-error');
@@ -458,7 +456,7 @@ angular.module('kitware.girder', ['ngCookies'])
                         } else {
                             blob = file.slice(offset, offset + chunkSize);
                             that.uploadChunk(upload._id, offset, blob)
-                                .then(function (data) {
+                                .then(function (res) {
                                     var msg;
 
                                     i += 1;
@@ -472,9 +470,9 @@ angular.module('kitware.girder', ['ngCookies'])
                                     });
 
                                     uploadNextChunk(offset + chunkSize);
-                                }, function (data) {
+                                }, function (err) {
                                     console.warn('could not upload data');
-                                    console.warn(data);
+                                    console.warn(err);
                                 });
                         }
                     };
@@ -692,13 +690,12 @@ angular.module('kitware.girder', ['ngCookies'])
         };
 
         this.startTaggerTask = function (item, taskDefId, cluster, taskConfig) {
-            var self = this;
             // Create task instance
             taskConfig.cluster.name = item._id;
-            return self.post('tasks', { taskSpecId: taskDefId })
+            return this.post('tasks', { taskSpecId: taskDefId })
                 .then(function(res) {
-                    return self.put(['tasks', res.data._id, 'run'].join('/'), taskConfig);
-                });
+                    return this.put(['tasks', res.data._id, 'run'].join('/'), taskConfig);
+                }.bind(this));
         };
 
         this.getTaskId = function(workflow, taskName) {

@@ -1,8 +1,7 @@
 angular.module('kitware.cmb.core')
     .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog',
-        '$templateCache', '$window', '$timeout', '$interval',
-        function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $timeout, $interval) {
-        var timeoutId = 0;
+        '$templateCache', '$window', '$interval',
+        function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $interval) {
 
         //from https://github.com/tjmehta/101/blob/master/is-object.js
         function isObject (val) {
@@ -121,8 +120,7 @@ angular.module('kitware.cmb.core')
                 return;
             }
             console.log('event received: ', data.status);
-            var simIndex = findSimulationIndexByTaskId(data._id),
-                simulationMeta;
+            var simIndex = findSimulationIndexByTaskId(data._id);
             if (simIndex < 0) {
                 console.log('_id '+data._id+' not found, elsewhere');
                 simIndex = findTaskIndexById(data._id);
