@@ -58,6 +58,7 @@ angular.module('pv.web')
                 function taskFailure(taskId) {
                     scope.activeCollection = $stateParams.collectionName;
                     scope.activeProject = $stateParams.projectID;
+                    scope.done = false;
                     $girder.getTaskWithId(taskId)
                         .then(function(res) {
                             if (res.data.log.length === 0 || !res.data.log[0].hasOwnProperty('$ref')) {
