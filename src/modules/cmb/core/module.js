@@ -1,4 +1,4 @@
-angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
+angular.module('kitware.cmb.core',['kitware.cmb.core.tpls'])
     .filter('toDateNumber', function() {
         return function(str) {
             if(str === undefined) {
@@ -34,13 +34,13 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
             return file.hasOwnProperty('size') && file.size > 0;
         };
     })
-    .directive("fileread", [function () {
+    .directive('fileread', [function () {
         return {
             scope: {
-                fileread: "="
+                fileread: '='
             },
             link: function (scope, element, attributes) {
-                element.bind("change", function (changeEvent) {
+                element.bind('change', function (changeEvent) {
                     var reader = new FileReader();
                     reader.onload = function (loadEvent) {
                         scope.$apply(function () {
@@ -52,13 +52,13 @@ angular.module("kitware.cmb.core",["kitware.cmb.core.tpls"])
             }
         };
     }])
-    .directive("filemeta", [function () {
+    .directive('filemeta', [function () {
         return {
             scope: {
-                filemeta: "="
+                filemeta: '='
             },
             link: function (scope, element, attributes) {
-                element.bind("change", function (changeEvent) {
+                element.bind('change', function (changeEvent) {
                     scope.$apply(function () {
                         scope.filemeta = changeEvent.target.files[0];
                     });

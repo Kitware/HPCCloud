@@ -1,9 +1,9 @@
-angular.module("kitware.cmb",[
-    "kitware.girder",
-    "kitware.cmb.core",
-    "ui.bootstrap",
-    "ngMaterial",
-    "nvd3",
-    "pvweb-module",
-    "pv.web"
+angular.module('kitware.cmb',[
+    'kitware.girder',
+    'kitware.cmb.core',
+    'ui.bootstrap',
+    'ngMaterial',
+    'nvd3',
+    'pvweb-module',
+    'pv.web'
 ]);

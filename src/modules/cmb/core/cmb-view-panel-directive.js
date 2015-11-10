@@ -1,4 +1,4 @@
-angular.module("kitware.cmb.core")
+angular.module('kitware.cmb.core')
     .directive('cmbViewPanel', ['$templateCache', '$compile', function ($templateCache, $compile) {
         return {
             restrict: 'AE',

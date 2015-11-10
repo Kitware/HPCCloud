@@ -9,7 +9,7 @@ angular.module('pv.web')
          fileId: $stateParams.fileID
       };
 
-      $scope.url = "ws://"+hostPort+"/proxy?sessionId=" +
+      $scope.url = 'ws://'+hostPort+'/proxy?sessionId=' +
          encodeURIComponent($stateParams.sessionId);
 
       function save(data) {

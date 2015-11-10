@@ -1,4 +1,4 @@
-angular.module("kitware.girder", ["ngCookies"])
+angular.module('kitware.girder', ['ngCookies'])
     /**
      * The girder.net.GirderConnector service simplify management
      * and interaction with a Girder server using its Restful API.
@@ -291,7 +291,7 @@ angular.module("kitware.girder", ["ngCookies"])
          * within a folder.
          */
         this.listFolders = function ( parentId, parentType ) {
-            parentType = parentType || "folder";
+            parentType = parentType || 'folder';
             return this.get('folder?parentType='+parentType+'&parentId=' + parentId);
         };
 
@@ -324,7 +324,7 @@ angular.module("kitware.girder", ["ngCookies"])
         };
 
         this.createFolder = function (parentId, name, description, parentType) {
-            parentType = parentType || "folder";
+            parentType = parentType || 'folder';
             return this.post(['folder?parentId=', parentId,
                 '&parentType=', parentType,
                 '&name=', escape(name),
@@ -482,7 +482,7 @@ angular.module("kitware.girder", ["ngCookies"])
                     uploadNextChunk(0);
                 })
                 .error(function (data) {
-                    console.warn("Could not upload file");
+                    console.warn('Could not upload file');
                     console.warn(data);
                 });
         };
@@ -493,12 +493,12 @@ angular.module("kitware.girder", ["ngCookies"])
 
         this.uploadContentToItem = function (itemId, name, content) {
             var self = this,
-                blob = new Blob([content], { type: "text/plain"});
+                blob = new Blob([content], { type: 'text/plain'});
 
             function uploadFunction (upload) {
                 self.uploadChunk(upload._id, 0, blob)
                     .success(function (data) {
-                        console.log("Upload ok");
+                        console.log('Upload ok');
                     })
                     .error(function (data) {
                         console.warn('could not upload data');
@@ -512,7 +512,7 @@ angular.module("kitware.girder", ["ngCookies"])
                                '?size=', content.length].join(''))
                         .success(uploadFunction)
                         .error(function (data) {
-                            console.warn("Could not upload content");
+                            console.warn('Could not upload content');
                             console.warn(data);
                         });
                 } else {
@@ -524,7 +524,7 @@ angular.module("kitware.girder", ["ngCookies"])
                                '&mimeType=txt/plain'].join(''))
                         .success(uploadFunction)
                         .error(function (data) {
-                            console.warn("Could not upload content");
+                            console.warn('Could not upload content');
                             console.warn(data);
                         });
                 }
@@ -546,7 +546,7 @@ angular.module("kitware.girder", ["ngCookies"])
                     self.get(['file/', fileId, '/download/', name].join(''))
                         .success(callback)
                         .error(function(data) {
-                            console.warn("Error while downloading file content");
+                            console.warn('Error while downloading file content');
                             console.warn(data);
                         });
                 } else {
@@ -571,7 +571,7 @@ angular.module("kitware.girder", ["ngCookies"])
         // }
         this.processMesh = function(itemId, fileId) {
           return this.put(
-            "meshes/" + fileId + "/extract/surface",
+            'meshes/' + fileId + '/extract/surface',
             {
               output: {
                 itemId: itemId,
@@ -673,19 +673,19 @@ angular.module("kitware.girder", ["ngCookies"])
                     // Start task
                     return self.put(['tasks', response.data._id, 'run'].join('/'), taskConfig)
                         .then(function(response){
-                            console.log("Task successfully started");
+                            console.log('Task successfully started');
                             metadata[taskConfig.taskName].status = 'running';
                             self.updateItemMetadata(item, metadata);
                             if (cb) {
                                 cb(metadata[metadata.task].taskId);
                             }
                         }, function(error) {
-                            console.log("Error while starting Task", error.data.message);
+                            console.log('Error while starting Task', error.data.message);
                             item.meta[taskConfig.taskName].status = 'error';
                             self.updateItemMetadata(item, item.meta);
                         });
                 }, function(error) {
-                    console.log("Error while task creation", error.data.message);
+                    console.log('Error while task creation', error.data.message);
                     item.meta[taskConfig.taskName].status = 'error';
                     self.updateItemMetadata(item, item.meta);
                 });
@@ -771,7 +771,7 @@ angular.module("kitware.girder", ["ngCookies"])
                     if(item.meta.status !== response.status) {
                         console.log('update status to ' + response.status + ' from: ' + item.meta[item.meta.task].task);
                         var sesssionId = (response.output && response.output.pvw_job) ? response.output.cluster._id + '%2F' + response.output.pvw_job._id : '',
-                            connectionURL = ( $window.location.protocol === 'https:' ? "wss://" : "ws://") + $window.location.host + "/proxy?sessionId=" + sesssionId,
+                            connectionURL = ( $window.location.protocol === 'https:' ? 'wss://' : 'ws://') + $window.location.host + '/proxy?sessionId=' + sesssionId,
                             meta = angular.copy(item.meta[item.meta.task]);
 
                         meta[item.meta.task].task = response.status;
@@ -840,7 +840,7 @@ angular.module("kitware.girder", ["ngCookies"])
                             self.updateItemMetadata(item, toUpdate);
                         })
                         .error(function(error){
-                            console.log("Error when deleting task " + taskId, error.message || error.data.message);
+                            console.log('Error when deleting task ' + taskId, error.message || error.data.message);
                             self.updateItemMetadata(item, toUpdate);
                         });
                 }
@@ -861,7 +861,7 @@ angular.module("kitware.girder", ["ngCookies"])
                         jobId = task.output.hydra_job._id;
                     }
                     if(ready === 0) {
-                        extractTiming({timings:{"info": "nothing to get"}});
+                        extractTiming({timings:{'info': 'nothing to get'}});
                     }
 
                     if(clusterId) {
@@ -903,7 +903,7 @@ angular.module("kitware.girder", ["ngCookies"])
                     self.updateItemMetadata(item, item.meta);
                 })
                 .error(function(error) {
-                    console.log("Error when terminating task " + taskId, error.message);
+                    console.log('Error when terminating task ' + taskId, error.message);
                 });
         };
 
@@ -911,10 +911,10 @@ angular.module("kitware.girder", ["ngCookies"])
             this.get(['tasks', taskId].join('/'))
                 .success(function(resp){
                     var sesssionId = resp.output.cluster._id + '%2F' + resp.output.pvw_job._id;
-                    callback( ( $window.location.protocol === 'https:' ? "wss://" : "ws://") + $window.location.host + "/proxy?sessionId=" + sesssionId);
+                    callback( ( $window.location.protocol === 'https:' ? 'wss://' : 'ws://') + $window.location.host + '/proxy?sessionId=' + sesssionId);
                 })
                 .error(function(error){
-                    console.log("Error when fetching task info for " + taskId, error.message);
+                    console.log('Error when fetching task info for ' + taskId, error.message);
                 });
         };
 

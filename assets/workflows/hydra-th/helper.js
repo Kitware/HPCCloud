@@ -5,7 +5,7 @@
         'create-project' : function (groupId, $girder, $data, $mdDialog) {
             $girder.createFolder(groupId, $data.name, $data.description)
                 .success(function (folder) {
-                    $girder.createItem(folder._id, "mesh", "Mesh file used for simulation")
+                    $girder.createItem(folder._id, 'mesh', 'Mesh file used for simulation')
                         .success(function (item) {
                             $girder.uploadFileItem(item._id, $data.mesh);
                         })

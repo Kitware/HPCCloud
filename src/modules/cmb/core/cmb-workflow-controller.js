@@ -1,4 +1,4 @@
-angular.module("kitware.cmb.core")
+angular.module('kitware.cmb.core')
     .controller('CmbWorkflowController', ['$scope', 'kw.Girder', '$state', '$stateParams',
         '$mdDialog', '$templateCache', '$window',
         function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window) {
@@ -66,7 +66,7 @@ angular.module("kitware.cmb.core")
                                 return $girder.getCollectionFromName($stateParams.collectionName).then(function(result) {
                                     var collectionId = result.data[0]._id;
                                     return $girder.createFolder(collectionId, $girder.getUser().login,
-                                        $girder.getUser().login + "'s projects", "collection").then(function(result) {
+                                        $girder.getUser().login + '\'s projects', 'collection').then(function(result) {
                                             return result.data;
                                         }, function(error) {
                                             console.log(error);

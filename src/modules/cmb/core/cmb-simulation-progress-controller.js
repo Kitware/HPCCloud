@@ -1,8 +1,8 @@
-angular.module("kitware.cmb.core")
+angular.module('kitware.cmb.core')
 .controller('CmbSimulationProgressController', ['$scope', 'kw.Girder', '$state', '$stateParams',
     '$mdDialog', '$templateCache', '$interval',
     function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $interval) {
-    var timoutId = 0;
+    var timeoutId = 0;
 
     $scope.outputStats = [];
     $scope.jobId = null;
@@ -62,7 +62,7 @@ angular.module("kitware.cmb.core")
         $interval.cancel(timeoutId);
     });
 
-    if(!girder.getAuth()) {
+    if(!$girder.getAuth()) {
         $state.go('login');
     }
 }]);

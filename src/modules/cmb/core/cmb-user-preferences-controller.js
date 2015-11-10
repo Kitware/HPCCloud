@@ -1,4 +1,4 @@
-angular.module("kitware.cmb.core")
+angular.module('kitware.cmb.core')
     .controller('CmbUserPreferencesController', ['$scope', 'kw.Girder',
         '$templateCache', '$timeout', '$mdToast', '$mdDialog',
         function ($scope, $girder, $templateCache, $timeout, $mdToast, $mdDialog) {
@@ -49,7 +49,7 @@ angular.module("kitware.cmb.core")
 
                 $girder.getAWSProfiles()
                     .then(function(res){
-                        data = res.data.map(function(el) {
+                        var data = res.data.map(function(el) {
                             el.saved = true;
                             return el;
                         });
@@ -60,7 +60,7 @@ angular.module("kitware.cmb.core")
 
                 $girder.getClusterProfiles()
                     .then(function(res){
-                        data = res.data.map(function(el) {
+                        var data = res.data.map(function(el) {
                             el.saved = true;
                             return el;
                         });

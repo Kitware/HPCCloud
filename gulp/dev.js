@@ -4,7 +4,8 @@ var gulp = require('gulp'),
     }),
     jsHintOptions = {
         eqeqeq: true,
-        curly: true
+        curly: true,
+        quotmark: 'single'
     };
 
 gulp.task('test', function() {

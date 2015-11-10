@@ -1,4 +1,4 @@
-angular.module("kitware.cmb.core")
+angular.module('kitware.cmb.core')
     .controller('CmbCollectionsController', ['$scope', 'kw.Girder', '$state', function ($scope, $girder, $state) {
 
         $scope.collections = [];

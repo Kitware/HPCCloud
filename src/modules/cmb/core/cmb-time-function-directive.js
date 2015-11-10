@@ -1,4 +1,4 @@
-angular.module("kitware.cmb.core")
+angular.module('kitware.cmb.core')
     .directive('cmbTimeFunction',  ['$templateCache', function ($templateCache) {
 
         return {

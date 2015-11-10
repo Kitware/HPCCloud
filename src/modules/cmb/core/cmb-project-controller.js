@@ -1,4 +1,4 @@
-angular.module("kitware.cmb.core")
+angular.module('kitware.cmb.core')
     .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog',
         '$templateCache', '$window', '$timeout', '$interval',
         function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $timeout, $interval) {
@@ -251,7 +251,7 @@ angular.module("kitware.cmb.core")
         // Simulation drop down controls
         $scope.cloneSimulation = function(simulation) {
             loading[simulation._id] = {cloning: true};
-            $scope.createSimulation(event, simulation);
+            $scope.createSimulation(null, simulation);
         };
 
         $scope.downloadSimulation = function(simulation) {
@@ -261,14 +261,14 @@ angular.module("kitware.cmb.core")
                     var downloadName = fileList.length > 1 ? simulation.name + '.zip' : fileList[0].name;
                     $girder.downloadItem(simulation._id)
                         .success(function(data) {
-                            $window.saveAs(new Blob([data], {type: "application/octet-stream"}), downloadName);
+                            $window.saveAs(new Blob([data], {type: 'application/octet-stream'}), downloadName);
                         })
                         .error(function() {
-                            console.log("Download error");
+                            console.log('Download error');
                         });
                 })
                 .error(function(){
-                    console.log("error in file listing");
+                    console.log('error in file listing');
                 });
 
         };
@@ -512,7 +512,7 @@ angular.module("kitware.cmb.core")
                 .success(function (items) {
                     var count = items.length;
                     if (count === 0) {
-                        console.error("no items found");
+                        console.error('no items found');
                     }
 
                     $scope.simulations = [];

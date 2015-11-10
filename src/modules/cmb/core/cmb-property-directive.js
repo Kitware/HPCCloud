@@ -1,4 +1,4 @@
-angular.module("kitware.cmb.core")
+angular.module('kitware.cmb.core')
     .directive('cmbProperty', ['$templateCache', '$compile', function ($templateCache, $compile) {
 
         function extractDefault(property) {
@@ -61,7 +61,7 @@ angular.module("kitware.cmb.core")
                     if(helpTemplate) {
                         htmlCode += '<md-card style="display:none;" class="help-content help-'+scope.property.id+'"><md-card-content>' + helpTemplate + '</md-card-content></md-card>';
                     } else {
-                        console.log("No help for " + scope.property.id + ' path: ' + scope.workflow + '/help/' + scope.property.id);
+                        console.log('No help for ' + scope.property.id + ' path: ' + scope.workflow + '/help/' + scope.property.id);
                     }
                     element.replaceWith($compile(htmlCode)(scope));
                     if(helpTemplate) {

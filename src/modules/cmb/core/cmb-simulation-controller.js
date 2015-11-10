@@ -1,4 +1,4 @@
-angular.module("kitware.cmb.core")
+angular.module('kitware.cmb.core')
     .controller('CmbSimulationController', ['$scope', 'kw.Girder', '$state', '$stateParams',
         '$mdDialog', '$templateCache', '$timeout',
         function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $timeout) {
@@ -37,7 +37,7 @@ angular.module("kitware.cmb.core")
                     .success(function (items) {
                         var count = items.length;
                         if (count === 0) {
-                            console.error("no item found");
+                            console.error('no item found');
                         }
 
                         // loop over faces
@@ -86,7 +86,7 @@ angular.module("kitware.cmb.core")
                                 $scope.external = {
                                     'face-tags': convertAnnotations(faces),
                                     'block-tags': convertAnnotations(blocks),
-                                    'element-tags': { labels: ["Elements for Stats"], values: [ 3720242 ] }
+                                    'element-tags': { labels: ['Elements for Stats'], values: [ 3720242 ] }
                                 };
 
                                 if($scope.viewModel) {
