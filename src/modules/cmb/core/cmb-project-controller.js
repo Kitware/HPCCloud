@@ -14,18 +14,28 @@ angular.module('kitware.cmb.core')
             !(val instanceof Number);
         }
 
-        //searches just the meta[meta.task]
-        function findSimulationIndexById(id) {
+        //basic _id matching search
+        function getSimulationIndexById(id) {
             for (var i=0; i < $scope.simulations.length; i++) {
-                var meta = $scope.simulations[i].meta;
-                if (meta[meta.task].taskId === id || meta[meta.task].taskId === undefined) {
+                if ($scope.simulations[i]._id === id) {
                     return i;
                 }
             }
             return -1;
         }
 
-        //searches in all of meta.task, so meta.hydra *and* meta.pvw for example
+        //searches sim.meta[sim.meta.task] for a given taskId
+        function findSimulationIndexByTaskId(id) {
+            for (var i=0; i < $scope.simulations.length; i++) {
+                var meta = $scope.simulations[i].meta;
+                if (meta[meta.task].taskId === id) { //|| meta[meta.task].taskId === undefined) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        //searches in all of meta.task (eg meta.hydra *and* meta.pvw) for a given taskId
         function findTaskIndexById(id) {
             for (var i=0; i < $scope.simulations.length; i++) {
                 var meta = $scope.simulations[i].meta,
@@ -84,13 +94,9 @@ angular.module('kitware.cmb.core')
                 if (data.status === 'running' && $scope.panelState.index === data.simIndex) {
                     startLoggingTask(simulation);
                 }
-            //simply update status.
-            } else {
+            } else { //simply update status.
                 $girder.patchItemMetadata(simulation._id, itemAttr(simulation, 'status', data.status, taskName));
             }
-
-            //force $digest
-            $scope.$apply();
 
             //show log if finished.
             if ($scope.hasStatus(simulation, finishedStates) && !$scope.taskOutput) {
@@ -100,11 +106,12 @@ angular.module('kitware.cmb.core')
 
         /* This seems convoluted... well it is.
          * 'task.status' receives a data object with {_id, status}. _id refers to the taskId
-         * which the status is for. We see if it's a meta object related to the meshtagger,
-         * then we try to find it in simulations[n].meta[...meta.task],
-         * if we don't find it there we look in the other task meta objects in sim.meta
-         * If we find the task we update its status, and possibly its taskId if === null.
-         */
+         * which the status is for.
+         *  - We see if it's a meta object related to the meshtagger, update project metadata if it is.
+         *  - We try to find it in simulations[n].meta[...meta.task], update item metadata if it is.
+         *  - We look in the other task meta objects in sim.meta, update item metadata if it is.
+         *  - We call the backend and get the item id for the task and then update the item metadata if we find it.
+         * The last one is the most straigt forward, but we probably don't want to query back end everytime. wow. */
         $scope.$on('task.status', function(event, data) {
             if ($scope.project.meta && $scope.project.meta.taskId &&
                     data._id === $scope.project.meta.taskId) {
@@ -113,21 +120,34 @@ angular.module('kitware.cmb.core')
                 console.log('new project status: ', data.status);
                 return;
             }
-            var simIndex = findSimulationIndexById(data._id),
-                simulationMeta;
             console.log('event received: ', data.status);
+            var simIndex = findSimulationIndexByTaskId(data._id),
+                simulationMeta;
             if (simIndex < 0) {
-                console.log('_id '+data._id+' not found, looking in other objects...');
+                console.log('_id '+data._id+' not found, elsewhere');
                 simIndex = findTaskIndexById(data._id);
                 if (simIndex.index < 0) {
-                    console.error('_id '+data._id+' not found');
+                    $girder.getTaskWithId(data._id)
+                        .then(function(res) {
+                            var simId = res.data.output.output.item.id,
+                               simIndex = getSimulationIndexById(simId);
+                            if (simIndex !== -1){
+                                console.log('found it.');
+                                data.simIndex = simIndex;
+                                handleNewTaskStatus($scope.simulations[simIndex], data);
+                            } else {
+                                console.error('_id '+data._id+' not found');
+                            }
+                        });
                 } else {
                     data.simIndex = simIndex.index;
                     handleNewTaskStatus($scope.simulations[simIndex.index], data, simIndex.key);
+                    $scope.$apply();
                 }
             } else {
                 data.simIndex = simIndex;
                 handleNewTaskStatus($scope.simulations[simIndex], data);
+                $scope.$apply();
             }
         });
 
