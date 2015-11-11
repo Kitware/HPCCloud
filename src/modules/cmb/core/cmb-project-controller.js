@@ -59,9 +59,11 @@ angular.module('kitware.cmb.core')
             });
         }
 
-        /* itemAttr(item, hasStatus, newAttr, taskName)
-        *   if hasStatus, set the new status in the item and return the meta object.
-        *   else get the status for the item's active task
+        /* itemAttr(item, attr, newAttr, taskName)
+        * checks the item.meta[item.meta.task] for attr and returns it
+        * - if newAttr is set, then it will be assigned the newValue of attr
+        * and return new meta for the task
+        * - if taskName is set, then it will use item.meta[taskName]
         */
         function itemAttr(item, attr, newAttr, taskName) {
             if (!taskName) {
@@ -527,11 +529,12 @@ angular.module('kitware.cmb.core')
                     if (res.data.output.cluster) {
                         $scope.itemClusterType[item.name] = res.data.output.cluster.type;
                     }
-                    if (res.data.status !== itemAttr(item, status)) {
-                        //console.log('status for "' + item.name + '", '+ index +' change, ' + item.meta.status + ' -> ' + res.data.status);
-                        item.meta[item.meta.task].status = res.data.status;
+                    if (res.data.status !== itemAttr(item, 'status')) {
+                        //console.log('status for "' + item.name + '", '+ index +' change, "' + itemAttr(item, 'status') + '" -> "' + res.data.status + '"');
+                        var newMeta = itemAttr(item, 'status', res.data.status);
+                        item.meta[item.meta.task] = newMeta[item.meta.task];
                         $scope.simulations[index] = item;
-                        $girder.patchItemMetadata(item._id, {status: res.data.status});
+                        $girder.patchItemMetadata(item._id, newMeta);
                     }
                 };
             }
