@@ -658,7 +658,6 @@ angular.module('kitware.girder', ['ngCookies'])
                     metadata[taskConfig.taskName] = {
                         taskId: response.data._id,
                         spec: response.data.taskSpecId,
-                        task: response.data.status,
                         startTime: new Date().getTime(),
                         cost: cluster.cost,
                         totalCost: (item.meta.totalCost || 0),

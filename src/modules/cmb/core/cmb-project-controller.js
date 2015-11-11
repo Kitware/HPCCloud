@@ -428,7 +428,6 @@ angular.module('kitware.cmb.core')
                         logInterval = null;
                     }
                     logInterval = $interval(function() {
-                        console.log('logging', url);
                         $girder.getTaskLog(url, offset)
                             .then(function(logData) {
                                 var log = logData.data.log;
@@ -554,7 +553,7 @@ angular.module('kitware.cmb.core')
                             // Simulation
                             $scope.simulations.push(items[count]);
                             var index = $scope.simulations.length-1;
-                            if (items[count].meta.taskId) {
+                            if (itemAttr(items[count], 'taskId')){
                                 $girder.getTask(items[count])
                                     //we need to isolate some vars so they don't get messed up in async.
                                     .then(getTaskCallback(items[count], index));
