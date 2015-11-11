@@ -1,8 +1,7 @@
-angular.module("kitware.cmb.core")
+angular.module('kitware.cmb.core')
     .controller('CmbProjectController', ['$scope', 'kw.Girder', '$state', '$stateParams', '$mdDialog',
-        '$templateCache', '$window', '$timeout', '$interval',
-        function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $timeout, $interval) {
-        var timeoutId = 0;
+        '$templateCache', '$window', '$interval',
+        function ($scope, $girder, $state, $stateParams, $mdDialog, $templateCache, $window, $interval) {
 
         //from https://github.com/tjmehta/101/blob/master/is-object.js
         function isObject (val) {
@@ -14,18 +13,28 @@ angular.module("kitware.cmb.core")
             !(val instanceof Number);
         }
 
-        //searches just the meta[meta.task]
-        function findSimulationIndexById(id) {
+        //basic _id matching search
+        function getSimulationIndexById(id) {
             for (var i=0; i < $scope.simulations.length; i++) {
-                var meta = $scope.simulations[i].meta;
-                if (meta[meta.task].taskId === id || meta[meta.task].taskId === undefined) {
+                if ($scope.simulations[i]._id === id) {
                     return i;
                 }
             }
             return -1;
         }
 
-        //searches in all of meta.task, so meta.hydra *and* meta.pvw for example
+        //searches sim.meta[sim.meta.task] for a given taskId
+        function findSimulationIndexByTaskId(id) {
+            for (var i=0; i < $scope.simulations.length; i++) {
+                var meta = $scope.simulations[i].meta;
+                if (meta[meta.task].taskId === id) { //|| meta[meta.task].taskId === undefined) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        //searches in all of meta.task (eg meta.hydra *and* meta.pvw) for a given taskId
         function findTaskIndexById(id) {
             for (var i=0; i < $scope.simulations.length; i++) {
                 var meta = $scope.simulations[i].meta,
@@ -50,9 +59,11 @@ angular.module("kitware.cmb.core")
             });
         }
 
-        /* itemAttr(item, hasStatus, newAttr, taskName)
-        *   if hasStatus, set the new status in the item and return the meta object.
-        *   else get the status for the item's active task
+        /* itemAttr(item, attr, newAttr, taskName)
+        * checks the item.meta[item.meta.task] for attr and returns it
+        * - if newAttr is set, then it will be assigned the newValue of attr
+        * and return new meta for the task
+        * - if taskName is set, then it will use item.meta[taskName]
         */
         function itemAttr(item, attr, newAttr, taskName) {
             if (!taskName) {
@@ -84,13 +95,9 @@ angular.module("kitware.cmb.core")
                 if (data.status === 'running' && $scope.panelState.index === data.simIndex) {
                     startLoggingTask(simulation);
                 }
-            //simply update status.
-            } else {
+            } else { //simply update status.
                 $girder.patchItemMetadata(simulation._id, itemAttr(simulation, 'status', data.status, taskName));
             }
-
-            //force $digest
-            $scope.$apply();
 
             //show log if finished.
             if ($scope.hasStatus(simulation, finishedStates) && !$scope.taskOutput) {
@@ -100,11 +107,12 @@ angular.module("kitware.cmb.core")
 
         /* This seems convoluted... well it is.
          * 'task.status' receives a data object with {_id, status}. _id refers to the taskId
-         * which the status is for. We see if it's a meta object related to the meshtagger,
-         * then we try to find it in simulations[n].meta[...meta.task],
-         * if we don't find it there we look in the other task meta objects in sim.meta
-         * If we find the task we update its status, and possibly its taskId if === null.
-         */
+         * which the status is for.
+         *  - We see if it's a meta object related to the meshtagger, update project metadata if it is.
+         *  - We try to find it in simulations[n].meta[...meta.task], update item metadata if it is.
+         *  - We look in the other task meta objects in sim.meta, update item metadata if it is.
+         *  - We call the backend and get the item id for the task and then update the item metadata if we find it.
+         * The last one is the most straigt forward, but we probably don't want to query back end everytime. wow. */
         $scope.$on('task.status', function(event, data) {
             if ($scope.project.meta && $scope.project.meta.taskId &&
                     data._id === $scope.project.meta.taskId) {
@@ -113,26 +121,38 @@ angular.module("kitware.cmb.core")
                 console.log('new project status: ', data.status);
                 return;
             }
-            var simIndex = findSimulationIndexById(data._id),
-                simulationMeta;
             console.log('event received: ', data.status);
+            var simIndex = findSimulationIndexByTaskId(data._id);
             if (simIndex < 0) {
-                console.log('_id '+data._id+' not found, looking in other objects...');
+                console.log('_id '+data._id+' not found, elsewhere');
                 simIndex = findTaskIndexById(data._id);
                 if (simIndex.index < 0) {
-                    console.error('_id '+data._id+' not found');
+                    $girder.getTaskWithId(data._id)
+                        .then(function(res) {
+                            var simId = res.data.output.output.item.id,
+                               simIndex = getSimulationIndexById(simId);
+                            if (simIndex !== -1){
+                                console.log('found it.');
+                                data.simIndex = simIndex;
+                                handleNewTaskStatus($scope.simulations[simIndex], data);
+                            } else {
+                                console.error('_id '+data._id+' not found');
+                            }
+                        });
                 } else {
                     data.simIndex = simIndex.index;
                     handleNewTaskStatus($scope.simulations[simIndex.index], data, simIndex.key);
+                    $scope.$apply();
                 }
             } else {
                 data.simIndex = simIndex;
                 handleNewTaskStatus($scope.simulations[simIndex], data);
+                $scope.$apply();
             }
         });
 
         $scope.$on('$destroy', function() {
-            if (logInterval) {
+            if (logInterval !== null) {
                 $interval.cancel(logInterval);
             }
         });
@@ -233,7 +253,7 @@ angular.module("kitware.cmb.core")
                     };
                 }],
                 template: $templateCache.get(collectionName + '/tpls/create-simulation.html'),
-                targetEvent: event,
+                targetEvent: event
             })
             .then(function(newSimulation) {
                 // Move to the newly created simulation
@@ -249,7 +269,7 @@ angular.module("kitware.cmb.core")
         };
 
         // Simulation drop down controls
-        $scope.cloneSimulation = function(simulation) {
+        $scope.cloneSimulation = function(event, simulation) {
             loading[simulation._id] = {cloning: true};
             $scope.createSimulation(event, simulation);
         };
@@ -261,20 +281,20 @@ angular.module("kitware.cmb.core")
                     var downloadName = fileList.length > 1 ? simulation.name + '.zip' : fileList[0].name;
                     $girder.downloadItem(simulation._id)
                         .success(function(data) {
-                            $window.saveAs(new Blob([data], {type: "application/octet-stream"}), downloadName);
+                            $window.saveAs(new Blob([data], {type: 'application/octet-stream'}), downloadName);
                         })
                         .error(function() {
-                            console.log("Download error");
+                            console.log('Download error');
                         });
                 })
                 .error(function(){
-                    console.log("error in file listing");
+                    console.log('error in file listing');
                 });
 
         };
         $scope.terminateCluster = function(simulation) {
             $girder.terminateTask(simulation);
-            if (logInterval && simulation._id === $scope.simulations[$scope.panelState.index]._id) {
+            if (logInterval !== null && simulation._id === $scope.simulations[$scope.panelState.index]._id) {
                 $interval.cancel(logInterval);
             }
         };
@@ -328,6 +348,7 @@ angular.module("kitware.cmb.core")
             } else if (!$scope.panelState.open) {
                 if (logInterval !== null) {
                     $interval.cancel(logInterval);
+                    logInterval = null;
                 }
             }
         };
@@ -404,6 +425,10 @@ angular.module("kitware.cmb.core")
                     var offset = 0,
                         url = res.data.log[0].$ref;
                     $scope.taskLog[simulation._id] = '';
+                    if (logInterval !== null) { //stop logging the prev task, there can be only one!
+                        $interval.cancel(logInterval);
+                        logInterval = null;
+                    }
                     logInterval = $interval(function() {
                         $girder.getTaskLog(url, offset)
                             .then(function(logData) {
@@ -411,6 +436,11 @@ angular.module("kitware.cmb.core")
                                 for (var i=0; i < log.length; i++) {
                                     $scope.taskLog[simulation._id] += logFormatter(log[i]);
                                     offset += 1;
+                                }
+                                var simIndex = getSimulationIndexById(simulation._id);
+                                if (!$scope.hasStatus($scope.simulations[simIndex], 'running')) {
+                                    $interval.cancel(logInterval);
+                                    logInterval = null;
                                 }
                             });
                     }, 2000);
@@ -499,11 +529,12 @@ angular.module("kitware.cmb.core")
                     if (res.data.output.cluster) {
                         $scope.itemClusterType[item.name] = res.data.output.cluster.type;
                     }
-                    if (res.data.status !== itemAttr(item, status)) {
-                        //console.log('status for "' + item.name + '", '+ index +' change, ' + item.meta.status + ' -> ' + res.data.status);
-                        item.meta[item.meta.task].status = res.data.status;
+                    if (res.data.status !== itemAttr(item, 'status')) {
+                        //console.log('status for "' + item.name + '", '+ index +' change, "' + itemAttr(item, 'status') + '" -> "' + res.data.status + '"');
+                        var newMeta = itemAttr(item, 'status', res.data.status);
+                        item.meta[item.meta.task] = newMeta[item.meta.task];
                         $scope.simulations[index] = item;
-                        $girder.patchItemMetadata(item._id, {status: res.data.status});
+                        $girder.patchItemMetadata(item._id, newMeta);
                     }
                 };
             }
@@ -512,7 +543,7 @@ angular.module("kitware.cmb.core")
                 .success(function (items) {
                     var count = items.length;
                     if (count === 0) {
-                        console.error("no items found");
+                        console.error('no items found');
                     }
 
                     $scope.simulations = [];
@@ -525,7 +556,7 @@ angular.module("kitware.cmb.core")
                             // Simulation
                             $scope.simulations.push(items[count]);
                             var index = $scope.simulations.length-1;
-                            if (items[count].meta.taskId) {
+                            if (itemAttr(items[count], 'taskId')){
                                 $girder.getTask(items[count])
                                     //we need to isolate some vars so they don't get messed up in async.
                                     .then(getTaskCallback(items[count], index));

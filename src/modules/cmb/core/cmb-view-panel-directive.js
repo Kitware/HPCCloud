@@ -1,5 +1,5 @@
-angular.module("kitware.cmb.core")
-    .directive('cmbViewPanel', ['$templateCache', '$compile', function ($templateCache, $compile) {
+angular.module('kitware.cmb.core')
+    .directive('cmbViewPanel', ['$templateCache', function ($templateCache) {
         return {
             restrict: 'AE',
             scope: {

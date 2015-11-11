@@ -1,6 +1,6 @@
 angular.module('pv.web')
-   .controller('pvExoMeshViewerController', ['$rootScope', '$scope', 'kw.Girder', '$stateParams', '$window', '$templateCache',
-         function($rootScope, $scope, $girder, $stateParams, $window, $templateCache) {
+   .controller('pvExoMeshViewerController', ['$rootScope', '$scope', 'kw.Girder', '$stateParams', '$window',
+         function($rootScope, $scope, $girder, $stateParams, $window) {
 
       var hostPort = $window.location.host;
 
@@ -9,7 +9,7 @@ angular.module('pv.web')
          fileId: $stateParams.fileID
       };
 
-      $scope.url = "ws://"+hostPort+"/proxy?sessionId=" +
+      $scope.url = 'ws://'+hostPort+'/proxy?sessionId=' +
          encodeURIComponent($stateParams.sessionId);
 
       function save(data) {

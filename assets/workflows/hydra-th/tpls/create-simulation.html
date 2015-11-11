@@ -3,14 +3,14 @@
         <strong title>Simulation creation for Hydra</strong>
     </md-subheader>
     <md-content layout-padding>
-    <form layout="column">
+    <form layout="column" ng-keypress="(data.name && $event.keyCode === 13) ? ok(data) : null">
         <div layout="row" style="margin: 10px 0;">
             <label class="control-label" flex="20">
               Name
             </label>
             <input type="text"
               ng-model='data.name'
-              flex
+              flex autofocus
               placeholder="Your simulation name">
         </div>
         <div layout="row" style="margin: 10px 0;">
