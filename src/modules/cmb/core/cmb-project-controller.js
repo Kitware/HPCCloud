@@ -150,7 +150,7 @@ angular.module('kitware.cmb.core')
         });
 
         $scope.$on('$destroy', function() {
-            if (logInterval) {
+            if (logInterval !== null) {
                 $interval.cancel(logInterval);
             }
         });
@@ -292,7 +292,7 @@ angular.module('kitware.cmb.core')
         };
         $scope.terminateCluster = function(simulation) {
             $girder.terminateTask(simulation);
-            if (logInterval && simulation._id === $scope.simulations[$scope.panelState.index]._id) {
+            if (logInterval !== null && simulation._id === $scope.simulations[$scope.panelState.index]._id) {
                 $interval.cancel(logInterval);
             }
         };
@@ -346,6 +346,7 @@ angular.module('kitware.cmb.core')
             } else if (!$scope.panelState.open) {
                 if (logInterval !== null) {
                     $interval.cancel(logInterval);
+                    logInterval = null;
                 }
             }
         };
@@ -422,13 +423,23 @@ angular.module('kitware.cmb.core')
                     var offset = 0,
                         url = res.data.log[0].$ref;
                     $scope.taskLog[simulation._id] = '';
+                    if (logInterval !== null) { //stop logging the prev task, there can be only one!
+                        $interval.cancel(logInterval);
+                        logInterval = null;
+                    }
                     logInterval = $interval(function() {
+                        console.log('logging', url);
                         $girder.getTaskLog(url, offset)
                             .then(function(logData) {
                                 var log = logData.data.log;
                                 for (var i=0; i < log.length; i++) {
                                     $scope.taskLog[simulation._id] += logFormatter(log[i]);
                                     offset += 1;
+                                }
+                                var simIndex = getSimulationIndexById(simulation._id);
+                                if (!$scope.hasStatus($scope.simulations[simIndex], 'running')) {
+                                    $interval.cancel(logInterval);
+                                    logInterval = null;
                                 }
                             });
                     }, 2000);
