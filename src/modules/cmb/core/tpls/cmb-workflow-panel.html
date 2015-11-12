@@ -17,19 +17,21 @@
         </div>
         <div class="workflow-content" layout="column">
             <div ng-repeat="project in projects"
-                ui-sref="project({ collectionName: getActiveCollection(), projectID: project._id })"
                 ng-if="project.parentId === group._id"
                 class="workflow-block" flex layout="row" layout-align="space-between center">
-                <span style='width: 20%;'>
+                <span style='width: 20%;'
+                    ui-sref="project({ collectionName: getActiveCollection(), projectID: project._id })">
                     {{ project.name | unescape}}
                 </span>
-                <span style='width: 60%;'>
+                <span style='width: 60%;'
+                    ui-sref="project({ collectionName: getActiveCollection(), projectID: project._id })">
                     {{ project.description | unescape}}
                 </span>
-                <span style='width: 20%;'>
+                <span style='width: 20%;'
+                    ui-sref="project({ collectionName: getActiveCollection(), projectID: project._id })">
                     {{ project.created | toDateNumber | date : 'medium' }}
                 </span>
-                <span ng-click='deleteProject(project._id)'>
+                <span ng-click='deleteProject($event, project._id)'>
                     <md-button class="md-icon-button project-button"
                         aria-label="delete project"
                         md-no-ink ng-disabled="uploading"

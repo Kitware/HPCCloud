@@ -123,12 +123,13 @@ angular.module('kitware.cmb.core')
             });
         };
 
-        $scope.deleteProject = function ( projectId ) {
+        $scope.deleteProject = function(event, projectId) {
             //make this a mdDialog
             var confirm = $mdDialog.confirm({
                 title: 'Are you sure you want to delete this project?',
                 ok: 'Delete',
-                cancel: 'Cancel'
+                cancel: 'Cancel',
+                targetEvent: event
             });
 
             $mdDialog.show(confirm).then(function(){
