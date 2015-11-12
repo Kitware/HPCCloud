@@ -5,6 +5,8 @@ material-blue  = #106CC8
 light-material-blue = #5bacef
 running-color  = #4CAF50 //green
 
+v-light-grey = #f5f5f5
+
 .simput-welcome
     display none
 
@@ -189,6 +191,33 @@ top-nav-hover()
 
 .no-padding
     padding 0
+
+.workflow-header
+    padding 7px 0px 5px 8px
+    font-size 1.1em
+    font-weight 500
+
+.workflow-content
+    background-color white
+    &::before
+        content ''
+        width 99%
+        border-bottom 1px solid #ccc
+        margin 0 auto
+        margin-bottom 1px
+
+.workflow-block
+    padding 7px 0px 7px 12px
+    background-color v-light-grey
+    transition background-color .15s ease
+    &:hover
+        background-color darken(v-light-grey, 5%)
+
+    &:nth-child(even)
+        background-color white
+        &:hover
+            background-color darken(white, 5%)
+
 
 .project-filter-button
     padding 0

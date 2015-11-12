@@ -1,43 +1,43 @@
 <md-content>
-    <table  class='table table-striped table-hover table-condensed'
+    <section layout="column"
             ng-repeat="group in groups">
-        <thead>
-            <tr>
-                <th>
-                    <i class="fa fa-database fa-fw"></i>
-                </th>
-                <th style='width: 20%;'>
-                    {{ group.name === user.login ? "My projects" : group.name }}
-                </th>
-                <th style='width: 60%;'></th>
-                <th style='width: 20%;'></th>
-                <th class='text-right' ng-click='createProject(group._id, $event)'>
+        <div class="workflow-header" flex layout="row" layout-align="space-between center">
+            <span>
+                <i class="fa fa-database fa-fw"></i>
+                {{ group.name === user.login ? "My projects" : group.name }}
+            </span>
+            <span flex="1"></span>
+            <span ng-click='createProject(group._id, $event)'>
+                <md-button class="md-icon-button project-button"
+                    aria-label="add project"
+                    md-no-ink>
                     <i class="fa fa-plus"></i>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="project in projects"
+                </md-button>
+            </span>
+        </div>
+        <div class="workflow-content" layout="column">
+            <div ng-repeat="project in projects"
+                ui-sref="project({ collectionName: getActiveCollection(), projectID: project._id })"
                 ng-if="project.parentId === group._id"
-                class="project-block">
-                <td ui-sref="project({ collectionName: getActiveCollection(), projectID: project._id })">
+                class="workflow-block" flex layout="row" layout-align="space-between center">
+                <span style='width: 20%;'>
                     {{ project.name | unescape}}
-                </td>
-                <td ui-sref="project({ collectionName: getActiveCollection(), projectID: project._id })">
+                </span>
+                <span style='width: 60%;'>
                     {{ project.description | unescape}}
-                </td>
-                <td ui-sref="project({ collectionName: getActiveCollection(), projectID: project._id })">
+                </span>
+                <span style='width: 20%;'>
                     {{ project.created | toDateNumber | date : 'medium' }}
-                </td>
-                <td class='text-right' ng-click='deleteProject(project._id)'>
-                    <md-button class="md-icon-button clickable project-button"
+                </span>
+                <span ng-click='deleteProject(project._id)'>
+                    <md-button class="md-icon-button project-button"
                         aria-label="delete project"
                         md-no-ink ng-disabled="uploading"
                         ng-if='project._accessLevel == 2'>
                         <i class='fa fa-trash'></i>
-                    </md-icon-button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                    </md-button>
+                </span>
+            </div>
+        </div>
+    </section>
 </md-content>
