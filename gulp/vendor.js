@@ -39,7 +39,7 @@ gulp.task('bower-js', function () {
 });
 
 gulp.task('ext-js', function () {
-  return gulp.src(['assets/simput/simput-tpls-min.js', 'assets/simput/simput-min.js', 'assets/simput/hydra.js', 'assets/js/**/*.js'])
+  return gulp.src(['assets/simput/simput-tpls-min.js', 'assets/simput/simput-min.js', 'assets/simput/hydra.js', 'assets/simput/simple.js', 'assets/js/**/*.js'])
     .pipe($.filter('**/*.js'))
     // .pipe($.debug({verbose: true}))
     // .pipe($.flatten())

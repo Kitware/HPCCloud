@@ -1,0 +1,32 @@
+<md-dialog aria-label="Project creation" style="width: 50%;">
+    <md-subheader class="md-sticky-no-effect cmb-subheader">
+      <strong title>Project creation for Simple Example</strong>
+    </md-subheader>
+    <md-content>
+    <form layout="column">
+        <div layout="row" style="margin: 10px 0;">
+            <label class="control-label" flex="20">
+              Name
+            </label>
+            <input type="text"
+              ng-model='data.name'
+              flex
+              placeholder="Your project name">
+        </div>
+        <div layout="row" style="margin: 10px 0;">
+            <label class="control-label" flex="20">
+              Description
+            </label>
+            <textarea type="text"
+              ng-model='data.description'
+              flex
+              placeholder="Your project description"></textarea>
+        </div>
+    </form>
+</md-content>
+  <div class="md-actions" layout="row">
+    <span flex></span>
+    <md-button ng-click="cancel()" class="md-raised md-warn">Cancel</md-button>
+    <md-button ng-click="ok(data)" class="md-raised md-primary" ng-disabled="data.name.trim().length === 0">Ok</md-button>
+  </div>
+</md-dialog>
