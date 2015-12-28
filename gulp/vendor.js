@@ -25,7 +25,14 @@ gulp.task('bower-css', function () {
 });
 
 gulp.task('bower-js', function () {
-  return gulp.src($.mainBowerFiles())
+  options = {
+    overrides: {
+      'angular-aria': {
+         main: '**/*.js'
+      }
+    }
+  }
+  return gulp.src($.mainBowerFiles(options))
     .pipe($.filter('**/*.js'))
     // .pipe($.debug({verbose: true}))
     // .pipe($.flatten())
