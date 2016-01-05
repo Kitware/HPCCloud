@@ -32,6 +32,7 @@ from lockfile import LockFile
 
 class Proxy(Resource):
     def __init__(self):
+        super(Proxy, self).__init__()
         self.resourceName = 'proxy'
         self.route('POST', (), self.add_entry)
         self.route('DELETE', (':key',), self.delete_entry)
