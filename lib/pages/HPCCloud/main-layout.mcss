@@ -1,0 +1,39 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.noLink a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.topBar {
+    flex: 1;
+    height: 2em;
+    line-height: 2em;
+
+    background-color: #aaa;
+    color: #000;
+
+    padding-left: 10px;
+    padding-right: 10px;
+
+    display: flex;
+    justify-content: space-between;
+}
+
+.topBarItem {
+    composes: noLink;
+    flex: 1;
+}
+
+.topBarRightItem {
+    composes: topBarItem, textRight from '../../style/layout.css';
+}
+
+.content {
+    flex: 1;
+}

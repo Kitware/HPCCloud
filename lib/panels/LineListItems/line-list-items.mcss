@@ -1,0 +1,7 @@
+.container {
+    composes: verticalFlexContainer from '../../style/layout.css';
+}
+
+.line {
+    composes: flexItem from '../../style/layout.css';
+}

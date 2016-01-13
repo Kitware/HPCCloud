@@ -1,0 +1,24 @@
+.container {
+    composes: container from '../../pages/HPCCloud/main-layout.mcss';
+}
+
+.actionBar {
+    composes: topBar from '../../pages/HPCCloud/main-layout.mcss';
+}
+
+.actionBarLeft {
+    composes: textLeft from '../../style/layout.css';
+}
+
+.actionBarCenter {
+    composes: textCenter from '../../style/layout.css';
+}
+
+.actionBarRight {
+    composes: textRight from '../../style/layout.css';
+}
+
+.content {
+    composes: content from '../../pages/HPCCloud/main-layout.mcss';
+}
+
