@@ -1,0 +1,25 @@
+.loginForm {
+    border: 1px solid grey;
+    text-align: center;
+    width: 35%;
+    padding: 20px 0;
+    display: inline-block;
+    margin-top: 30px;
+}
+
+.loginLabel {
+    display: block;
+    margin-bottom: 4px;
+}
+
+@media screen and (max-width: 700px) {
+    .loginForm {
+        width: 50%;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .loginForm {
+        width: 100%;
+    }
+}

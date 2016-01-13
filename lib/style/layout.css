@@ -27,3 +27,11 @@
 .flexItem {
     flex: 1;
 }
+
+.horizontalCenter {
+    justify-content: center;
+}
+
+.verticalCenter {
+    align-items: center;
+}
