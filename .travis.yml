@@ -13,8 +13,6 @@ cache:
     - node_modules
 node_js:
   - "4.1"
-before_install:
-  - npm run dep:travis
 script:
   - npm run build:release
 after_success:
