@@ -62,10 +62,6 @@
     "start": "webpack-dev-server --content-base ./dist/ --hot --progress --colors ",
     "open": "open http://localhost:8080/webpack-dev-server/#/",
 
-    "fix-autobahn": "sed -i.bak 's/WAMP_FEATURES = {/var WAMP_FEATURES = {/' ./node_modules/autobahn/lib/session.js && sed -i.bak 's/var var WAMP_FEATURES = {/var WAMP_FEATURES = {/' ./node_modules/autobahn/lib/session.js && rm ./node_modules/autobahn/lib/session.js.bak",
-    "postinstall": "npm run fix-autobahn",
-
-    "pretest": "npm run fix-autobahn",
     "test": "./bin/run-dev.js",
 
     "commit": "git cz",
