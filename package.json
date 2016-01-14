@@ -1,6 +1,6 @@
 {
   "name": "hpc-cloud",
-  "description": "Virtual platform for running simulation and visualization",
+  "description": "Virtual platform for running simulations and visualization",
   "license": "BSD-3-Clause",
   "version": "0.0.0-semantically-release",
   "main": "./lib/app.js",
