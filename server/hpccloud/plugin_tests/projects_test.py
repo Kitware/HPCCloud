@@ -261,7 +261,7 @@ class ProjectsTestCase(base.TestCase):
         json_body = json.dumps(body)
         r = self.request('/projects/%s/share' % str(project1['_id']),
                          method='PUT', type='application/json', body=json_body,
-                         user=self._user)
+                         user=self._yet_another_user)
         self.assertStatus(r, 200)
 
         # We should now have access to both projects
@@ -269,6 +269,12 @@ class ProjectsTestCase(base.TestCase):
                          type='application/json', user=self._another_user)
         self.assertStatus(r, 200)
         self.assertEqual(len(r.json), 2)
+
+        # Check we have read access to the project folder
+        r = self.request('/folder/%s' % str(project1['folderId']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(r.json['_id'], project1['folderId'])
 
         # Check that owner still has access
         r = self.request('/projects/%s' % str(project1['_id']), method='GET',

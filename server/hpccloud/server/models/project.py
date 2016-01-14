@@ -120,22 +120,40 @@ class Project(AccessControlledModel):
         :param groups: The groups to share the project with.
         """
         access_list = project['access']
-
         access_list['users'] \
             = [user for user in access_list['users'] if user != sharer['_id']]
         access_list['groups'] = []
 
+        project_folder = self.model('folder').load(
+            project['folderId'], user=sharer)
+
+        folder_access_list = project_folder['access']
+        folder_access_list['users'] \
+            = [user for user in folder_access_list['users'] \
+               if user != sharer['_id']]
+        folder_access_list['groups'] = []
+
         for user_id in users:
-            access_list['users'].append({
+            access_object = {
                 'id': self._to_object_id(user_id),
                 'level': AccessType.READ
-            })
+            }
+            access_list['users'].append(access_object)
+
+            # Give read access to the project folder
+            folder_access_list['users'].append(access_object)
 
         for group_id in groups:
-            access_list['groups'].append({
+            access_object = {
                 'id': self._to_object_id(group_id),
                 'level': AccessType.READ
-            })
+            }
+            access_list['groups'].append(access_object)
+
+            # Give read access to the project folder
+            folder_access_list['groups'].append(access_object)
+
+        self.model('folder').save(project_folder)
 
         # TODO when we have simulation associated with a project we will have to
         # share them as well.
