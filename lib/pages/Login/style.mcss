@@ -12,6 +12,10 @@
     margin-bottom: 4px;
 }
 
+.center {
+    composes: textCenter from '../../style/layout.css';
+}
+
 @media screen and (max-width: 700px) {
     .loginForm {
         width: 50%;
