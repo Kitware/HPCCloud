@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "oneOf": [
+        { "$ref": "#/definitions/project" },
+        { "$ref": "#/definitions/simulation" }
+    ],
+    "definitions": {
+        "project": {
+            "type": "object",
+            "id":"#project",
+            "required": ["name", "type", "steps"],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                }
+            }
+        } ,
+        "simulation": {
+            "type": "object",
+            "id":"#simulation",
+            "required": ["name"],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

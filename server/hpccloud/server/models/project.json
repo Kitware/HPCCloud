@@ -1,0 +1,77 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "id":"#project",
+    "required": ["name", "type", "steps"],
+    "additionalProperties": false,
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string"
+        },
+        "steps": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "data": {
+            "$ref": "#/definitions/data"
+        },
+        "access": {
+
+        },
+        "userId": {
+
+        },
+        "_id": {
+
+        }
+    },
+    "definitions": {
+        "data": {
+            "type": "object",
+            "properties": {
+                "folderIds": {
+                    "$ref": "#/definitions/arrayOfIds"
+                },
+                "fileIds": {
+                    "$ref": "#/definitions/arrayOfIds"
+                },
+                "itemIds": {
+                    "$ref": "#/definitions/arrayOfIds"
+                },
+                "meta": {
+                    "type": "object"
+                }
+            },
+            "additionalProperties": false
+        },
+        "objectId": {
+            "type": "string",
+            "pattern": "^[a-f\\d]{24}$"
+        },
+        "arrayOfIds": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/objectId"
+            }
+        },
+        "share": {
+            "type": "object",
+            "properties": {
+                "users": {
+                    "$ref": "#/definitions/arrayOfIds"
+                },
+                "groups": {
+                    "$ref": "#/definitions/arrayOfIds"
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

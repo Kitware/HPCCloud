@@ -1,0 +1,2 @@
+jsonschema==2.4.0
+jsonpath-rw==1.4.0

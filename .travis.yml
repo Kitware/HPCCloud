@@ -1,4 +1,10 @@
-language: node_js
+language: python
+python:
+    - "2.7"
+
+node_js:
+  - "4.1"
+
 sudo: false
 notifications:
   email:
@@ -11,9 +17,47 @@ notifications:
 cache:
   directories:
     - node_modules
-node_js:
-  - "4.1"
+    - $HOME/.cache/pip
+
+compiler:
+    - gcc
+before_install:
+    # First install Girder
+    - pushd "${HOME}/build"
+    - git clone https://github.com/girder/girder.git
+    - export IGNORE_PLUGINS=celery_jobs,geospatial,google_analytics,hdfs_assetstore,jquery_widgets,meta
+    - girder/scripts/InstallPythonRequirements.py --mode=dev --ignore-plugins=${IGNORE_PLUGINS}
+    - pip install girder/
+    - pushd "${HOME}"
+    - curl -L "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGO_VERSION}.tgz" | gunzip -c | tar x
+    - cd mongodb-*/bin && export PATH="${PWD}:${PATH}"
+    - popd
+    - mkdir /tmp/db
+    - mongod --dbpath=/tmp/db >/dev/null 2>/dev/null &
+    - mongod --version
+    # Install plugins
+    - popd
+    - ln -s "${HOME}/build/Kitware/HPCCloud/server/hpccloud" "${HOME}/build/girder/plugins/hpccloud"
+    # Install CMake
+    - pushd "${HOME}"
+    - curl -L "http://cmake.org/files/v3.1/cmake-3.1.0-Linux-x86_64.tar.gz" | gunzip -c | tar x
+    - cd cmake-*/bin && export PATH="${PWD}:${PATH}"
+    - popd
+    - cmake --version
+    - pip install -U pip virtualenv
+
+install:
+    - pip install -U -r requirements.txt
+
 script:
+  # Run client tests
+  - npm install
   - npm run build:release
+  # Now run server tests
+  - mkdir _girder_build
+  - pushd _girder_build
+  - cmake -DBUILD_JAVASCRIPT_TESTS:BOOL=OFF -DPYTHON_COVERAGE:BOOL=ON -DPYTHON_VERSION:STRING=${TRAVIS_PYTHON_VERSION} "${HOME}/build/girder"
+  - ctest -R hpccloud -VV
+
 after_success:
   - npm run semantic-release
