@@ -12,7 +12,7 @@ button[disabled] {
     background-color: #ddd;
 }
 
-button:active{ 
+button:active{
     background-color: lightgrey;
 }
 
@@ -22,4 +22,8 @@ a, a:visited {
 
 a:hover, a:active {
     color: blue;
+}
+
+.is-clickable {
+    cursor: pointer;
 }
