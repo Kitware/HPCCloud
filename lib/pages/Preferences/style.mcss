@@ -52,6 +52,12 @@
     margin-bottom: 4px;
 }
 
+.reverseRow {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row-reverse;
+}
+
 .preferenceFormSubmitLine {
     composes: textRight from '../../style/layout.css';
 }
