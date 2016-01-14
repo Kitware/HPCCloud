@@ -1,0 +1,23 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.topBar {
+    composes: topBar from '../../style/theme.css';
+    composes: topBar from '../../style/layout.css';
+}
+
+.topBarItem {
+    flex: 1;
+}
+
+.topBarRightItem {
+    composes: topBarItem, textRight from '../../style/layout.css';
+}
+
+.content {
+    flex: 1;
+}

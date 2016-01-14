@@ -17,11 +17,12 @@ button:active{
 }
 
 a, a:visited {
-    color: black;
+    color: inherit;
+    text-decoration: none;
 }
 
 a:hover, a:active {
-    color: blue;
+    color: inherit;
 }
 
 input, textarea {
@@ -36,4 +37,8 @@ input[type=submit] {
     margin: 3px;
     text-transform: uppercase;
     font-size: 0.80em;
+}
+
+.is-clickable {
+    cursor: pointer;
 }

@@ -39,3 +39,33 @@
 .fullWidth {
     width: 100%;
 }
+
+.horizontalPadding {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.verticalPadding {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.linePadding {
+    composes: horizontalPadding;
+    composes: verticalPadding;
+}
+
+.topBar {
+    composes: horizontalFlexContainer;
+    composes: horizontalPadding;
+
+    justify-content: space-between;
+    flex: 1;
+
+    height: 2em;
+    line-height: 2em;
+}
+
+.subBar {
+    composes: topBar;
+}
