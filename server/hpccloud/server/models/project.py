@@ -129,7 +129,7 @@ class Project(AccessControlledModel):
 
         folder_access_list = project_folder['access']
         folder_access_list['users'] \
-            = [user for user in folder_access_list['users'] \
+            = [user for user in folder_access_list['users']
                if user != sharer['_id']]
         folder_access_list['groups'] = []
 
