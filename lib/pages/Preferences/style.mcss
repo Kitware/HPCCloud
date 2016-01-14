@@ -25,3 +25,37 @@
     background-color: #bebebe;
     composes: topBar from '../HPCCloud/main-layout.mcss';
 }
+
+.preferenceContainer {
+    width: 50vw;
+    text-align: left;
+    margin: 20px auto;
+    border: 1px solid lightgrey;
+}
+
+.preferenceCollapsible {
+    border: 1px solid lightgrey;
+    border-bottom-width: 0px;
+}
+
+.preferenceCollapsible:last-child {
+    margin-bottom: 8px; 
+    border-bottom-width: 1px;
+}
+
+.preferenceForm {
+    text-align: center;
+}
+
+.preferenceFormLine {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.preferenceFormSubmitLine {
+    composes: textRight from '../../style/layout.css';
+}
+
+.fullWidth {
+    composes: fullWidth from '../../style/layout.css';
+}

@@ -35,3 +35,7 @@
 .verticalCenter {
     align-items: center;
 }
+
+.fullWidth {
+    width: 100%;
+}

@@ -23,3 +23,7 @@ a, a:visited {
 a:hover, a:active {
     color: blue;
 }
+
+input, textarea {
+    box-sizing: border-box;
+}
