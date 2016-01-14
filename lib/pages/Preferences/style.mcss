@@ -1,0 +1,27 @@
+.linkSection {
+    display: flex;
+    justify-content: center;
+}
+
+.center {
+    composes: textCenter from '../../style/layout.css';
+}
+
+.link {
+    display: inline-block;
+    padding: 60px 30px;
+    width: 90px;
+    text-align: center;
+    border: 1px solid lightgrey;
+    margin: 5px;
+    transition: background-color 2s linear; 
+}
+
+.link:hover{
+    background-color: lightblue;
+}
+
+.preferencesToolbar {
+    background-color: #bebebe;
+    composes: topBar from '../HPCCloud/main-layout.mcss';
+}
