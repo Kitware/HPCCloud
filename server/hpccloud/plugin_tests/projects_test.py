@@ -21,9 +21,13 @@ import json
 
 from tests import base
 
+get_hpccloud_folder = None
+
 def setUpModule():
     base.enabledPlugins.append('hpccloud')
     base.startServer()
+    global get_hpccloud_folder
+    from girder.plugins.hpccloud.utility import get_hpccloud_folder
 
 
 def tearDownModule():
@@ -59,8 +63,9 @@ class ProjectsTestCase(base.TestCase):
             [self.model('user').createUser(**user) for user in users]
 
     def test_create(self):
+        project_name = 'myProject'
         body = {
-            'name': 'myProject',
+            'name': project_name,
             'type': 'PyFR',
             'steps': ['onestep']
         }
@@ -70,6 +75,17 @@ class ProjectsTestCase(base.TestCase):
         r = self.request('/projects', method='POST',
                          type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 201)
+
+        # Check that a project folder was created
+        hpccloud_folder = get_hpccloud_folder(user=self._user)
+        filters = {
+            'name': project_name
+        }
+        project_folder = self.model('folder').childFolders(
+            parentType='folder', user=self._user, parent=hpccloud_folder,
+            filters=filters, limit=1)
+
+        self.assertEqual(len(list(project_folder)), 1)
 
         # Test missing name
         body = {
@@ -108,32 +124,8 @@ class ProjectsTestCase(base.TestCase):
 
         # Now try add some bogus data to our project
         body = {
-            'data': {
+            'metadata': {
                 'foo': 'bogus'
-            }
-        }
-
-        json_body = json.dumps(body)
-        r = self.request('/projects/%s' % str(project['_id']), method='PUT',
-                         type='application/json', body=json_body, user=self._user)
-        self.assertStatus(r, 400)
-
-        # Now try add some bogus id data to our project
-        body = {
-            'data': {
-                'folderIds': ['bogus']
-            }
-        }
-
-        json_body = json.dumps(body)
-        r = self.request('/projects/%s' % str(project['_id']), method='PUT',
-                         type='application/json', body=json_body, user=self._user)
-        self.assertStatus(r, 400)
-
-        # Now try add a valid id data to our project
-        body = {
-            'data': {
-                'folderIds': ['56957192b4a9e33d39ec48a5']
             }
         }
 
@@ -142,9 +134,9 @@ class ProjectsTestCase(base.TestCase):
                          type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 200)
 
-        # Check the id was added
+        # Check the data was added
         project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
-        self.assertEqual(body['data'], project_model['data'])
+        self.assertEqual(project_model['metadata'], body['metadata'])
 
     def _create_project(self, name, user):
         body = {
@@ -158,6 +150,7 @@ class ProjectsTestCase(base.TestCase):
                          type='application/json', body=json_body,
                          user=user)
         self.assertStatus(r, 201)
+
         return r.json
 
 
@@ -174,55 +167,10 @@ class ProjectsTestCase(base.TestCase):
 
     def test_delete(self):
 
-        # Create a test folder
-        # Grab the user public folder
-        params = {
-            'parentType': 'user',
-            'parentId': self._another_user['_id'],
-            'sort': 'name',
-            'sortdir': 1
-        }
-
-        r = self.request(path='/folder', method='GET', user=self._another_user,
-                         params=params)
-        self.assertStatusOk(r)
-        public_folder = r.json[1]
-
-        params={
-            'name': 'Delete me please',
-            'parentId': public_folder['_id']
-        }
-        # Create a test folder
-        folder = self.model('folder').createFolder(public_folder,
-                                                   'Delete me please',
-                                                   creator=self._another_user)
-
-        # Create a test item
-        item = self.model('item').createItem('deleteme', self._another_user,
-                                             public_folder)
-
-        # Create a test file
-        r = self.request(path='/assetstore', method='GET', user=self._user)
-        self.assertStatusOk(r)
-        self.assertEqual(1, len(r.json))
-        assetstore = r.json[0]
-
-        file_item = self.model('item').createItem('fileItem', self._another_user,
-                                             public_folder)
-        file = self.model('file').createFile(self._another_user, file_item,
-                                             'test', 100, assetstore)
-        file['sha512'] = 'dummy'
-        self.model('file').save(file)
-
         body = {
             'name': 'deleteme',
             'type': 'PyFR',
-            'steps': ['onestep'],
-            'data': {
-                'folderIds': [str(folder['_id'])],
-                'itemIds': [str(item['_id'])],
-                'fileIds': [str(file['_id'])]
-            }
+            'steps': ['onestep']
         }
 
         json_body = json.dumps(body)
@@ -231,6 +179,32 @@ class ProjectsTestCase(base.TestCase):
                          user=self._another_user)
         self.assertStatus(r, 201)
         project = r.json
+
+        project_folder = self.model('folder').load(
+            project['folderId'], user = self._another_user)
+
+        # Create a test folder
+        folder = self.model('folder').createFolder(project_folder,
+                                                   'Delete me please',
+                                                   creator=self._another_user)
+
+        # Create a test item
+        item = self.model('item').createItem('deleteme', self._another_user,
+                                             project_folder)
+
+        # Create a test file
+        r = self.request(path='/assetstore', method='GET',
+                         user=self._user)
+        self.assertStatusOk(r)
+        self.assertEqual(1, len(r.json))
+        assetstore = r.json[0]
+
+        file_item = self.model('item').createItem('fileItem', self._another_user,
+                                             project_folder)
+        file = self.model('file').createFile(self._another_user, file_item,
+                                             'test', 100, assetstore)
+        file['sha512'] = 'dummy'
+        self.model('file').save(file)
 
         # Now delete the project
         r = self.request('/projects/%s' % str(project['_id']), method='DELETE',
@@ -250,6 +224,10 @@ class ProjectsTestCase(base.TestCase):
 
         # Check that the file was deleted
         self.assertIsNone(self.model('file').load(file['_id'], force=True))
+
+        # Check that the project folder was remove
+        self.assertIsNone(self.model('folder').load(project['folderId'],
+                                                    force=True))
 
     def test_get(self):
         project1 = self._create_project('project1', self._user)

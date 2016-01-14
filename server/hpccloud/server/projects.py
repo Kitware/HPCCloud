@@ -78,14 +78,14 @@ class Projects(Resource):
     def update(self, project, params):
         immutable = ['name', 'type', 'steps']
         updates = getBodyJson()
-        self.requireParams('data', updates)
+        self.requireParams('metadata', updates)
 
         for p in updates:
             if p in immutable:
                 raise RestException('\'%s\' is an immutable property' % p, 400)
 
         user = getCurrentUser()
-        self._model.update(user, project, updates['data'])
+        self._model.update(user, project, updates['metadata'])
 
     @describeRoute(
         Description('Get all projects this user has access to project')

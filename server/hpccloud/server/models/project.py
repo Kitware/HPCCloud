@@ -17,13 +17,14 @@
 #  limitations under the License.
 ###############################################################################
 
-from jsonpath_rw import parse
 import jsonschema
 
 from girder.models.model_base import ValidationException, AccessControlledModel
 from bson.objectid import ObjectId
 from girder.constants import AccessType
 import schema
+
+from ..utility import get_hpccloud_folder
 
 
 class Project(AccessControlledModel):
@@ -46,23 +47,41 @@ class Project(AccessControlledModel):
         return project
 
     def create(self, user, project):
+        """
+        Create a new project
+
+        Create a new folder to associate with this project:
+
+        <user>/Private/HPCCloud/<project>
+
+        """
         project['userId'] = user['_id']
+
+        self.validate(project)
+
+        # We need to create the project folder
+        hpccloud_folder = get_hpccloud_folder(user)
+        project_folder = self.model('folder').createFolder(
+            hpccloud_folder, project['name'], parentType='folder',
+            creator=user)
+
+        project['folderId'] = project_folder['_id']
         project = self.setUserAccess(project, user=user, level=AccessType.ADMIN)
         project = self.save(project)
 
         return project
 
-    def update(self, user, project, data):
+    def update(self, user, project, metadata):
         """
         Update an existing project, this involves update the data property.
         For now we will just do a dict update, in the future we migth want
         more complex merging.
         :param user: The user performing the update
         :param project: The project object being updated
-        :param data: The new data object
+        :param metadata: The new data object
         :returns: The updated project
         """
-        project.setdefault('data', {}).update(data)
+        project.setdefault('metadata', {}).update(metadata)
         self.save(project)
 
     def delete(self, user, project):
@@ -76,65 +95,10 @@ class Project(AccessControlledModel):
         :param project: The project to delete.
         """
 
-        # Check we can clean up project files
-        file_ids = parse('data.fileIds').find(project)
-        files = []
-        if file_ids:
-            file_ids = file_ids[0].value
-            model = self.model('file')
-            for file_id in file_ids:
-                file = model.load(file_id, user=user)
-                if not file or not model.hasAccess(file, user=user,
-                                                   level=AccessType.ADMIN):
-                    raise ValidationException('User %s doesn\'t have admin '
-                                              'access to delete file %s'
-                                              % (user['_id'], file_id))
-                files.append(file)
-
-        # Check we can clean up project items
-        item_ids = parse('data.itemIds').find(project)
-        items = []
-        if item_ids:
-            item_ids = item_ids[0].value
-            model = self.model('item')
-            for item_id in item_ids:
-                item = model.load(item_id, user=user)
-                if not item or not model.hasAccess(item, user=user,
-                                                   level=AccessType.ADMIN):
-                    raise ValidationException('User %s doesn\'t have admin '
-                                              'access to delete item %s'
-                                              % (user['_id'], item_id))
-                items.append(item)
-
-        # Check we can clean up project folders
-        folder_ids = parse('data.folderIds').find(project)
-        folders = []
-        if folder_ids:
-            folder_ids = folder_ids[0].value
-            model = self.model('folder')
-            for folder_id in folder_ids:
-                folder = model.load(folder_id, user=user)
-                if not folder or not model.hasAccess(folder, user=user,
-                                                     level=AccessType.ADMIN):
-                    raise ValidationException('User %s doesn\'t have admin '
-                                              'access to delete folder %s'
-                                              % (user['_id'], folder_id))
-                folders.append(folder)
-
-        # Now delete the files
-        model = self.model('file')
-        for file in files:
-            model.remove(file)
-
-        # Now delete the items
-        model = self.model('item')
-        for items in items:
-            model.remove(item)
-
-        # Now delete the folders
-        model = self.model('folder')
-        for folder in folders:
-            model.remove(folder)
+        # Clean up the project folder
+        project_folder = self.model('folder').load(
+            project['folderId'], user=user)
+        self.model('folder').remove(project_folder)
 
         super(Project, self).remove(project)
 
