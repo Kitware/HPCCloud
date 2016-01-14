@@ -11,7 +11,13 @@
     composes: flexItem from '../../../style/layout.css';
 }
 
+.status {
+    composes: textLeft from '../../../style/layout.css';
+    flex: none;
+    width: 30px;
+}
+
 .action {
     composes: textRight from '../../../style/layout.css';
-    composes: flexItem  from '../../../style/layout.css';
+    flex: none;
 }

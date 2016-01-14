@@ -3,10 +3,8 @@
 }
 
 .titleBar {
-    composes: horizontalFlexContainer from '../../../style/layout.css';
-    justify-content: space-between;
-    line-height: 2em;
-    background-color: red;
+    composes: subBar from '../../../style/layout.css';
+    composes: subBar from '../../../style/theme.css';
 }
 
 .titleBar > * {

@@ -14,7 +14,7 @@
     text-align: center;
     border: 1px solid lightgrey;
     margin: 5px;
-    transition: background-color 2s linear; 
+    transition: background-color 2s linear;
 }
 
 .link:hover{
@@ -22,8 +22,8 @@
 }
 
 .preferencesToolbar {
-    background-color: #bebebe;
-    composes: topBar from '../HPCCloud/main-layout.mcss';
+    composes: topBar from '../../style/layout.css';
+    composes: subBar from '../../style/theme.css';
 }
 
 .preferenceContainer {
@@ -39,7 +39,7 @@
 }
 
 .preferenceCollapsible:last-child {
-    margin-bottom: 8px; 
+    margin-bottom: 8px;
     border-bottom-width: 1px;
 }
 
