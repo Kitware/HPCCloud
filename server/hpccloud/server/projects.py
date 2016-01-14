@@ -62,7 +62,7 @@ class Projects(Resource):
                                                            project)
 
         cherrypy.response.status = 201
-        cherrypy.response.headers['Location'] = '/project/%s' % project['_id']
+        cherrypy.response.headers['Location'] = '/projects/%s' % project['_id']
 
         return project
 
@@ -137,7 +137,8 @@ class Projects(Resource):
 
         # Validate we have been given a value body
         try:
-            ref_resolver = jsonschema.RefResolver.from_schema(schema.project)
+            ref_resolver = jsonschema.RefResolver.from_schema(
+                schema.definitions)
             jsonschema.validate(body, schema.project['definitions']['share'],
                                 resolver=ref_resolver)
         except jsonschema.ValidationError as ve:
@@ -148,8 +149,29 @@ class Projects(Resource):
 
         return self._model.share(user, project, users, groups)
 
-    def create_simulation(self, params):
-        pass
+    addModel('SimProperties', schema.simulation, 'simulations')
+
+    @describeRoute(
+        Description('Create a simulation associated with a project.')
+        .param('id', 'The project the simulation will be created in.',
+               dataType='string', required=True, paramType='path')
+        .param('body', 'The properties of the simulation.',
+               dataType='ProjectProperties', required=True, paramType='body')
+    )
+    @access.user
+    @loadmodel(model='project', plugin='hpccloud', level=AccessType.WRITE)
+    def create_simulation(self, project, params):
+        simulation = getBodyJson()
+        user = getCurrentUser()
+
+        simulation = self.model('simulation', 'hpccloud').create(
+            user, project, simulation)
+
+        cherrypy.response.status = 201
+        cherrypy.response.headers['Location'] = '/simulations/%s' \
+            % simulation['_id']
+
+        return simulation
 
     @loadmodel(model='project', plugin='hpccloud', level=AccessType.READ)
     def simulations(self, project, params):

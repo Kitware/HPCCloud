@@ -1,0 +1,36 @@
+{
+    "objectId": {
+        "type": "string",
+        "pattern": "^[a-f\\d]{24}$"
+    },
+    "arrayOfIds": {
+        "type": "array",
+        "items": {
+            "$ref": "#/objectId"
+        }
+    },
+    "step": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+            "type": {
+                "enum": ["input", "output"]
+            },
+            "status": {
+                "enum": ["created", "complete"]
+            },
+            "folderId": {
+                "$ref": "#/objectId"
+            },
+            "metadata": {
+                "type": "object"
+            },
+            "export": {
+                "type": "array",
+                "item": {
+                    "$ref": "#/objectId"
+                }
+            }
+        }
+    }
+}
