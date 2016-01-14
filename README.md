@@ -58,7 +58,7 @@ getting started guide, advanced documentation, and API descriptions.
 
 #### Licensing
 
-**hpc-cloud** aka LightViz is licensed under [BSD Clause 3](LICENSE).
+**HPCCloud**  is licensed under [Apache 2](LICENSE).
 
 #### Getting Involved
 

@@ -19,8 +19,11 @@
             "minItems": 1,
             "uniqueItems": true
         },
-        "data": {
-            "$ref": "#/definitions/data"
+        "metadata": {
+            "type": "object"
+        },
+        "folderId": {
+
         },
         "access": {
 
@@ -33,24 +36,6 @@
         }
     },
     "definitions": {
-        "data": {
-            "type": "object",
-            "properties": {
-                "folderIds": {
-                    "$ref": "#/definitions/arrayOfIds"
-                },
-                "fileIds": {
-                    "$ref": "#/definitions/arrayOfIds"
-                },
-                "itemIds": {
-                    "$ref": "#/definitions/arrayOfIds"
-                },
-                "meta": {
-                    "type": "object"
-                }
-            },
-            "additionalProperties": false
-        },
         "objectId": {
             "type": "string",
             "pattern": "^[a-f\\d]{24}$"
