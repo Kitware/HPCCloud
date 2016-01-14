@@ -1,0 +1,17 @@
+.container {
+    composes: horizontalFlexContainer from '../../../style/layout.css';
+}
+
+.container a {
+    text-decoration: none;
+    color: black;
+}
+
+.name {
+    composes: flexItem from '../../../style/layout.css';
+}
+
+.action {
+    composes: textRight from '../../../style/layout.css';
+    composes: flexItem  from '../../../style/layout.css';
+}

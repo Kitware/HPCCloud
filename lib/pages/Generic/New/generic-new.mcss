@@ -1,0 +1,53 @@
+.container {
+    composes: verticalFlexContainer from '../../../style/layout.css';
+}
+
+.titleBar {
+    composes: horizontalFlexContainer from '../../../style/layout.css';
+    justify-content: space-between;
+    line-height: 2em;
+    background-color: red;
+}
+
+.titleBar > * {
+    flex: 1;
+}
+
+.action {
+    composes: isClickable from '../../../style/states.css';
+}
+
+.left {
+    composes: textLeft from '../../../style/layout.css';
+}
+
+.center {
+    composes: textCenter from '../../../style/layout.css';
+}
+
+.right {
+    composes: textRight from '../../../style/layout.css';
+}
+
+.formItem {
+    composes: horizontalFlexContainer from '../../../style/layout.css';
+    margin-top: 10px;
+    padding: 0 20px;
+}
+
+
+.label {
+    flex: 1;
+}
+
+.form {
+    flex: 3;
+}
+
+.form > * {
+    width: 100%;
+}
+
+.form textarea {
+    resize: none;
+}
