@@ -20,6 +20,7 @@
 import jsonschema
 
 from girder.models.model_base import AccessControlledModel, ValidationException
+from girder.constants import AccessType
 
 import schema
 
@@ -83,5 +84,7 @@ class Simulation(AccessControlledModel):
             creator=user)
 
         simulation['folderId'] = simulation_folder['_id']
+        simulation = self.setUserAccess(
+            simulation, user=user, level=AccessType.ADMIN)
 
         return self.save(simulation)

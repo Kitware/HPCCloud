@@ -52,20 +52,23 @@ class SimulationTestCase(base.TestCase):
         self._user, self._another_user = \
             [self.model('user').createUser(**user) for user in users]
 
-        # Create a test project
-        self._project_name = 'myProject'
-        body = {
-            'name': self._project_name,
-            'type': 'PyFR',
-            'steps': ['onestep']
-        }
+        def create_project(name):
+            # Create a test project
+            body = {
+                'name': name,
+                'type': 'PyFR',
+                'steps': ['onestep']
+            }
 
-        json_body = json.dumps(body)
+            json_body = json.dumps(body)
 
-        r = self.request('/projects', method='POST',
-                         type='application/json', body=json_body, user=self._user)
-        self.assertStatus(r, 201)
-        self._project = r.json
+            r = self.request('/projects', method='POST',
+                             type='application/json', body=json_body, user=self._another_user)
+            self.assertStatus(r, 201)
+            return r.json
+
+        self._project1 = create_project('project1')
+        self._project2 = create_project('project2')
 
     def test_create(self):
         body = {
@@ -84,10 +87,10 @@ class SimulationTestCase(base.TestCase):
         }
 
         json_body = json.dumps(body)
-        r = self.request('/projects/%s/simulations' % str(self._project['_id']), method='POST',
-                         type='application/json', body=json_body, user=self._user)
+        r = self.request('/projects/%s/simulations' % str(self._project1['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
         self.assertStatus(r, 201)
-        self.assertEqual(r.json['projectId'], self._project['_id'])
+        self.assertEqual(r.json['projectId'], self._project1['_id'])
         self.assertTrue('step1' in r.json['steps'])
         self.assertTrue('step2' in r.json['steps'])
         self.assertTrue('step3' in r.json['steps'])
@@ -97,4 +100,42 @@ class SimulationTestCase(base.TestCase):
         # Assert that a folder has been created for this simulation
         self.assertIsNotNone(
             self.model('folder').load(r.json['folderId'], force=True))
+
+    def _create_simulation(self, project, user, name):
+        body = {
+            "name": name,
+            "steps": {
+                "step1": {
+                    "type": "input"
+                },
+                "step2": {
+                    "type": "input"
+                },
+                "step3": {
+                    "type": "input"
+                }
+            }
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s/simulations' % str(project['_id']), method='POST',
+                         type='application/json', body=json_body, user=user)
+        self.assertStatus(r, 201)
+
+        return r.json
+
+    def test_list_simulations(self):
+        sim1 = self._create_simulation(
+            self._project1, self._another_user, 'sim1')
+        sim2 = self._create_simulation(self._project1,
+            self._another_user, 'sim2')
+        sim3 = self._create_simulation(self._project2,
+            self._another_user, 'sim3')
+
+        r = self.request('/projects/%s/simulations' % str(self._project1['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatusOk(r)
+        self.assertEqual(len(r.json), 2)
+
+
 

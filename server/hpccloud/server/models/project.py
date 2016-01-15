@@ -166,3 +166,20 @@ class Project(AccessControlledModel):
         # share them as well.
 
         return self.save(project)
+
+    def simulations(self, user, project):
+        """
+        Get all the simulation associated with a given project.
+
+        :param user: The user making the request
+        :param project: The project to fetch the simulations for.
+        """
+
+        query = {
+            "projectId": project['_id']
+        }
+
+        sims = self.model('simulation', 'hpccloud').find(query=query)
+
+        return list(self.filterResultsByPermission(
+                    cursor=sims, user=user, level=AccessType.READ))

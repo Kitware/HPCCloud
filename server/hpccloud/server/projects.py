@@ -173,6 +173,14 @@ class Projects(Resource):
 
         return simulation
 
+    @describeRoute(
+        Description('List all the simulations associated with a project.')
+        .param('id', 'The project',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
     @loadmodel(model='project', plugin='hpccloud', level=AccessType.READ)
     def simulations(self, project, params):
-        pass
+        user = getCurrentUser()
+
+        return self.model('project', 'hpccloud').simulations(user, project)
