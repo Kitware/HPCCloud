@@ -88,3 +88,19 @@ class Simulation(AccessControlledModel):
             simulation, user=user, level=AccessType.ADMIN)
 
         return self.save(simulation)
+
+    def delete(self, user, simulation):
+        """
+        Delete a simulation.
+
+        :param user: The user deleting the simulation.
+        :param simulation: The simulation to be deleted
+        """
+
+        # Load the simulation folder
+        simulation_folder = self.model('folder').load(
+            simulation['folderId'], user=user)
+
+        self.remove(simulation)
+        self.model('folder').remove(simulation_folder)
+

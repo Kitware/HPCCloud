@@ -137,7 +137,7 @@ class SimulationTestCase(base.TestCase):
         self.assertStatusOk(r)
         self.assertEqual(len(r.json), 2)
 
-    def test_get_simulation(self):
+    def test_get(self):
         sim1 = self._create_simulation(
             self._project1, self._another_user, 'sim1')
         self._create_simulation(self._project1,
@@ -150,3 +150,23 @@ class SimulationTestCase(base.TestCase):
         self.assertStatusOk(r)
         self.assertEqual(r.json['_id'], sim1['_id'])
 
+    def test_delete(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim')
+
+        # Assert that a folder has been created for this simulation
+        self.assertIsNotNone(
+            self.model('folder').load(sim['folderId'], force=True))
+
+        # Now delete the simulation
+        r = self.request('/simulations/%s' % str(sim['_id']), method='DELETE',
+                         type='application/json', user=self._another_user)
+        self.assertStatusOk(r)
+
+        # Confirm the deletion
+        self.assertIsNone(self.model('simulation', 'hpccloud').load(
+            sim['_id'], force=True))
+
+        # Confirm that the folder was also removed
+        self.assertIsNone(self.model('folder').load(
+            sim['folderId'], force=True))

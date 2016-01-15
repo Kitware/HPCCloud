@@ -18,8 +18,7 @@
 ###############################################################################
 
 from girder.constants import AccessType
-from girder.api.rest import loadmodel
-from girder.api.rest import Resource
+from girder.api.rest import loadmodel, getCurrentUser, Resource
 from girder.api.describe import Description, describeRoute
 from girder.api import access
 
@@ -36,6 +35,8 @@ class Simulations(Resource):
         self.route('GET', (':id', 'steps', 'stepName'), self.get_step)
         self.route('PUT', (':id', 'steps', 'stepName'), self.update_step)
 
+        self._model = self.model('simulation', 'hpccloud')
+
     @describeRoute(
         Description('Get a simulation')
         .param('id', 'The simulation to get.',
@@ -46,9 +47,16 @@ class Simulations(Resource):
     def get(self, simulation, params):
         return simulation
 
+    @describeRoute(
+        Description('Delete a simulation')
+        .param('id', 'The simulation to delete.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def delete(self, simulation, params):
-        pass
+        user = getCurrentUser()
+        self._model.delete(user, simulation)
 
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def update(self, simulation, params):
