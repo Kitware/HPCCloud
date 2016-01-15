@@ -20,6 +20,8 @@
 from girder.constants import AccessType
 from girder.api.rest import loadmodel
 from girder.api.rest import Resource
+from girder.api.describe import Description, describeRoute
+from girder.api import access
 
 
 class Simulations(Resource):
@@ -27,37 +29,43 @@ class Simulations(Resource):
     def __init__(self):
         super(Simulations, self).__init__()
         self.resourceName = 'simulations'
-        self.route('GET', ('id',), self.get)
+        self.route('GET', (':id',), self.get)
         self.route('DELETE', (':id',), self.delete)
         self.route('PUT', (':id',), self.update)
         self.route('POST', (':id',), self.clone)
         self.route('GET', (':id', 'steps', 'stepName'), self.get_step)
         self.route('PUT', (':id', 'steps', 'stepName'), self.update_step)
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.READ)
+    @describeRoute(
+        Description('Get a simulation')
+        .param('id', 'The simulation to get.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def get(self, simulation, params):
-        pass
+        return simulation
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.WRITE)
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def delete(self, simulation, params):
         pass
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.WRITE)
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def update(self, simulation, params):
         pass
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.READ)
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def clone(self, simulation, params):
         pass
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.READ)
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def get_step(self, simulation, params):
         pass
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.WRITE)
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def update_step(self, simulation, params):
         pass
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.READ)
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def download(self, simulations):
         pass

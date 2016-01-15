@@ -125,11 +125,11 @@ class SimulationTestCase(base.TestCase):
         return r.json
 
     def test_list_simulations(self):
-        sim1 = self._create_simulation(
+        self._create_simulation(
             self._project1, self._another_user, 'sim1')
-        sim2 = self._create_simulation(self._project1,
+        self._create_simulation(self._project1,
             self._another_user, 'sim2')
-        sim3 = self._create_simulation(self._project2,
+        self._create_simulation(self._project2,
             self._another_user, 'sim3')
 
         r = self.request('/projects/%s/simulations' % str(self._project1['_id']), method='GET',
@@ -137,5 +137,16 @@ class SimulationTestCase(base.TestCase):
         self.assertStatusOk(r)
         self.assertEqual(len(r.json), 2)
 
+    def test_get_simulation(self):
+        sim1 = self._create_simulation(
+            self._project1, self._another_user, 'sim1')
+        self._create_simulation(self._project1,
+            self._another_user, 'sim2')
+        self._create_simulation(self._project2,
+            self._another_user, 'sim3')
 
+        r = self.request('/simulations/%s' % str(sim1['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatusOk(r)
+        self.assertEqual(r.json['_id'], sim1['_id'])
 
