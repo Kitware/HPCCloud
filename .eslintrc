@@ -77,7 +77,7 @@
     "dot-location": [1, "property"],
     "eqeqeq": 1,
     "guard-for-in": 0,
-    "no-alert": 1,
+    "no-alert": 0,
     "no-caller": 1,
     "no-div-regex": 1,
     "no-else-return": 1,
