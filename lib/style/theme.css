@@ -15,3 +15,7 @@
 .odd {
     background: #eee;
 }
+
+.disabled {
+    color: #090909;
+}

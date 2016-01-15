@@ -1,0 +1,54 @@
+.container {
+    composes: verticalFlexContainer from '../../../style/layout.css';
+}
+
+.subBar {
+    composes: subBar from '../../../style/layout.css';
+    composes: subBar from '../../../style/theme.css';
+}
+
+.content {
+    composes: horizontalFlexContainer from '../../../style/layout.css';
+}
+
+.left {
+    composes: textLeft from '../../../style/layout.css';
+    composes: flexItem from '../../../style/layout.css';
+}
+
+.left > * {
+    margin-right: 20px;
+}
+
+.center {
+    composes: textCenter from '../../../style/layout.css';
+    composes: flexItem from '../../../style/layout.css';
+}
+
+.right {
+    composes: textRight from '../../../style/layout.css';
+    composes: flexItem from '../../../style/layout.css';
+}
+
+.sideBarVisible {
+    flex: none;
+    border-right: 1px solid black;
+}
+
+.sideBarHidden {
+    display: none;
+}
+
+.stepContent {
+    flex: 3;
+    padding: 10px 20px;
+}
+
+.action {
+    composes: isClickable from '../../../style/states.css';
+}
+
+.disabledAction {
+    composes: isClickable from '../../../style/states.css';
+    composes: disabled    from '../../../style/theme.css';
+}
