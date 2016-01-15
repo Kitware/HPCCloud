@@ -36,24 +36,14 @@
         }
     },
     "definitions": {
-        "objectId": {
-            "type": "string",
-            "pattern": "^[a-f\\d]{24}$"
-        },
-        "arrayOfIds": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/objectId"
-            }
-        },
         "share": {
             "type": "object",
             "properties": {
                 "users": {
-                    "$ref": "#/definitions/arrayOfIds"
+                    "$ref": "#/arrayOfIds"
                 },
                 "groups": {
-                    "$ref": "#/definitions/arrayOfIds"
+                    "$ref": "#/arrayOfIds"
                 }
             },
             "additionalProperties": false

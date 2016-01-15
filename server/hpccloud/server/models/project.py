@@ -40,7 +40,9 @@ class Project(AccessControlledModel):
         Validate using jsonschema
         """
         try:
-            jsonschema.validate(project, schema.project)
+            ref_resolver = jsonschema.RefResolver.from_schema(
+                schema.definitions)
+            jsonschema.validate(project, schema.project, resolver=ref_resolver)
         except jsonschema.ValidationError as ve:
             raise ValidationException(ve.message)
 
@@ -63,6 +65,11 @@ class Project(AccessControlledModel):
         hpccloud_folder = get_hpccloud_folder(user)
         project_folder = self.model('folder').createFolder(
             hpccloud_folder, project['name'], parentType='folder',
+            creator=user)
+
+        # Create the sub directory the whole simulations for this project
+        self.model('folder').createFolder(
+            project_folder, '_simulations', parentType='folder',
             creator=user)
 
         project['folderId'] = project_folder['_id']
@@ -159,3 +166,20 @@ class Project(AccessControlledModel):
         # share them as well.
 
         return self.save(project)
+
+    def simulations(self, user, project):
+        """
+        Get all the simulation associated with a given project.
+
+        :param user: The user making the request
+        :param project: The project to fetch the simulations for.
+        """
+
+        query = {
+            "projectId": project['_id']
+        }
+
+        sims = self.model('simulation', 'hpccloud').find(query=query)
+
+        return list(self.filterResultsByPermission(
+                    cursor=sims, user=user, level=AccessType.READ))
