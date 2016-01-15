@@ -76,16 +76,18 @@ class Projects(Resource):
     @access.user
     @loadmodel(model='project', plugin='hpccloud', level=AccessType.WRITE)
     def update(self, project, params):
-        immutable = ['name', 'type', 'steps']
+        immutable = ['type', 'steps']
         updates = getBodyJson()
-        self.requireParams('metadata', updates)
 
         for p in updates:
             if p in immutable:
                 raise RestException('\'%s\' is an immutable property' % p, 400)
 
         user = getCurrentUser()
-        self._model.update(user, project, updates['metadata'])
+        name = updates.get('name')
+        metadata = updates.get('metadata')
+
+        self._model.update(user, project, name=name, metadata=metadata)
 
     @describeRoute(
         Description('Get all projects this user has access to project')
