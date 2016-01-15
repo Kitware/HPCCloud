@@ -18,9 +18,13 @@
 ###############################################################################
 
 from girder.constants import AccessType
-from girder.api.rest import loadmodel, getCurrentUser, Resource
+from girder.api.rest import loadmodel, getCurrentUser, Resource, getBodyJson
+from girder.api.rest import RestException
 from girder.api.describe import Description, describeRoute
 from girder.api import access
+from girder.api.docs import addModel
+
+from .models import schema
 
 
 class Simulations(Resource):
@@ -30,7 +34,7 @@ class Simulations(Resource):
         self.resourceName = 'simulations'
         self.route('GET', (':id',), self.get)
         self.route('DELETE', (':id',), self.delete)
-        self.route('PUT', (':id',), self.update)
+        self.route('PATCH', (':id',), self.update)
         self.route('POST', (':id',), self.clone)
         self.route('GET', (':id', 'steps', 'stepName'), self.get_step)
         self.route('PUT', (':id', 'steps', 'stepName'), self.update_step)
@@ -58,9 +62,35 @@ class Simulations(Resource):
         user = getCurrentUser()
         self._model.delete(user, simulation)
 
+    addModel('Steps', schema.simulation['properties']['steps'], 'simulations')
+    addModel('UpdateProperties', {
+        'id': 'UpdateProperties',
+        'properties': {
+            'name': {'type': 'string', 'description': 'The simulation name.'},
+            'steps': {'type': 'Steps', 'description': 'The simulation steps.'}
+        }
+    }, 'simulations')
+
+    @describeRoute(
+        Description('Update a simulation')
+        .param('id', 'The simulation to update.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def update(self, simulation, params):
-        pass
+        immutable = ['projectId', 'folderId', 'access', 'userId', '_id']
+        updates = getBodyJson()
+
+        for p in updates:
+            if p in immutable:
+                raise RestException('\'%s\' is an immutable property' % p, 400)
+
+        user = getCurrentUser()
+        name = updates.get('name')
+        steps = updates.get('steps')
+
+        self._model.update(user, simulation, name=name, steps=steps)
 
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def clone(self, simulation, params):

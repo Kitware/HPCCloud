@@ -118,7 +118,7 @@ class ProjectsTestCase(base.TestCase):
         }
 
         json_body = json.dumps(body)
-        r = self.request('/projects/%s' % str(project['_id']), method='PUT',
+        r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
                          type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 400)
 
@@ -130,7 +130,7 @@ class ProjectsTestCase(base.TestCase):
         }
 
         json_body = json.dumps(body)
-        r = self.request('/projects/%s' % str(project['_id']), method='PUT',
+        r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
                          type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 200)
 
@@ -144,7 +144,7 @@ class ProjectsTestCase(base.TestCase):
         }
 
         json_body = json.dumps(body)
-        r = self.request('/projects/%s' % str(project['_id']), method='PUT',
+        r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
                          type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 200)
 

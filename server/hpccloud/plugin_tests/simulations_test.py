@@ -170,3 +170,53 @@ class SimulationTestCase(base.TestCase):
         # Confirm that the folder was also removed
         self.assertIsNone(self.model('folder').load(
             sim['folderId'], force=True))
+
+    def test_update(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim')
+
+        # First try to update an immutable property
+        body = {
+            'folderId': 'notthanks'
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 400)
+
+
+        new_name = 'billy bob'
+        # Now try updating the name
+        body = {
+            'name': new_name
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatusOk(r)
+        # Assert that the new name was added to the document
+        self.assertEqual(self.model('simulation', 'hpccloud').load(sim['_id'], force=True)['name'],
+                         new_name)
+
+
+        # Now try updating the name
+        body = {
+            'steps': {
+                'step1': {
+                    'type': 'input'
+                },
+                'step2': {
+                    'type': 'input'
+                }
+            }
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatusOk(r)
+        # Assert that the new steps where added
+        self.assertEqual(len(self.model('simulation', 'hpccloud').load(sim['_id'], force=True)['steps']), 2)
+

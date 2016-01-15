@@ -38,7 +38,7 @@ class Projects(Resource):
         super(Projects, self).__init__()
         self.resourceName = 'projects'
         self.route('POST', (), self.create)
-        self.route('PUT', (':id', ), self.update)
+        self.route('PATCH', (':id', ), self.update)
         self.route('GET', (), self.get_all)
         self.route('DELETE', (':id', ), self.delete)
         self.route('PUT', (':id', 'share'), self.share)
@@ -76,7 +76,7 @@ class Projects(Resource):
     @access.user
     @loadmodel(model='project', plugin='hpccloud', level=AccessType.WRITE)
     def update(self, project, params):
-        immutable = ['type', 'steps']
+        immutable = ['type', 'steps', 'folderId', 'access', 'userId', '_id']
         updates = getBodyJson()
 
         for p in updates:
