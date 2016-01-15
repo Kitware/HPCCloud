@@ -47,14 +47,14 @@
     "url-loader": "0.5.7",
     "webpack": "1.12.11",
     "webpack-dev-server": "1.14.1",
-    "simput": "1.0.0"
+    "simput": "1.0.0",
+    "js-girder-client": "0.0.2"
   },
   "scripts": {
     "build": "webpack --progress --colors",
     "build:debug": "webpack --display-modules",
     "build:release": "webpack -p --progress --colors",
-    "start": "webpack-dev-server --content-base ./dist/ --hot --progress --colors --port 9999",
-    "open": "open http://localhost:9999/webpack-dev-server/#/",
+    "start": "webpack-dev-server --progress --open",
     "test": "./bin/run-dev.js",
     "commit": "git cz",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
