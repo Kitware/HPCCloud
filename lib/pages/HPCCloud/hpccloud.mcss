@@ -16,6 +16,7 @@
 
 .topBarRightItem {
     composes: topBarItem, textRight from '../../style/layout.css';
+    text-transform: capitalize;
 }
 
 .content {
