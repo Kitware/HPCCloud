@@ -1,5 +1,13 @@
+var webpack = require('webpack');
+
+var definePlugin = new webpack.DefinePlugin({
+  __BROWSER_BUILD__: true,
+});
+
 module.exports = {
-    plugins: [],
+    plugins: [
+        definePlugin,
+    ],
     entry: './lib/app.js',
     output: {
         path: './dist',
@@ -30,5 +38,19 @@ module.exports = {
     ],
     eslint: {
         configFile: '.eslintrc',
+    },
+    devServer: {
+        contentBase: './dist/',
+        port: 9999,
+        hot: true,
+        quiet: false,
+        noInfo: false,
+        stats: {
+            colors: true,
+        },
+        proxy: {
+            '/api*': 'http://localhost:8080',
+            '/static/*': 'http://localhost:8080',
+        },
     },
 };
