@@ -25,6 +25,10 @@ a:hover, a:active {
     color: inherit;
 }
 
+a:focus {
+    outline: none;
+}
+
 input, textarea {
     box-sizing: border-box;
 }

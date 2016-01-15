@@ -1,5 +1,6 @@
 .container {
-    composes: horizontalFlexContainer from '../../../style/layout.css';
+    composes: horizontalFlexContainer   from '../../../style/layout.css';
+    composes: linePadding               from '../../../style/layout.css';
 }
 
 .container a {

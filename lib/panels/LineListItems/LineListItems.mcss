@@ -4,14 +4,10 @@
 
 .even {
     composes: flexItem  from '../../style/layout.css';
-    composes: linePadding  from '../../style/layout.css';
-
     composes: even      from '../../style/theme.css';
 }
 
 .odd {
     composes: flexItem  from '../../style/layout.css';
-    composes: linePadding  from '../../style/layout.css';
-
     composes: odd       from '../../style/theme.css';
 }
