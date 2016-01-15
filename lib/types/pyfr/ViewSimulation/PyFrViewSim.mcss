@@ -41,7 +41,7 @@
 
 .stepContent {
     flex: 3;
-    padding: 10px 20px;
+    padding: 0;
 }
 
 .action {
