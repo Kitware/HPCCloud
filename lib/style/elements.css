@@ -46,3 +46,7 @@ input[type=submit] {
 .is-clickable {
     cursor: pointer;
 }
+
+.is-hidden {
+    display: none;
+}

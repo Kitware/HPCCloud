@@ -42,13 +42,13 @@
     "react-hot-loader": "1.3.0",
     "react-router": "2.0.0-rc5",
     "style-loader": "0.13.0",
-    "tonic-io": "1.1.5",
-    "tonic-ui": "1.2.12",
+    "tonic-io": "latest",
+    "tonic-ui": "latest",
     "url-loader": "0.5.7",
     "webpack": "1.12.11",
     "webpack-dev-server": "1.14.1",
-    "simput": "1.0.1",
-    "js-girder-client": "0.0.2"
+    "simput": "latest",
+    "js-girder-client": "Kitware/js-girder-client"
   },
   "scripts": {
     "build": "webpack --progress --colors",
