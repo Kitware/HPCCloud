@@ -188,3 +188,32 @@ class Simulation(AccessControlledModel):
         share_folder(sharer, simulation_folder, users, groups)
 
         return self.save(simulation)
+
+    def update_step(self, user, simulation, step_name, status, metadata,
+                    export):
+        """
+        Update a simulation step.
+
+        :param user: The user updating the simulation.
+        :param simulation: The simulation to be updated.
+        :param step_name: The name of the step to be updated.
+        :param status: The new status.
+        :param metadata: The new metadata object.
+        :param export: The new export object.
+        """
+        step = simulation['steps'][step_name]
+        dirty = False
+        if status is not None:
+            step['status'] = status
+            dirty = True
+
+        if metadata is not None:
+            step['metadata'] = metadata
+            dirty = True
+
+        if export is not None:
+            step['export'] = export
+            dirty = True
+
+        if dirty:
+            self.save(simulation)

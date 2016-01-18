@@ -17,6 +17,7 @@
 #  limitations under the License.
 ###############################################################################
 import cherrypy
+import jsonschema
 
 from girder.constants import AccessType
 from girder.api.rest import loadmodel, getCurrentUser, Resource, getBodyJson
@@ -38,7 +39,7 @@ class Simulations(Resource):
         self.route('PATCH', (':id',), self.update)
         self.route('POST', (':id', 'clone'), self.clone)
         self.route('GET', (':id', 'steps', ':stepName'), self.get_step)
-        self.route('PUT', (':id', 'steps', 'stepName'), self.update_step)
+        self.route('PATCH', (':id', 'steps', ':stepName'), self.update_step)
 
         self._model = self.model('simulation', 'hpccloud')
 
@@ -67,8 +68,7 @@ class Simulations(Resource):
     addModel('UpdateProperties', {
         'id': 'UpdateProperties',
         'properties': {
-            'name': {'type': 'string', 'description': 'The simulation name.'},
-            'steps': {'type': 'Steps', 'description': 'The simulation steps.'}
+            'name': {'type': 'string', 'description': 'The simulation name.'}
         }
     }, 'simulations')
 
@@ -76,6 +76,8 @@ class Simulations(Resource):
         Description('Update a simulation')
         .param('id', 'The simulation to update.',
                dataType='string', required=True, paramType='path')
+        .param('body', 'The properies of the simulation to update.',
+               dataType='UpdateProperties', required=True, paramType='body')
     )
     @access.user
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
@@ -129,9 +131,47 @@ class Simulations(Resource):
 
         return simulation.get('steps', {}).get(stepName)
 
+    addModel('Step', schema.definitions['stepUpdate'], 'simulations')
+
+    @describeRoute(
+        Description('Update a particular step in a simulation')
+        .param('id', 'The simulation containing the step.',
+               dataType='string', required=True, paramType='path')
+        .param('stepName', 'The step name to gets.',
+               dataType='string', required=True, paramType='path')
+        .param('body', 'The properies of the step to update.',
+               dataType='Step', required=True, paramType='body')
+    )
+    @access.user
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def update_step(self, simulation, stepName, params):
-        pass
+        user = getCurrentUser()
+        immutable = ['type', 'folderId']
+        updates = getBodyJson()
+
+        if stepName not in simulation.get('steps', {}):
+            raise RestException('Simulation %s doesn\'t contain step %s' %
+                                (simulation['_id'], stepName), 400)
+
+        for p in updates:
+            if p in immutable:
+                raise RestException('\'%s\' is an immutable property' % p, 400)
+
+        try:
+            ref_resolver = jsonschema.RefResolver.from_schema(
+                schema.definitions)
+            jsonschema.validate(
+                updates, schema.definitions['stepUpdate'],
+                resolver=ref_resolver)
+        except jsonschema.ValidationError as ve:
+            raise RestException(ve.message, 400)
+
+        status = updates.get('status')
+        metadata = updates.get('metadata')
+        export = updates.get('export')
+
+        self._model.update_step(
+            user, simulation, stepName, status, metadata, export)
 
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def download(self, simulations):
