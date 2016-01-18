@@ -16,6 +16,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 ###############################################################################
+import cherrypy
 
 from girder.constants import AccessType
 from girder.api.rest import loadmodel, getCurrentUser, Resource, getBodyJson
@@ -35,7 +36,7 @@ class Simulations(Resource):
         self.route('GET', (':id',), self.get)
         self.route('DELETE', (':id',), self.delete)
         self.route('PATCH', (':id',), self.update)
-        self.route('POST', (':id',), self.clone)
+        self.route('POST', (':id', 'clone'), self.clone)
         self.route('GET', (':id', 'steps', 'stepName'), self.get_step)
         self.route('PUT', (':id', 'steps', 'stepName'), self.update_step)
 
@@ -79,7 +80,8 @@ class Simulations(Resource):
     @access.user
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def update(self, simulation, params):
-        immutable = ['projectId', 'folderId', 'access', 'userId', '_id']
+        immutable = ['projectId', 'folderId', 'access', 'userId', '_id',
+                     'steps']
         updates = getBodyJson()
 
         for p in updates:
@@ -88,13 +90,28 @@ class Simulations(Resource):
 
         user = getCurrentUser()
         name = updates.get('name')
-        steps = updates.get('steps')
 
-        self._model.update(user, simulation, name=name, steps=steps)
+        self._model.update(user, simulation, name=name)
 
+    @describeRoute(
+        Description('Clone a simulation')
+        .param('id', 'The simulation to clone.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def clone(self, simulation, params):
-        pass
+        props = getBodyJson()
+        self.requireParams(('name', ), props)
+        user = getCurrentUser()
+
+        cloned = self._model.clone(user, simulation, props['name'])
+
+        cherrypy.response.status = 201
+        cherrypy.response.headers['Location'] = '/simulations/%s' \
+            % cloned['_id']
+
+        return cloned
 
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def get_step(self, simulation, params):

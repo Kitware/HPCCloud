@@ -20,7 +20,6 @@
                 "enum": ["created", "complete"]
             },
             "folderId": {
-                "$ref": "#/objectId"
             },
             "metadata": {
                 "type": "object"
