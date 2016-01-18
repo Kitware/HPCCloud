@@ -12,6 +12,7 @@
     "step": {
         "type": "object",
         "required": ["type"],
+        "additionalProperties": false,
         "properties": {
             "type": {
                 "enum": ["input", "output"]
@@ -20,6 +21,24 @@
                 "enum": ["created", "complete"]
             },
             "folderId": {
+            },
+            "metadata": {
+                "type": "object"
+            },
+            "export": {
+                "type": "array",
+                "item": {
+                    "$ref": "#/objectId"
+                }
+            }
+        }
+    },
+    "stepUpdate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "status": {
+                "enum": ["created", "complete"]
             },
             "metadata": {
                 "type": "object"

@@ -341,3 +341,77 @@ class SimulationTestCase(base.TestCase):
         files = list(self.model('item').childFiles(cloned_step1_file_item))
         self.assertEqual(len(files), 1)
 
+    def test_get_simulation_step(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim1')
+
+        # First try a bogus step
+        r = self.request('/simulations/%s/steps/bogus' % str(sim['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 400)
+
+        # Now get step1
+        r = self.request('/simulations/%s/steps/step1' % str(sim['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+        step = r.json
+        self.assertEqual(step['type'],'input')
+        self.assertEqual(step['status'],'created')
+        self.assertTrue('folderId' in step)
+
+    def test_update_simulation_step(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim1')
+
+        body = {
+            'metadata': {
+                'name': 'name'
+            }
+        }
+        json_body = json.dumps(body)
+        # First try a bogus step
+        r = self.request('/simulations/%s/steps/bogus' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 400)
+
+        # Try immutable property
+        body = {
+            'folderId': 'noway'
+        }
+        json_body = json.dumps(body)
+        # Now update step1
+        r = self.request('/simulations/%s/steps/step1' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body,  user=self._another_user)
+        self.assertStatus(r, 400)
+
+        # Try bogus property
+        body = {
+            'bogus': 'noway'
+        }
+        json_body = json.dumps(body)
+        # Now update step1
+        r = self.request('/simulations/%s/steps/step1' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body,  user=self._another_user)
+        self.assertStatus(r, 400)
+
+        # Now try something valid
+        body = {
+            'metadata': {
+                'name': 'name'
+            },
+            'status': 'complete',
+            'export': []
+        }
+        json_body = json.dumps(body)
+        # Now update step1
+        r = self.request('/simulations/%s/steps/step1' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body,  user=self._another_user)
+        self.assertStatus(r, 200)
+
+        # Assert things where updated
+        new_sim = self.model('simulation', 'hpccloud').load(sim['_id'], force=True)
+        new_step1 = new_sim['steps']['step1']
+        self.assertEqual(new_step1['status'], 'complete')
+        self.assertEqual(new_step1['metadata'], body['metadata'])
+        self.assertEqual(new_step1['export'], body['export'])
+
