@@ -341,3 +341,21 @@ class SimulationTestCase(base.TestCase):
         files = list(self.model('item').childFiles(cloned_step1_file_item))
         self.assertEqual(len(files), 1)
 
+    def test_get_simulation_step(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim1')
+
+        # First try a bogus step
+        r = self.request('/simulations/%s/steps/bogus' % str(sim['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 400)
+
+        # Now get step1
+        r = self.request('/simulations/%s/steps/step1' % str(sim['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+        step = r.json
+        self.assertEqual(step['type'],'input')
+        self.assertEqual(step['status'],'created')
+        self.assertTrue('folderId' in step)
+

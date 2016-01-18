@@ -37,7 +37,7 @@ class Simulations(Resource):
         self.route('DELETE', (':id',), self.delete)
         self.route('PATCH', (':id',), self.update)
         self.route('POST', (':id', 'clone'), self.clone)
-        self.route('GET', (':id', 'steps', 'stepName'), self.get_step)
+        self.route('GET', (':id', 'steps', ':stepName'), self.get_step)
         self.route('PUT', (':id', 'steps', 'stepName'), self.update_step)
 
         self._model = self.model('simulation', 'hpccloud')
@@ -113,12 +113,24 @@ class Simulations(Resource):
 
         return cloned
 
+    @describeRoute(
+        Description('Get a particular step in a simulation')
+        .param('id', 'The simulation containing the step.',
+               dataType='string', required=True, paramType='path')
+        .param('stepName', 'The step name to gets.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
-    def get_step(self, simulation, params):
-        pass
+    def get_step(self, simulation, stepName, params):
+        if stepName not in simulation.get('steps', {}):
+            raise RestException('Simulation %s doesn\'t contain step %s' %
+                                (simulation['_id'], stepName), 400)
+
+        return simulation.get('steps', {}).get(stepName)
 
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
-    def update_step(self, simulation, params):
+    def update_step(self, simulation, stepName, params):
         pass
 
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
