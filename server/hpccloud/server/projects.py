@@ -161,7 +161,7 @@ class Projects(Resource):
                dataType='ProjectProperties', required=True, paramType='body')
     )
     @access.user
-    @loadmodel(model='project', plugin='hpccloud', level=AccessType.WRITE)
+    @loadmodel(model='project', plugin='hpccloud', level=AccessType.READ)
     def create_simulation(self, project, params):
         simulation = getBodyJson()
         user = getCurrentUser()

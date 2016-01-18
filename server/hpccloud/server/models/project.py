@@ -20,11 +20,11 @@
 import jsonschema
 
 from girder.models.model_base import ValidationException, AccessControlledModel
-from bson.objectid import ObjectId
 from girder.constants import AccessType
 import schema
 
-from ..utility import get_hpccloud_folder
+from ..utility import get_hpccloud_folder, share_folder, to_object_id, \
+    get_simulations_folder
 
 
 class Project(AccessControlledModel):
@@ -72,6 +72,8 @@ class Project(AccessControlledModel):
             project_folder, '_simulations', parentType='folder',
             creator=user)
 
+        self.model('folder').setUserAccess(
+            project_folder, user=user, level=AccessType.ADMIN, save=True)
         project['folderId'] = project_folder['_id']
         project = self.setUserAccess(project, user=user, level=AccessType.ADMIN)
         project = self.save(project)
@@ -114,15 +116,6 @@ class Project(AccessControlledModel):
 
         super(Project, self).remove(project)
 
-    def _to_object_id(self, id):
-        if id and type(id) is not ObjectId:
-            try:
-                id = ObjectId(id)
-            except Exception:
-                raise ValidationException('Invalid ObjectId: %s' % id)
-
-        return id
-
     def share(self, sharer, project, users, groups):
         """
         Share a give project.
@@ -131,44 +124,49 @@ class Project(AccessControlledModel):
         :param users: The users to share the project with.
         :param groups: The groups to share the project with.
         """
+
         access_list = project['access']
         access_list['users'] \
             = [user for user in access_list['users'] if user != sharer['_id']]
         access_list['groups'] = []
 
-        project_folder = self.model('folder').load(
-            project['folderId'], user=sharer)
-
-        folder_access_list = project_folder['access']
-        folder_access_list['users'] \
-            = [user for user in folder_access_list['users']
-               if user != sharer['_id']]
-        folder_access_list['groups'] = []
-
         for user_id in users:
             access_object = {
-                'id': self._to_object_id(user_id),
+                'id': to_object_id(user_id),
                 'level': AccessType.READ
             }
             access_list['users'].append(access_object)
 
-            # Give read access to the project folder
-            folder_access_list['users'].append(access_object)
-
         for group_id in groups:
             access_object = {
-                'id': self._to_object_id(group_id),
+                'id': to_object_id(group_id),
                 'level': AccessType.READ
             }
             access_list['groups'].append(access_object)
 
-            # Give read access to the project folder
-            folder_access_list['groups'].append(access_object)
+        project_folder = self.model('folder').load(
+            project['folderId'], user=sharer)
 
-        self.model('folder').save(project_folder)
+        # Share the project folder
+        share_folder(
+            sharer, project_folder, users, groups, level=AccessType.READ,
+            recurse=True)
 
-        # TODO when we have simulation associated with a project we will have to
-        # share them as well.
+        # We need to share the _simulations folder, with WRITE access, so the
+        # user can create simulations
+        simulations_folder = get_simulations_folder(sharer, project)
+
+        share_folder(sharer, simulations_folder, users, groups,
+                     level=AccessType.ADMIN)
+
+        # Now share any simulation associated with this project
+        query = {
+            "projectId": project['_id']
+        }
+        sims = self.model('simulation', 'hpccloud').find(query=query)
+        for sim in sims:
+            self.model('simulation', 'hpccloud').share(
+                sharer, sim, users, groups)
 
         return self.save(project)
 
