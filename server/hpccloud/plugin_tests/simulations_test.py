@@ -125,11 +125,11 @@ class SimulationTestCase(base.TestCase):
         return r.json
 
     def test_list_simulations(self):
-        sim1 = self._create_simulation(
+        self._create_simulation(
             self._project1, self._another_user, 'sim1')
-        sim2 = self._create_simulation(self._project1,
+        self._create_simulation(self._project1,
             self._another_user, 'sim2')
-        sim3 = self._create_simulation(self._project2,
+        self._create_simulation(self._project2,
             self._another_user, 'sim3')
 
         r = self.request('/projects/%s/simulations' % str(self._project1['_id']), method='GET',
@@ -137,5 +137,86 @@ class SimulationTestCase(base.TestCase):
         self.assertStatusOk(r)
         self.assertEqual(len(r.json), 2)
 
+    def test_get(self):
+        sim1 = self._create_simulation(
+            self._project1, self._another_user, 'sim1')
+        self._create_simulation(self._project1,
+            self._another_user, 'sim2')
+        self._create_simulation(self._project2,
+            self._another_user, 'sim3')
 
+        r = self.request('/simulations/%s' % str(sim1['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatusOk(r)
+        self.assertEqual(r.json['_id'], sim1['_id'])
+
+    def test_delete(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim')
+
+        # Assert that a folder has been created for this simulation
+        self.assertIsNotNone(
+            self.model('folder').load(sim['folderId'], force=True))
+
+        # Now delete the simulation
+        r = self.request('/simulations/%s' % str(sim['_id']), method='DELETE',
+                         type='application/json', user=self._another_user)
+        self.assertStatusOk(r)
+
+        # Confirm the deletion
+        self.assertIsNone(self.model('simulation', 'hpccloud').load(
+            sim['_id'], force=True))
+
+        # Confirm that the folder was also removed
+        self.assertIsNone(self.model('folder').load(
+            sim['folderId'], force=True))
+
+    def test_update(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim')
+
+        # First try to update an immutable property
+        body = {
+            'folderId': 'notthanks'
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 400)
+
+
+        new_name = 'billy bob'
+        # Now try updating the name
+        body = {
+            'name': new_name
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatusOk(r)
+        # Assert that the new name was added to the document
+        self.assertEqual(self.model('simulation', 'hpccloud').load(sim['_id'], force=True)['name'],
+                         new_name)
+
+
+        # Now try updating the name
+        body = {
+            'steps': {
+                'step1': {
+                    'type': 'input'
+                },
+                'step2': {
+                    'type': 'input'
+                }
+            }
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatusOk(r)
+        # Assert that the new steps where added
+        self.assertEqual(len(self.model('simulation', 'hpccloud').load(sim['_id'], force=True)['steps']), 2)
 

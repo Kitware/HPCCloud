@@ -78,17 +78,22 @@ class Project(AccessControlledModel):
 
         return project
 
-    def update(self, user, project, metadata):
+    def update(self, user, project, name=None, metadata=None):
         """
         Update an existing project, this involves update the data property.
-        For now we will just do a dict update, in the future we migth want
+        For now we will just do a dict update, in the future we might want
         more complex merging.
         :param user: The user performing the update
         :param project: The project object being updated
+        :param project: The project name
         :param metadata: The new data object
         :returns: The updated project
         """
-        project.setdefault('metadata', {}).update(metadata)
+        if metadata:
+            project.setdefault('metadata', {}).update(metadata)
+
+        if name:
+            project['name'] = name
         self.save(project)
 
     def delete(self, user, project):

@@ -18,8 +18,13 @@
 ###############################################################################
 
 from girder.constants import AccessType
-from girder.api.rest import loadmodel
-from girder.api.rest import Resource
+from girder.api.rest import loadmodel, getCurrentUser, Resource, getBodyJson
+from girder.api.rest import RestException
+from girder.api.describe import Description, describeRoute
+from girder.api import access
+from girder.api.docs import addModel
+
+from .models import schema
 
 
 class Simulations(Resource):
@@ -27,37 +32,78 @@ class Simulations(Resource):
     def __init__(self):
         super(Simulations, self).__init__()
         self.resourceName = 'simulations'
-        self.route('GET', ('id',), self.get)
+        self.route('GET', (':id',), self.get)
         self.route('DELETE', (':id',), self.delete)
-        self.route('PUT', (':id',), self.update)
+        self.route('PATCH', (':id',), self.update)
         self.route('POST', (':id',), self.clone)
         self.route('GET', (':id', 'steps', 'stepName'), self.get_step)
         self.route('PUT', (':id', 'steps', 'stepName'), self.update_step)
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.READ)
+        self._model = self.model('simulation', 'hpccloud')
+
+    @describeRoute(
+        Description('Get a simulation')
+        .param('id', 'The simulation to get.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def get(self, simulation, params):
-        pass
+        return simulation
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.WRITE)
+    @describeRoute(
+        Description('Delete a simulation')
+        .param('id', 'The simulation to delete.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def delete(self, simulation, params):
-        pass
+        user = getCurrentUser()
+        self._model.delete(user, simulation)
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.WRITE)
+    addModel('Steps', schema.simulation['properties']['steps'], 'simulations')
+    addModel('UpdateProperties', {
+        'id': 'UpdateProperties',
+        'properties': {
+            'name': {'type': 'string', 'description': 'The simulation name.'},
+            'steps': {'type': 'Steps', 'description': 'The simulation steps.'}
+        }
+    }, 'simulations')
+
+    @describeRoute(
+        Description('Update a simulation')
+        .param('id', 'The simulation to update.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def update(self, simulation, params):
-        pass
+        immutable = ['projectId', 'folderId', 'access', 'userId', '_id']
+        updates = getBodyJson()
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.READ)
+        for p in updates:
+            if p in immutable:
+                raise RestException('\'%s\' is an immutable property' % p, 400)
+
+        user = getCurrentUser()
+        name = updates.get('name')
+        steps = updates.get('steps')
+
+        self._model.update(user, simulation, name=name, steps=steps)
+
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def clone(self, simulation, params):
         pass
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.READ)
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def get_step(self, simulation, params):
         pass
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.WRITE)
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def update_step(self, simulation, params):
         pass
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.READ)
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def download(self, simulations):
         pass
