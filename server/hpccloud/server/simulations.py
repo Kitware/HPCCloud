@@ -18,6 +18,7 @@
 ###############################################################################
 import cherrypy
 import jsonschema
+from girder.utility import ziputil
 
 from girder.constants import AccessType
 from girder.api.rest import loadmodel, getCurrentUser, Resource, getBodyJson
@@ -27,6 +28,7 @@ from girder.api import access
 from girder.api.docs import addModel
 
 from .models import schema
+from .utility import list_simulation_assets
 
 
 class Simulations(Resource):
@@ -40,6 +42,7 @@ class Simulations(Resource):
         self.route('POST', (':id', 'clone'), self.clone)
         self.route('GET', (':id', 'steps', ':stepName'), self.get_step)
         self.route('PATCH', (':id', 'steps', ':stepName'), self.update_step)
+        self.route('GET', (':id', 'download'), self.download)
 
         self._model = self.model('simulation', 'hpccloud')
 
@@ -173,6 +176,25 @@ class Simulations(Resource):
         self._model.update_step(
             user, simulation, stepName, status, metadata, export)
 
+    @describeRoute(
+        Description('Download all the asset associated with a simulation')
+        .param('id', 'The simulation to download.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
-    def download(self, simulations):
-        pass
+    def download(self, simulation, params):
+        print 'download'
+        user = self.getCurrentUser()
+        cherrypy.response.headers['Content-Type'] = 'application/zip'
+        cherrypy.response.headers['Content-Disposition'] = \
+            u'attachment; filename="{}{}"'.format(simulation['name'], '.zip')
+
+        def stream():
+            zip = ziputil.ZipGenerator()
+            for (path, file) in list_simulation_assets(user, simulation):
+                for data in zip.addFile(file, path):
+                    yield data
+            yield zip.footer()
+
+        return stream

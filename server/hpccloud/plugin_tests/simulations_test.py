@@ -18,9 +18,11 @@
 ###############################################################################
 
 import json
+import zipfile
+import io
 
 from tests import base
-
+from base import TestCase
 
 def setUpModule():
     base.enabledPlugins.append('hpccloud')
@@ -31,7 +33,7 @@ def tearDownModule():
     base.stopServer()
 
 
-class SimulationTestCase(base.TestCase):
+class SimulationTestCase(TestCase):
 
     def setUp(self):
         super(SimulationTestCase, self).setUp()
@@ -414,4 +416,74 @@ class SimulationTestCase(base.TestCase):
         self.assertEqual(new_step1['status'], 'complete')
         self.assertEqual(new_step1['metadata'], body['metadata'])
         self.assertEqual(new_step1['export'], body['export'])
+
+    def test_download(self):
+        test_meta ={
+            'test': True
+        }
+
+        body = {
+            "name": 'testing',
+            "steps": {
+                "step1": {
+                    "type": "input"
+                },
+                "step2": {
+                    "type": "input"
+                },
+                "step3": {
+                    "type": "output",
+                    "metadata": test_meta
+                }
+            }
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s/simulations' % str(self._project1['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 201)
+        sim = r.json
+
+        step1_folder = self.model('folder').load(sim['steps']['step1']['folderId'], force=True)
+        # Add some test data to one of the simulation steps
+        # Create a test item
+        self.model('item').createItem('deleteme', self._another_user,
+                                      step1_folder)
+
+        step1_file_item = self.model('item').createItem('step1.txt', self._another_user,
+                                             step1_folder)
+
+        self.create_file(self._another_user, step1_file_item, 'step1.txt', 'step1')
+
+        # Add some test data to output step
+        # Create a test item
+        step3_folder = self.model('folder').load(sim['steps']['step3']['folderId'], force=True)
+        step3_file_item = self.model('item').createItem('step3.txt', self._another_user,
+                                      step3_folder)
+
+        # Create a test file
+        self.create_file(self._another_user, step3_file_item, 'step3.txt', 'step3')
+
+        r = self.request('/simulations/%s/download' % str(sim['_id']), method='GET',
+                         isJson=False, user=self._another_user)
+        self.assertStatusOk(r)
+
+        self.assertEqual(r.headers['Content-Type'], 'application/zip')
+        zip = zipfile.ZipFile(io.BytesIO(self.getBody(r, text=False)), 'r')
+        self.assertTrue(zip.testzip() is None)
+
+        expected = [
+            'project1/meta.json',
+            'project1/testing/input/step1/meta.json',
+            'project1/testing/input/step1/step1.txt',
+            'project1/testing/input/step2/meta.json',
+            'project1/testing/output/step3/meta.json',
+            'project1/testing/output/step3/step3.txt'
+        ]
+        self.assertEqual(sorted([i.filename for i in zip.infolist()]), expected)
+        step3_txt = zip.read('project1/testing/output/step3/step3.txt')
+        self.assertEqual(step3_txt, 'step3')
+        step3_meta = json.loads(zip.read('project1/testing/output/step3/meta.json'))
+        self.assertEqual(step3_meta, test_meta)
+
 
