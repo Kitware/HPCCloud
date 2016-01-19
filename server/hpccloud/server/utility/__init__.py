@@ -127,6 +127,7 @@ def share_folder(owner, folder, users, groups, level=AccessType.READ,
     return ModelImporter.model('folder').setAccessList(
         folder, folder_access_list, save=True, recurse=recurse, user=owner)
 
+
 def _list_item(item, prefix, export):
     """
     Generate a list of files within a item.
@@ -140,7 +141,7 @@ def _list_item(item, prefix, export):
               data).
     :rtype: generator(str, func)
     """
-    item_model =  ModelImporter.model('item')
+    item_model = ModelImporter.model('item')
     file_model = ModelImporter.model('file')
     files = list(item_model.childFiles(item=item, limit=2))
     path = prefix
@@ -150,6 +151,7 @@ def _list_item(item, prefix, export):
         if not export or file['_id'] in export:
             yield (os.path.join(path, file['name']),
                    file_model.download(file, headers=False))
+
 
 def _list_folder(user, folder, prefix='', export=None, skip_folders=[]):
     """
@@ -169,7 +171,7 @@ def _list_folder(user, folder, prefix='', export=None, skip_folders=[]):
     folder_model = ModelImporter.model('folder')
 
     for sub in folder_model.childFolders(parentType='folder', parent=folder,
-                                  user=user):
+                                         user=user):
 
         if sub['name'] in skip_folders:
             continue
@@ -182,6 +184,7 @@ def _list_folder(user, folder, prefix='', export=None, skip_folders=[]):
         for (filepath, file) in _list_item(
                 item, path, export):
             yield (filepath, file)
+
 
 def list_simulation_assets(user, simulation):
     """
@@ -224,8 +227,7 @@ def list_simulation_assets(user, simulation):
         path = os.path.join(prefix, step['type'])
         yield (os.path.join(path, step_name, 'meta.json'), stream_step_meta)
         step_folder = ModelImporter.model('folder').load(
-                        step['folderId'], user=user, level=AccessType.READ)
-        for (filepath, file) in _list_folder(user, step_folder, path):
+            step['folderId'], user=user, level=AccessType.READ)
+        for (filepath, file) in _list_folder(user, step_folder, path,
+                                             export=step.get('export')):
             yield (filepath, file)
-
-

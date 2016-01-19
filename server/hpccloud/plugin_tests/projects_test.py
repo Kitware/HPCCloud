@@ -20,6 +20,7 @@
 import json
 
 from tests import base
+from base import TestCase
 
 get_hpccloud_folder = None
 
@@ -34,7 +35,7 @@ def tearDownModule():
     base.stopServer()
 
 
-class ProjectsTestCase(base.TestCase):
+class ProjectsTestCase(TestCase):
 
     def setUp(self):
         super(ProjectsTestCase, self).setUp()

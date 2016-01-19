@@ -28,6 +28,7 @@ from ..utility import get_hpccloud_folder, share_folder, to_object_id, \
 
 from ..constants import SIMULATIONS_FOLDER
 
+
 class Project(AccessControlledModel):
 
     def __init__(self):

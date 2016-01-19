@@ -20,6 +20,7 @@
 import json
 
 from tests import base
+from base import TestCase
 
 list_simulation_assets = None
 
@@ -35,7 +36,7 @@ def tearDownModule():
     base.stopServer()
 
 
-class SimulationTestCase(base.TestCase):
+class SimulationTestCase(TestCase):
 
     def setUp(self):
         super(SimulationTestCase, self).setUp()
@@ -117,28 +118,7 @@ class SimulationTestCase(base.TestCase):
         step1_file_item = self.model('item').createItem('step1.txt', self._another_user,
                                              step1_folder)
 
-        def _create_file(item, name, contents):
-            contents = 'step1'
-            resp = self.request(
-                path='/file', method='POST', user=self._another_user, params={
-                    'parentType': 'item',
-                    'parentId': item['_id'],
-                    'name': name,
-                    'size': len(contents),
-                    'mimeType': 'application/octet-stream'
-                })
-            self.assertStatusOk(resp)
-            upload = resp.json
-
-            # Upload some content
-            fields = [('offset', 0), ('uploadId', upload['_id'])]
-            files = [('chunk', 'step1.txt', contents)]
-            resp = self.multipartRequest(
-                path='/file/chunk', user=self._another_user, fields=fields, files=files)
-            self.assertStatusOk(resp)
-
-
-        _create_file(step1_file_item, 'step1.txt', 'step1')
+        self.create_file(self._another_user, step1_file_item, 'step1.txt', 'step1')
 
         # Add some test data to output step
         # Create a test item
@@ -147,7 +127,7 @@ class SimulationTestCase(base.TestCase):
                                       step3_folder)
 
         # Create a test file
-        _create_file(step3_file_item, 'step3.txt', 'step3')
+        self.create_file(self._another_user, step3_file_item, 'step3.txt', 'step3')
 
         expected = [
             'project1/meta.json',
