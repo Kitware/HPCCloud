@@ -79,8 +79,27 @@ class Simulation(AccessControlledModel):
                     creator=user)
                 step['folderId'] = step_folder['_id']
 
+        # We should share with the same users and groups associated with the
+        # project
+        users = [user_access for user_access in project['access']['users']
+                 if user_access['id'] != user['_id']]
+        groups = project['access']['groups']
+
+        # Give admin access to creator
         simulation = self.setUserAccess(
-            simulation, user=user, level=AccessType.ADMIN)
+            simulation, user=user, level=AccessType.ADMIN, save=False)
+
+        simulation['access']['users'] += users
+        simulation['access']['groups'] += groups
+
+        # Share the simulation folder
+        simulation_folder = self.model('folder').load(
+            simulation['folderId'], user=user)
+        simulation_folder['access']['users'] += users
+        simulation_folder['access']['groups'] += groups
+        self.model('folder').setAccessList(
+            simulation_folder, simulation_folder['access'], save=True,
+            recurse=True, user=user)
 
         return self.save(simulation)
 
@@ -162,9 +181,9 @@ class Simulation(AccessControlledModel):
         :param users: The users to share with.
         :param groups: The groups to share with.
         """
-        access_list = simulation['access']
-        access_list['users'] \
-            = [user for user in access_list['users'] if user != sharer['_id']]
+        access_list = simulation.get('access', {})
+        access_list['users'] = [user for user in access_list.get('users', [])
+                                if user != sharer['_id']]
         access_list['groups'] = []
 
         for user_id in users:
