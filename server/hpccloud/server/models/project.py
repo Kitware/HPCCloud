@@ -26,6 +26,7 @@ import schema
 from ..utility import get_hpccloud_folder, share_folder, to_object_id, \
     get_simulations_folder
 
+from ..constants import SIMULATIONS_FOLDER
 
 class Project(AccessControlledModel):
 
@@ -69,7 +70,7 @@ class Project(AccessControlledModel):
 
         # Create the sub directory the whole simulations for this project
         self.model('folder').createFolder(
-            project_folder, '_simulations', parentType='folder',
+            project_folder, SIMULATIONS_FOLDER, parentType='folder',
             creator=user)
 
         self.model('folder').setUserAccess(

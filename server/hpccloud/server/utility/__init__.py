@@ -17,11 +17,16 @@
 #  limitations under the License.
 ###############################################################################
 
+import os
+import json
+
 from bson.objectid import ObjectId
 
 from girder.utility.model_importer import ModelImporter
 from girder.models.model_base import ValidationException
 from girder.constants import AccessType
+
+from ..constants import SIMULATIONS_FOLDER
 
 
 def get_hpccloud_folder(user):
@@ -68,7 +73,7 @@ def get_simulations_folder(user, project):
         project['folderId'], user=user, level=AccessType.READ)
 
     filters = {
-        'name': '_simulations'
+        'name': SIMULATIONS_FOLDER
     }
 
     try:
@@ -121,3 +126,106 @@ def share_folder(owner, folder, users, groups, level=AccessType.READ,
 
     return ModelImporter.model('folder').setAccessList(
         folder, folder_access_list, save=True, recurse=recurse, user=owner)
+
+def _list_item(item, prefix, export):
+    """
+    Generate a list of files within a item.
+    :param item: The item to list.
+    :param prefix: A path prefix to add to the results.
+    :type prefix: str
+    :param export: List of fileId to include in export.
+    :type export: list
+    :returns: Iterable over files in this item, where each element is a
+              tuple of (path name of the file, stream function with file
+              data).
+    :rtype: generator(str, func)
+    """
+    item_model =  ModelImporter.model('item')
+    file_model = ModelImporter.model('file')
+    files = list(item_model.childFiles(item=item, limit=2))
+    path = prefix
+    if (len(files) != 1 or files[0]['name'] != item['name']):
+            path = os.path.join(prefix, item['name'])
+    for file in item_model.childFiles(item=item):
+        if not export or file['_id'] in export:
+            yield (os.path.join(path, file['name']),
+                   file_model.download(file, headers=False))
+
+def _list_folder(user, folder, prefix='', export=None, skip_folders=[]):
+    """
+    Generate a list of files within a folder.
+    :param folder: The folder to list.
+    :param user: A user used to validate data that is returned.
+    :param prefix: A path prefix to add to the results.
+    :type prefix: str
+    :param export: List of fileId to include in export.
+    :type export: list
+    :returns: Iterable over files in this folder, where each element is a
+              tuple of (path name of the file, stream function with file
+              data).
+    :rtype: generator(str, func)
+    """
+    path = os.path.join(prefix, folder['name'])
+    folder_model = ModelImporter.model('folder')
+
+    for sub in folder_model.childFolders(parentType='folder', parent=folder,
+                                  user=user):
+
+        if sub['name'] in skip_folders:
+            continue
+
+        for (filepath, file) in _list_folder(
+                user, sub, path, export):
+            yield (filepath, file)
+
+    for item in folder_model.childItems(folder=folder):
+        for (filepath, file) in _list_item(
+                item, path, export):
+            yield (filepath, file)
+
+def list_simulation_assets(user, simulation):
+    """
+    Generate a list of assets within a simulation, including project related
+    inputs.
+
+    :param user: The user to use for access.
+    :param simulation: The simulation to list.
+    :returns: Iterable over assets in this simulation, where each element is a
+              tuple of (path name of the file, stream function with file
+              data).
+    :rtype: generator(str, func)
+    """
+
+    # First list project assets
+    project = ModelImporter.model('project', 'hpccloud').load(
+        simulation['projectId'], user=user, level=AccessType.READ)
+
+    def stream_project_meta():
+        yield json.dumps(project.get('metadata', {}))
+
+    yield (os.path.join(project['name'], 'meta.json'), stream_project_meta)
+
+    project_folder = ModelImporter.model('folder').load(
+        project['folderId'], user=user, level=AccessType.READ)
+
+    for (filepath, file) in _list_folder(user, project_folder,
+                                         prefix='', export=None,
+                                         skip_folders=[SIMULATIONS_FOLDER]):
+        yield (filepath, file)
+
+    prefix = os.path.join(project['name'], simulation['name'])
+
+    # Now list the simulation steps
+    for step_name, step in simulation['steps'].iteritems():
+        # Export the metadata
+        def stream_step_meta():
+            yield json.dumps(step.get('metadata', {}))
+
+        path = os.path.join(prefix, step['type'])
+        yield (os.path.join(path, step_name, 'meta.json'), stream_step_meta)
+        step_folder = ModelImporter.model('folder').load(
+                        step['folderId'], user=user, level=AccessType.READ)
+        for (filepath, file) in _list_folder(user, step_folder, path):
+            yield (filepath, file)
+
+
