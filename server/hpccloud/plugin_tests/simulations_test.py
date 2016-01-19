@@ -48,8 +48,15 @@ class SimulationTestCase(base.TestCase):
             'firstName': 'First',
             'lastName': 'Last',
             'password': 'goodpassword'
+        },
+         {
+            'email': 'yetanother@email.com',
+            'login': 'yetanother',
+            'firstName': 'First',
+            'lastName': 'Last',
+            'password': 'goodpassword'
         })
-        self._user, self._another_user = \
+        self._user, self._another_user,  self._yet_another_user  = \
             [self.model('user').createUser(**user) for user in users]
 
         def create_project(name):
@@ -101,6 +108,12 @@ class SimulationTestCase(base.TestCase):
         self.assertIsNotNone(
             self.model('folder').load(r.json['folderId'], force=True))
 
+        # Assert that a folder has been created for each step
+        for _, step in r.json['steps'].iteritems():
+            self.assertIsNotNone(self.model('folder').load(
+                step['folderId'], force=True))
+
+
     def _create_simulation(self, project, user, name):
         body = {
             "name": name,
@@ -125,11 +138,11 @@ class SimulationTestCase(base.TestCase):
         return r.json
 
     def test_list_simulations(self):
-        sim1 = self._create_simulation(
+        self._create_simulation(
             self._project1, self._another_user, 'sim1')
-        sim2 = self._create_simulation(self._project1,
+        self._create_simulation(self._project1,
             self._another_user, 'sim2')
-        sim3 = self._create_simulation(self._project2,
+        self._create_simulation(self._project2,
             self._another_user, 'sim3')
 
         r = self.request('/projects/%s/simulations' % str(self._project1['_id']), method='GET',
@@ -137,5 +150,268 @@ class SimulationTestCase(base.TestCase):
         self.assertStatusOk(r)
         self.assertEqual(len(r.json), 2)
 
+    def test_get(self):
+        sim1 = self._create_simulation(
+            self._project1, self._another_user, 'sim1')
+        self._create_simulation(self._project1,
+            self._another_user, 'sim2')
+        self._create_simulation(self._project2,
+            self._another_user, 'sim3')
 
+        r = self.request('/simulations/%s' % str(sim1['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatusOk(r)
+        self.assertEqual(r.json['_id'], sim1['_id'])
+
+    def test_delete(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim')
+
+        # Assert that a folder has been created for this simulation
+        self.assertIsNotNone(
+            self.model('folder').load(sim['folderId'], force=True))
+
+        # Now delete the simulation
+        r = self.request('/simulations/%s' % str(sim['_id']), method='DELETE',
+                         type='application/json', user=self._another_user)
+        self.assertStatusOk(r)
+
+        # Confirm the deletion
+        self.assertIsNone(self.model('simulation', 'hpccloud').load(
+            sim['_id'], force=True))
+
+        # Confirm that the folder was also removed
+        self.assertIsNone(self.model('folder').load(
+            sim['folderId'], force=True))
+
+    def test_update(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim')
+
+        # First try to update an immutable property
+        body = {
+            'folderId': 'notthanks'
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 400)
+
+
+        new_name = 'billy bob'
+        # Now try updating the name
+        body = {
+            'name': new_name
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatusOk(r)
+        # Assert that the new name was added to the document
+        self.assertEqual(self.model('simulation', 'hpccloud').load(sim['_id'], force=True)['name'],
+                         new_name)
+
+    def test_clone(self):
+        test_meta ={
+            'test': True
+        }
+
+        body = {
+            "name": 'testing',
+            "steps": {
+                "step1": {
+                    "type": "input"
+                },
+                "step2": {
+                    "type": "input"
+                },
+                "step3": {
+                    "type": "output",
+                    "metadata": test_meta
+                }
+            }
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s/simulations' % str(self._project1['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 201)
+        sim = r.json
+
+        step1_folder = self.model('folder').load(sim['steps']['step1']['folderId'], force=True)
+        # Add some test data to one of the simulation steps
+        # Create a test item
+        step1_item = self.model('item').createItem('deleteme', self._another_user,
+                                             step1_folder)
+
+        # Create a test file
+        r = self.request(path='/assetstore', method='GET',
+                         user=self._user)
+        self.assertStatusOk(r)
+        self.assertEqual(1, len(r.json))
+        assetstore = r.json[0]
+
+        step1_file_item = self.model('item').createItem('fileItem', self._another_user,
+                                             step1_folder)
+        step1_file = self.model('file').createFile(self._another_user, step1_file_item,
+                                             'test', 100, assetstore)
+        step1_file['sha512'] = 'dummy'
+        self.model('file').save(step1_file)
+
+        # Add some test data to output step
+        # Create a test item
+        step3_folder = self.model('folder').load(sim['steps']['step3']['folderId'], force=True)
+        step3_item = self.model('item').createItem('deleteme', self._another_user,
+                                             step3_folder)
+
+        # Create a test file
+        r = self.request(path='/assetstore', method='GET',
+                         user=self._user)
+        self.assertStatusOk(r)
+        self.assertEqual(1, len(r.json))
+        assetstore = r.json[0]
+
+        step3_file_item = self.model('item').createItem('fileItem', self._another_user,
+                                             step3_folder)
+        step3_file = self.model('file').createFile(self._another_user, step3_file_item,
+                                             'test', 100, assetstore)
+        step3_file['sha512'] = 'dummy'
+        self.model('file').save(step3_file)
+
+        # Now share the project and clone
+        body = {
+            "users": [str(self._yet_another_user['_id'])]
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s/share' % str(self._project1['_id']), method='PUT',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatusOk(r)
+
+        # First try without providing a name
+        body = {
+
+        }
+        json_body = json.dumps(body)
+        r = self.request('/simulations/%s/clone' % str(sim['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 400)
+
+        name = "iamaclone"
+        body = {
+            'name': name
+        }
+        json_body = json.dumps(body)
+        r = self.request('/simulations/%s/clone' % str(sim['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._yet_another_user)
+        self.assertStatus(r, 201)
+        cloned = r.json
+
+        self.assertEqual(cloned['name'], name)
+        steps = cloned['steps']
+        self.assertEqual(len(steps), 3)
+        self.assertEqual(steps['step3']['metadata'], test_meta)
+
+        # Assert that we have new folders
+        self.assertNotEqual(steps['step1']['folderId'], sim['steps']['step1']['folderId'])
+        self.assertNotEqual(steps['step2']['folderId'], sim['steps']['step2']['folderId'])
+        self.assertNotEqual(steps['step3']['folderId'], sim['steps']['step3']['folderId'])
+
+        # Assert the step3 data was not copied
+        cloned_step3_folder = self.model('folder').load(steps['step3']['folderId'], force=True)
+        items = self.model('folder').childItems(cloned_step3_folder)
+        self.assertFalse(list(items))
+
+        # Assert that step1 data was copied
+        cloned_step1_folder = self.model('folder').load(steps['step1']['folderId'], force=True)
+        items = list(self.model('folder').childItems(cloned_step1_folder))
+
+        self.assertEqual(len(items), 2)
+
+        cloned_step1_item, cloned_step1_file_item = items
+
+        self.assertNotEqual(step1_item, cloned_step1_item)
+        self.assertNotEqual(step1_file_item, cloned_step1_file_item)
+        self.assertEqual(cloned_step1_item['name'], 'deleteme')
+        self.assertEqual(cloned_step1_file_item['name'], 'fileItem')
+
+        # Check we have our file as well
+        files = list(self.model('item').childFiles(cloned_step1_file_item))
+        self.assertEqual(len(files), 1)
+
+    def test_get_simulation_step(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim1')
+
+        # First try a bogus step
+        r = self.request('/simulations/%s/steps/bogus' % str(sim['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 400)
+
+        # Now get step1
+        r = self.request('/simulations/%s/steps/step1' % str(sim['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+        step = r.json
+        self.assertEqual(step['type'],'input')
+        self.assertEqual(step['status'],'created')
+        self.assertTrue('folderId' in step)
+
+    def test_update_simulation_step(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim1')
+
+        body = {
+            'metadata': {
+                'name': 'name'
+            }
+        }
+        json_body = json.dumps(body)
+        # First try a bogus step
+        r = self.request('/simulations/%s/steps/bogus' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 400)
+
+        # Try immutable property
+        body = {
+            'folderId': 'noway'
+        }
+        json_body = json.dumps(body)
+        # Now update step1
+        r = self.request('/simulations/%s/steps/step1' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body,  user=self._another_user)
+        self.assertStatus(r, 400)
+
+        # Try bogus property
+        body = {
+            'bogus': 'noway'
+        }
+        json_body = json.dumps(body)
+        # Now update step1
+        r = self.request('/simulations/%s/steps/step1' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body,  user=self._another_user)
+        self.assertStatus(r, 400)
+
+        # Now try something valid
+        body = {
+            'metadata': {
+                'name': 'name'
+            },
+            'status': 'complete',
+            'export': []
+        }
+        json_body = json.dumps(body)
+        # Now update step1
+        r = self.request('/simulations/%s/steps/step1' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body,  user=self._another_user)
+        self.assertStatus(r, 200)
+
+        # Assert things where updated
+        new_sim = self.model('simulation', 'hpccloud').load(sim['_id'], force=True)
+        new_step1 = new_sim['steps']['step1']
+        self.assertEqual(new_step1['status'], 'complete')
+        self.assertEqual(new_step1['metadata'], body['metadata'])
+        self.assertEqual(new_step1['export'], body['export'])
 

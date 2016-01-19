@@ -114,11 +114,11 @@ class ProjectsTestCase(base.TestCase):
 
         # Now try and update one of the immutable properties
         body = {
-            'name': 'myProject'
+            'type': 'FooBar'
         }
 
         json_body = json.dumps(body)
-        r = self.request('/projects/%s' % str(project['_id']), method='PUT',
+        r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
                          type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 400)
 
@@ -130,13 +130,27 @@ class ProjectsTestCase(base.TestCase):
         }
 
         json_body = json.dumps(body)
-        r = self.request('/projects/%s' % str(project['_id']), method='PUT',
+        r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
                          type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 200)
 
         # Check the data was added
         project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
         self.assertEqual(project_model['metadata'], body['metadata'])
+
+        # Now try changing the name
+        body = {
+            'name': 'FooBar'
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 200)
+
+        # Check the name was updated
+        project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
+        self.assertEqual(project_model['name'], body['name'])
 
     def _create_project(self, name, user):
         body = {

@@ -16,10 +16,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 ###############################################################################
+import cherrypy
+import jsonschema
 
 from girder.constants import AccessType
-from girder.api.rest import loadmodel
-from girder.api.rest import Resource
+from girder.api.rest import loadmodel, getCurrentUser, Resource, getBodyJson
+from girder.api.rest import RestException
+from girder.api.describe import Description, describeRoute
+from girder.api import access
+from girder.api.docs import addModel
+
+from .models import schema
 
 
 class Simulations(Resource):
@@ -27,37 +34,145 @@ class Simulations(Resource):
     def __init__(self):
         super(Simulations, self).__init__()
         self.resourceName = 'simulations'
-        self.route('GET', ('id',), self.get)
+        self.route('GET', (':id',), self.get)
         self.route('DELETE', (':id',), self.delete)
-        self.route('PUT', (':id',), self.update)
-        self.route('POST', (':id',), self.clone)
-        self.route('GET', (':id', 'steps', 'stepName'), self.get_step)
-        self.route('PUT', (':id', 'steps', 'stepName'), self.update_step)
+        self.route('PATCH', (':id',), self.update)
+        self.route('POST', (':id', 'clone'), self.clone)
+        self.route('GET', (':id', 'steps', ':stepName'), self.get_step)
+        self.route('PATCH', (':id', 'steps', ':stepName'), self.update_step)
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.READ)
+        self._model = self.model('simulation', 'hpccloud')
+
+    @describeRoute(
+        Description('Get a simulation')
+        .param('id', 'The simulation to get.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def get(self, simulation, params):
-        pass
+        return simulation
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.WRITE)
+    @describeRoute(
+        Description('Delete a simulation')
+        .param('id', 'The simulation to delete.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def delete(self, simulation, params):
-        pass
+        user = getCurrentUser()
+        self._model.delete(user, simulation)
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.WRITE)
+    addModel('Steps', schema.simulation['properties']['steps'], 'simulations')
+    addModel('UpdateProperties', {
+        'id': 'UpdateProperties',
+        'properties': {
+            'name': {'type': 'string', 'description': 'The simulation name.'}
+        }
+    }, 'simulations')
+
+    @describeRoute(
+        Description('Update a simulation')
+        .param('id', 'The simulation to update.',
+               dataType='string', required=True, paramType='path')
+        .param('body', 'The properies of the simulation to update.',
+               dataType='UpdateProperties', required=True, paramType='body')
+    )
+    @access.user
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def update(self, simulation, params):
-        pass
+        immutable = ['projectId', 'folderId', 'access', 'userId', '_id',
+                     'steps']
+        updates = getBodyJson()
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.READ)
+        for p in updates:
+            if p in immutable:
+                raise RestException('\'%s\' is an immutable property' % p, 400)
+
+        user = getCurrentUser()
+        name = updates.get('name')
+
+        self._model.update(user, simulation, name=name)
+
+    @describeRoute(
+        Description('Clone a simulation')
+        .param('id', 'The simulation to clone.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def clone(self, simulation, params):
-        pass
+        props = getBodyJson()
+        self.requireParams(('name', ), props)
+        user = getCurrentUser()
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.READ)
-    def get_step(self, simulation, params):
-        pass
+        cloned = self._model.clone(user, simulation, props['name'])
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.WRITE)
-    def update_step(self, simulation, params):
-        pass
+        cherrypy.response.status = 201
+        cherrypy.response.headers['Location'] = '/simulations/%s' \
+            % cloned['_id']
 
-    @loadmodel(model='simulations', plugin='hpccloud', level=AccessType.READ)
+        return cloned
+
+    @describeRoute(
+        Description('Get a particular step in a simulation')
+        .param('id', 'The simulation containing the step.',
+               dataType='string', required=True, paramType='path')
+        .param('stepName', 'The step name to gets.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
+    def get_step(self, simulation, stepName, params):
+        if stepName not in simulation.get('steps', {}):
+            raise RestException('Simulation %s doesn\'t contain step %s' %
+                                (simulation['_id'], stepName), 400)
+
+        return simulation.get('steps', {}).get(stepName)
+
+    addModel('Step', schema.definitions['stepUpdate'], 'simulations')
+
+    @describeRoute(
+        Description('Update a particular step in a simulation')
+        .param('id', 'The simulation containing the step.',
+               dataType='string', required=True, paramType='path')
+        .param('stepName', 'The step name to gets.',
+               dataType='string', required=True, paramType='path')
+        .param('body', 'The properies of the step to update.',
+               dataType='Step', required=True, paramType='body')
+    )
+    @access.user
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
+    def update_step(self, simulation, stepName, params):
+        user = getCurrentUser()
+        immutable = ['type', 'folderId']
+        updates = getBodyJson()
+
+        if stepName not in simulation.get('steps', {}):
+            raise RestException('Simulation %s doesn\'t contain step %s' %
+                                (simulation['_id'], stepName), 400)
+
+        for p in updates:
+            if p in immutable:
+                raise RestException('\'%s\' is an immutable property' % p, 400)
+
+        try:
+            ref_resolver = jsonschema.RefResolver.from_schema(
+                schema.definitions)
+            jsonschema.validate(
+                updates, schema.definitions['stepUpdate'],
+                resolver=ref_resolver)
+        except jsonschema.ValidationError as ve:
+            raise RestException(ve.message, 400)
+
+        status = updates.get('status')
+        metadata = updates.get('metadata')
+        export = updates.get('export')
+
+        self._model.update_step(
+            user, simulation, stepName, status, metadata, export)
+
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def download(self, simulations):
         pass

@@ -38,7 +38,7 @@ class Projects(Resource):
         super(Projects, self).__init__()
         self.resourceName = 'projects'
         self.route('POST', (), self.create)
-        self.route('PUT', (':id', ), self.update)
+        self.route('PATCH', (':id', ), self.update)
         self.route('GET', (), self.get_all)
         self.route('DELETE', (':id', ), self.delete)
         self.route('PUT', (':id', 'share'), self.share)
@@ -76,16 +76,18 @@ class Projects(Resource):
     @access.user
     @loadmodel(model='project', plugin='hpccloud', level=AccessType.WRITE)
     def update(self, project, params):
-        immutable = ['name', 'type', 'steps']
+        immutable = ['type', 'steps', 'folderId', 'access', 'userId', '_id']
         updates = getBodyJson()
-        self.requireParams('metadata', updates)
 
         for p in updates:
             if p in immutable:
                 raise RestException('\'%s\' is an immutable property' % p, 400)
 
         user = getCurrentUser()
-        self._model.update(user, project, updates['metadata'])
+        name = updates.get('name')
+        metadata = updates.get('metadata')
+
+        self._model.update(user, project, name=name, metadata=metadata)
 
     @describeRoute(
         Description('Get all projects this user has access to project')
@@ -159,7 +161,7 @@ class Projects(Resource):
                dataType='ProjectProperties', required=True, paramType='body')
     )
     @access.user
-    @loadmodel(model='project', plugin='hpccloud', level=AccessType.WRITE)
+    @loadmodel(model='project', plugin='hpccloud', level=AccessType.READ)
     def create_simulation(self, project, params):
         simulation = getBodyJson()
         user = getCurrentUser()

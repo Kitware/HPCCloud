@@ -17,7 +17,11 @@
 #  limitations under the License.
 ###############################################################################
 
+from bson.objectid import ObjectId
+
 from girder.utility.model_importer import ModelImporter
+from girder.models.model_base import ValidationException
+from girder.constants import AccessType
 
 
 def get_hpccloud_folder(user):
@@ -56,3 +60,64 @@ def get_hpccloud_folder(user):
     return ModelImporter.model('folder').createFolder(
         private_folder, 'HPCCloud', description='Folder for HPCCloud data',
         parentType='folder', creator=user)
+
+
+def get_simulations_folder(user, project):
+
+    project_folder = ModelImporter.model('folder').load(
+        project['folderId'], user=user, level=AccessType.READ)
+
+    filters = {
+        'name': '_simulations'
+    }
+
+    try:
+        simulations_folder = ModelImporter.model('folder').childFolders(
+            parentType='folder', user=user, parent=project_folder,
+            filters=filters, limit=1).next()
+    except StopIteration:
+        raise Exception('Unable to find project simulations folder')
+
+    return simulations_folder
+
+
+def to_object_id(id):
+    if id and type(id) is not ObjectId:
+        try:
+            id = ObjectId(id)
+        except Exception:
+            raise ValidationException('Invalid ObjectId: %s' % id)
+
+    return id
+
+
+def share_folder(owner, folder, users, groups, level=AccessType.READ,
+                 recurse=False):
+    folder_access_list = folder['access']
+    folder_access_list['users'] \
+        = [user for user in folder_access_list['users']
+           if user != owner['_id']]
+    folder_access_list['groups'] = []
+
+    for user_id in users:
+        access_object = {
+            'id': to_object_id(user_id),
+            'level': level
+        }
+        folder_access_list['users'].append(access_object)
+
+        # Give read access to the project folder
+        folder_access_list['users'].append(access_object)
+
+    for group_id in groups:
+        access_object = {
+            'id': to_object_id(group_id),
+            'level': level
+        }
+        folder_access_list['groups'].append(access_object)
+
+        # Give read access to the project folder
+        folder_access_list['groups'].append(access_object)
+
+    return ModelImporter.model('folder').setAccessList(
+        folder, folder_access_list, save=True, recurse=recurse, user=owner)
