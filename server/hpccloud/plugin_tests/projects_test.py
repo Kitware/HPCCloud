@@ -20,7 +20,7 @@
 import json
 
 from tests import base
-from base import TestCase
+from .base import TestCase
 
 get_hpccloud_folder = None
 

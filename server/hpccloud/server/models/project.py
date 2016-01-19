@@ -21,7 +21,7 @@ import jsonschema
 
 from girder.models.model_base import ValidationException, AccessControlledModel
 from girder.constants import AccessType
-import schema
+from . import schema
 
 from ..utility import get_hpccloud_folder, share_folder, to_object_id, \
     get_simulations_folder

@@ -20,9 +20,10 @@
 import json
 import zipfile
 import io
+import six
 
 from tests import base
-from base import TestCase
+from .base import TestCase
 
 def setUpModule():
     base.enabledPlugins.append('hpccloud')
@@ -103,7 +104,7 @@ class SimulationTestCase(TestCase):
         self.assertTrue('step1' in r.json['steps'])
         self.assertTrue('step2' in r.json['steps'])
         self.assertTrue('step3' in r.json['steps'])
-        for _, step in r.json['steps'].iteritems():
+        for _, step in six.iteritems(r.json['steps']):
             self.assertEqual(step['status'], 'created')
 
         # Assert that a folder has been created for this simulation
@@ -111,7 +112,7 @@ class SimulationTestCase(TestCase):
             self.model('folder').load(r.json['folderId'], force=True))
 
         # Assert that a folder has been created for each step
-        for _, step in r.json['steps'].iteritems():
+        for _, step in six.iteritems(r.json['steps']):
             self.assertIsNotNone(self.model('folder').load(
                 step['folderId'], force=True))
 
@@ -481,9 +482,9 @@ class SimulationTestCase(TestCase):
             'project1/testing/output/step3/step3.txt'
         ]
         self.assertEqual(sorted([i.filename for i in zip.infolist()]), expected)
-        step3_txt = zip.read('project1/testing/output/step3/step3.txt')
+        step3_txt = zip.read('project1/testing/output/step3/step3.txt').decode('utf8')
         self.assertEqual(step3_txt, 'step3')
-        step3_meta = json.loads(zip.read('project1/testing/output/step3/meta.json'))
+        step3_meta = json.loads(zip.read('project1/testing/output/step3/meta.json').decode('utf8'))
         self.assertEqual(step3_meta, test_meta)
 
 
