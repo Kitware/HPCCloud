@@ -20,7 +20,7 @@
 import json
 
 from tests import base
-from base import TestCase
+from .base import TestCase
 
 list_simulation_assets = None
 
@@ -131,14 +131,14 @@ class SimulationTestCase(TestCase):
 
         expected = [
             'project1/meta.json',
-            'project1/testing/output/step3/meta.json',
-            'project1/testing/output/step3/step3.txt',
-            'project1/testing/input/step2/meta.json',
             'project1/testing/input/step1/meta.json',
-            'project1/testing/input/step1/step1.txt'
+            'project1/testing/input/step1/step1.txt',
+            'project1/testing/input/step2/meta.json',
+            'project1/testing/output/step3/meta.json',
+            'project1/testing/output/step3/step3.txt'
         ]
 
         listing = [ filepath for  (filepath, file) in list_simulation_assets(self._another_user, sim)]
-        self.assertEqual(listing, expected)
+        self.assertEqual(sorted(listing), expected)
 
 

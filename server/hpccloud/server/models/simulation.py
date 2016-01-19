@@ -18,12 +18,13 @@
 ###############################################################################
 
 import jsonschema
+import six
 
 from girder.models.model_base import AccessControlledModel, ValidationException
 from girder.constants import AccessType
 
 from ..utility import share_folder, to_object_id, get_simulations_folder
-import schema
+from . import schema
 
 
 class Simulation(AccessControlledModel):
@@ -71,7 +72,7 @@ class Simulation(AccessControlledModel):
         simulation['folderId'] = simulation_folder['_id']
         # Set the status of all the steps to 'created' and create the folders
         # for each step
-        for name, step in simulation['steps'].iteritems():
+        for name, step in six.iteritems(simulation['steps']):
             step['status'] = 'created'
             if create_step_folders:
                 step_folder = self.model('folder').createFolder(
@@ -151,7 +152,7 @@ class Simulation(AccessControlledModel):
         simulation_folder = self.model('folder').load(
             cloned_simulation['folderId'], user=user, level=AccessType.READ)
 
-        for name, step in cloned_simulation['steps'].iteritems():
+        for name, step in six.iteritems(cloned_simulation['steps']):
             if step['type'] == 'input':
                 step_folder = self.model('folder').load(
                     step['folderId'], user=user, level=AccessType.READ)

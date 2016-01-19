@@ -184,7 +184,6 @@ class Simulations(Resource):
     @access.user
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def download(self, simulation, params):
-        print 'download'
         user = self.getCurrentUser()
         cherrypy.response.headers['Content-Type'] = 'application/zip'
         cherrypy.response.headers['Content-Disposition'] = \

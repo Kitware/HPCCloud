@@ -19,6 +19,7 @@
 
 import os
 import json
+import six
 
 from bson.objectid import ObjectId
 
@@ -39,9 +40,9 @@ def get_hpccloud_folder(user):
     }
 
     try:
-        private_folder = ModelImporter.model('folder').childFolders(
+        private_folder = six.next(ModelImporter.model('folder').childFolders(
             parentType='user', user=user, parent=user, filters=filters,
-            limit=1).next()
+            limit=1))
     except StopIteration:
         raise Exception('Unable to find users private folder')
 
@@ -52,9 +53,9 @@ def get_hpccloud_folder(user):
 
     hpccloud_folder = None
     try:
-        hpccloud_folder = ModelImporter.model('folder').childFolders(
+        hpccloud_folder = six.next(ModelImporter.model('folder').childFolders(
             parentType='folder', user=user, parent=private_folder,
-            filters=filters, limit=1).next()
+            filters=filters, limit=1))
     except StopIteration:
         pass
 
@@ -77,9 +78,10 @@ def get_simulations_folder(user, project):
     }
 
     try:
-        simulations_folder = ModelImporter.model('folder').childFolders(
-            parentType='folder', user=user, parent=project_folder,
-            filters=filters, limit=1).next()
+        simulations_folder = six.next(
+            ModelImporter.model('folder').childFolders(
+                parentType='folder', user=user, parent=project_folder,
+                filters=filters, limit=1))
     except StopIteration:
         raise Exception('Unable to find project simulations folder')
 
@@ -219,7 +221,7 @@ def list_simulation_assets(user, simulation):
     prefix = os.path.join(project['name'], simulation['name'])
 
     # Now list the simulation steps
-    for step_name, step in simulation['steps'].iteritems():
+    for step_name, step in six.iteritems(simulation['steps']):
         # Export the metadata
         def stream_step_meta():
             yield json.dumps(step.get('metadata', {}))
