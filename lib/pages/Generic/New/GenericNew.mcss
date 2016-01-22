@@ -1,4 +1,4 @@
-.container {
+.container, .subcontainer {
     composes: verticalFlexContainer from '../../../style/layout.css';
 }
 
