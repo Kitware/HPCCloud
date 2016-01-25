@@ -151,14 +151,14 @@ class Projects(Resource):
 
         return self._model.share(user, project, users, groups)
 
-    addModel('SimProperties', schema.simulation, 'simulations')
+    addModel('SimProperties', schema.simulation, 'projects')
 
     @describeRoute(
         Description('Create a simulation associated with a project.')
         .param('id', 'The project the simulation will be created in.',
                dataType='string', required=True, paramType='path')
         .param('body', 'The properties of the simulation.',
-               dataType='ProjectProperties', required=True, paramType='body')
+               dataType='SimProperties', required=True, paramType='body')
     )
     @access.user
     @loadmodel(model='project', plugin='hpccloud', level=AccessType.READ)
