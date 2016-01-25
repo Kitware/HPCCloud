@@ -98,10 +98,22 @@ class Simulations(Resource):
 
         self._model.update(user, simulation, name=name)
 
+    addModel('CloneParams', {
+        'id': 'CloneParams',
+        'properties': {
+            'name': {
+                'type': 'string',
+                'description': 'The new name for the simulation'
+            }
+        }
+    }, 'simulations')
+
     @describeRoute(
         Description('Clone a simulation')
         .param('id', 'The simulation to clone.',
                dataType='string', required=True, paramType='path')
+        .param('body', 'The properies of the simulation to update.',
+               dataType='CloneParams', required=True, paramType='body')
     )
     @access.user
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
