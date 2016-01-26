@@ -24,7 +24,7 @@ module.exports = {
             { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=60000&mimetype=application/font-woff" },
             { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=60000" },
             { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192'},
-            { test: /\.css$/, loader: "style!css!autoprefixer-loader?browsers=last 2 versions" },
+            { test: /\.css$/, loader: "style!css!postcss" },
             { test: /\.mcss$/,loader: 'style!css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss' },
             { test: /\.json$/, loader: 'json-loader' },
             { test: /\.html$/, loader: 'html-loader' },
