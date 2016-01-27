@@ -20,15 +20,17 @@
     cursor: pointer;
     margin: 0;
     box-sizing: border-box;
+    transition: all 0.35s ease;
 }
 
 .active {
-    background-color: yellow;
+    background-color: #E1F5FE;
+    color: #01579B;
 }
 
 .detailList > button {
-    padding: 0.3em 0;
-    font-size: 1em;
+    padding: 0.6em 0;
+    font-size: 0.9em;
     border: 1px solid lightgrey;
     background-color: white;
     width: 90%;

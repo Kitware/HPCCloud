@@ -1,11 +1,11 @@
 .topBar {
-    background: #000;
+    background: #222;
     color: #fff;
 }
 
 .subBar {
     background: #ccc;
-    color: #000;
+    color: #222;
 }
 
 .even {
