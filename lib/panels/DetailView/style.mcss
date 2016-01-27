@@ -1,0 +1,45 @@
+.detailView {
+    display: flex;
+    flex-direction: row;
+}
+
+.detailList {
+    flex: none;
+    margin-top: 1px;
+    border-right: 1px solid grey;
+}
+
+.detailList > ul {
+    list-style: none;
+    padding: 0 20px;
+    min-width: 90px;
+}
+
+.detailList > button {
+    padding: 0.3em 0;
+    font-size: 1em;
+    border: 1px solid lightgrey;
+    background-color: white;
+    width: 90%;
+    display: list-item;
+    margin: 0 auto;
+}
+
+.active {
+    font-weight: bold;
+}
+
+.detailContent {
+    flex: 3;
+}
+
+.buttonLine {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row-reverse;
+    padding: 7px 17px;
+}
+
+.buttonLine > button {
+    margin-left: 12px;
+}
