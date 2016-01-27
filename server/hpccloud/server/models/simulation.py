@@ -119,7 +119,7 @@ class Simulation(AccessControlledModel):
         self.remove(simulation)
         self.model('folder').remove(simulation_folder)
 
-    def update(self, user, simulation, name):
+    def update(self, user, simulation, name, description=None):
         """
         Update a simulation.
 
@@ -129,6 +129,9 @@ class Simulation(AccessControlledModel):
         """
         if name:
             simulation['name'] = name
+
+        if description:
+            simulation['description'] = description
 
         return self.save(simulation)
 
