@@ -219,6 +219,20 @@ class SimulationTestCase(TestCase):
         self.assertEqual(self.model('simulation', 'hpccloud').load(sim['_id'], force=True)['name'],
                          new_name)
 
+        new_description = 'billy bob'
+        # Now try updating the name
+        body = {
+            'description': new_description
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatusOk(r)
+        # Assert that the new name was added to the document
+        self.assertEqual(self.model('simulation', 'hpccloud').load(sim['_id'], force=True)['description'],
+                         new_description)
+
     def test_clone(self):
         test_meta ={
             'test': True

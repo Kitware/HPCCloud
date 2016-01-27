@@ -86,8 +86,10 @@ class Projects(Resource):
         user = getCurrentUser()
         name = updates.get('name')
         metadata = updates.get('metadata')
+        description = updates.get('description')
 
-        self._model.update(user, project, name=name, metadata=metadata)
+        self._model.update(user, project, name=name, metadata=metadata,
+                           description=description)
 
     @describeRoute(
         Description('Get all projects this user has access to project')

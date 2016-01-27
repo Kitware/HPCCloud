@@ -155,6 +155,20 @@ class ProjectsTestCase(TestCase):
         project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
         self.assertEqual(project_model['name'], body['name'])
 
+        # Now try changing the description
+        body = {
+            'description': 'FooBar'
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 200)
+
+        # Check the description was updated
+        project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
+        self.assertEqual(project_model['description'], body['description'])
+
     def _create_project(self, name, user):
         body = {
             'name': name,

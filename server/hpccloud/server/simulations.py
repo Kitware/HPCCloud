@@ -71,7 +71,9 @@ class Simulations(Resource):
     addModel('UpdateProperties', {
         'id': 'UpdateProperties',
         'properties': {
-            'name': {'type': 'string', 'description': 'The simulation name.'}
+            'name': {'type': 'string', 'description': 'The simulation name.'},
+            'description': {'type': 'string', 'description': 'The description '
+                            'of the simulation.'},
         }
     }, 'simulations')
 
@@ -95,8 +97,9 @@ class Simulations(Resource):
 
         user = getCurrentUser()
         name = updates.get('name')
+        description = updates.get('description')
 
-        self._model.update(user, simulation, name=name)
+        self._model.update(user, simulation, name=name, description=description)
 
     addModel('CloneParams', {
         'id': 'CloneParams',
