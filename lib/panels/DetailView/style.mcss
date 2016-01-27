@@ -5,14 +5,25 @@
 
 .detailList {
     flex: none;
-    margin-top: 1px;
     border-right: 1px solid grey;
 }
 
 .detailList > ul {
     list-style: none;
-    padding: 0 20px;
+    padding: 0;
+    margin: 0;
     min-width: 90px;
+}
+
+.detailList > ul > li {
+    padding: 6px 15px;
+    cursor: pointer;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.active {
+    background-color: yellow;
 }
 
 .detailList > button {
@@ -22,11 +33,7 @@
     background-color: white;
     width: 90%;
     display: list-item;
-    margin: 0 auto;
-}
-
-.active {
-    font-weight: bold;
+    margin: 3px auto 0;
 }
 
 .detailContent {
