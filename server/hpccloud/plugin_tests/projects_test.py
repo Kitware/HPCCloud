@@ -79,6 +79,8 @@ class ProjectsTestCase(TestCase):
                          type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 201)
         self.assertEqual(r.json['description'], description)
+        self.assertIsNotNone(r.json['updated'])
+        self.assertIsNotNone(r.json['created'])
         # Check that a project folder was created
         hpccloud_folder = get_hpccloud_folder(user=self._user)
         filters = {
@@ -115,6 +117,14 @@ class ProjectsTestCase(TestCase):
         self.assertStatus(r, 201)
         project = r.json
 
+        # Fetch the project so we get the right updated time ( its a timestamp
+        # truncation thing )
+        r = self.request('/projects/%s' % str(project['_id']), method='GET',
+                         type='application/json', user=self._user)
+        self.assertStatusOk(r)
+        project = r.json
+        updated = project['updated']
+
         # Now try and update one of the immutable properties
         body = {
             'type': 'FooBar'
@@ -136,6 +146,7 @@ class ProjectsTestCase(TestCase):
         r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
                          type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 200)
+        self.assertNotEqual(updated, r.json['updated'])
 
         # Check the data was added
         project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
@@ -194,6 +205,10 @@ class ProjectsTestCase(TestCase):
                          type='application/json', user=self._another_user)
         self.assertStatus(r, 200)
         self.assertEqual(len(r.json), 1)
+        del r.json[0]['created']
+        del r.json[0]['updated']
+        del project2['created']
+        del project2['updated']
         self.assertEqual(r.json[0], project2)
 
     def test_delete(self):
@@ -307,6 +322,10 @@ class ProjectsTestCase(TestCase):
         r = self.request('/projects/%s' % str(project2['_id']), method='GET',
                          type='application/json', user=self._another_user)
         self.assertStatus(r, 200)
+        del r.json['created']
+        del r.json['updated']
+        del project2['created']
+        del project2['updated']
         self.assertEqual(r.json, project2)
 
         # Now try and get a project we shouldn't have access to
@@ -322,6 +341,10 @@ class ProjectsTestCase(TestCase):
                          type='application/json', user=self._another_user)
         self.assertStatus(r, 200)
         self.assertEqual(len(r.json), 1)
+        del r.json[0]['created']
+        del r.json[0]['updated']
+        del project2['created']
+        del project2['updated']
         self.assertEqual(r.json[0], project2)
 
         # Now share the other project

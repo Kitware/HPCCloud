@@ -76,7 +76,8 @@ class Projects(Resource):
     @access.user
     @loadmodel(model='project', plugin='hpccloud', level=AccessType.WRITE)
     def update(self, project, params):
-        immutable = ['type', 'steps', 'folderId', 'access', 'userId', '_id']
+        immutable = ['type', 'steps', 'folderId', 'access', 'userId', '_id',
+                     'created', 'updated']
         updates = getBodyJson()
 
         for p in updates:
@@ -88,8 +89,8 @@ class Projects(Resource):
         metadata = updates.get('metadata')
         description = updates.get('description')
 
-        self._model.update(user, project, name=name, metadata=metadata,
-                           description=description)
+        return self._model.update(user, project, name=name, metadata=metadata,
+                                  description=description)
 
     @describeRoute(
         Description('Get all projects this user has access to project')

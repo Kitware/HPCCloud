@@ -17,6 +17,8 @@
 #  limitations under the License.
 ###############################################################################
 
+import datetime
+
 import jsonschema
 import six
 
@@ -59,6 +61,9 @@ class Simulation(AccessControlledModel):
         """
         simulation['projectId'] = project['_id']
         simulation['userId'] = user['_id']
+        now = datetime.datetime.utcnow()
+        simulation['created'] = now
+        simulation['updated'] = now
 
         # validate first, so we know we have the properties we need
         self.validate(simulation)
@@ -132,6 +137,8 @@ class Simulation(AccessControlledModel):
 
         if description:
             simulation['description'] = description
+
+        simulation['updated'] = datetime.datetime.utcnow()
 
         return self.save(simulation)
 
@@ -239,4 +246,5 @@ class Simulation(AccessControlledModel):
             dirty = True
 
         if dirty:
+            simulation['updated'] = datetime.datetime.utcnow()
             self.save(simulation)

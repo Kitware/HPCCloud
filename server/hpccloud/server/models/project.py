@@ -17,6 +17,8 @@
 #  limitations under the License.
 ###############################################################################
 
+import datetime
+
 import jsonschema
 
 from girder.models.model_base import ValidationException, AccessControlledModel
@@ -60,6 +62,9 @@ class Project(AccessControlledModel):
 
         """
         project['userId'] = user['_id']
+        now = datetime.datetime.utcnow()
+        project['created'] = now
+        project['updated'] = now
 
         self.validate(project)
 
@@ -102,7 +107,9 @@ class Project(AccessControlledModel):
         if description:
             project['description'] = description
 
-        self.save(project)
+        project['updated'] = datetime.datetime.utcnow()
+
+        return self.save(project)
 
     def delete(self, user, project):
         """
@@ -183,6 +190,8 @@ class Project(AccessControlledModel):
         for sim in sims:
             self.model('simulation', 'hpccloud').share(
                 sharer, sim, users, groups)
+
+        project['updated'] = datetime.datetime.utcnow()
 
         return self.save(project)
 
