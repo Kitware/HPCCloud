@@ -244,6 +244,46 @@ class ProjectsTestCase(TestCase):
         self.assertIsNone(self.model('folder').load(project['folderId'],
                                                     force=True))
 
+        # Try deleting a project containing a simulation
+        body = {
+            'name': 'deleteme',
+            'type': 'PyFR',
+            'steps': ['onestep']
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects', method='POST',
+                         type='application/json', body=json_body,
+                         user=self._another_user)
+        self.assertStatus(r, 201)
+        project = r.json
+
+        body = {
+            "name": "mySim",
+            "steps": {
+                "step1": {
+                    "type": "input"
+                },
+                "step2": {
+                    "type": "input"
+                },
+                "step3": {
+                    "type": "input"
+                }
+            }
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s/simulations' % str(project['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 201)
+
+        # The delete should fail
+        r = self.request('/projects/%s' % str(project['_id']), method='DELETE',
+                 type='application/json', body=json_body,
+                 user=self._another_user)
+        self.assertStatus(r, 400)
+
     def test_get(self):
         project1 = self._create_project('project1', self._user)
         project2 = self._create_project('project2', self._another_user)

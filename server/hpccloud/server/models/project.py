@@ -111,6 +111,16 @@ class Project(AccessControlledModel):
         :param project: The project to delete.
         """
 
+        # Prevent the deletion of a project that contains simulations
+        query = {
+            "projectId": project['_id']
+        }
+
+        sim = self.model('simulation', 'hpccloud').findOne(query=query)
+        if sim is not None:
+            raise ValidationException(
+                'Unable to delete project that contains simulations')
+
         # Clean up the project folder
         project_folder = self.model('folder').load(
             project['folderId'], user=user)
