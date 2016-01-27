@@ -107,6 +107,9 @@ class SimulationTestCase(TestCase):
         self.assertTrue('step2' in r.json['steps'])
         self.assertTrue('step3' in r.json['steps'])
         self.assertEqual(r.json['description'], description)
+        self.assertIsNotNone(r.json['updated'])
+        self.assertIsNotNone(r.json['created'])
+
         for _, step in six.iteritems(r.json['steps']):
             self.assertEqual(step['status'], 'created')
 
@@ -194,6 +197,13 @@ class SimulationTestCase(TestCase):
         sim = self._create_simulation(
             self._project1, self._another_user, 'sim')
 
+        # Fetch the sim so we get the right updated time
+        r = self.request('/simulations/%s' % str(sim['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatusOk(r)
+        sim = r.json
+        updated = sim['updated']
+
         # First try to update an immutable property
         body = {
             'folderId': 'notthanks'
@@ -203,7 +213,6 @@ class SimulationTestCase(TestCase):
         r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
                          type='application/json', body=json_body, user=self._another_user)
         self.assertStatus(r, 400)
-
 
         new_name = 'billy bob'
         # Now try updating the name
@@ -215,6 +224,8 @@ class SimulationTestCase(TestCase):
         r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
                          type='application/json', body=json_body, user=self._another_user)
         self.assertStatusOk(r)
+        self.assertNotEqual(updated, r.json['updated'])
+
         # Assert that the new name was added to the document
         self.assertEqual(self.model('simulation', 'hpccloud').load(sim['_id'], force=True)['name'],
                          new_name)
