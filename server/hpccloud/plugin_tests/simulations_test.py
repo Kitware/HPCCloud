@@ -81,17 +81,19 @@ class SimulationTestCase(TestCase):
         self._project2 = create_project('project2')
 
     def test_create(self):
+        description = 'My description'
         body = {
-            "name": "mySim",
-            "steps": {
-                "step1": {
-                    "type": "input"
+            'name': 'mySim',
+            'description': description,
+            'steps': {
+                'step1': {
+                    'type': 'input'
                 },
-                "step2": {
-                    "type": "input"
+                'step2': {
+                    'type': 'input'
                 },
-                "step3": {
-                    "type": "input"
+                'step3': {
+                    'type': 'input'
                 }
             }
         }
@@ -104,6 +106,7 @@ class SimulationTestCase(TestCase):
         self.assertTrue('step1' in r.json['steps'])
         self.assertTrue('step2' in r.json['steps'])
         self.assertTrue('step3' in r.json['steps'])
+        self.assertEqual(r.json['description'], description)
         for _, step in six.iteritems(r.json['steps']):
             self.assertEqual(step['status'], 'created')
 
@@ -119,16 +122,16 @@ class SimulationTestCase(TestCase):
 
     def _create_simulation(self, project, user, name):
         body = {
-            "name": name,
-            "steps": {
-                "step1": {
-                    "type": "input"
+            'name': name,
+            'steps': {
+                'step1': {
+                    'type': 'input'
                 },
-                "step2": {
-                    "type": "input"
+                'step2': {
+                    'type': 'input'
                 },
-                "step3": {
-                    "type": "input"
+                'step3': {
+                    'type': 'input'
                 }
             }
         }
@@ -222,17 +225,17 @@ class SimulationTestCase(TestCase):
         }
 
         body = {
-            "name": 'testing',
-            "steps": {
-                "step1": {
-                    "type": "input"
+            'name': 'testing',
+            'steps': {
+                'step1': {
+                    'type': 'input'
                 },
-                "step2": {
-                    "type": "input"
+                'step2': {
+                    'type': 'input'
                 },
-                "step3": {
-                    "type": "output",
-                    "metadata": test_meta
+                'step3': {
+                    'type': 'output',
+                    'metadata': test_meta
                 }
             }
         }
@@ -285,7 +288,7 @@ class SimulationTestCase(TestCase):
 
         # Now share the project and clone
         body = {
-            "users": [str(self._yet_another_user['_id'])]
+            'users': [str(self._yet_another_user['_id'])]
         }
 
         json_body = json.dumps(body)
@@ -302,7 +305,7 @@ class SimulationTestCase(TestCase):
                          type='application/json', body=json_body, user=self._another_user)
         self.assertStatus(r, 400)
 
-        name = "iamaclone"
+        name = 'iamaclone'
         body = {
             'name': name
         }
@@ -424,17 +427,17 @@ class SimulationTestCase(TestCase):
         }
 
         body = {
-            "name": 'testing',
-            "steps": {
-                "step1": {
-                    "type": "input"
+            'name': 'testing',
+            'steps': {
+                'step1': {
+                    'type': 'input'
                 },
-                "step2": {
-                    "type": "input"
+                'step2': {
+                    'type': 'input'
                 },
-                "step3": {
-                    "type": "output",
-                    "metadata": test_meta
+                'step3': {
+                    'type': 'output',
+                    'metadata': test_meta
                 }
             }
         }

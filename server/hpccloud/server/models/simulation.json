@@ -8,6 +8,9 @@
         "name": {
             "type": "string"
         },
+        "description": {
+            "type": "string"
+        },
         "steps": {
             "type": "object",
             "patternProperties": {

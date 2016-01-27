@@ -65,8 +65,10 @@ class ProjectsTestCase(TestCase):
 
     def test_create(self):
         project_name = 'myProject'
+        description = 'asdf asdfasdf'
         body = {
             'name': project_name,
+            'description': description,
             'type': 'PyFR',
             'steps': ['onestep']
         }
@@ -76,7 +78,7 @@ class ProjectsTestCase(TestCase):
         r = self.request('/projects', method='POST',
                          type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 201)
-
+        self.assertEqual(r.json['description'], description)
         # Check that a project folder was created
         hpccloud_folder = get_hpccloud_folder(user=self._user)
         filters = {
