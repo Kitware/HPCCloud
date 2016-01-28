@@ -34,12 +34,22 @@
     composes: textCenter from '../../style/layout.css';
 }
 
-.errorBox {
-    composes: errorBox from '../../style/theme.css';
-    composes: borderRadius from '../../style/theme.css';
+.box {
     width: 80%;
     margin: 16px auto 0;
     padding: 7px;
+    composes: box;
+    composes: borderRadius from '../../style/theme.css';
+}
+
+.errorBox {
+    composes: errorBox from '../../style/theme.css';
+    composes: box;
+}
+
+.warningBox {
+    composes: warningBox from '../../style/theme.css';
+    composes: box;
 }
 
 @media screen and (max-width: 700px) {
