@@ -18,6 +18,8 @@
 
 .loginButton {
     width: 90%;
+    background-color: #444;
+    color: white;
 }
 
 .header {
@@ -32,6 +34,13 @@
 
 .center {
     composes: textCenter from '../../style/layout.css';
+}
+
+.forgotPassword {
+    width: 90%;
+    text-align: left;
+    margin: 0 auto;
+    font-size: 0.85em;
 }
 
 .box {
