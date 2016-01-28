@@ -1,0 +1,21 @@
+.subBar {
+    composes: topBar from '../../style/layout.css';
+    composes: subBar from '../../style/theme.css';
+    align-items: center;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row-reverse;
+    padding: 7px 17px;
+}
+
+.actions > i {
+    cursor: pointer;
+}
+
+.title {
+    font-weight: bold;
+    text-align: center;
+}
