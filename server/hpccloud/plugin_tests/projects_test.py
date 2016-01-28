@@ -104,6 +104,29 @@ class ProjectsTestCase(TestCase):
                          type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 400)
 
+        # Test unique name
+        body = {
+            'name': 'dup',
+            'type': 'PyFR',
+            'steps': ['onestep']
+        }
+
+        json_body = json.dumps(body)
+
+        r = self.request('/projects', method='POST',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 201)
+
+        r = self.request('/projects', method='POST',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 400)
+
+        # Another should be able to reuse the name
+        r = self.request('/projects', method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 201)
+
+
     def test_update(self):
         body = {
             'name': 'myProject',

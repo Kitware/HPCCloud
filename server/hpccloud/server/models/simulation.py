@@ -49,6 +49,20 @@ class Simulation(AccessControlledModel):
         except jsonschema.ValidationError as ve:
             raise ValidationException(ve.message)
 
+        # Ensure unique name for the simulation within the project
+        q = {
+            'name': simulation['name'],
+            'projectId': simulation['projectId']
+        }
+
+        if '_id' in simulation:
+            q['_id'] = {'$ne': simulation['_id']}
+
+        duplicate = self.findOne(q, fields=['_id'])
+        if duplicate is not None:
+            raise ValidationException('A simulation with that name already '
+                                      'exists in this project.', 'name')
+
         return simulation
 
     def create(self, user, project, simulation, create_step_folders=True):

@@ -122,6 +122,15 @@ class SimulationTestCase(TestCase):
             self.assertIsNotNone(self.model('folder').load(
                 step['folderId'], force=True))
 
+        # Test names
+        r = self.request('/projects/%s/simulations' % str(self._project1['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 400)
+
+        # Should be able to use the name in another project
+        r = self.request('/projects/%s/simulations' % str(self._project2['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 201)
 
     def _create_simulation(self, project, user, name):
         body = {
