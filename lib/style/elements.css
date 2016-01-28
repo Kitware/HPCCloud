@@ -1,10 +1,16 @@
 button {
     background-color: white;
     border: 1px solid lightgrey;
-    padding: 5px 8px;
+    padding: 7px 16px;
     margin: 3px;
     text-transform: uppercase;
-    font-size: 0.80em;
+    font-size: 0.90em;
+    border-radius: 4px;
+}
+
+button:focus {
+    outline-width: 0px;
+    border-color: #999;
 }
 
 button[disabled] {
@@ -41,6 +47,11 @@ input[type=submit] {
     margin: 3px;
     text-transform: uppercase;
     font-size: 0.80em;
+}
+
+input:focus {
+    outline-width: 0px;
+    border-color: #888;
 }
 
 .is-clickable {
