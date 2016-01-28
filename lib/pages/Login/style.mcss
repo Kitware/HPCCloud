@@ -1,24 +1,50 @@
 .loginForm {
+    composes: borderRadius from '../../style/theme.css';
     border: 1px solid grey;
     text-align: center;
     width: 35%;
     padding: 20px 0;
     display: inline-block;
-    margin-top: 30px;
+    margin-top: 12px;
 }
 
-.loginLabel {
+.loginInput {
+    composes: borderRadius from '../../style/theme.css';
+    composes: input from '../../style/theme.css';
     display: block;
-    margin-bottom: 4px;
+    margin: 3px auto 0;
+    width: 90%;
+}
+
+.loginButton {
+    width: 90%;
+}
+
+.header {
+    margin-top: 10px;
+}
+
+.subtitle {
+    composes: lightText from '../../style/theme.css';
+    font-size: 1.25em;
+    margin: 10px auto;
 }
 
 .center {
     composes: textCenter from '../../style/layout.css';
 }
 
+.errorBox {
+    composes: errorBox from '../../style/theme.css';
+    composes: borderRadius from '../../style/theme.css';
+    width: 80%;
+    margin: 16px auto 0;
+    padding: 7px;
+}
+
 @media screen and (max-width: 700px) {
     .loginForm {
-        width: 50%;
+        width: 70%;
     }
 }
 

@@ -19,3 +19,31 @@
 .disabled {
     color: #090909;
 }
+
+.borderRadius {
+    border-radius: 4px;
+}
+
+.input {
+	padding: 7px 14px;
+    border-radius: 4px;
+    border: 1px solid lightgrey;
+}
+
+.errorBox {
+	color: white;
+	background-color: #FF3710;
+}
+
+.successBox {
+	color: white;
+	background-color: #0DFF70;
+}
+
+.boldText {
+	font-weight: bold;
+}
+
+.lightText {
+	font-weight: 300;
+}

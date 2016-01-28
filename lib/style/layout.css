@@ -69,7 +69,3 @@
 .subBar {
     composes: topBar;
 }
-
-.border-radius {
-    border-radius: 4px;
-}

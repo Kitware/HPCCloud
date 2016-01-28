@@ -52,6 +52,7 @@
     width: 100%;
 }
 
+/* cannot compose this. */
 input.form, .form > input, .form > select{
     padding: 7px 14px;
     border-radius: 4px;
