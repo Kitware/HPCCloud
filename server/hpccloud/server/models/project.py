@@ -23,6 +23,7 @@ import jsonschema
 
 from girder.models.model_base import ValidationException, AccessControlledModel
 from girder.constants import AccessType
+from girder.api.rest import getCurrentUser
 from . import schema
 
 from ..utility import get_hpccloud_folder, share_folder, to_object_id, \
@@ -49,6 +50,20 @@ class Project(AccessControlledModel):
             jsonschema.validate(project, schema.project, resolver=ref_resolver)
         except jsonschema.ValidationError as ve:
             raise ValidationException(ve.message)
+
+        # Ensure unique name for the project
+        user = getCurrentUser()
+        q = {
+            'name': project['name'],
+            'userId': user['_id']
+        }
+        if '_id' in project:
+            q['_id'] = {'$ne': project['_id']}
+
+        duplicate = self.findOne(q, fields=['_id'])
+        if duplicate is not None:
+            raise ValidationException('A project with that name already '
+                                      'exists.', 'name')
 
         return project
 
