@@ -58,8 +58,7 @@
 
 .errorMessage {
     padding: 0 20px;
-    color: red;
-    font-weight: bold;
+    composes: errorBox from '../../style/theme.css';
 }
 
 .buttonLine {

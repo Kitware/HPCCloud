@@ -45,6 +45,7 @@
     background-color: #11bb11;
 }
 
+/* in case we ever have more varied font weights*/
 .boldText {
     font-weight: bold;
 }

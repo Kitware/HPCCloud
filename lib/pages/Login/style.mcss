@@ -44,10 +44,9 @@
 }
 
 .box {
-    width: 80%;
+    width: 90%;
     margin: 16px auto 0;
     padding: 7px;
-    composes: box;
     composes: borderRadius from '../../style/theme.css';
 }
 

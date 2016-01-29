@@ -1,13 +1,13 @@
-.buttomBar {
+.buttonBar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
 }
 
 .error {
-    padding: 0 20px;
-    color: red;
-    font-weight: bold;
+    padding: 7px;
+    composes: errorBox from '../../style/theme.css';
+    composes: borderRadius from '../../style/theme.css';
 }
 
 .buttons {
