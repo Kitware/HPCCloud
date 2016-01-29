@@ -14,6 +14,11 @@
     flex: 1;
 }
 
+.topBarItemBusy {
+    composes: topBarItem;
+    color: lightblue;
+}
+
 .topBarRightItem {
     composes: topBarItem, textRight from '../../style/layout.css';
     text-transform: capitalize;
