@@ -25,10 +25,11 @@ button:active{
 a, a:visited {
     color: inherit;
     text-decoration: none;
+    transition: color .25s ease;
 }
 
 a:hover, a:active {
-    color: inherit;
+    color: #18e;
 }
 
 a:focus {
@@ -49,7 +50,7 @@ input[type=submit] {
     font-size: 0.80em;
 }
 
-input:focus {
+textarea:focus, input:focus {
     outline-width: 0px;
     border-color: #888;
 }

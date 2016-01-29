@@ -4,7 +4,7 @@
 
 .subBar {
     composes: subBar from '../../../style/layout.css';
-    composes: subBar from '../../../style/theme.css';
+    composes: subBar from '../../../style/theme.mcss';
 }
 
 .content {
@@ -50,5 +50,5 @@
 
 .disabledAction {
     composes: isClickable from '../../../style/states.css';
-    composes: disabled    from '../../../style/theme.css';
+    composes: disabled    from '../../../style/theme.mcss';
 }

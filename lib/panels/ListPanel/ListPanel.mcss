@@ -4,7 +4,7 @@
 
 .actionBar {
     composes: subBar from '../../style/layout.css';
-    composes: subBar from '../../style/theme.css';
+    composes: subBar from '../../style/theme.mcss';
 }
 
 .actionBarLeft {
@@ -18,7 +18,7 @@
 
 .actionBarCenter {
     composes: textCenter from '../../style/layout.css';
-    composes: flexItem from '../../style/layout.css';
+    flex: none;
 }
 
 .actionBarRight {
@@ -27,8 +27,8 @@
 }
 
 .filter {
+    composes: borderRadius from '../../style/theme.mcss';
     border: 1px solid #aaa;
-    border-radius: 1em;
     padding: 2px 10px;
 }
 

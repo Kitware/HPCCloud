@@ -6,7 +6,7 @@
 }
 
 .topBar {
-    composes: topBar from '../../style/theme.css';
+    composes: topBar from '../../style/theme.mcss';
     composes: topBar from '../../style/layout.css';
 }
 

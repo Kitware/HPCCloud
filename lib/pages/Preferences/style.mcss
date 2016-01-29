@@ -23,7 +23,7 @@
 
 .preferencesToolbar {
     composes: topBar from '../../style/layout.css';
-    composes: subBar from '../../style/theme.css';
+    composes: subBar from '../../style/theme.mcss';
     align-items: center;
 }
 

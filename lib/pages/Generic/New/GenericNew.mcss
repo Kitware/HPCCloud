@@ -4,7 +4,7 @@
 
 .titleBar {
     composes: subBar from '../../../style/layout.css';
-    composes: subBar from '../../../style/theme.css';
+    composes: subBar from '../../../style/theme.mcss';
 }
 
 .titleBar > * {
@@ -28,42 +28,30 @@
 }
 
 .formItem {
-    composes: horizontalFlexContainer from '../../../style/layout.css';
-    align-items: center;
-    margin-top: 10px;
-    padding: 0 20px;
+    composes: formItem from '../../../style/theme.mcss';
 }
-
 
 .label {
-    flex: 1;
-    text-align: right;
-    max-width: 175px;
-    padding-right: 20px;
-    font-weight: bold;
-    color: #333;
-}
-
-.form {
-    flex: 1;
+    composes: label from '../../../style/theme.mcss';
 }
 
 .form > * {
     width: 100%;
 }
 
-/* cannot compose this. */
-input.form, .form > input, .form > select{
-    padding: 7px 14px;
-    border-radius: 4px;
-    border: 1px solid lightgrey;
+.form {
+    composes: form from '../../../style/theme.mcss';
 }
 
-/* select does not support padding */
-.form > select {
-    height: 34px;
+textarea.form {
+    height: auto;
 }
 
-.form textarea {
-    resize: none;
+.errorBox {
+    composes: errorBox from '../../../style/theme.mcss';
+    composes: box from '../../Login/style.mcss';
+}
+
+.errorBox a {
+    text-decoration: underline;
 }

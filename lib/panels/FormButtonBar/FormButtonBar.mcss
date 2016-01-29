@@ -6,8 +6,8 @@
 
 .error {
     padding: 7px;
-    composes: errorBox from '../../style/theme.css';
-    composes: borderRadius from '../../style/theme.css';
+    composes: errorBox from '../../style/theme.mcss';
+    composes: borderRadius from '../../style/theme.mcss';
 }
 
 .buttons {

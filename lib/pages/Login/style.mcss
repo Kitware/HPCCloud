@@ -1,5 +1,5 @@
 .loginForm {
-    composes: borderRadius from '../../style/theme.css';
+    composes: borderRadius from '../../style/theme.mcss';
     border: 1px solid grey;
     text-align: center;
     width: 35%;
@@ -9,8 +9,8 @@
 }
 
 .loginInput {
-    composes: borderRadius from '../../style/theme.css';
-    composes: input from '../../style/theme.css';
+    composes: borderRadius from '../../style/theme.mcss';
+    composes: input from '../../style/theme.mcss';
     display: block;
     margin: 3px auto 0;
     width: 90%;
@@ -27,7 +27,7 @@
 }
 
 .subtitle {
-    composes: lightText from '../../style/theme.css';
+    composes: lightText from '../../style/theme.mcss';
     font-size: 1.25em;
     margin: 10px auto;
 }
@@ -47,17 +47,17 @@
     width: 90%;
     margin: 16px auto 0;
     padding: 7px;
-    composes: borderRadius from '../../style/theme.css';
+    composes: borderRadius from '../../style/theme.mcss';
 }
 
 .errorBox {
-    composes: errorBox from '../../style/theme.css';
     composes: box;
+    composes: errorBox from '../../style/theme.mcss';
 }
 
 .warningBox {
-    composes: warningBox from '../../style/theme.css';
     composes: box;
+    composes: warningBox from '../../style/theme.mcss';
 }
 
 @media screen and (max-width: 700px) {
