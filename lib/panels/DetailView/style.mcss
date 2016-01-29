@@ -9,6 +9,7 @@
     width: 15%;
     max-width: 225px;
     min-width: 150px;
+    min-height: calc(100vh - 4em);
 }
 
 .detailList > ul {
