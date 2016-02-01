@@ -3,15 +3,15 @@
     border: 1px solid grey;
     text-align: center;
     width: 35%;
-    padding: 20px 0;
+    padding: 20px 0 15px;
     display: inline-block;
     margin-top: 12px;
 }
 
 .loginInput {
-    composes: borderRadius from '../../style/theme.mcss';
-    composes: input from '../../style/theme.mcss';
-    display: block;
+    /* composes: borderRadius from '../../style/theme.mcss'; */
+    composes: form from '../../style/theme.mcss';
+    /* display: block; */
     margin: 3px auto 0;
     width: 90%;
 }
@@ -20,6 +20,13 @@
     width: 90%;
     background-color: #444;
     color: white;
+    margin: 3px auto;
+    composes: btn from '../../style/theme.mcss';
+}
+
+.loginButton:hover, .loginButton:active, .loginButton:focus {
+    color: white;
+    background-color: #999;
 }
 
 .header {
@@ -46,13 +53,14 @@
 .box {
     width: 90%;
     margin: 16px auto 0;
-    padding: 7px;
-    composes: borderRadius from '../../style/theme.mcss';
+    /* padding: 7px; */
+    /* composes: borderRadius from '../../style/theme.mcss'; */
 }
 
 .errorBox {
     composes: box;
     composes: errorBox from '../../style/theme.mcss';
+
 }
 
 .warningBox {

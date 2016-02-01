@@ -32,18 +32,33 @@
 }
 
 .errorBox {
-    color: white;
-    background-color: #FF3710;
+    /* color: white;
+    background-color: #FF3710; */
+    composes: alert from 'bootstrap/dist/css/bootstrap.css';
+    composes: alert-danger from 'bootstrap/dist/css/bootstrap.css';
+    margin-bottom: 0px;
 }
 
 .warningBox {
-    color: #333;
-    background-color: #FFEF4F;
+    /* color: #333; */
+    /* background-color: #FFEF4F; */
+    composes: alert from 'bootstrap/dist/css/bootstrap.css';
+    composes: alert-warning from 'bootstrap/dist/css/bootstrap.css';
+    margin-bottom: 0px;
 }
 
 .successBox {
-    color: white;
-    background-color: #11bb11;
+    /* color: white;
+    background-color: #11bb11; */
+    composes: alert from 'bootstrap/dist/css/bootstrap.css';
+    composes: alert-success from 'bootstrap/dist/css/bootstrap.css';
+    margin-bottom: 0px;
+}
+
+/* Some bootstrap stuff */
+.btn {
+    composes: btn from 'bootstrap/dist/css/bootstrap.css';
+    composes: btn-default from 'bootstrap/dist/css/bootstrap.css';
 }
 
 /* in case we ever have more varied font weights*/
@@ -58,7 +73,6 @@
 /* forms */
 .formItem {
     composes: horizontalFlexContainer from './layout.css';
-
     align-items: center;
     margin-top: 10px;
     padding: 0 20px;
@@ -79,7 +93,8 @@
 
 .form {
     flex: 1;
-    composes: input;
+    /* composes: input; */
+    composes: form-control from 'bootstrap/dist/css/bootstrap.css';
 }
 
 .formTextarea {
