@@ -1,0 +1,57 @@
+.container, .subcontainer {
+    composes: verticalFlexContainer from 'hpccloud/style/layout.css';
+}
+
+.titleBar {
+    composes: subBar from 'hpccloud/style/layout.css';
+    composes: subBar from 'hpccloud/style/theme.mcss';
+}
+
+.titleBar > * {
+    flex: 1;
+}
+
+.action {
+    composes: isClickable from 'hpccloud/style/states.css';
+}
+
+.left {
+    composes: textLeft from 'hpccloud/style/layout.css';
+}
+
+.center {
+    composes: textCenter from 'hpccloud/style/layout.css';
+}
+
+.right {
+    composes: textRight from 'hpccloud/style/layout.css';
+}
+
+.formItem {
+    composes: formItem from 'hpccloud/style/theme.mcss';
+}
+
+.label {
+    composes: label from 'hpccloud/style/theme.mcss';
+}
+
+.form > * {
+    width: 100%;
+}
+
+.form {
+    composes: form from 'hpccloud/style/theme.mcss';
+}
+
+textarea.form {
+    height: auto;
+}
+
+.errorBox {
+    composes: errorBox from 'hpccloud/style/theme.mcss';
+    composes: box from 'hpccloud/style/Login.mcss';
+}
+
+.errorBox a {
+    text-decoration: underline;
+}

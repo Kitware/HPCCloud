@@ -1,0 +1,13 @@
+.container {
+    composes: verticalFlexContainer from 'hpccloud/style/layout.css';
+}
+
+.even {
+    composes: flexItem  from 'hpccloud/style/layout.css';
+    composes: even      from 'hpccloud/style/theme.mcss';
+}
+
+.odd {
+    composes: flexItem  from 'hpccloud/style/layout.css';
+    composes: odd       from 'hpccloud/style/theme.mcss';
+}

@@ -6,8 +6,8 @@
 }
 
 .topBar {
-    composes: topBar from '../../style/theme.mcss';
-    composes: topBar from '../../style/layout.css';
+    composes: topBar from 'hpccloud/style/theme.mcss';
+    composes: topBar from 'hpccloud/style/layout.css';
 }
 
 .topBarItem {
@@ -20,7 +20,7 @@
 }
 
 .topBarRightItem {
-    composes: topBarItem, textRight from '../../style/layout.css';
+    composes: topBarItem, textRight from 'hpccloud/style/layout.css';
     text-transform: capitalize;
 }
 

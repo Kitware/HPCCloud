@@ -1,4 +1,5 @@
-var webpack = require('webpack');
+var webpack = require('webpack'),
+    path = require('path');
 
 var definePlugin = new webpack.DefinePlugin({
   __BROWSER_BUILD__: true,
@@ -32,6 +33,11 @@ module.exports = {
             { test: /\.js$/, include: /node_modules\/simput/, loader: "babel?presets[]=react,presets[]=es2015" },
             { test: /\.js$/, exclude: /node_modules/, loader: "babel?presets[]=react,presets[]=es2015" },
         ],
+    },
+    resolve: {
+        alias: {
+            hpccloud: path.resolve('./lib/'),
+        },
     },
     postcss: [
         require('autoprefixer')({ browsers: ['last 2 versions'] }),

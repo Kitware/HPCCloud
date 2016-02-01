@@ -1,0 +1,24 @@
+.container {
+    composes: horizontalFlexContainer   from 'hpccloud/style/layout.css';
+    composes: linePadding               from 'hpccloud/style/layout.css';
+}
+
+.container a {
+    text-decoration: none;
+    color: black;
+}
+
+.name {
+    composes: flexItem from 'hpccloud/style/layout.css';
+}
+
+.status {
+    composes: textLeft from 'hpccloud/style/layout.css';
+    flex: none;
+    width: 30px;
+}
+
+.action {
+    composes: textRight from 'hpccloud/style/layout.css';
+    flex: none;
+}

@@ -1,5 +1,5 @@
 .loginForm {
-    composes: borderRadius from '../../style/theme.mcss';
+    composes: borderRadius from 'hpccloud/style/theme.mcss';
     border: 1px solid grey;
     text-align: center;
     width: 35%;
@@ -9,24 +9,25 @@
 }
 
 .loginInput {
-    /* composes: borderRadius from '../../style/theme.mcss'; */
-    composes: form from '../../style/theme.mcss';
+    /* composes: borderRadius from 'hpccloud/style/theme.mcss'; */
+    composes: form from 'hpccloud/style/theme.mcss';
     /* display: block; */
     margin: 3px auto 0;
     width: 90%;
 }
 
 .loginButton {
+    composes: btn from 'hpccloud/style/theme.mcss';
     width: 90%;
     background-color: #444;
     color: white;
     margin: 3px auto;
-    composes: btn from '../../style/theme.mcss';
 }
 
-.loginButton:hover, .loginButton:active, .loginButton:focus {
+.loginButton:hover, .loginButton:active,
+.loginButton:focus, .loginButton[disabled]:hover {
     color: white;
-    background-color: #999;
+    background-color: #555;
 }
 
 .header {
@@ -34,13 +35,13 @@
 }
 
 .subtitle {
-    composes: lightText from '../../style/theme.mcss';
+    composes: lightText from 'hpccloud/style/theme.mcss';
     font-size: 1.25em;
     margin: 10px auto;
 }
 
 .center {
-    composes: textCenter from '../../style/layout.css';
+    composes: textCenter from 'hpccloud/style/layout.css';
 }
 
 .forgotPassword {
@@ -54,18 +55,18 @@
     width: 90%;
     margin: 16px auto 0;
     /* padding: 7px; */
-    /* composes: borderRadius from '../../style/theme.mcss'; */
+    /* composes: borderRadius from 'hpccloud/style/theme.mcss'; */
 }
 
 .errorBox {
     composes: box;
-    composes: errorBox from '../../style/theme.mcss';
+    composes: errorBox from 'hpccloud/style/theme.mcss';
 
 }
 
 .warningBox {
     composes: box;
-    composes: warningBox from '../../style/theme.mcss';
+    composes: warningBox from 'hpccloud/style/theme.mcss';
 }
 
 @media screen and (max-width: 700px) {

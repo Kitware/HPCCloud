@@ -59,7 +59,7 @@
 
 .errorMessage {
     padding: 0 20px;
-    composes: errorBox from '../../style/theme.mcss';
+    composes: errorBox from 'hpccloud/style/theme.mcss';
 }
 
 .buttonLine {

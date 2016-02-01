@@ -1,6 +1,6 @@
 .subBar {
-    composes: topBar from '../../style/layout.css';
-    composes: subBar from '../../style/theme.mcss';
+    composes: topBar from 'hpccloud/style/layout.css';
+    composes: subBar from 'hpccloud/style/theme.mcss';
     align-items: center;
 }
 

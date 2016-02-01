@@ -1,0 +1,54 @@
+.container {
+    composes: verticalFlexContainer from 'hpccloud/style/layout.css';
+}
+
+.subBar {
+    composes: subBar from 'hpccloud/style/layout.css';
+    composes: subBar from 'hpccloud/style/theme.mcss';
+}
+
+.content {
+    composes: horizontalFlexContainer from 'hpccloud/style/layout.css';
+}
+
+.left {
+    composes: textLeft from 'hpccloud/style/layout.css';
+    composes: flexItem from 'hpccloud/style/layout.css';
+}
+
+.left > * {
+    margin-right: 20px;
+}
+
+.center {
+    composes: textCenter from 'hpccloud/style/layout.css';
+    composes: flexItem from 'hpccloud/style/layout.css';
+}
+
+.right {
+    composes: textRight from 'hpccloud/style/layout.css';
+    composes: flexItem from 'hpccloud/style/layout.css';
+}
+
+.sideBarVisible {
+    flex: none;
+    border-right: 1px solid black;
+}
+
+.sideBarHidden {
+    display: none;
+}
+
+.stepContent {
+    flex: 3;
+    padding: 0;
+}
+
+.action {
+    composes: isClickable from 'hpccloud/style/states.css';
+}
+
+.disabledAction {
+    composes: isClickable from 'hpccloud/style/states.css';
+    composes: disabled    from 'hpccloud/style/theme.mcss';
+}

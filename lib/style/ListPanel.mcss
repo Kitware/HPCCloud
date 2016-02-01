@@ -1,0 +1,38 @@
+.container {
+    composes: verticalFlexContainer from 'hpccloud/style/layout.css';
+}
+
+.actionBar {
+    composes: subBar from 'hpccloud/style/layout.css';
+    composes: subBar from 'hpccloud/style/theme.mcss';
+}
+
+.actionBarLeft {
+    composes: textLeft from 'hpccloud/style/layout.css';
+    composes: flexItem from 'hpccloud/style/layout.css';
+}
+
+.actionBarLeft > * {
+    margin-right: 20px;
+}
+
+.actionBarCenter {
+    composes: textCenter from 'hpccloud/style/layout.css';
+    flex: none;
+}
+
+.actionBarRight {
+    composes: textRight from 'hpccloud/style/layout.css';
+    composes: flexItem from 'hpccloud/style/layout.css';
+}
+
+.filter {
+    composes: borderRadius from 'hpccloud/style/theme.mcss';
+    border: 1px solid #aaa;
+    padding: 2px 10px;
+}
+
+.content {
+    composes: flexItem from 'hpccloud/style/layout.css';
+}
+

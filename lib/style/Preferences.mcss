@@ -4,16 +4,16 @@
 }
 
 .center {
-    composes: textCenter from '../../style/layout.css';
+    composes: textCenter from 'hpccloud/style/layout.css';
 }
 
 .link {
     display: inline-block;
     padding: 60px 30px;
-    width: 140px;
+    width: 90px;
     text-align: center;
     border: 1px solid lightgrey;
-    margin: 5px 5px;
+    margin: 5px;
     transition: background-color 2s linear;
 }
 
@@ -22,8 +22,8 @@
 }
 
 .preferencesToolbar {
-    composes: topBar from '../../style/layout.css';
-    composes: subBar from '../../style/theme.mcss';
+    composes: topBar from 'hpccloud/style/layout.css';
+    composes: subBar from 'hpccloud/style/theme.mcss';
     align-items: center;
 }
 
@@ -60,9 +60,9 @@
 }
 
 .preferenceFormSubmitLine {
-    composes: textRight from '../../style/layout.css';
+    composes: textRight from 'hpccloud/style/layout.css';
 }
 
 .fullWidth {
-    composes: fullWidth from '../../style/layout.css';
+    composes: fullWidth from 'hpccloud/style/layout.css';
 }
