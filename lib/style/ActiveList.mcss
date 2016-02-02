@@ -1,0 +1,34 @@
+.list {
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: scroll;
+}
+
+.selectable {
+    box-sizing: border-box;
+    color: #888;
+    cursor: pointer;
+    margin: 0;
+    overflow: hidden;
+    padding: 6px 15px;
+    text-overflow: ellipsis;
+    transition: all 0.35s ease;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.unselectable {
+    composes: selectable;
+
+    color: #555;
+}
+
+.active {
+    composes: selectable;
+
+    background-color: #F0F0F0;
+    color: #111;
+    font-weight: bold;
+}
