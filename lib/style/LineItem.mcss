@@ -1,9 +1,9 @@
-.container {
+.lineItemContainer {
     padding: 15px 10px;
 }
 
 /* Some font families have an x-height which shifts the line-height
  * this fixes that, <Link> turns into <a> */
-.container > a {
+.lineItemContainer > a {
     line-height: 1em;
 }

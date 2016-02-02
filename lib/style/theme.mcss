@@ -1,9 +1,11 @@
 .topBar {
+    composes: topBar from 'HPCCloudStyle/layout.css';
     background: #222;
     color: #fff;
 }
 
 .subBar {
+    composes: subBar from 'HPCCloudStyle/layout.css';
     background: #ccc;
     color: #222;
 }
@@ -18,44 +20,31 @@
 
 .disabled {
     color: #090909;
+    cursor: not-allowed;
 }
 
 .borderRadius {
     border-radius: 4px;
 }
 
-.input {
-    composes: borderRadius;
-    padding: 7px 14px;
-    border: 1px solid lightgrey;
-    height: 34px;
-}
-
 .errorBox {
-    /* color: white;
-    background-color: #FF3710; */
     composes: alert from 'bootstrap/dist/css/bootstrap.css';
     composes: alert-danger from 'bootstrap/dist/css/bootstrap.css';
     margin-bottom: 0px;
 }
 
 .warningBox {
-    /* color: #333; */
-    /* background-color: #FFEF4F; */
     composes: alert from 'bootstrap/dist/css/bootstrap.css';
     composes: alert-warning from 'bootstrap/dist/css/bootstrap.css';
     margin-bottom: 0px;
 }
 
 .successBox {
-    /* color: white;
-    background-color: #11bb11; */
     composes: alert from 'bootstrap/dist/css/bootstrap.css';
     composes: alert-success from 'bootstrap/dist/css/bootstrap.css';
     margin-bottom: 0px;
 }
 
-/* Some bootstrap stuff */
 .btn {
     composes: btn from 'bootstrap/dist/css/bootstrap.css';
     composes: btn-default from 'bootstrap/dist/css/bootstrap.css';
@@ -70,33 +59,3 @@
     font-weight: 300;
 }
 
-/* forms */
-.formItem {
-    composes: horizontalFlexContainer from './layout.css';
-    align-items: center;
-    margin-top: 10px;
-    padding: 0 20px;
-}
-
-.label {
-    flex: 1;
-    text-align: right;
-    max-width: 175px;
-    padding-right: 20px;
-    font-weight: bold;
-    color: #333;
-}
-
-.form > * {
-    width: 100%;
-}
-
-.form {
-    flex: 1;
-    /* composes: input; */
-    composes: form-control from 'bootstrap/dist/css/bootstrap.css';
-}
-
-.formTextarea {
-    resize: none;
-}

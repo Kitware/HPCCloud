@@ -1,15 +1,6 @@
-.container {
-    composes: verticalFlexContainer from 'hpccloud/style/layout.css';
-}
-
-.actionBar {
-    composes: subBar from 'hpccloud/style/layout.css';
-    composes: subBar from 'hpccloud/style/theme.mcss';
-}
-
 .actionBarLeft {
-    composes: textLeft from 'hpccloud/style/layout.css';
-    composes: flexItem from 'hpccloud/style/layout.css';
+    composes: textLeft from 'HPCCloudStyle/layout.css';
+    composes: flexItem from 'HPCCloudStyle/layout.css';
 }
 
 .actionBarLeft > * {
@@ -17,22 +8,22 @@
 }
 
 .actionBarCenter {
-    composes: textCenter from 'hpccloud/style/layout.css';
+    composes: textCenter from 'HPCCloudStyle/layout.css';
     flex: none;
 }
 
 .actionBarRight {
-    composes: textRight from 'hpccloud/style/layout.css';
-    composes: flexItem from 'hpccloud/style/layout.css';
+    composes: textRight from 'HPCCloudStyle/layout.css';
+    composes: flexItem from 'HPCCloudStyle/layout.css';
 }
 
 .filter {
-    composes: borderRadius from 'hpccloud/style/theme.mcss';
+    composes: borderRadius from 'HPCCloudStyle/theme.mcss';
     border: 1px solid #aaa;
     padding: 2px 10px;
 }
 
 .content {
-    composes: flexItem from 'hpccloud/style/layout.css';
+    composes: flexItem from 'HPCCloudStyle/layout.css';
 }
 

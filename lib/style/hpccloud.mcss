@@ -1,29 +1,8 @@
-.container {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-}
-
-.topBar {
-    composes: topBar from 'hpccloud/style/theme.mcss';
-    composes: topBar from 'hpccloud/style/layout.css';
-}
-
-.topBarItem {
-    flex: 1;
-}
-
 .topBarItemBusy {
-    composes: topBarItem;
     color: lightblue;
 }
 
 .topBarRightItem {
-    composes: topBarItem, textRight from 'hpccloud/style/layout.css';
+    composes: topBarItem, textRight from 'HPCCloudStyle/layout.css';
     text-transform: capitalize;
-}
-
-.content {
-    flex: 1;
 }

@@ -1,19 +1,6 @@
-.container {
-    composes: verticalFlexContainer from 'hpccloud/style/layout.css';
-}
-
-.subBar {
-    composes: subBar from 'hpccloud/style/layout.css';
-    composes: subBar from 'hpccloud/style/theme.mcss';
-}
-
-.content {
-    composes: horizontalFlexContainer from 'hpccloud/style/layout.css';
-}
-
 .left {
-    composes: textLeft from 'hpccloud/style/layout.css';
-    composes: flexItem from 'hpccloud/style/layout.css';
+    composes: textLeft from 'HPCCloudStyle/layout.css';
+    composes: flexItem from 'HPCCloudStyle/layout.css';
 }
 
 .left > * {
@@ -21,13 +8,13 @@
 }
 
 .center {
-    composes: textCenter from 'hpccloud/style/layout.css';
-    composes: flexItem from 'hpccloud/style/layout.css';
+    composes: textCenter from 'HPCCloudStyle/layout.css';
+    composes: flexItem from 'HPCCloudStyle/layout.css';
 }
 
 .right {
-    composes: textRight from 'hpccloud/style/layout.css';
-    composes: flexItem from 'hpccloud/style/layout.css';
+    composes: textRight from 'HPCCloudStyle/layout.css';
+    composes: flexItem from 'HPCCloudStyle/layout.css';
 }
 
 .sideBarVisible {
@@ -44,11 +31,7 @@
     padding: 0;
 }
 
-.action {
-    composes: isClickable from 'hpccloud/style/states.css';
-}
-
 .disabledAction {
-    composes: isClickable from 'hpccloud/style/states.css';
-    composes: disabled    from 'hpccloud/style/theme.mcss';
+    composes: isClickable from 'HPCCloudStyle/states.css';
+    composes: disabled    from 'HPCCloudStyle/theme.mcss';
 }

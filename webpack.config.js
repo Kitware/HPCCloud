@@ -25,8 +25,9 @@ module.exports = {
             { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=60000&mimetype=application/font-woff" },
             { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=60000" },
             { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192'},
-            { test: /\.css$/, loader: "style!css!postcss" },
-            { test: /\.mcss$/,loader: 'style!css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss' },
+            { test: /\.css$/, include: /node_modules/, loader: "style!css!postcss"},
+            { test: /\.css$/, exclude: /node_modules/, loader: 'style!css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss'},
+            { test: /\.mcss$/,loader: 'style!css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss'},
             { test: /\.json$/, loader: 'json-loader' },
             { test: /\.html$/, loader: 'html-loader' },
             { test: /\.js$/, include: /node_modules\/tonic-/, loader: "babel?presets[]=react,presets[]=es2015" },
@@ -36,7 +37,7 @@ module.exports = {
     },
     resolve: {
         alias: {
-            hpccloud: path.resolve('./lib/'),
+            HPCCloudStyle: path.resolve('./lib/style'),
         },
     },
     postcss: [

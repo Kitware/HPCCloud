@@ -24,6 +24,20 @@
     align-items: stretch;
 }
 
+.rightRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.rightRowReverse {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    align-items: center;
+}
+
 .flexItem {
     flex: 1;
 }
@@ -60,6 +74,7 @@
     composes: horizontalPadding;
 
     justify-content: space-between;
+    align-items: center;
     flex: 1;
 
     height: 2em;

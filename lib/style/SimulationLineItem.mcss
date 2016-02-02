@@ -1,6 +1,6 @@
 .container {
-    composes: horizontalFlexContainer   from 'hpccloud/style/layout.css';
-    composes: linePadding               from 'hpccloud/style/layout.css';
+    composes: horizontalFlexContainer   from 'HPCCloudStyle/layout.css';
+    composes: linePadding               from 'HPCCloudStyle/layout.css';
 }
 
 .container a {
@@ -8,17 +8,13 @@
     color: black;
 }
 
-.name {
-    composes: flexItem from 'hpccloud/style/layout.css';
-}
-
 .status {
-    composes: textLeft from 'hpccloud/style/layout.css';
+    composes: textLeft from 'HPCCloudStyle/layout.css';
     flex: none;
     width: 30px;
 }
 
 .action {
-    composes: textRight from 'hpccloud/style/layout.css';
+    composes: textRight from 'HPCCloudStyle/layout.css';
     flex: none;
 }

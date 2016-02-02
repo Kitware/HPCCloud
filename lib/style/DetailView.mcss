@@ -32,9 +32,9 @@
 }
 
 .active {
+    composes: boldText from 'HPCCloudStyle/theme.mcss';
     background-color: #F0F0F0;
-    color: #111; /* compose me */
-    font-weight: bold;
+    color: #111;
 }
 
 .detailList > button {
@@ -58,8 +58,8 @@
 }
 
 .errorMessage {
+    composes: errorBox from 'HPCCloudStyle/theme.mcss';
     padding: 0 20px;
-    composes: errorBox from 'hpccloud/style/theme.mcss';
 }
 
 .buttonLine {
