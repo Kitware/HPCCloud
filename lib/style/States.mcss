@@ -1,0 +1,17 @@
+.isHidden {
+    display: none;
+}
+
+.isClickable {
+    cursor: pointer;
+    transition: color .25s ease;
+}
+
+.isClickable:hover {
+    color: #18e;
+}
+
+.isBusy {
+    color: #18e;
+    transition: color .25s ease;
+}

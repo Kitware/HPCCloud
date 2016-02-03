@@ -1,0 +1,39 @@
+.container {
+    composes: subBar from 'HPCCloudStyle/Layout.mcss';
+    background: #ccc;
+    color: #222;
+}
+
+.breadcrumb {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.breadcrumb i {
+    padding: 7px 17px;
+}
+
+.actions {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row-reverse;
+    align-items: center;
+}
+
+.actions > input {
+    border-radius: 1em;
+    padding: 2px 15px;
+    border: 1px solid #ccc;
+}
+
+.actionButton {
+    composes: isClickable from 'HPCCloudStyle/States.mcss';
+    padding: 7px 17px;
+}
+
+.title {
+    flex: 1;
+    text-align: center;
+}

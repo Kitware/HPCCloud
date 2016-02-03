@@ -1,0 +1,54 @@
+.topBar {
+    composes: topBar from 'HPCCloudStyle/Layout.mcss';
+    background: #222;
+    color: #fff;
+}
+
+.even {
+    background: #fff;
+}
+
+.odd {
+    background: #eee;
+}
+
+.disabled {
+    color: #090909;
+    cursor: not-allowed;
+}
+
+.borderRadius {
+    border-radius: 4px;
+}
+
+.errorBox {
+    composes: alert from 'bootstrap/dist/css/bootstrap.css';
+    composes: alert-danger from 'bootstrap/dist/css/bootstrap.css';
+    margin-bottom: 0px;
+}
+
+.warningBox {
+    composes: alert from 'bootstrap/dist/css/bootstrap.css';
+    composes: alert-warning from 'bootstrap/dist/css/bootstrap.css';
+    margin-bottom: 0px;
+}
+
+.successBox {
+    composes: alert from 'bootstrap/dist/css/bootstrap.css';
+    composes: alert-success from 'bootstrap/dist/css/bootstrap.css';
+    margin-bottom: 0px;
+}
+
+/* in case we ever have more varied font weights*/
+.boldText {
+    font-weight: bold;
+}
+
+.lightText {
+    font-weight: 300;
+}
+
+.capitalizeRightText {
+    text-align: right;
+    text-transform: capitalize;
+}

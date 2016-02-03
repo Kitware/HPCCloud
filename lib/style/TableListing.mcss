@@ -1,0 +1,25 @@
+.container {
+    composes: verticalFlexContainer from './Layout.mcss';
+}
+
+.table {
+    composes: table         from 'bootstrap/dist/css/bootstrap.css';
+    composes: table-striped from 'bootstrap/dist/css/bootstrap.css';
+}
+
+.table > tbody > tr > td {
+    cursor: pointer;
+    transition: color .25s ease;
+}
+
+.table > tbody > tr > td:hover {
+    color: #18e;
+}
+
+.table > tbody > tr > td:first-child {
+    text-align: center;
+}
+
+.table > tbody > tr > td:last-child {
+    text-align: center;
+}

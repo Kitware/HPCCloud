@@ -1,0 +1,37 @@
+.rootContainer {
+    composes: verticalFlexContainer from './Layout.mcss';
+    flex: 1;
+}
+
+.container {
+    composes: horizontalFlexContainer from './Layout.mcss';
+}
+
+.menu {
+    height: calc(100vh - 4em - 1px);
+    min-width: 150px;
+    max-width: 300px;
+    width: 10%;
+    border-right: solid 1px #ccc;
+    overflow-y: scroll;
+}
+
+.menu20 {
+    composes: menu;
+    min-width: 250px;
+    max-width: 400px;
+    width: 20%;
+}
+
+.menu30 {
+    composes: menu;
+    min-width: 350px;
+    max-width: 500px;
+    width: 30%;
+}
+
+.content {
+    flex: 1;
+    height: calc(100vh - 4em - 1px);
+    overflow-y: scroll;
+}

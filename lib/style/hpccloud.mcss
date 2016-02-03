@@ -1,8 +1,0 @@
-.topBarItemBusy {
-    color: lightblue;
-}
-
-.topBarRightItem {
-    composes: topBarItem, textRight from 'HPCCloudStyle/layout.css';
-    text-transform: capitalize;
-}

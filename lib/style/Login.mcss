@@ -1,5 +1,5 @@
 .loginForm {
-    composes: borderRadius from 'HPCCloudStyle/theme.mcss';
+    composes: borderRadius from 'HPCCloudStyle/Theme.mcss';
     border: 1px solid grey;
     text-align: center;
     width: 35%;
@@ -14,13 +14,13 @@
 
 .loginInput {
     composes: loginWidth;
-    composes: input from 'HPCCloudStyle/form.css';
+    composes: input from 'HPCCloudStyle/ItemEditor.mcss';
     margin: 3px auto 0;
 }
 
 .loginButton {
     composes: loginWidth;
-    composes: btn from 'HPCCloudStyle/theme.mcss';
+    composes: button from 'HPCCloudStyle/ItemEditor.mcss';
     background-color: #444;
     color: white;
     margin: 3px auto;
@@ -37,7 +37,7 @@
 }
 
 .subtitle {
-    composes: lightText from 'HPCCloudStyle/theme.mcss';
+    composes: lightText from 'HPCCloudStyle/Theme.mcss';
     font-size: 1.25em;
     margin: 10px auto;
 }
@@ -56,13 +56,13 @@
 
 .errorBox {
     composes: box;
-    composes: errorBox from 'HPCCloudStyle/theme.mcss';
+    composes: errorBox from 'HPCCloudStyle/Theme.mcss';
 
 }
 
 .warningBox {
     composes: box;
-    composes: warningBox from 'HPCCloudStyle/theme.mcss';
+    composes: warningBox from 'HPCCloudStyle/Theme.mcss';
 }
 
 @media screen and (max-width: 700px) {

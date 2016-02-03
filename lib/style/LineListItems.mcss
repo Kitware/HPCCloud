@@ -1,9 +1,0 @@
-.even {
-    composes: flexItem  from 'HPCCloudStyle/layout.css';
-    composes: even      from 'HPCCloudStyle/theme.mcss';
-}
-
-.odd {
-    composes: flexItem  from 'HPCCloudStyle/layout.css';
-    composes: odd       from 'HPCCloudStyle/theme.mcss';
-}
