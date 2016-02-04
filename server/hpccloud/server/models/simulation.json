@@ -11,6 +11,9 @@
         "description": {
             "type": "string"
         },
+        "active": {
+            "type": "string"
+        },
         "steps": {
             "type": "object",
             "patternProperties": {

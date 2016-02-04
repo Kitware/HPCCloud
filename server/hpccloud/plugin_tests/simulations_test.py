@@ -524,4 +524,16 @@ class SimulationTestCase(TestCase):
         step3_meta = json.loads(zip.read('project1/testing/output/step3/meta.json').decode('utf8'))
         self.assertEqual(step3_meta, test_meta)
 
+    def test_set_active_step(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim1')
 
+        # Try invalid stepName
+        r = self.request('/simulations/%s/steps/bogus/active' % str(sim['_id']), method='PUT',
+                         user=self._another_user)
+        self.assertStatus(r, 400)
+
+        r = self.request('/simulations/%s/steps/step1/active' % str(sim['_id']), method='PUT',
+                         user=self._another_user)
+        self.assertStatus(r, 200)
+        sim = r.json
