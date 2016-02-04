@@ -21,8 +21,8 @@
 
 .unselectable {
     composes: selectable;
-
-    color: #555;
+    cursor: not-allowed;
+    color: #ddd;
 }
 
 .active {
