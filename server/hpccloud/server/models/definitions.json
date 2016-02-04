@@ -15,7 +15,7 @@
         "additionalProperties": false,
         "properties": {
             "type": {
-                "enum": ["input", "output"]
+                "enum": ["input", "output", "information"]
             },
             "status": {
                 "enum": ["created", "complete"]
