@@ -43,6 +43,8 @@ class Simulations(Resource):
         self.route('GET', (':id', 'steps', ':stepName'), self.get_step)
         self.route('PATCH', (':id', 'steps', ':stepName'), self.update_step)
         self.route('GET', (':id', 'download'), self.download)
+        self.route('PUT', (':id', 'steps', ':stepName', 'active'),
+                   self.set_active)
 
         self._model = self.model('simulation', 'hpccloud')
 
@@ -88,7 +90,7 @@ class Simulations(Resource):
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def update(self, simulation, params):
         immutable = ['projectId', 'folderId', 'access', 'userId', '_id',
-                     'steps', 'updated', 'created']
+                     'steps', 'updated', 'created', 'active']
         updates = getBodyJson()
 
         for p in updates:
@@ -213,3 +215,21 @@ class Simulations(Resource):
             yield zip.footer()
 
         return stream
+
+    @describeRoute(
+        Description('Set particular step in the simulation as the active step')
+        .param('id', 'The simulation id.',
+               dataType='string', required=True, paramType='path')
+        .param('stepName', 'The simulation step name.',
+               dataType='string', required=True, paramType='path')
+    )
+    @access.user
+    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
+    def set_active(self, simulation, stepName, params):
+
+        if stepName not in simulation.get('steps', {}):
+            raise RestException('Invalid step name', 400)
+
+        simulation['active'] = stepName
+
+        return self._model.save(simulation)
