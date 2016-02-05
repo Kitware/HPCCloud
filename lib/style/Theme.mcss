@@ -39,6 +39,16 @@
     margin-bottom: 0px;
 }
 
+.progressBar {
+    position: absolute;
+    width: 0px;
+    height: 2px;
+    transition: width 1s linear, opacity 1.5s linear;
+    background-color: #18e;
+    left: 0;
+    top: 0;
+}
+
 /* in case we ever have more varied font weights*/
 .boldText {
     font-weight: bold;
