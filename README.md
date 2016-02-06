@@ -8,7 +8,7 @@ environment and resources on which you can run those simulations.
 ## Installation
 
 ```
-$ npm install -g hpc-cloud
+$ npm install
 ```
 
 After installing the package you will get one executable **HPCCloud** with
@@ -45,9 +45,20 @@ Using just the repository:
 ```sh
 $ git clone https://github.com/Kitware/HPCCloud.git
 $ cd HPCCloud
-$ npm run dev:local
 $ npm install
 ```
+
+## Trouble shooting
+
+$ vagrant ssh
+$ sudo -iu hpccloud
+
+### Fixing celery Girder URL
+
+$ vi /opt/hpccloud/cumulus/cumulus/conf/config.json
+  +-> Fix host to be localhost
+  +-> baseUrl: "http://localhost:8080/api/v1",
+$ sudo service celeryd restart
 
 ## Documentation
 

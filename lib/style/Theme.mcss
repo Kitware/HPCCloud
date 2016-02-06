@@ -1,15 +1,36 @@
+.colorLightGrey {
+    color: #eee;
+}
+.colorGrey {
+    color: #18e;
+}
+.colorGreen {
+    color: #4ecdc4;
+}
+.colorLightGreen {
+    color: #c8f363;
+}
+.colorLightRed {
+    color: #fe6b6b;
+}
+.colorRed {
+    color: #c54d57;
+}
+
 .topBar {
     composes: topBar from 'HPCCloudStyle/Layout.mcss';
     background: #222;
-    color: #fff;
+    color: #dedede;
 }
 
-.even {
-    background: #fff;
+.logout {
+    margin-left: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
-.odd {
-    background: #eee;
+.topBar a:hover, .topBar a:active {
+    color: #4ecdc4;
 }
 
 .disabled {
@@ -44,7 +65,7 @@
     width: 0px;
     height: 2px;
     transition: width 1s linear, opacity 1.5s linear;
-    background-color: #18e;
+    background-color: #4ecdc4;
     left: 0;
     top: 0;
 }

@@ -4,7 +4,12 @@ a, a:visited {
     transition: color .25s ease;
 }
 
-a:hover, a:active {
+a:hover {
+    color: #18e;
+    text-decoration: none;
+}
+
+a:active {
     color: #18e;
     text-decoration: none;
 }
@@ -31,6 +36,11 @@ input[type=submit] {
 textarea:focus, input:focus {
     outline-width: 0px;
     border-color: #888;
+}
+
+:global
+.lmr {
+    margin-right: 5px;
 }
 
 :global

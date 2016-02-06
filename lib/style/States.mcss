@@ -11,7 +11,8 @@
     color: #18e;
 }
 
+
 .isBusy {
-    color: #18e;
+    color: #4ecdc4;
     transition: color .25s ease;
 }
