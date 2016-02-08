@@ -14,6 +14,15 @@
         "active": {
             "type": "string"
         },
+        "disabled": {
+            "type": "array",
+            "item": {
+                "type": "string"
+            }
+        },
+        "status": {
+            "enum": ["editing", "running", "data"]
+        },
         "steps": {
             "type": "object",
             "patternProperties": {

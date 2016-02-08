@@ -528,12 +528,102 @@ class SimulationTestCase(TestCase):
         sim = self._create_simulation(
             self._project1, self._another_user, 'sim1')
 
+        body = {
+            'active': 'bogus'
+        }
+        json_body = json.dumps(body)
+
         # Try invalid stepName
-        r = self.request('/simulations/%s/steps/bogus/active' % str(sim['_id']), method='PUT',
-                         user=self._another_user)
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         user=self._another_user,  type='application/json',
+                         body=json_body)
         self.assertStatus(r, 400)
 
-        r = self.request('/simulations/%s/steps/step1/active' % str(sim['_id']), method='PUT',
-                         user=self._another_user)
+        body = {
+            'active': 'step1'
+        }
+        json_body = json.dumps(body)
+
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         user=self._another_user,  type='application/json',
+                         body=json_body)
         self.assertStatus(r, 200)
         sim = r.json
+
+    def test_disabled_step(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim1')
+
+        body = {
+            'disabled': 'bogus'
+        }
+        json_body = json.dumps(body)
+
+        # Try invalid type
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         user=self._another_user,  type='application/json',
+                         body=json_body)
+        self.assertStatus(r, 400)
+
+        # Try invalid stepName
+        body = {
+            'disabled': ['bogus']
+        }
+        json_body = json.dumps(body)
+
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         user=self._another_user,  type='application/json',
+                         body=json_body)
+        self.assertStatus(r, 400)
+
+        body = {
+            'disabled': ['step1']
+        }
+        json_body = json.dumps(body)
+
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         user=self._another_user,  type='application/json',
+                         body=json_body)
+        self.assertStatus(r, 200)
+        sim = r.json
+
+    def test_update_status(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim1')
+
+        body = {
+            'status': 'bogus'
+        }
+        json_body = json.dumps(body)
+
+        # Try invalid status
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         user=self._another_user,  type='application/json',
+                         body=json_body)
+        self.assertStatus(r, 400)
+
+        body = {
+            'status': 'data'
+        }
+        json_body = json.dumps(body)
+
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         user=self._another_user,  type='application/json',
+                         body=json_body)
+        self.assertStatus(r, 200)
+        sim = r.json
+
+    def test_update_step_view(self):
+        sim = self._create_simulation(
+            self._project1, self._another_user, 'sim1')
+
+        body = {
+            'view': 'bogus'
+        }
+        json_body = json.dumps(body)
+
+        # Try invalid status
+        r = self.request('/simulations/%s/steps/step1' % str(sim['_id']), method='PATCH',
+                         user=self._another_user,  type='application/json',
+                         body=json_body)
+        self.assertStatusOk(r)
