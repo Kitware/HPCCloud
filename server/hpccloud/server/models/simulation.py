@@ -49,6 +49,17 @@ class Simulation(AccessControlledModel):
         except jsonschema.ValidationError as ve:
             raise ValidationException(ve.message)
 
+        if 'active' in simulation and \
+                simulation['active'] not in simulation.get('steps', {}):
+            raise ValidationException('Invalid step name', 'active')
+
+        if 'disabled' in simulation:
+            steps = simulation.get('steps', {})
+            for step in simulation['disabled']:
+                if step not in steps:
+                    raise ValidationException('Invalid step name \'%s\'.' %
+                                              step, 'disabled')
+
         # Ensure unique name for the simulation within the project
         q = {
             'name': simulation['name'],
@@ -138,7 +149,8 @@ class Simulation(AccessControlledModel):
         self.remove(simulation)
         self.model('folder').remove(simulation_folder)
 
-    def update(self, user, simulation, name, description=None):
+    def update(self, user, simulation, name, description=None, active=None,
+               disabled=None, view=None, status=None):
         """
         Update a simulation.
 
@@ -151,6 +163,18 @@ class Simulation(AccessControlledModel):
 
         if description:
             simulation['description'] = description
+
+        if active:
+            simulation['active'] = active
+
+        if disabled:
+            simulation['disabled'] = disabled
+
+        if view:
+            simulation['view'] = view
+
+        if status:
+            simulation['status'] = status
 
         simulation['updated'] = datetime.datetime.utcnow()
 

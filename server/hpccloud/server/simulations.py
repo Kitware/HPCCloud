@@ -43,8 +43,6 @@ class Simulations(Resource):
         self.route('GET', (':id', 'steps', ':stepName'), self.get_step)
         self.route('PATCH', (':id', 'steps', ':stepName'), self.update_step)
         self.route('GET', (':id', 'download'), self.download)
-        self.route('PUT', (':id', 'steps', ':stepName', 'active'),
-                   self.set_active)
 
         self._model = self.model('simulation', 'hpccloud')
 
@@ -76,6 +74,10 @@ class Simulations(Resource):
             'name': {'type': 'string', 'description': 'The simulation name.'},
             'description': {'type': 'string', 'description': 'The description '
                             'of the simulation.'},
+            'active': {'type': 'string', 'description': 'The name of the'
+                       'active step.'},
+            'disabled': {'type': 'array', 'description': 'List of disabled '
+                         'steps.'},
         }
     }, 'simulations')
 
@@ -90,7 +92,7 @@ class Simulations(Resource):
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def update(self, simulation, params):
         immutable = ['projectId', 'folderId', 'access', 'userId', '_id',
-                     'steps', 'updated', 'created', 'active']
+                     'steps', 'updated', 'created']
         updates = getBodyJson()
 
         for p in updates:
@@ -100,9 +102,14 @@ class Simulations(Resource):
         user = getCurrentUser()
         name = updates.get('name')
         description = updates.get('description')
+        active = updates.get('active')
+        disabled = updates.get('disabled')
+        view = updates.get('view')
+        status = updates.get('status')
 
         return self._model.update(user, simulation, name=name,
-                                  description=description)
+                                  description=description, active=active,
+                                  disabled=disabled, view=view, status=status)
 
     addModel('CloneParams', {
         'id': 'CloneParams',
