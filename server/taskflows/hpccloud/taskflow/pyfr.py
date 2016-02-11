@@ -20,20 +20,19 @@ import tempfile
 import json
 import os
 import subprocess
+import sys
+
 import cumulus.taskflow
 from cumulus.starcluster.tasks.job import download_job_input_folders, submit_job
 from cumulus.starcluster.tasks.job import monitor_job, upload_job_output_to_folder
+from cumulus.starcluster.tasks.job import terminate_job
 
 from girder.utility.model_importer import ModelImporter
 from girder.api.rest import getCurrentUser
 from girder.constants import AccessType
-from girder_client import GirderClient
+from girder_client import GirderClient, HttpError
 
 class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
-    """
-    This is a simple linear taskflow, chain together 6 task. Notice that
-    simple_task3 "fans" out the flow, by scheduling 10 copies of simple_task4.
-    """
     def start(self, *args, **kwargs):
 
         # Load the cluster
@@ -42,17 +41,29 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
         cluster = model.load(kwargs['cluster']['_id'],
                              user=user, level=AccessType.ADMIN)
         cluster = model.filter(cluster, user, passphrase=False)
-        print cluster
         kwargs['cluster'] = cluster
 
         super(PyFrTaskFlow, self).start(
             import_mesh.s(self,*args, **kwargs))
 
     def terminate(self):
-        pass
+        super(PyFrTaskFlow, self).start(
+            pyfr_terminate.s())
 
     def delete(self):
-        pass
+        for job in self.get('jobs'):
+            job_id = job['_id']
+            client = _create_girder_client(
+            self.girder_api_url, self.girder_token)
+            client.delete('jobs/%s' % job_id)
+
+            try:
+                client.get('jobs/%s' % job_id)
+            except HttpError as e:
+                if e.status != 404:
+                    self.logger.error('Unable to delete job: %s' % job_id)
+
+
 
 def _create_girder_client(girder_api_url, girder_token):
     client = GirderClient(apiUrl=girder_api_url)
@@ -60,7 +71,7 @@ def _create_girder_client(girder_api_url, girder_token):
 
     return client
 
-def _import_mesh(input_path, output_path, extn):
+def _import_mesh(logger, input_path, output_path, extn):
     #
     # HACK! In the future we should call pyfr directly, however, we need to
     # support python3 first!
@@ -69,8 +80,20 @@ def _import_mesh(input_path, output_path, extn):
         'pyfr', 'import', '-t', 'gmsh', input_path, output_path
     ]
 
-    subprocess.check_call(command)
+    try:
+        subprocess.check_call(command)
+    except subprocess.CalledProcessError as ex:
+        logger.exception(ex, ex.output)
+        print >> sys.stderr, ex.output
+        raise
 
+@cumulus.taskflow.task
+def pyfr_terminate(task):
+    cluster = task.taskflow['cluster']
+    for job in task.taskflow.get('jobs'):
+        terminate_job(
+            cluster, job, log_write_url=None,
+            girder_token=task.taskflow.girder_token)
 
 @cumulus.taskflow.task
 def import_mesh(task, *args, **kwargs):
@@ -94,7 +117,7 @@ def import_mesh(task, *args, **kwargs):
         file = client.getResource('file', mesh_file_id)
         extn = file['exts'][0]
         task.logger.info('Converting mesh to pyfrm format.')
-        _import_mesh(input_path, output_path, extn)
+        _import_mesh(task.taskflow.logger, input_path, output_path, extn)
         task.logger.info('Conversion complete.')
 
         task.logger.info('Uploading converted mesh.')
@@ -137,19 +160,18 @@ def create_job(task, *args, **kwargs):
 
     job = client.post('jobs', data=json.dumps(body))
 
+    task.taskflow.set('jobs', [job])
+
     submit.delay(job, *args, **kwargs)
 
 @cumulus.taskflow.task
 def submit(task, job, *args, **kwargs):
     task.taskflow.logger.info('Submitting job to cluster.')
     girder_token = task.taskflow.girder_token
-    girder_api_url = task.taskflow.girder_api_url
     cluster = kwargs.pop('cluster')
-
-    client = _create_girder_client(girder_api_url, girder_token)
+    task.taskflow.set('cluster', cluster)
 
     # Now download and submit job to the cluster
-
     task.logger.info('Uploading input files to cluster.')
     download_job_input_folders(cluster, job, log_write_url=None,
                         girder_token=girder_token, submit=False)
@@ -183,8 +205,6 @@ def monitor_pyfr_job(task, cluster, job, *args, **kwargs):
 def upload_output(task, cluster, job, *args, **kwargs):
     task.taskflow.logger.info('Uploading results from cluster')
     output_folder_id = kwargs['output']['folderId']
-
-    print cluster
 
     job['output'] = [{
         'folderId': output_folder_id,
