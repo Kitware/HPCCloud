@@ -89,7 +89,7 @@ def _create_girder_client(girder_api_url, girder_token):
     return client
 
 def validate_args(kwargs):
-    required = ['dataDir', 'config.paraview.installDir', 'sessionKey']
+    required = ['dataDir', 'cluster.config.paraview.installDir', 'sessionKey']
 
     for r in required:
         if not parse(r).find(kwargs):
