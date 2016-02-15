@@ -20,7 +20,7 @@ import tempfile
 import json
 import os
 import subprocess
-import sys
+import shutil
 
 import cumulus.taskflow
 from cumulus.starcluster.tasks.job import download_job_input_folders, submit_job
@@ -100,10 +100,20 @@ def _import_mesh(logger, input_path, output_path, extn):
     ]
 
     try:
-        subprocess.check_call(command)
+        subprocess.check_output(command, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as ex:
-        logger.exception(ex, ex.output)
-        print >> sys.stderr, ex.output
+        logger.exception(ex.output)
+        raise
+
+def _partition_mesh(logger, input_path, output_dir,  n):
+    command = [
+        'pyfr', 'partition', str(n), input_path, output_dir
+    ]
+
+    try:
+        subprocess.check_output(command, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as ex:
+        logger.exception(ex.output)
         raise
 
 @cumulus.taskflow.task
@@ -127,7 +137,8 @@ def import_mesh(task, *args, **kwargs):
 
     try:
         input_path = os.path.join(tempfile.tempdir, input_folder_id)
-        output_path = os.path.join(tempfile.tempdir, '%s.%s' % (mesh_file_id, 'pyfrm'))
+        output_dir =  tempfile.mkdtemp()
+        output_path = os.path.join(output_dir, 'mesh.pyfrm')
 
         client.downloadFile(mesh_file_id, input_path)
         task.logger.info('Downloading complete.')
@@ -139,18 +150,33 @@ def import_mesh(task, *args, **kwargs):
         _import_mesh(task.taskflow.logger, input_path, output_path, extn)
         task.logger.info('Conversion complete.')
 
+        task.logger.info('Partitioning the mesh.')
+
+        if 'numberOfSlots' in kwargs \
+                and int(kwargs['numberOfSlots']) > 1:
+            print "partitioning: %s" % kwargs['numberOfSlots']
+            _partition_mesh(
+                task.logger, output_path, output_dir, kwargs['numberOfSlots'])
+        else:
+            task.logger.info('Skipping partitioning we are running serial.')
+
+
+        task.logger.info('Partitioning complete.')
+
         task.logger.info('Uploading converted mesh.')
-        size = os.path.getsize(output_path)
-        with open(output_path) as fp:
-            client.uploadFile(input_folder_id, fp, 'mesh.pyfrm', size=size, parentType='folder')
+        for f in os.listdir(output_dir):
+            path = os.path.join(output_dir, f)
+            size = os.path.getsize(path)
+            with open(path) as fp:
+                client.uploadFile(input_folder_id, fp, f, size=size, parentType='folder')
 
         task.logger.info('Upload complete.')
 
     finally:
         if os.path.exists(input_path):
             os.remove(input_path)
-        if os.path.exists(output_path):
-            os.remove(output_path)
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
 
     create_job.delay(*args, **kwargs)
 
@@ -160,10 +186,12 @@ def create_job(task, *args, **kwargs):
     task.taskflow.logger.info('Create PyFr job.')
     input_folder_id = kwargs['input']['folder']['id']
 
+    number_of_slots = kwargs.get('numberOfSlots', 1)
+
     body = {
         'name': 'pyfr',
         'commands': [
-            "mpirun -n {{ '-n %d' % numberOfSlots if numberOfSlots else 1 }} pyfr run -b openmp input/mesh.pyfrm input/pyfr.ini"
+            "mpirun -n %s pyfr run -b openmp input/mesh.pyfrm input/pyfr.ini" % number_of_slots
         ],
         'input': [
             {
