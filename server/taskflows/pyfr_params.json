@@ -1,0 +1,12 @@
+{
+    "input": {
+        "folderId": "56bcfd110640fd1de42fd365",
+        "meshFileId": "56bcfd6e0640fd1de42fd369"
+    },
+    "output": {
+        "folderId": "56bcfd170640fd1de42fd366"
+    },
+    "cluster": {
+        "_id": "56bcfcb20640fd1de42fd361"
+    }
+}
