@@ -33,6 +33,26 @@ from girder.constants import AccessType
 from girder_client import GirderClient, HttpError
 
 class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
+    """
+    {
+        "input": {
+            "folder": {
+                "id": <the id of the folder containing input files>
+            },
+            "meshFile": {
+                "id": <the file id of the mesh file>
+            }
+        },
+        "output": {
+            "folder": {
+                "id": <id of folder to upload output into>
+            }
+        },
+        "cluster": {
+            "_id": <id of cluster to run on>
+        }
+    }
+    """
     def start(self, *args, **kwargs):
 
         # Load the cluster
@@ -47,8 +67,7 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
             import_mesh.s(self,*args, **kwargs))
 
     def terminate(self):
-        super(PyFrTaskFlow, self).start(
-            pyfr_terminate.s())
+        self.run_task(pyfr_terminate.s())
 
     def delete(self):
         for job in self.get('jobs'):
@@ -103,8 +122,8 @@ def import_mesh(task, *args, **kwargs):
     client = _create_girder_client(
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
 
-    input_folder_id = kwargs['input']['folderId']
-    mesh_file_id = kwargs['input']['meshFileId']
+    input_folder_id = kwargs['input']['folder']['id']
+    mesh_file_id = kwargs['input']['meshFile']['id']
 
     try:
         input_path = os.path.join(tempfile.tempdir, input_folder_id)
@@ -139,7 +158,7 @@ def import_mesh(task, *args, **kwargs):
 @cumulus.taskflow.task
 def create_job(task, *args, **kwargs):
     task.taskflow.logger.info('Create PyFr job.')
-    input_folder_id = kwargs['input']['folderId']
+    input_folder_id = kwargs['input']['folder']['id']
 
     body = {
         'name': 'pyfr',
@@ -204,7 +223,7 @@ def monitor_pyfr_job(task, cluster, job, *args, **kwargs):
 @cumulus.taskflow.task
 def upload_output(task, cluster, job, *args, **kwargs):
     task.taskflow.logger.info('Uploading results from cluster')
-    output_folder_id = kwargs['output']['folderId']
+    output_folder_id = kwargs['output']['folder']['id']
 
     job['output'] = [{
         'folderId': output_folder_id,

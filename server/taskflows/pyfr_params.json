@@ -1,12 +1,18 @@
 {
     "input": {
-        "folderId": "56bcfd110640fd1de42fd365",
-        "meshFileId": "56bcfd6e0640fd1de42fd369"
+        "folder": {
+            "id": "56bddb500640fd3957f7493c"
+        },
+        "meshFile": {
+            "id": "56bddbf30640fd3957f74943"
+        }
     },
     "output": {
-        "folderId": "56bcfd170640fd1de42fd366"
+        "folder": {
+            "id": "56bddb550640fd3957f7493d"
+        }
     },
     "cluster": {
-        "_id": "56bcfcb20640fd1de42fd361"
+        "_id": "56bddafb0640fd3957f74937"
     }
 }
