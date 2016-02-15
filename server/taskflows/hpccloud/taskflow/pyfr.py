@@ -33,6 +33,26 @@ from girder.constants import AccessType
 from girder_client import GirderClient, HttpError
 
 class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
+    """
+    {
+        "input": {
+            "folder": {
+                "id": <the id of the folder containing input files>
+            },
+            "meshFile": {
+                "id": <the file id of the mesh file>
+            }
+        },
+        "output": {
+            "folder": {
+                "id": <id of folder to upload output into>
+            }
+        },
+        "cluster": {
+            "_id": <id of cluster to run on>
+        }
+    }
+    """
     def start(self, *args, **kwargs):
 
         # Load the cluster
