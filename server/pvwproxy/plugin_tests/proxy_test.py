@@ -87,10 +87,9 @@ class ProxyTestCase(base.TestCase):
         db = dbm.open(self._proxy_file_path)
         keys = db.keys()
         self.assertEqual(len(keys), 1)
-        expected_key = urllib.quote_plus('%s/%s' % (self._cluster_id, self._job_id))
-        self.assertEquals(keys[0], expected_key)
+        self.assertEquals(keys[0].decode('utf8'), key)
         expected_value = '%s:%s' % (host, port)
-        self.assertEquals(db[keys[0]], expected_value)
+        self.assertEquals(db[keys[0]].decode('utf8'), expected_value)
 
 
 
