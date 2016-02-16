@@ -38,6 +38,7 @@ before_install:
     # Install plugins
     - popd
     - ln -s "${HOME}/build/Kitware/HPCCloud/server/hpccloud" "${HOME}/build/girder/plugins/hpccloud"
+    - ln -s "${HOME}/build/Kitware/HPCCloud/server/pvwproxy" "${HOME}/build/girder/plugins/pvwproxy"
     # Install CMake
     - pushd "${HOME}"
     - curl -L "http://cmake.org/files/v3.1/cmake-3.1.0-Linux-x86_64.tar.gz" | gunzip -c | tar x
@@ -58,6 +59,7 @@ script:
   - pushd _girder_build
   - cmake -DBUILD_JAVASCRIPT_TESTS:BOOL=OFF -DPYTHON_COVERAGE:BOOL=OFF -DPYTHON_VERSION:STRING=${TRAVIS_PYTHON_VERSION} "${HOME}/build/girder"
   - ctest -R hpccloud -VV
+  - ctest -R pvwproxy -VV
 
 after_success:
   - npm run semantic-release
