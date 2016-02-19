@@ -9,11 +9,15 @@
 
 .table > tbody > tr > td {
     cursor: pointer;
-    transition: color .25s ease;
+    vertical-align: middle;
 }
 
-.table > tbody > tr > td:hover {
-    color: #18e;
+.table > tbody > tr {
+    transition: all 0.2s ease;
+}
+
+.table > tbody > tr:hover {
+    background-color: #efefef;
 }
 
 .table > tbody > tr > td:first-child {
@@ -22,4 +26,8 @@
 
 .table > tbody > tr > td:last-child {
     text-align: center;
+}
+
+.table > tbody > tr > td:last-child:hover {
+    color: #18e;
 }
