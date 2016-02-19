@@ -20,8 +20,8 @@ export function deleteTaskflow(id) {
 }
 
 //PUT /taskflows/{id}/start Start the taskflow
-export function startTaskflow(id) {
-    return girder.startTaskflow(id);
+export function startTaskflow(id, cluster) {
+    return girder.startTaskflow(id, cluster);
 }
 
 //GET /taskflows/{id}/status Get the taskflow status

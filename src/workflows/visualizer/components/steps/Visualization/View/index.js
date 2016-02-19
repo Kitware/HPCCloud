@@ -1,9 +1,11 @@
 import React        from 'react';
+import client       from '../../../../../../network';
 import ButtonBar    from '../../../../../../panels/ButtonBar';
 
 export default React.createClass({
     displayName: 'pvw/view-visualization',
     propTypes: {
+        location: React.PropTypes.object,
         project: React.PropTypes.object,
         simulation: React.PropTypes.object,
         step: React.PropTypes.string,
@@ -13,9 +15,20 @@ export default React.createClass({
     contextTypes: {
         router: React.PropTypes.object,
     },
+    getInitialState() {
+        return {
+            tasks: [],
+            error: '',
+        }
+    },
     componentWillMount(){
-        // get jobs for taskflowid
-        //
+        client.getTaskflowTaskStatuses(this.props.location.query.taskflowId)
+            .then((resp) => {
+                this.setState({tasks: resp.data});
+            })
+            .catch((error) => {
+                this.setState({error: error.data.message});
+            });
     },
     visualizeTaskflow() {
         console.log('visualize');
@@ -40,7 +53,6 @@ export default React.createClass({
                 {/* foreach jobs <jobInfoContainer /> */}
                 <section>
                 <ButtonBar
-                    visible={this.state[this.state.serverType].profile !== ''}
                     onAction={ (action) => { this[action](); }}
                     actions={actions}
                     error={this.state.error} />

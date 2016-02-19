@@ -6,10 +6,12 @@ import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
 import ButtonBar               from '../../../../../../panels/ButtonBar';
 import client                  from '../../../../../../network';
 import formStyle               from 'HPCCloudStyle/ItemEditor.mcss';
+import merge                   from 'mout/src/object/merge';
 
 export default React.createClass({
     displayName: 'pvw/start-visualization',
     propTypes: {
+        location: React.PropTypes.object,
         project: React.PropTypes.object,
         simulation: React.PropTypes.object,
         step: React.PropTypes.string,
@@ -38,11 +40,18 @@ export default React.createClass({
     startVisualization() {
         client.createTaskflow(this.props.taskFlowName)
             .then( (resp) => {
-                return client.startTaskflow(resp.data._id);
+                return client.startTaskflow(resp.data._id, {cluster: {_id:this.state[this.state.serverType].profile}});
             })
             .then( (resp) => {
-                console.log('simulation started');
-                // this.context.router.replace();
+                const routeQuery = {
+                    view: 'run',
+                    taskflowId: resp._id,
+                };
+                this.context.router.replace({
+                    pathname: this.props.location.pathname,
+                    query: merge(this.props.location.query, routeQuery),
+                    state: this.props.location.state,
+                });
             })
             .catch( (error) => {
                 this.setState({error: error.data.message});
@@ -53,19 +62,19 @@ export default React.createClass({
     },
     render() {
         var actions = [{name: 'startVisualization', label:'Start Visualization', icon:''}],
-            element;
+            serverForm;
             switch(this.state.serverType) {
                 case 'EC2':
-                    element = <RunEC2 contents={this.state.EC2} onChange={this.dataChange} />;
+                    serverForm = <RunEC2 contents={this.state.EC2} onChange={this.dataChange} />;
                     break;
                 case 'Traditional':
-                    element = <RunCluster contents={this.state.Traditional} onChange={this.dataChange} />;
+                    serverForm = <RunCluster contents={this.state.Traditional} onChange={this.dataChange} />;
                     break;
                 case 'OpenStack':
-                    element = <RunOpenStack />;
+                    serverForm = <RunOpenStack />;
                     break;
                 default:
-                    element = <span>no valid serverType: {this.state.serverType}</span>;
+                    serverForm = <span>no valid serverType: {this.state.serverType}</span>;
             }
         return (
             <div>
@@ -78,7 +87,7 @@ export default React.createClass({
                     </select>
                 </section>
                 <section>
-                    {element}
+                    {serverForm}
                 </section>
                 <section>
                     <ButtonBar

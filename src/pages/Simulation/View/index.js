@@ -69,7 +69,7 @@ export default React.createClass({
         const view = this.props.location.query.view || 'default';
         const childComponent = wfModule.components.ViewSimulation;
         if(childComponent) {
-            return (<div>{ React.createElement(childComponent, { project, simulation, step, view, taskFlowName }) }</div>);
+            return (<div>{ React.createElement(childComponent, { project, simulation, step, view, taskFlowName, location:this.props.location }) }</div>);
         }
         return <center>No simulation view for simulation of type {project.type}.</center>
     },

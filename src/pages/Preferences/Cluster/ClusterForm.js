@@ -146,18 +146,19 @@ export default React.createClass({
                     })}
                 </form>
                 { this.state.data.status !== 'running' ? null :
-                <section className={style.group}>
-                    <label className={style.label}>Public SSH key</label>
-                    <textarea className={style.input} readOnly rows='3' value={ this.state.data.config.ssh.publicKey }/>
-                </section>
+                    <section className={style.group}>
+                        <label className={style.label}>Public SSH key</label>
+                        <textarea className={style.input} readOnly rows='3' value={ this.state.data.config.ssh.publicKey }/>
+                    </section>
                 }
                 { (this.state.data.status === 'created' && this.state.data.config.ssh.publicKey) ?
-                <section className={style.group}>
-                    <label className={style.label}>Command to add this key to cluster</label>
-                    <textarea className={style.input} style={{color:'#a00'}} readOnly rows='3' value={ `echo "${this.state.data.config.ssh.publicKey}" | \
-ssh ${this.state.data.config.ssh.user}@${this.state.data.config.host} \
-"umask 077 && mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"`}/>
-                </section> : null
+                    <section className={style.group}>
+                        <label className={style.label}>Command to add this key to cluster</label>
+                        <textarea className={style.input} style={{color:'#a00'}} readOnly rows='3' value={ `echo "${this.state.data.config.ssh.publicKey}" | \
+    ssh ${this.state.data.config.ssh.user}@${this.state.data.config.host} \
+    "umask 077 && mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"`}/>
+                    </section> :
+                    null
                 }
             </div>);
     },

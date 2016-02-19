@@ -48,6 +48,7 @@ export default {
             path: '/Logout',
             component: Logout,
         },{
+            onEnter: redirectToHome,
             path: '/Register',
             component: Register,
         },{
