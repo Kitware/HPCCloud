@@ -1,0 +1,40 @@
+.linkSection {
+    display: flex;
+    justify-content: center;
+}
+
+.link {
+    display: inline-block;
+    padding: 60px 30px;
+    width: 140px;
+    text-align: center;
+    border: 1px solid lightgrey;
+    margin: 5px;
+    transition: background-color 2s linear;
+}
+
+.link:hover{
+    background-color: lightblue;
+}
+
+.preferenceIcon {
+    composes: fa        from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw     from 'font-awesome/css/font-awesome.css';
+    color: black;
+}
+
+.userIcon {
+    composes: preferenceIcon;
+    composes: fa-user   from 'font-awesome/css/font-awesome.css';
+}
+
+.clusterIcon {
+    composes: preferenceIcon;
+    composes: fa-share-alt  from 'font-awesome/css/font-awesome.css';
+}
+
+
+.ec2Icon {
+    composes: preferenceIcon;
+    composes: fa-mixcloud   from 'font-awesome/css/font-awesome.css';
+}

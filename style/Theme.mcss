@@ -1,0 +1,159 @@
+.hpcCloudIcon {
+    composes: fa         from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw      from 'font-awesome/css/font-awesome.css';
+    composes: fa-cloud   from 'font-awesome/css/font-awesome.css';
+}
+
+.logoutIcon {
+    composes: fa            from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
+    composes: fa-sign-out   from 'font-awesome/css/font-awesome.css';
+}
+
+.landingIcon {
+    composes: fa                from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw             from 'font-awesome/css/font-awesome.css';
+    composes: fa-cloud-download from 'font-awesome/css/font-awesome.css';
+}
+
+.colorLightGrey {
+    color: #eee;
+}
+.colorGrey {
+    color: #18e;
+}
+.colorGreen {
+    color: #4ecdc4;
+}
+.colorLightGreen {
+    color: #c8f363;
+}
+.colorLightRed {
+    color: #fe6b6b;
+}
+.colorRed {
+    color: #c54d57;
+}
+
+.topBar {
+    composes: topBar from 'HPCCloudStyle/Layout.mcss';
+    background: #222;
+    color: #ededed;
+    letter-spacing: 0.025em;
+    font-size: 1.05em;
+}
+
+.topBarText {
+    color: #fff;
+}
+
+.logout {
+    margin-left: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.topBar a:hover, .topBar a:active {
+    color: #4ecdc4;
+}
+
+.disabled {
+    color: #090909;
+    cursor: not-allowed;
+}
+
+.borderRadius {
+    border-radius: 4px;
+}
+
+.errorBox {
+    composes: alert from 'bootstrap/dist/css/bootstrap.css';
+    composes: alert-danger from 'bootstrap/dist/css/bootstrap.css';
+    margin-bottom: 0px;
+}
+
+.warningBox {
+    composes: alert from 'bootstrap/dist/css/bootstrap.css';
+    composes: alert-warning from 'bootstrap/dist/css/bootstrap.css';
+    margin-bottom: 0px;
+}
+
+.successBox {
+    composes: alert from 'bootstrap/dist/css/bootstrap.css';
+    composes: alert-success from 'bootstrap/dist/css/bootstrap.css';
+    margin-bottom: 0px;
+}
+
+.progressBar {
+    position: absolute;
+    width: 0px;
+    height: 2px;
+    transition: width 1s linear, opacity 1.5s linear;
+    background-color: #4ecdc4;
+    left: 0;
+    top: 0;
+}
+
+/* in case we ever have more varied font weights*/
+.boldText {
+    font-weight: bold;
+}
+
+.lightText {
+    font-weight: 300;
+}
+
+.capitalizeRightText {
+    text-align: right;
+    text-transform: capitalize;
+}
+
+.editIcon {
+    composes: fa            from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
+    composes: fa-pencil     from 'font-awesome/css/font-awesome.css';
+}
+
+.simulationEditIcon {
+    composes: fa            from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
+    composes: fa-pencil-square-o   from 'font-awesome/css/font-awesome.css';
+}
+
+.simulationRunningIcon {
+    composes: fa            from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
+    composes: fa-rocket     from 'font-awesome/css/font-awesome.css';
+}
+
+.simulationDoneIcon {
+    composes: fa            from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
+    composes: fa-database   from 'font-awesome/css/font-awesome.css';
+}
+
+.breadCrumbIcon {
+    composes: fa        from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw     from 'font-awesome/css/font-awesome.css';
+    color: black;
+}
+
+.breadCrumbRootIcon {
+    composes: breadCrumbIcon;
+    composes: fa-list   from 'font-awesome/css/font-awesome.css';
+}
+
+.breadCrumbProjectIcon {
+    composes: breadCrumbIcon;
+    composes: fa-folder-open-o   from 'font-awesome/css/font-awesome.css';
+}
+
+.breadCrumbSimulationIcon {
+    composes: breadCrumbIcon;
+    composes: fa-file-text-o   from 'font-awesome/css/font-awesome.css';
+}
+
+.breadCrumbUnknownIcon {
+    composes: breadCrumbIcon;
+    composes: fa-question   from 'font-awesome/css/font-awesome.css';
+}

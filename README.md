@@ -30,22 +30,11 @@ $ HPCCloud
 
 ## Development
 
-Using the tonic suite:
-
-```sh
-$ git clone https://github.com/Kitware/tonic.git
-$ cd tonic
-$ npm run global
-$ npm install
-$ cd tonic-applications/hpc-cloud
-```
-
-Using just the repository:
-
 ```sh
 $ git clone https://github.com/Kitware/HPCCloud.git
 $ cd HPCCloud
 $ npm install
+$ npm start
 ```
 
 ## Trouble shooting

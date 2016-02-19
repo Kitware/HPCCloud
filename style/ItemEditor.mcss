@@ -1,0 +1,62 @@
+.container {
+    composes: verticalFlexContainer from './Layout.mcss';
+}
+
+.group {
+    composes: horizontalFlexContainer from './Layout.mcss';
+    align-items: center;
+    margin-top: 10px;
+    padding: 0 20px;
+}
+
+.label {
+    flex: 1;
+    text-align: right;
+    max-width: 175px;
+    padding-right: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.input {
+    flex: 1;
+    composes: form-control from 'bootstrap/dist/css/bootstrap.css';
+}
+
+textarea.input {
+    resize: none;
+}
+
+.input > * {
+    width: 100%;
+}
+
+.buttonGroup {
+    composes: rightRow from './Layout.mcss';
+    padding: 10px 20px;
+}
+
+.button {
+    composes: btn from 'bootstrap/dist/css/bootstrap.css';
+    composes: btn-default from 'bootstrap/dist/css/bootstrap.css';
+
+    margin-left: 10px;
+}
+
+.errorBox {
+    composes: alert from 'bootstrap/dist/css/bootstrap.css';
+    composes: alert-danger from 'bootstrap/dist/css/bootstrap.css';
+    margin-bottom: 0px;
+    padding: 6px 15px;
+}
+
+.validIcon {
+    composes: fa        from 'font-awesome/css/font-awesome.css';
+    composes: fa-check  from 'font-awesome/css/font-awesome.css';
+}
+
+.listIcon {
+    composes: fa        from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw     from 'font-awesome/css/font-awesome.css';
+    composes: fa-list   from 'font-awesome/css/font-awesome.css';
+}
