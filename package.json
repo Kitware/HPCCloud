@@ -31,9 +31,9 @@
     "history": "1.17.0",
     "react-router": "2.0.0",
     "axios": "0.9.1",
-    "tonic-io": "latest",
-    "tonic-ui": "latest",
-    "simput": "latest"
+    "tonic-io": "1.2.19",
+    "tonic-ui": "1.3.12",
+    "simput": "1.0.15"
   },
   "dep": {
     "build": {
