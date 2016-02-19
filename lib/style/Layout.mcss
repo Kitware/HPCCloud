@@ -77,7 +77,7 @@
     align-items: center;
     flex: 1;
 
-    height: 2em;
+    height: 2.4em;
     line-height: 2em;
 }
 

@@ -12,6 +12,10 @@
     vertical-align: middle;
 }
 
+.table > thead > tr > th {
+    cursor: default;
+}
+
 .table > tbody > tr {
     transition: all 0.2s ease;
 }

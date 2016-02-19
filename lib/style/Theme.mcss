@@ -20,7 +20,9 @@
 .topBar {
     composes: topBar from 'HPCCloudStyle/Layout.mcss';
     background: #222;
-    color: #dedede;
+    color: #ededed;
+    letter-spacing: 0.025em;
+    font-size: 1.05em;
 }
 
 .logout {
