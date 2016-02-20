@@ -4,21 +4,21 @@ python:
     - "3.4"
 
 node_js:
-  - "4.1"
+    - "4.1"
 
 sudo: false
 notifications:
-  email:
-    recipients:
-      - sebastien.jourdain@kitware.com
-      - tristan.wright@kitware.com
-      - chris.harris@kitware.com
-    on_success: change
-    on_failure: always
+    email:
+        recipients:
+            - sebastien.jourdain@kitware.com
+            - tristan.wright@kitware.com
+            - chris.harris@kitware.com
+        on_success: change
+        on_failure: always
 cache:
-  directories:
-    - node_modules
-    - $HOME/.cache/pip
+    directories:
+        - node_modules
+        - $HOME/.cache/pip
 
 compiler:
     - gcc
@@ -46,20 +46,21 @@ before_install:
     - popd
     - cmake --version
     - pip install -U pip virtualenv
+    - nvm install 4.1
 
 install:
     - pip install -U -r requirements.txt
 
 script:
-  # Run client tests, only with python 2.7
-  - if [ -n "${PY2}" ]; then npm install; fi
-  - if [ -n "${PY2}" ]; then npm run build:release; fi
-  # Now run server tests
-  - mkdir _girder_build
-  - pushd _girder_build
-  - cmake -DBUILD_JAVASCRIPT_TESTS:BOOL=OFF -DPYTHON_COVERAGE:BOOL=OFF -DPYTHON_VERSION:STRING=${TRAVIS_PYTHON_VERSION} "${HOME}/build/girder"
-  - ctest -R hpccloud -VV
-  - ctest -R pvwproxy -VV
+    # Run client tests, only with python 2.7
+    - if [ -n "${PY2}" ]; then npm install; fi
+    - if [ -n "${PY2}" ]; then npm run build:release; fi
+    # Now run server tests
+    - mkdir _girder_build
+    - pushd _girder_build
+    - cmake -DBUILD_JAVASCRIPT_TESTS:BOOL=OFF -DPYTHON_COVERAGE:BOOL=OFF -DPYTHON_VERSION:STRING=${TRAVIS_PYTHON_VERSION} "${HOME}/build/girder"
+    - ctest -R hpccloud -VV
+    - ctest -R pvwproxy -VV
 
 after_success:
-  - npm run semantic-release
+    - npm run semantic-release
