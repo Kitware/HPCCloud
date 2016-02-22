@@ -68,7 +68,7 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
         self.run_task(cleanup_proxy_entries.s())
 
     def delete(self):
-        for job in self.get('jobs'):
+        for job in self.get('jobs', []):
             job_id = job['_id']
             client = _create_girder_client(
             self.girder_api_url, self.girder_token)
