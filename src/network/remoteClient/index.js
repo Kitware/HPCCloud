@@ -46,7 +46,9 @@ import {
     getProjectSimulations,
     getSimulation,
     saveSimulation,
-    activateSimualtionStep,
+    activateSimulationStep,
+    getSimulationStep,
+    updateSimulationStep,
 } from './Simulation';
 
 import {
@@ -69,10 +71,12 @@ import {
 } from './Taskflows'
 
 export default {
+    /* BusyProgress */
     onBusy,
     onProgress,
     onEvent,
 
+    /* User */
     changePassword,
     getLoggedInPromise,
     getUser,
@@ -85,34 +89,42 @@ export default {
     resetPassword,
     updateUser,
 
+    /* Clusters */
     createCluster,
     deleteCluster,
     listClusterProfiles,
     saveCluster,
     testCluster,
 
+    /* AWS */
     saveAWSProfile,
     deleteAWSProfile,
     getAWSMaxInstances,
     listAWSProfiles,
     listAWSRunningInstances,
 
+    /* Project */
     listProjects,
     getProject,
     saveProject,
     deleteProject,
 
+    /* Simulation */
     deleteSimulation,
     getProjectSimulations,
     getSimulation,
     saveSimulation,
-    activateSimualtionStep,
+    activateSimulationStep,
+    getSimulationStep,
+    updateSimulationStep,
 
+    /* Notifications */
     invalidateSimulation,
     onSimulationChange,
     invalidateProject,
     onProjectChange,
 
+    /* Taskflow */
     createTaskflow,
     getTaskflow,
     updateTaskflow,

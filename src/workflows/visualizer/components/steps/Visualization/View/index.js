@@ -37,10 +37,26 @@ export default React.createClass({
         console.log('log');
     },
     terminateTaskflow() {
-        if(confirm('Are you sure you want to terminate this job?')) {
+        if(!confirm('Are you sure you want to terminate this taskflow?')) {
             return;
         }
-        console.log('terminate');
+        client.deleteTaskflow(this.props.location.query.taskflowId)
+            .then((resp) => {
+                return client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+                    view: 'default',
+                    metadata: {},
+                });
+            })
+            .then((resp) => {
+                this.context.router.replace({
+                    pathname: this.props.location.pathname,
+                    query:  {view: 'default'},
+                    state: this.props.location.state,
+                });
+            })
+            .catch((error) => {
+                this.setState({error: error.data.message});
+            });
     },
     render() {
         var actions = [
@@ -50,7 +66,11 @@ export default React.createClass({
         ];
         return (
             <div>
-                {/* foreach jobs <jobInfoContainer /> */}
+                { this.state.tasks.map( (task) =>
+                    <span key={task._id}>
+                        {task.name.split('.').pop()} : {task.status}
+                    </span>
+                )}
                 <section>
                 <ButtonBar
                     onAction={ (action) => { this[action](); }}

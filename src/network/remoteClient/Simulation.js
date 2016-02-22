@@ -59,7 +59,7 @@ export function getProjectSimulations(pId) {
     return girder.listSimulations(pId);
 }
 
-export function activateSimualtionStep(simulation, active, disabled) {
+export function activateSimulationStep(simulation, active, disabled) {
     // Update local data
     simulation.active = active;
     if(disabled) {
@@ -68,4 +68,12 @@ export function activateSimualtionStep(simulation, active, disabled) {
     invalidateSimulation(simulation);
 
     return girder.editSimulation({_id: simulation._id, active, disabled});
+}
+
+export function getSimulationStep(id, name) {
+    return girder.getSimulationStep(id, name);
+}
+
+export function updateSimulationStep(id, name, step) {
+    return girder.updateSimulationStep(id, name, step);
 }

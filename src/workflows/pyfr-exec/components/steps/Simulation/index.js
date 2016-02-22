@@ -59,7 +59,7 @@ export default React.createClass({
 
         console.log('run this Simulation with:', this.state[this.state.type]);
 
-        client.activateSimualtionStep(this.props.simulation, NEXT_STEP, disabled)
+        client.activateSimulationStep(this.props.simulation, NEXT_STEP, disabled)
             .then(r => {
                 this.context.router.replace(['/View/Simulation', this.props.simulation._id, NEXT_STEP].join('/'));
             })

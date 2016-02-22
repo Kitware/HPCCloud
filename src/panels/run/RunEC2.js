@@ -61,7 +61,7 @@ export default React.createClass({
 
         if(this.state.profiles.length === 0) {
             return this.state.busy ? null :
-                    <div className={style.container + ' ' + theme.warningBox}>
+                    <div className={style.container + ' ' + theme.warningBox} style={{margin: '15px'}}>
                         <span>
                             There are no EC2 AWS profiles defined. Add some on&nbsp;
                             <Link to='/Preferences/AWS'>the AWS preference page</Link>.

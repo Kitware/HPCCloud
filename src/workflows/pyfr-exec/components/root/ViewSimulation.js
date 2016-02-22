@@ -24,7 +24,7 @@ export default React.createClass({
 
     updateActiveStep(idx, item) {
         const stepName = PyFrModule.steps._order[idx];
-        client.activateSimualtionStep(this.props.simulation, stepName)
+        client.activateSimulationStep(this.props.simulation, stepName)
             .then(resp => this.context.router.replace(['/View/Simulation', this.props.simulation._id, stepName].join('/')))
             .catch(err => {
                 console.log('Update active error for', stepName);

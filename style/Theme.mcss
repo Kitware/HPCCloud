@@ -51,6 +51,7 @@
     margin-left: 5px;
     padding-left: 10px;
     padding-right: 10px;
+    color: white;
 }
 
 .topBar a:hover, .topBar a:active {

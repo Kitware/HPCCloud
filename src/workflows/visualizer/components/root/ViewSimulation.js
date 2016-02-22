@@ -24,8 +24,21 @@ export default React.createClass({
 
     updateActiveStep(idx, item) {
         const stepName = VizModule.steps._order[idx];
-        client.activateSimualtionStep(this.props.simulation, stepName)
-            .then(resp => this.context.router.replace(['/View/Simulation', this.props.simulation._id, stepName].join('/')))
+        client.activateSimulationStep(this.props.simulation, stepName)
+            .then(resp => {
+                console.log(resp);
+                if (stepName === 'Visualization') {
+                    const stepView = resp.data.steps[stepName].view ? resp.data.steps[stepName].view : 'default',
+                        taskflowId = resp.data.steps[stepName].metadata.taskflowId;
+                    this.context.router.replace({
+                        pathname: ['/View/Simulation', this.props.simulation._id, stepName].join('/'),
+                        query: {view: stepView, taskflowId},
+                        state: {},
+                    });
+                } else {
+                    this.context.router.replace(['/View/Simulation', this.props.simulation._id, stepName].join('/'));
+                }
+            })
             .catch(err => {
                 console.log('Update active error for', stepName);
                 console.log(err);

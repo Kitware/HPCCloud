@@ -38,14 +38,22 @@ export default React.createClass({
         this.setState({[server]: profile});
     },
     startVisualization() {
+        var taskflowId;
         client.createTaskflow(this.props.taskFlowName)
             .then( (resp) => {
-                return client.startTaskflow(resp.data._id, {cluster: {_id:this.state[this.state.serverType].profile}});
+                taskflowId = resp.data._id;
+                return client.startTaskflow(taskflowId, {cluster: {_id:this.state[this.state.serverType].profile}});
+            })
+            .then((resp) => {
+                return client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+                    view: 'run',
+                    metadata: {taskflowId},
+                });
             })
             .then( (resp) => {
                 const routeQuery = {
                     view: 'run',
-                    taskflowId: resp._id,
+                    taskflowId,
                 };
                 this.context.router.replace({
                     pathname: this.props.location.pathname,
