@@ -258,7 +258,7 @@ class Simulation(AccessControlledModel):
         return self.save(simulation)
 
     def update_step(self, user, simulation, step_name, status, metadata,
-                    export):
+                    export, view):
         """
         Update a simulation step.
 
@@ -281,6 +281,10 @@ class Simulation(AccessControlledModel):
 
         if export is not None:
             step['export'] = export
+            dirty = True
+
+        if view is not None:
+            step['view'] = view
             dirty = True
 
         if dirty:

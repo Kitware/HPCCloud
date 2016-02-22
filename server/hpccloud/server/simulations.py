@@ -197,9 +197,10 @@ class Simulations(Resource):
         status = updates.get('status')
         metadata = updates.get('metadata')
         export = updates.get('export')
+        view = updates.get('view')
 
         self._model.update_step(
-            user, simulation, stepName, status, metadata, export)
+            user, simulation, stepName, status, metadata, export, view)
 
     @describeRoute(
         Description('Download all the asset associated with a simulation')
