@@ -1,5 +1,5 @@
 import visualizer from './visualizer';
 
-export {
+export default {
     visualizer,
 }

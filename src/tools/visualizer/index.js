@@ -1,5 +1,5 @@
 import React            from 'react';
-import Toolbar          from '../../../../panels/Toolbar';
+import Toolbar          from '../../panels/Toolbar';
 import * as network     from 'pvw-visualizer/src/network';
 import ProxyManager     from 'pvw-visualizer/src/ProxyManager';
 import ControlPanel     from 'pvw-visualizer/src/panels/ControlPanel';
@@ -27,23 +27,35 @@ export default React.createClass({
     getInitialState() {
         return {
             menuVisible: true,
+            playing: false,
+            timeStep: 0,
+            timeValues: [],
         };
     },
 
-    componentWillMount() {
+    componentDidMount() {
         network.onReady(() => {
             this.client = network.getClient();
             this.proxyManager = new ProxyManager(this.client);
-            this.forceUpdate();
+
+            /* eslint-disable */
+            this.timeSubcription = this.proxyManager.onTimeChange( (data, envelope) => {
+                const { timeStep, timeValues } = data;
+                this.setState({ timeStep, timeValues });
+            });
+            /* eslint-enable */
         });
 
-        // Find configuration based on simulation
+        // FIXME: Find configuration based on simulation
         const config = { sessionURL: 'ws://localhost:9876/ws' };
         network.connect(config);
     },
 
     componentWillUnmount() {
-
+        if(this.timeSubcription) {
+            this.timeSubcription.unsubscribe();
+            this.timeSubcription = null;
+        }
     },
 
     onAction(name) {
@@ -60,9 +72,24 @@ export default React.createClass({
         }
     },
 
+    nextTimeStep() {
+        const timeStep = ( this.state.timeStep + 1 ) % this.state.timeValues.length;
+        this.proxyManager.setTimeStep(timeStep);
+    },
+
+    togglePlay() {
+        const playing = !this.state.playing;
+        this.setState({playing});
+        this.proxyManager[ playing ? 'playTime' : 'stopTime']();
+    },
+
+    previousTimeStep() {
+        const timeStep = ( this.state.timeStep - 1 + this.state.timeValues.length ) % this.state.timeValues.length;
+        this.proxyManager.setTimeStep(timeStep);
+    },
+
     render() {
         if(!this.proxyManager) {
-            console.log('no proxy manager yet');
             return null;
         }
 
@@ -79,6 +106,9 @@ export default React.createClass({
                     }}
                     actions={[
                         { name: 'toggleMenu',  icon: vizStyle.toggleMenuButton },
+                        { name: 'nextTimeStep',  icon: vizStyle.nextButton },
+                        { name: 'togglePlay',  icon: this.state.playing ? vizStyle.stopButton : vizStyle.playButton },
+                        { name: 'previousTimeStep',  icon: vizStyle.previousButton },
                         { name: 'resetCamera', icon: vizStyle.resetCameraButton },
                     ]}
                     onAction={ this.onAction }

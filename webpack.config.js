@@ -24,6 +24,7 @@ module.exports = {
         loaders: [
             { test: require.resolve("./src/app.js"), loader: "expose?HPCCloud" },
             { test: /\.js$/, include: /node_modules\/simput\//, loader: 'babel?presets[]=es2015,presets[]=react' },
+            { test: /\.js$/, include: /node_modules\/pvw-visualizer\//, loader: 'babel?presets[]=es2015,presets[]=react'},
         ].concat(loaders),
     },
     resolve: {
@@ -31,6 +32,7 @@ module.exports = {
             'PVWStyle/ReactProperties/PropertyPanel.mcss': path.resolve('./node_modules/simput/style/PropertyPanel.mcss'),
             PVWStyle: path.resolve('./node_modules/paraviewweb/style'),
             SimputStyle: path.resolve('./node_modules/simput/style'),
+            VisualizerStyle: path.resolve('./node_modules/pvw-visualizer/style'),
             HPCCloudStyle: path.resolve('./style'),
         },
     },

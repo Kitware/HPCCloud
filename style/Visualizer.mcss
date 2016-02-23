@@ -1,22 +1,48 @@
-.resetCameraButton {
-    composes: fa            from 'font-awesome/css/font-awesome.css';
-    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
-    composes: fa-arrows-alt from 'font-awesome/css/font-awesome.css';
+.button {
+    composes: fa    from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw from 'font-awesome/css/font-awesome.css';
     cursor: pointer;
 }
 
+.resetCameraButton {
+    composes: button;
+    composes: fa-arrows-alt from 'font-awesome/css/font-awesome.css';
+
+}
+
 .toggleMenuButton {
-    composes: fa        from 'font-awesome/css/font-awesome.css';
-    composes: fa-fw     from 'font-awesome/css/font-awesome.css';
-    composes: fa-bars   from 'font-awesome/css/font-awesome.css';
-    cursor: pointer;
+    composes: button;
+    composes: fa-bars from 'font-awesome/css/font-awesome.css';
+    margin-right: 10px;
+}
+
+.playButton {
+    composes: button;
+    composes: fa-play from 'font-awesome/css/font-awesome.css';
+}
+
+.stopButton {
+    composes: button;
+    composes: fa-stop from 'font-awesome/css/font-awesome.css';
+}
+
+.previousButton {
+    composes: button;
+    composes: fa-chevron-left from 'font-awesome/css/font-awesome.css';
+    padding-right: 0;
+}
+
+.nextButton {
+    composes: button;
+    composes: fa-chevron-right from 'font-awesome/css/font-awesome.css';
+    padding-left: 0;
 }
 
 .menu {
     position: absolute;
-    top: 4em;
-    left: 0px;
-    height: calc(100vh - 60px);
+    top: 3.5em;
+    right: 10px;
+    height: calc(100vh - 4.5em);
     width: 300px;
     background-color: #eee;
     z-index: 2;
@@ -43,5 +69,5 @@
     top: 4em;
     left: 0;
     right: 0;
-    bottom: 0;
+    height: calc(100vh - 60px);
 }
