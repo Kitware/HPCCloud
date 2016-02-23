@@ -38,11 +38,16 @@ export default React.createClass({
         this.setState({[server]: profile});
     },
     startVisualization() {
-        var taskflowId;
+        var taskflowId,
+            sessionKey = Math.floor(Math.random() * 0xffffff);
         client.createTaskflow(this.props.taskFlowName)
             .then( (resp) => {
                 taskflowId = resp.data._id;
-                return client.startTaskflow(taskflowId, {cluster: {_id:this.state[this.state.serverType].profile}});
+                return client.startTaskflow(taskflowId, {
+                    cluster: {_id:this.state[this.state.serverType].profile},
+                    dataDir: '/tmp', //where the output for the sim will be
+                    sessionKey, //uuid-ish for pvw
+                });
             })
             .then((resp) => {
                 return client.updateSimulationStep(this.props.simulation._id, this.props.step, {

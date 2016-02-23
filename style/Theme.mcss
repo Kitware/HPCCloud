@@ -80,12 +80,6 @@
     margin-bottom: 0px;
 }
 
-.statusListItem {
-    padding: 12px 0;
-    margin: 0 18px;
-    border-bottom: 1px solid #eee;
-}
-
 /* Text styles */
 .boldText {
     font-weight: bold;

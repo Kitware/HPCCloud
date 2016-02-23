@@ -1,9 +1,9 @@
 import React        from 'react';
 import client       from '../../../../../../network';
 import ButtonBar    from '../../../../../../panels/ButtonBar';
-import formStyle    from 'HPCCloudStyle/ItemEditor.mcss';
+import CollapsibleWidget from 'paraviewweb/src/React/Widgets/CollapsibleWidget'
 import layout       from 'HPCCloudStyle/Layout.mcss';
-import theme        from 'HPCCloudStyle/Theme.mcss';
+import statusList        from 'HPCCloudStyle/StatusList.mcss';
 
 export default React.createClass({
     displayName: 'pvw/view-visualization',
@@ -25,15 +25,13 @@ export default React.createClass({
         }
     },
     componentWillMount(){
-        client.getTaskflowTaskStatuses(this.props.location.query.taskflowId)
-            .then((resp) => {
-                this.setState({tasks: resp.data});
-            })
-            .catch((error) => {
-                this.setState({error: error.data.message});
-            });
+        this.fetchTaskflowTasks();
+
         client.onEvent((resp) => {
             const tasks = this.state.tasks;
+            if (resp.data.status === 'complete') {
+                this.fetchTaskflowTasks();
+            }
             for (let i=0; i < tasks.length; i++) {
                 if (tasks[i]._id === resp.data._id) {
                     tasks[i].status = resp.data.status;
@@ -41,13 +39,22 @@ export default React.createClass({
                     return;
                 }
             }
-            console.log(`no task found with id: ${resp.data._id}`);
+            console.log(`no task found with id: ${resp.data._id}`, resp.data);
         });
+    },
+    fetchTaskflowTasks() {
+        client.getTaskflowTaskStatuses(this.props.location.query.taskflowId)
+            .then((resp) => {
+                this.setState({tasks: resp.data});
+            })
+            .catch((error) => {
+                this.setState({error: error.data.message});
+            });
     },
     visualizeTaskflow() {
         console.log('visualize');
     },
-    logTaskflow() {
+    logTaskflows() {
         console.log('log');
     },
     terminateTaskflow() {
@@ -76,23 +83,51 @@ export default React.createClass({
     render() {
         var actions = [
             {name: 'visualizeTaskflow', label:'Visualize', icon:''},
-            {name: 'logTaskflow',       label:'Log',       icon:''},
             {name: 'terminateTaskflow', label:'Terminate', icon:''},
-        ];
+        ],
+        formatTime = (time) => {
+            var date = new Date(time),
+                hours = date.getHours().toString(),
+                minutes = date.getMinutes().toString(),
+                seconds = date.getSeconds().toString(),
+                ms = date.getMilliseconds().toString();
+
+            hours = hours.length === 1 ? '0' + hours : hours;
+            minutes = minutes.length === 1 ? '0' + minutes : minutes;
+            seconds = seconds.length === 1 ? '0' + seconds : seconds;
+            if (ms.length < 3) {
+                while(ms.length < 3) {
+                    ms = '0' + ms;
+                }
+            }
+
+            return hours + ':' + minutes + ':' + seconds + '.' + ms;
+        };
         return (
             <div>
-                { this.state.tasks.map( (task) =>
-                    <section key={task._id} className={theme.statusListItem}>
+                { this.state.tasks.map( (task) => {
+                    if (task.log.length === 0) {
+                        return (<section key={task._id} className={statusList.statusListItem}>
+                            <strong className={statusList.statusListItemContent}>{task.name.split('.').pop()}</strong>
+                            <div className={statusList.statusListItemContent}>{task.status}</div>
+                        </section>);
+                    }
+                    return <section key={task._id} className={statusList.statusListLogItem}>
                         <div className={layout.horizontalFlexContainer}>
-                            <label className={formStyle.label}>Name:</label>
-                            <span className={layout.flexItem}>{task.name.split('.').pop()}</span>
+                            <CollapsibleWidget title={task.name.split('.').pop()}
+                                subtitle={task.status}
+                                open={false}>
+                                <pre>
+                                    {   //reduce log array to a string with formatted entries
+                                        task.log.reduce( (prevVal, entry, index) =>
+                                            prevVal + `[${formatTime(entry.created)}] ${entry.levelname}: ${entry.msg}\n`
+                                        , '')
+                                    }
+                                </pre>
+                            </CollapsibleWidget>
                         </div>
-                        <div className={layout.horizontalFlexContainer}>
-                            <label className={formStyle.label}>Status:</label>
-                            <span className={layout.flexItem}>{task.status}</span>
-                        </div>
-                    </section>
-                )}
+                    </section>;
+                })}
                 <section>
                 <ButtonBar
                     onAction={ (action) => { this[action](); }}
