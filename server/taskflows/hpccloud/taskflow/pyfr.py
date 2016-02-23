@@ -70,7 +70,7 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
         self.run_task(pyfr_terminate.s())
 
     def delete(self):
-        for job in self.get('jobs'):
+        for job in self.get('meta', {}).get('jobs', []):
             job_id = job['_id']
             client = _create_girder_client(
             self.girder_api_url, self.girder_token)
@@ -130,7 +130,7 @@ def _export_solution(logger, mesh_path, input_path, output_path):
 @cumulus.taskflow.task
 def pyfr_terminate(task):
     cluster = task.taskflow['cluster']
-    for job in task.taskflow.get('jobs'):
+    for job in task.taskflow.get('meta', {}).get('jobs', []):
         terminate_job(
             cluster, job, log_write_url=None,
             girder_token=task.taskflow.girder_token)

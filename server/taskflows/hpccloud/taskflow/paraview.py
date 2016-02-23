@@ -57,9 +57,6 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
         cluster = model.filter(cluster, user, passphrase=False)
         kwargs['cluster'] = cluster
 
-        print cluster
-
-
         super(ParaViewTaskFlow, self).start(
             create_paraview_job.s(self, *args, **kwargs))
 
@@ -68,7 +65,7 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
         self.run_task(cleanup_proxy_entries.s())
 
     def delete(self):
-        for job in self.get('jobs', []):
+        for job in self.get('meta', {}).get('jobs', []):
             job_id = job['_id']
             client = _create_girder_client(
             self.girder_api_url, self.girder_token)
@@ -99,7 +96,7 @@ def validate_args(kwargs):
 @cumulus.taskflow.task
 def paraview_terminate(task):
     cluster = task.taskflow['cluster']
-    for job in task.taskflow.get('jobs'):
+    for job in task.taskflow.get('meta', {}).get('jobs', []):
         terminate_job(
             cluster, job, log_write_url=None,
             girder_token=task.taskflow.girder_token)
