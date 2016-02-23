@@ -29,6 +29,17 @@ export default React.createClass({
             .catch((error) => {
                 this.setState({error: error.data.message});
             });
+        client.onEvent((resp) => {
+            const tasks = this.state.tasks;
+            for (let i=0; i < tasks.length; i++) {
+                if (tasks[i]._id === resp.data._id) {
+                    tasks[i].status = resp.data.status;
+                    this.setState({tasks});
+                    return;
+                }
+            }
+            console.log(`no task found with id: ${resp.data._id}`);
+        });
     },
     visualizeTaskflow() {
         console.log('visualize');
@@ -37,7 +48,8 @@ export default React.createClass({
         console.log('log');
     },
     terminateTaskflow() {
-        if(!confirm('Are you sure you want to terminate this taskflow?')) {
+        if(this.state.tasks.every(tk => tk.status !== 'error') &&
+            !confirm('Are you sure you want to terminate this taskflow?')) {
             return;
         }
         client.deleteTaskflow(this.props.location.query.taskflowId)
