@@ -93,7 +93,8 @@ def validate_args(kwargs):
 
     for r in required:
         if not parse(r).find(kwargs):
-            raise Exception('Required parameter %s not provide to taskflow.')
+            raise Exception('Required parameter %s not provide to taskflow.'
+                            %  r)
 
 @cumulus.taskflow.task
 def paraview_terminate(task):
