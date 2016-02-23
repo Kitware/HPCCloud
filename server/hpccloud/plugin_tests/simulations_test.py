@@ -622,8 +622,15 @@ class SimulationTestCase(TestCase):
         }
         json_body = json.dumps(body)
 
-        # Try invalid status
         r = self.request('/simulations/%s/steps/step1' % str(sim['_id']), method='PATCH',
                          user=self._another_user,  type='application/json',
                          body=json_body)
         self.assertStatusOk(r)
+
+        r = self.request('/simulations/%s/steps/step1' % str(sim['_id']), method='GET',
+                         user=self._another_user)
+        self.assertStatusOk(r)
+        self.assertEqual(r.json['view'], 'bogus')
+
+
+

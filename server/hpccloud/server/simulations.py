@@ -104,12 +104,11 @@ class Simulations(Resource):
         description = updates.get('description')
         active = updates.get('active')
         disabled = updates.get('disabled')
-        view = updates.get('view')
         status = updates.get('status')
 
         return self._model.update(user, simulation, name=name,
                                   description=description, active=active,
-                                  disabled=disabled, view=view, status=status)
+                                  disabled=disabled, status=status)
 
     addModel('CloneParams', {
         'id': 'CloneParams',
@@ -197,9 +196,10 @@ class Simulations(Resource):
         status = updates.get('status')
         metadata = updates.get('metadata')
         export = updates.get('export')
+        view = updates.get('view')
 
         self._model.update_step(
-            user, simulation, stepName, status, metadata, export)
+            user, simulation, stepName, status, metadata, export, view)
 
     @describeRoute(
         Description('Download all the asset associated with a simulation')

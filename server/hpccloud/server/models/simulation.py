@@ -150,7 +150,7 @@ class Simulation(AccessControlledModel):
         self.model('folder').remove(simulation_folder)
 
     def update(self, user, simulation, name, description=None, active=None,
-               disabled=None, view=None, status=None):
+               disabled=None, status=None):
         """
         Update a simulation.
 
@@ -169,9 +169,6 @@ class Simulation(AccessControlledModel):
 
         if disabled:
             simulation['disabled'] = disabled
-
-        if view:
-            simulation['view'] = view
 
         if status:
             simulation['status'] = status
@@ -258,7 +255,7 @@ class Simulation(AccessControlledModel):
         return self.save(simulation)
 
     def update_step(self, user, simulation, step_name, status, metadata,
-                    export):
+                    export, view):
         """
         Update a simulation step.
 
@@ -281,6 +278,10 @@ class Simulation(AccessControlledModel):
 
         if export is not None:
             step['export'] = export
+            dirty = True
+
+        if view is not None:
+            step['view'] = view
             dirty = True
 
         if dirty:
