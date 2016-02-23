@@ -150,7 +150,7 @@ class Simulation(AccessControlledModel):
         self.model('folder').remove(simulation_folder)
 
     def update(self, user, simulation, name, description=None, active=None,
-               disabled=None, view=None, status=None):
+               disabled=None, status=None):
         """
         Update a simulation.
 
@@ -169,9 +169,6 @@ class Simulation(AccessControlledModel):
 
         if disabled:
             simulation['disabled'] = disabled
-
-        if view:
-            simulation['view'] = view
 
         if status:
             simulation['status'] = status

@@ -104,12 +104,11 @@ class Simulations(Resource):
         description = updates.get('description')
         active = updates.get('active')
         disabled = updates.get('disabled')
-        view = updates.get('view')
         status = updates.get('status')
 
         return self._model.update(user, simulation, name=name,
                                   description=description, active=active,
-                                  disabled=disabled, view=view, status=status)
+                                  disabled=disabled, status=status)
 
     addModel('CloneParams', {
         'id': 'CloneParams',
