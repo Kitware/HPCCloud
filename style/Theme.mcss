@@ -1,21 +1,4 @@
-.hpcCloudIcon {
-    composes: fa         from 'font-awesome/css/font-awesome.css';
-    composes: fa-fw      from 'font-awesome/css/font-awesome.css';
-    composes: fa-cloud   from 'font-awesome/css/font-awesome.css';
-}
-
-.logoutIcon {
-    composes: fa            from 'font-awesome/css/font-awesome.css';
-    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
-    composes: fa-sign-out   from 'font-awesome/css/font-awesome.css';
-}
-
-.landingIcon {
-    composes: fa                from 'font-awesome/css/font-awesome.css';
-    composes: fa-fw             from 'font-awesome/css/font-awesome.css';
-    composes: fa-cloud-download from 'font-awesome/css/font-awesome.css';
-}
-
+/* Text colors */
 .colorLightGrey {
     color: #eee;
 }
@@ -35,6 +18,7 @@
     color: #c54d57;
 }
 
+/* Toolbars / Headers */
 .topBar {
     composes: topBar from 'HPCCloudStyle/Layout.mcss';
     background: #222;
@@ -67,6 +51,17 @@
     border-radius: 4px;
 }
 
+.progressBar {
+    position: absolute;
+    width: 0px;
+    height: 2px;
+    transition: width 1s linear, opacity 1.5s linear;
+    background-color: #4ecdc4;
+    left: 0;
+    top: 0;
+}
+
+/* Boxes */
 .errorBox {
     composes: alert from 'bootstrap/dist/css/bootstrap.css';
     composes: alert-danger from 'bootstrap/dist/css/bootstrap.css';
@@ -85,17 +80,13 @@
     margin-bottom: 0px;
 }
 
-.progressBar {
-    position: absolute;
-    width: 0px;
-    height: 2px;
-    transition: width 1s linear, opacity 1.5s linear;
-    background-color: #4ecdc4;
-    left: 0;
-    top: 0;
+.statusListItem {
+    padding: 12px 0;
+    margin: 0 18px;
+    border-bottom: 1px solid #eee;
 }
 
-/* in case we ever have more varied font weights*/
+/* Text styles */
 .boldText {
     font-weight: bold;
 }
@@ -107,6 +98,25 @@
 .capitalizeRightText {
     text-align: right;
     text-transform: capitalize;
+}
+
+/* Icons */
+.hpcCloudIcon {
+    composes: fa         from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw      from 'font-awesome/css/font-awesome.css';
+    composes: fa-cloud   from 'font-awesome/css/font-awesome.css';
+}
+
+.logoutIcon {
+    composes: fa            from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
+    composes: fa-sign-out   from 'font-awesome/css/font-awesome.css';
+}
+
+.landingIcon {
+    composes: fa                from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw             from 'font-awesome/css/font-awesome.css';
+    composes: fa-cloud-download from 'font-awesome/css/font-awesome.css';
 }
 
 .editIcon {

@@ -1,6 +1,9 @@
 import React        from 'react';
 import client       from '../../../../../../network';
 import ButtonBar    from '../../../../../../panels/ButtonBar';
+import formStyle    from 'HPCCloudStyle/ItemEditor.mcss';
+import layout       from 'HPCCloudStyle/Layout.mcss';
+import theme        from 'HPCCloudStyle/Theme.mcss';
 
 export default React.createClass({
     displayName: 'pvw/view-visualization',
@@ -79,9 +82,16 @@ export default React.createClass({
         return (
             <div>
                 { this.state.tasks.map( (task) =>
-                    <span key={task._id}>
-                        {task.name.split('.').pop()} : {task.status}
-                    </span>
+                    <section key={task._id} className={theme.statusListItem}>
+                        <div className={layout.horizontalFlexContainer}>
+                            <label className={formStyle.label}>Name:</label>
+                            <span className={layout.flexItem}>{task.name.split('.').pop()}</span>
+                        </div>
+                        <div className={layout.horizontalFlexContainer}>
+                            <label className={formStyle.label}>Status:</label>
+                            <span className={layout.flexItem}>{task.status}</span>
+                        </div>
+                    </section>
                 )}
                 <section>
                 <ButtonBar
