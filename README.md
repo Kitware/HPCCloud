@@ -39,15 +39,19 @@ $ npm start
 
 ## Trouble shooting
 
+```sh
 $ vagrant ssh
 $ sudo -iu hpccloud
+```
 
 ### Fixing celery Girder URL
 
+```sh
 $ vi /opt/hpccloud/cumulus/cumulus/conf/config.json
   +-> Fix host to be localhost
   +-> baseUrl: "http://localhost:8080/api/v1",
 $ sudo service celeryd restart
+```
 
 ## Documentation
 

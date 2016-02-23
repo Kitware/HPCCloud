@@ -1,0 +1,47 @@
+.resetCameraButton {
+    composes: fa            from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
+    composes: fa-arrows-alt from 'font-awesome/css/font-awesome.css';
+    cursor: pointer;
+}
+
+.toggleMenuButton {
+    composes: fa        from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw     from 'font-awesome/css/font-awesome.css';
+    composes: fa-bars   from 'font-awesome/css/font-awesome.css';
+    cursor: pointer;
+}
+
+.menu {
+    position: absolute;
+    top: 4em;
+    left: 0px;
+    height: calc(100vh - 60px);
+    width: 300px;
+    background-color: #eee;
+    z-index: 2;
+    border-radius: 5px;
+    color: #111;
+    font-size: 20px;
+    transition: opacity 0.5s;
+    opacity: .75;
+    overflow: hidden;
+}
+
+.menu:hover {
+   opacity: 1;
+}
+
+.hiddenMenu {
+    composes: menu;
+    z-index: -1;
+    opacity: 0;
+}
+
+.viewport {
+    position: absolute;
+    top: 4em;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}

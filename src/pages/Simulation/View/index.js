@@ -1,6 +1,7 @@
 import React     from 'react';
 import Workflows from '../../../workflows';
 import client    from '../../../network';
+import tools     from  '../../../tools';
 
 export default React.createClass({
 
@@ -67,7 +68,8 @@ export default React.createClass({
         const taskFlowName = wfModule.taskFlows && wfModule.taskFlows[step] ? wfModule.taskFlows[step] : null;
 
         const view = this.props.location.query.view || 'default';
-        const childComponent = wfModule.components.ViewSimulation;
+        const childComponent = tools[view] || wfModule.components.ViewSimulation;
+
         if(childComponent) {
             return (<div>{ React.createElement(childComponent, { project, simulation, step, view, taskFlowName, location:this.props.location }) }</div>);
         }
