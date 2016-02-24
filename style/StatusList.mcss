@@ -16,3 +16,15 @@
     margin: 0 18px;
     border-bottom: 1px solid #eee;
 }
+
+.log {
+    max-height: 250px;
+    overflow: scroll;
+}
+
+.header {
+    font-size: 18px;
+    margin: 7px 18px 0;
+    display: inline-block;
+    composes: lightText from 'HPCCloudStyle/Theme.mcss';
+}

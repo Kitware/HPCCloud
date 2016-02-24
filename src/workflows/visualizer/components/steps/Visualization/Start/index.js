@@ -22,7 +22,7 @@ export default React.createClass({
         router: React.PropTypes.object,
     },
     getInitialState() {
-        return {serverType: 'EC2',
+        return {serverType: 'Traditional',
             EC2: defaultServerParameters.EC2,
             Traditional:defaultServerParameters.Traditional,
             OpenStack: defaultServerParameters.OpenStack,
@@ -37,22 +37,28 @@ export default React.createClass({
         profile[key] = value;
         this.setState({[server]: profile});
     },
+    //generated uuid format: p <- [a-f0-9]{4}, 'pp-p-p-p-ppp'
+    generateSessionId() {
+        var f = () => Math.floor(Math.random() * 0x10000).toString(16);
+
+        return [f() + f(), f(), f(), f(), f() + f() + f()].join('-');
+    },
     startVisualization() {
         var taskflowId,
-            sessionKey = Math.floor(Math.random() * 0xffffff);
+            sessionId = this.generateSessionId();
         client.createTaskflow(this.props.taskFlowName)
             .then( (resp) => {
                 taskflowId = resp.data._id;
                 return client.startTaskflow(taskflowId, {
                     cluster: {_id:this.state[this.state.serverType].profile},
                     dataDir: '/tmp', //where the output for the sim will be
-                    sessionKey, //uuid-ish for pvw
+                    sessionKey: sessionId,       //for pvw, we use this later for connecting
                 });
             })
             .then((resp) => {
                 return client.updateSimulationStep(this.props.simulation._id, this.props.step, {
                     view: 'run',
-                    metadata: {taskflowId},
+                    metadata: {taskflowId, sessionId},
                 });
             })
             .then( (resp) => {
@@ -94,8 +100,8 @@ export default React.createClass({
                 <section className={formStyle.group}>
                     <label className={formStyle.label}>Region</label>
                     <select className={formStyle.input} value={this.state.serverType} onChange={ (e) => this.setState({serverType: e.target.value})}>
-                        <option value="EC2">EC2</option>
                         <option value="Traditional">Traditional</option>
+                        <option value="EC2">EC2</option>
                         <option value="OpenStack">OpenStack</option>
                     </select>
                 </section>

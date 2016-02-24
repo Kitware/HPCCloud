@@ -4,6 +4,7 @@ import * as network     from 'pvw-visualizer/src/network';
 import ProxyManager     from 'pvw-visualizer/src/ProxyManager';
 import ControlPanel     from 'pvw-visualizer/src/panels/ControlPanel';
 import VtkRenderer      from 'paraviewweb/src/React/Renderers/VtkRenderer';
+import client           from '../../network';
 
 import style            from 'HPCCloudStyle/PageWithMenu.mcss';
 import breadCrumbStyle  from 'HPCCloudStyle/Theme.mcss';
@@ -14,6 +15,7 @@ export default React.createClass({
     displayName: 'Visualization',
 
     propTypes: {
+        location: React.PropTypes.object,
         project: React.PropTypes.object,
         simulation: React.PropTypes.object,
         step: React.PropTypes.string,
@@ -46,9 +48,14 @@ export default React.createClass({
             /* eslint-enable */
         });
 
-        // FIXME: Find configuration based on simulation
-        const config = { sessionURL: 'ws://localhost:9876/ws' };
-        network.connect(config);
+        client.getSimulationStep(this.props.simulation._id, this.props.step)
+            .then((resp) => {
+                const config = { sessionURL: `ws://${location.hostname}:8888/proxy?sessionId=${resp.data.metadata.sessionId}` };
+                network.connect(config);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     },
 
     componentWillUnmount() {
