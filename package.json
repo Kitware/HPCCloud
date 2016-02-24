@@ -32,9 +32,9 @@
     "history": "1.17.0",
     "react-router": "2.0.0",
 
-    "paraviewweb": "1.0.10",
+    "paraviewweb": "1.1.1",
     "simput": "1.1.0",
-    "pvw-visualizer": "1.0.2",
+    "pvw-visualizer": "1.0.3",
 
     "commitizen": "2.5.0",
     "cz-conventional-changelog": "1.1.5",
@@ -76,11 +76,11 @@
     "install:pyfr"  : "cp ./node_modules/simput/dist/types/pyfr.js ./dist/simput-pyfr.js",
     "postinstall"   : "npm run install:pyfr",
 
-    "build"         : "webpack --progress --colors",
-    "build:debug"   : "webpack --display-modules",
-    "build:release" : "webpack -p --progress --colors",
+    "build"         : "fix-autobahn && webpack --progress --colors",
+    "build:debug"   : "fix-autobahn && webpack --display-modules",
+    "build:release" : "fix-autobahn && webpack -p --progress --colors",
 
-    "start": "webpack-dev-server --progress --open",
+    "start": "fix-autobahn && webpack-dev-server --progress --open",
 
     "commit"            : "git cz",
     "semantic-release"  : "semantic-release pre && npm publish && semantic-release post"
