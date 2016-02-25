@@ -147,8 +147,6 @@ def submit_paraview_job(task, job, *args, **kwargs):
     cluster = kwargs.pop('cluster')
     task.taskflow.set('cluster', cluster)
 
-    print "cluster: "  + str(cluster)
-
     params = {}
 
     if 'dataDir' in kwargs:
@@ -156,6 +154,9 @@ def submit_paraview_job(task, job, *args, **kwargs):
 
     if 'simulationJobId' in kwargs:
         params['simulationJobId'] = kwargs['simulationJobId']
+
+    if 'sessionKey' in kwargs:
+        params['sessionKey'] = kwargs['sessionKey']
 
     parallel_environment \
         = parse('config.parallelEnvironment').find(cluster)
