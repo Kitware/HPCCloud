@@ -139,7 +139,7 @@
     "no-mixed-requires": 1,
     "no-new-require": 1,
     "no-path-concat": 1,
-    "no-process-exit": 1,
+    "no-process-exit": 0,
     "no-restricted-modules": [1, ""], // add any unwanted Node.js core modules
     "no-sync": 1,
 

@@ -75,7 +75,9 @@
   "scripts": {
     "install:pyfr"  : "cp ./node_modules/simput/dist/types/pyfr.js ./dist/simput-pyfr.js",
     "postinstall"   : "npm run install:pyfr",
+    "check"         : "node bin/version-check.js",
 
+    "prebuild"      : "npm run check",
     "build"         : "fix-autobahn && webpack --progress --colors",
     "build:debug"   : "fix-autobahn && webpack --display-modules",
     "build:release" : "fix-autobahn && webpack -p --progress --colors",
