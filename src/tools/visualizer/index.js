@@ -4,6 +4,7 @@ import * as network     from 'pvw-visualizer/src/network';
 import ProxyManager     from 'pvw-visualizer/src/ProxyManager';
 import ControlPanel     from 'pvw-visualizer/src/panels/ControlPanel';
 import VtkRenderer      from 'paraviewweb/src/React/Renderers/VtkRenderer';
+import client           from '../../network';
 
 import style            from 'HPCCloudStyle/PageWithMenu.mcss';
 import breadCrumbStyle  from 'HPCCloudStyle/Theme.mcss';
@@ -47,9 +48,15 @@ export default React.createClass({
             /* eslint-enable */
         });
 
-        const config = { sessionURL: `ws://${location.hostname}:8888/proxy?` +
-            `sessionId=${this.props.simulation.steps[this.props.step].metadata.sessionId}` };
-        network.connect(config);
+        //props.simulation is not necessarily updated with latest metadata, so we fetch it.
+        client.getSimulationStep(this.props.simulation._id, this.props.step)
+           .then((resp) => {
+               const config = { sessionURL: `ws://${location.hostname}:8888/proxy?sessionId=${resp.data.metadata.sessionId}` };
+               network.connect(config);
+           })
+           .catch((err) => {
+               console.log(err);
+           });
     },
 
     componentWillUnmount() {
