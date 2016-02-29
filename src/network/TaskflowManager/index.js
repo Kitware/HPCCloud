@@ -1,125 +1,128 @@
 import Monologue from 'monologue.js';
 import client from '../index.js';
 
-var myTaskflow,
+var taskflows = {},
     tasks = {}, //taskflow tasks
     jobs = {};  //hpc tasks/job
 
+const typeMapping = {
+    job: jobs,
+    task: tasks,
+};
 
 class Observable {}
 Monologue.mixInto(Observable);
-// const TASKFLOW_CHANNEL = 'TaskFlows';
-export const changeDispatcher = new Observable()
-
-
-//interates through arr and assigns new status from notification
-function checkItems(arr, notification) {
-    for (let i=0; i < arr.length; i++) {
-        if (arr[i]._id === notification._id) {
-            arr[i].status = notification.status;
-            return true;
-        }
-    }
-    return false;
-}
+const changeDispatcher = new Observable()
 
 // emit change on monolog
-function notifyChange(which) {
-    var packet;
-    switch (which){
-        case 'jobs':
-            packet = {jobs};
-            break;
-        case 'tasks':
-            packet = {tasks};
-            break;
-        default:
-            packet = {jobs, tasks};
+function notifyChange(taskflowId) {
+    const event = { jobs: [] },
+        taskflow = taskflows[taskflowId];
+
+    // Fill events with tasks and jobs
+    if(taskflow && taskflow.tasks && taskflow.flow) {
+        event.tasks = taskflow.tasks;
+        if(taskflow.flow.meta && taskflow.flow.meta.jobs) {
+            taskflow.flow.meta.jobs.forEach(job => {
+                if(jobs[job._id]) {
+                    event.jobs.push(jobs[job._id]);
+                }
+            })
+        }
+
+        changeDispatcher.emit(taskflowId, event);
     }
-    changeDispatcher.emit(`${myTaskflow}`, packet);
 }
 
+function onEventUpdate(type, event) {
+    const typeMap = type.split('.');
 
-//fetches jobs and tasks
-export function fetchItems() {
-    client.getTaskflowTaskStatuses(myTaskflow)
-        .then((resp) => {
-            tasks = resp.data;
-            return client.getTaskflow(myTaskflow);
-        })
-        .then( (resp) => {
-            if (resp.data.meta && resp.data.meta.jobs) {
-                jobs = resp.data.meta.jobs;
-            }
-            const promises = jobs.map((job) => {
-                return client.getJobStatus(job._id)
-                    .then((statusRes) => {
-                        job.status = statusRes.data.status;
-                    })
-                    .catch((err) => {
-                        console.log('error fetching job status: ', job._id, err);
-                    });
+    if(!typeMapping[typeMap[0]]) {
+        return null;
+    }
+
+    const obj = typeMapping[typeMap[0]][event._id];
+    if(obj) {
+        obj.status = event.status;
+        if(obj.__taskflowId) {
+            notifyChange(obj.__taskflowId);
+        }
+    }
+    return obj;
+}
+
+function updateJobStatus(taskflowId, jobId) {
+    client.getJobStatus(jobId)
+        .then( resp => {
+            jobs[jobId].status = resp.data.status
+            notifyChange(taskflowId);
+        });
+}
+
+function updateTaskFlow(taskflowId) {
+    if(!taskflows[taskflowId]) {
+        taskflows[taskflowId] = {};
+    }
+
+    client.getTaskflowTaskStatuses(taskflowId)
+        .then( resp => {
+            taskflows[taskflowId].tasks = resp.data;
+            taskflows[taskflowId].tasks.forEach(task => {
+                tasks[task._id] = task;
+                task.__taskflowId = taskflowId;
             });
-            return Promise.all(promises);
-        })
-        .then(() => {
-            notifyChange();
-        })
-        .catch((error) => {
-            console.log(error);
+            notifyChange(taskflowId);
+        });
+
+    client.getTaskflow(taskflowId)
+        .then( resp => {
+            taskflows[taskflowId].flow = resp.data;
+
+            if(taskflows[taskflowId].flow && taskflows[taskflowId].flow.meta && taskflows[taskflowId].flow.meta.jobs) {
+                resp.data.meta.jobs.forEach( job => {
+                    jobs[job._id] = job;
+                    job.__taskflowId = taskflowId;
+                    updateJobStatus(taskflowId, job._id);
+                });
+            }
+
         });
 }
 
 client.onEvent((resp) =>{
-    var evt = resp.data,
-        type = resp.type,
-        update = false;
-
-    //update the jobs or tasks based on notification type
-    if (/job/.test(type)) {
-        update = checkItems(jobs, evt);
-    } else if (/task/.test(type)) {
-        update = checkItems(tasks, evt);
-    }
+    // update the jobs or tasks based on notification type
+    const obj = onEventUpdate(resp.type, resp.data);
 
     //if nothing was updated check the endpoints for new items.
-    //reiterate through them and see if the notification applies to
-    //any of the new obejects. Emit changes if there are any.
-    if (!update && myTaskflow) {
-        if (/job/.test(type)) {
-            client.getTaskflow(myTaskflow)
-                .then((res) => {
-                    if (res.data.meta && res.data.meta.jobs) {
-                        jobs = res.data.meta.jobs;
-                        update = checkItems(jobs, evt);
-                    }
-                    if (update) {
-                        notifyChange('jobs');
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        } else if (/task/.test(type)) {
-            client.getTaskflowTaskStatuses(myTaskflow)
-                .then((res) => {
-                    tasks = res.data;
-                    update = checkItems(tasks, evt);
-                    if (update) {
-                        notifyChange('tasks');
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
+    if (!obj) {
+        // Let's refresh all taskflows
+        for(const taskflowId in taskflows) {
+            updateTaskFlow(taskflowId);
         }
     }
 });
 
 //set the instance's taskflowId
-export function setTaskflow(id) {
-    myTaskflow = id;
-    fetchItems();
+export function monitorTaskflow(id, callback) {
+    taskflows[id] = {};
+    updateTaskFlow(id);
+    return changeDispatcher.on(id, callback);
+}
+
+export function unmonitorTaskflow(id) {
+    changeDispatcher.off(id);
+    const taskflow = taskflows[id];
+    if(taskflow && taskflow.flow && taskflow.flow.meta && taskflow.flow.meta.jobs) {
+        taskflow.flow.meta.jobs.forEach(job => {
+            delete jobs[job._id];
+        })
+    }
+    if(taskflow && taskflow.tasks) {
+        taskflow.tasks.forEach(task => {
+            delete tasks[task._id];
+        })
+    }
+    delete taskflows[id];
 }
 
 export function terminateTaskflow(id) {
@@ -130,10 +133,9 @@ export function deleteTaskflow(id) {
     return client.deleteTaskflow(id);
 }
 
-export function getJobList(id) {
-    return jobs;
-}
-
-export function getTaskList(id) {
-    return tasks;
+export default {
+    monitorTaskflow,
+    unmonitorTaskflow,
+    terminateTaskflow,
+    deleteTaskflow,
 }

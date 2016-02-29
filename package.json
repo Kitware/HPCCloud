@@ -32,9 +32,9 @@
     "history": "1.17.0",
     "react-router": "2.0.0",
 
-    "paraviewweb": "1.1.5",
+    "paraviewweb": "1.2.2",
     "simput": "1.1.0",
-    "pvw-visualizer": "1.0.3",
+    "pvw-visualizer": "1.0.5",
 
     "commitizen": "2.5.0",
     "cz-conventional-changelog": "1.1.5",

@@ -1,4 +1,4 @@
-import * as tfManager from '../../../../../../network/TaskflowManager';
+import tfManager    from '../../../../../../network/TaskflowManager';
 import ButtonBar    from '../../../../../../panels/ButtonBar';
 import client       from '../../../../../../network';
 import CollapsibleWidget from 'paraviewweb/src/React/Widgets/CollapsibleWidget'
@@ -28,14 +28,20 @@ export default React.createClass({
         };
     },
     componentWillMount(){
-        var tfid = this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId,
-            newStateFromPacket = (pkt) => {
-                this.setState(pkt);
-            };
+        var tfid = this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId;
 
-        tfManager.setTaskflow(tfid);
-        tfManager.changeDispatcher.on(`${tfid}`, newStateFromPacket);
+        this.subscription = tfManager.monitorTaskflow(tfid, (pkt) => {
+            this.setState(pkt);
+        });
     },
+
+    componentWillUnmount() {
+        if(this.subscription) {
+            this.subscription.unsubscribe();
+            this.subscription = null;
+        }
+    },
+
     visualizeTaskflow() {
         this.context.router.replace({
             pathname: this.props.location.pathname,
