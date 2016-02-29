@@ -26,12 +26,13 @@ from jsonpath_rw import parse
 import cumulus.taskflow
 from cumulus.starcluster.tasks.job import download_job_input_folders, submit_job
 from cumulus.starcluster.tasks.job import monitor_job, upload_job_output_to_folder
-from cumulus.starcluster.tasks.job import terminate_job
 
 from girder.utility.model_importer import ModelImporter
 from girder.api.rest import getCurrentUser
 from girder.constants import AccessType
 from girder_client import GirderClient, HttpError
+
+from hpccloud.taskflow.utility import *
 
 class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
     """
@@ -95,11 +96,15 @@ def validate_args(kwargs):
 
 @cumulus.taskflow.task
 def paraview_terminate(task):
-    cluster = task.taskflow['cluster']
-    for job in task.taskflow.get('meta', {}).get('jobs', []):
-        terminate_job(
-            cluster, job, log_write_url=None,
-            girder_token=task.taskflow.girder_token)
+    cluster = parse('meta.cluster').find(task.taskflow)
+    if cluster:
+        cluster = cluster[0].value
+
+    client = _create_girder_client(
+            task.taskflow.girder_api_url, task.taskflow.girder_token)
+
+    jobs = task.taskflow.get('meta', {}).get('jobs', [])
+    terminate_jobs(task, client, cluster, jobs)
 
 @cumulus.taskflow.task
 def create_paraview_job(task, *args, **kwargs):
@@ -145,6 +150,7 @@ def submit_paraview_job(task, job, *args, **kwargs):
     girder_token = task.taskflow.girder_token
 
     cluster = kwargs.pop('cluster')
+    # Save the cluster in the taskflow for termination
     task.taskflow.set('cluster', cluster)
 
     params = {}
@@ -157,6 +163,8 @@ def submit_paraview_job(task, job, *args, **kwargs):
 
     if 'sessionKey' in kwargs:
         params['sessionKey'] = kwargs['sessionKey']
+        # Save the sessionKey so we can clean up the proxy entry
+        task.taskflow.set('sessionKey', kwargs['sessionKey'])
 
     parallel_environment \
         = parse('config.parallelEnvironment').find(cluster)
@@ -220,7 +228,8 @@ def cleanup_proxy_entries(task):
     client = _create_girder_client(
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
 
-    cluster = task.taskflow['cluster']
-    for job in task.taskflow['jobs']:
-        client.delete('proxy/%s%2F%s' % (cluster['_id'], job['_id']))
+    session_key = parse('meta.sessionKey').find(task.taskflow)
+    if session_key:
+        session_key = session_key[0].value
+        client.delete('proxy/%s' % session_key)
 
