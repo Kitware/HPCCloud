@@ -95,8 +95,12 @@ def validate_args(kwargs):
 
 @cumulus.taskflow.task
 def paraview_terminate(task):
-    cluster = task.taskflow['cluster']
+    cluster = parse('meta.cluster').find(task.taskflow)
+    if cluster:
+        cluster = cluster[0].value
+
     for job in task.taskflow.get('meta', {}).get('jobs', []):
+        task.logger.info('Terminating job %s' % job)
         terminate_job(
             cluster, job, log_write_url=None,
             girder_token=task.taskflow.girder_token)
@@ -145,6 +149,7 @@ def submit_paraview_job(task, job, *args, **kwargs):
     girder_token = task.taskflow.girder_token
 
     cluster = kwargs.pop('cluster')
+    # Save the cluster in the taskflow for termination
     task.taskflow.set('cluster', cluster)
 
     params = {}
@@ -157,6 +162,8 @@ def submit_paraview_job(task, job, *args, **kwargs):
 
     if 'sessionKey' in kwargs:
         params['sessionKey'] = kwargs['sessionKey']
+        # Save the sessionKey so we can clean up the proxy entry
+        task.taskflow.set('sessionKey', kwargs['sessionKey'])
 
     parallel_environment \
         = parse('config.parallelEnvironment').find(cluster)
@@ -220,7 +227,8 @@ def cleanup_proxy_entries(task):
     client = _create_girder_client(
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
 
-    cluster = task.taskflow['cluster']
-    for job in task.taskflow['jobs']:
-        client.delete('proxy/%s%2F%s' % (cluster['_id'], job['_id']))
+    session_key = parse('meta.sessionKey').find(task.taskflow)
+    if session_key:
+        session_key = session_key[0].value
+        client.delete('proxy/%s' % session_key)
 
