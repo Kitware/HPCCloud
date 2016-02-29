@@ -36,17 +36,16 @@ export const ProjectHelper = {
     },
 }
 
-const SIMULATIONS_ICONS = [
-    style.simulationEditIcon,
-    style.simulationRunningIcon,
-    style.simulationDoneIcon,
-];
+const SIMULATIONS_ICONS = {
+    'created': style.simulationEditIcon,
+    'running': style.simulationRunningIcon,
+    'complete': style.simulationDoneIcon,
+};
 
 export const SimulationHelper = {
 
     getIcon(simulation) {
-        const idx = Math.floor(Math.random() * (SIMULATIONS_ICONS.length + 1)) % SIMULATIONS_ICONS.length;
-        return { icon: SIMULATIONS_ICONS[idx] };
+        return { icon: SIMULATIONS_ICONS[simulation.steps[simulation.active].status] };
     },
 
     getName(simulation) {

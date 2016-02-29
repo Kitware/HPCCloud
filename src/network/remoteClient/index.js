@@ -35,6 +35,18 @@ import {
 } from './AWS';
 
 import {
+    getJobs,
+    createJob,
+    getJob,
+    updateJob,
+    deleteJob,
+    getJobLog,
+    getJobOutput,
+    getJobStatus,
+    terminateJob,
+} from './Jobs';
+
+import {
     listProjects,
     getProject,
     saveProject,
@@ -102,6 +114,17 @@ export default {
     getAWSMaxInstances,
     listAWSProfiles,
     listAWSRunningInstances,
+
+    /* Jobs */
+    getJobs,
+    createJob,
+    getJob,
+    updateJob,
+    deleteJob,
+    getJobLog,
+    getJobOutput,
+    getJobStatus,
+    terminateJob,
 
     /* Project */
     listProjects,

@@ -51,6 +51,18 @@ export function fetchItems() {
             if (resp.data.meta && resp.data.meta.jobs) {
                 jobs = resp.data.meta.jobs;
             }
+            const promises = jobs.map((job) => {
+                return client.getJobStatus(job._id)
+                    .then((statusRes) => {
+                        job.status = statusRes.data.status;
+                    })
+                    .catch((err) => {
+                        console.log('error fetching job status: ', job._id, err);
+                    });
+            });
+            return Promise.all(promises);
+        })
+        .then(() => {
             notifyChange();
         })
         .catch((error) => {

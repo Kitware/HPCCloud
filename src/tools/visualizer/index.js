@@ -51,7 +51,7 @@ export default React.createClass({
         //props.simulation is not necessarily updated with latest metadata, so we fetch it.
         client.getSimulationStep(this.props.simulation._id, this.props.step)
            .then((resp) => {
-               const config = { sessionURL: `ws://${location.hostname}:8888/proxy?sessionId=${resp.data.metadata.sessionId}` };
+               const config = { sessionURL: `ws://${location.hostname}:8888/proxy?sessionId=${resp.data.metadata.sessionId}&path=ws` };
                network.connect(config);
            })
            .catch((err) => {
