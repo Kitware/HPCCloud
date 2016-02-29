@@ -148,7 +148,7 @@ def create_paraview_job(task, *args, **kwargs):
     }
 
     job = client.post('jobs', data=json.dumps(body))
-    task.logger.info('ParaView job create: %s' % job['_id'])
+    task.logger.info('ParaView job created: %s' % job['_id'])
     task.taskflow.logger.info('ParaView job created.')
 
     task.taskflow.set('jobs', [job])
