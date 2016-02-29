@@ -26,6 +26,8 @@ from jsonpath_rw import parse
 import cumulus.taskflow
 from cumulus.starcluster.tasks.job import download_job_input_folders, submit_job
 from cumulus.starcluster.tasks.job import monitor_job, upload_job_output_to_folder
+from cumulus.starcluster.tasks.job import job_dir
+from cumulus.transport import get_connection
 
 from girder.utility.model_importer import ModelImporter
 from girder.api.rest import getCurrentUser
@@ -66,10 +68,10 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
         self.run_task(cleanup_proxy_entries.s())
 
     def delete(self):
+        client = _create_girder_client(
+            self.girder_api_url, self.girder_token)
         for job in self.get('meta', {}).get('jobs', []):
             job_id = job['_id']
-            client = _create_girder_client(
-            self.girder_api_url, self.girder_token)
             client.delete('jobs/%s' % job_id)
 
             try:
@@ -85,6 +87,16 @@ def _create_girder_client(girder_api_url, girder_token):
     client.token = girder_token
 
     return client
+
+def _get_job_output_dir(cluster):
+    job_output_dir \
+        = parse('config.jobOutputDir').find(cluster)
+    if job_output_dir:
+        job_output_dir = job_output_dir[0].value
+    else:
+        job_output_dir = None
+
+    return job_output_dir
 
 def validate_args(kwargs):
     required = ['dataDir', 'cluster.config.paraview.installDir', 'sessionKey']
@@ -111,6 +123,9 @@ def create_paraview_job(task, *args, **kwargs):
     task.logger.info('Validating args passed to flow.')
     validate_args(kwargs)
 
+    client = _create_girder_client(
+                task.taskflow.girder_api_url, task.taskflow.girder_token)
+
     task.taskflow.logger.info('Creating ParaView job.')
     task.logger.info('Load ParaView submission script.')
 
@@ -132,24 +147,38 @@ def create_paraview_job(task, *args, **kwargs):
         'output': []
     }
 
-    client = _create_girder_client(
-                task.taskflow.girder_api_url, task.taskflow.girder_token)
-
     job = client.post('jobs', data=json.dumps(body))
     task.logger.info('ParaView job create: %s' % job['_id'])
     task.taskflow.logger.info('ParaView job created.')
 
     task.taskflow.set('jobs', [job])
 
-    submit_paraview_job.delay(job, *args, **kwargs)
+    # Upload the visualizer code
+    task.logger.info('Uploading visualizer')
+    viz_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '../',  '../', '../','../',
+            'node_modules/pvw-visualizer/server/pvw-visualizer.py'))
 
+    if not os.path.exists(viz_path):
+        task.logger.error('Unable to local pvw-visualizer.py for upload.')
+        return
+
+    cluster = kwargs.pop('cluster')
+    target_dir = job_dir(job, _get_job_output_dir(cluster))
+    target_path = os.path.join(target_dir, 'pvw-visualizer.py')
+
+    with get_connection(task.taskflow.girder_token, cluster) as conn:
+        conn.makedirs(target_dir)
+        with open(viz_path, 'r') as fp:
+            conn.put(fp, target_path)
+
+    submit_paraview_job.delay(cluster, job,  *args, **kwargs)
 
 @cumulus.taskflow.task
-def submit_paraview_job(task, job, *args, **kwargs):
+def submit_paraview_job(task, cluster, job, *args, **kwargs):
     task.taskflow.logger.info('Submitting job to cluster.')
     girder_token = task.taskflow.girder_token
 
-    cluster = kwargs.pop('cluster')
     # Save the cluster in the taskflow for termination
     task.taskflow.set('cluster', cluster)
 
@@ -173,10 +202,8 @@ def submit_paraview_job(task, job, *args, **kwargs):
         parallel_environment = parallel_environment[0].value
         params['parallelEnvironment'] = parallel_environment
 
-    job_output_dir \
-        = parse('config.jobOutputDir').find(cluster)
+    job_output_dir = _get_job_output_dir(cluster)
     if job_output_dir:
-        job_output_dir = job_output_dir[0].value
         params['jobOutputDir'] = job_output_dir
 
     paraview_install_dir \

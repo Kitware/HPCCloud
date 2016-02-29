@@ -8,7 +8,7 @@ PARAVIEW_DIR={{paraviewInstallDir if paraviewInstallDir else "/opt/paraview/inst
 PV_PYTHON="${PARAVIEW_DIR}/bin/pvpython"
 LIB_VERSION_DIR=`ls ${PARAVIEW_DIR}/lib | grep paraview`
 APPS_DIR="lib/${LIB_VERSION_DIR}/site-packages/paraview/web"
-VISUALIZER="${PARAVIEW_DIR}/${APPS_DIR}/pv_web_visualizer.py"
+VISUALIZER="pvw-visualizer.py"
 GET_PORT_PYTHON_CMD='import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()'
 RC_PORT=`python -c "${GET_PORT_PYTHON_CMD}"`
 echo ${RC_PORT} > /tmp/{{job._id}}.rc_port
@@ -17,7 +17,6 @@ echo ${RC_PORT} > /tmp/{{job._id}}.rc_port
 if [[ "${PARAVIEW_DIR}" == *paraview.app ]]
 then
    PV_PYTHON="${PARAVIEW_DIR}/Contents/bin/pvpython"
-   VISUALIZER="${PARAVIEW_DIR}/Contents/Python/paraview/web/pv_web_visualizer.py"
 fi
 
 REVERSE="--reverse-connect-port ${RC_PORT}"
