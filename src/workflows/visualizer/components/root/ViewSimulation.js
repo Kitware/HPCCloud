@@ -26,7 +26,6 @@ export default React.createClass({
         const stepName = VizModule.steps._order[idx];
         client.activateSimulationStep(this.props.simulation, stepName)
             .then(resp => {
-                console.log(resp);
                 if (stepName === 'Visualization') {
                     const stepView = resp.data.steps[stepName].view ? resp.data.steps[stepName].view : 'default',
                         taskflowId = resp.data.steps[stepName].metadata.taskflowId;

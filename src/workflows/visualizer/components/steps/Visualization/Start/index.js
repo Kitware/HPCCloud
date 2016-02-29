@@ -7,6 +7,7 @@ import ButtonBar               from '../../../../../../panels/ButtonBar';
 import client                  from '../../../../../../network';
 import formStyle               from 'HPCCloudStyle/ItemEditor.mcss';
 import merge                   from 'mout/src/object/merge';
+import deepClone               from 'mout/src/lang/deepClone';
 
 export default React.createClass({
     displayName: 'pvw/start-visualization',
@@ -62,13 +63,15 @@ export default React.createClass({
                 });
             })
             .then( (resp) => {
-                const routeQuery = {
-                    view: 'run',
-                    taskflowId,
-                };
+                var newSim = {};
+                deepClone(this.props.simulation, newSim);
+                newSim.view = 'run';
+                newSim.metadata = {taskflowId, sessionId};
+                client.invalidateSimulation(newSim);
+
                 this.context.router.replace({
                     pathname: this.props.location.pathname,
-                    query: merge(this.props.location.query, routeQuery),
+                    query: merge(this.props.location.query, {view: 'run'}),
                     state: this.props.location.state,
                 });
             })
@@ -108,7 +111,7 @@ export default React.createClass({
                 <section>
                     {serverForm}
                 </section>
-                <section>
+                <section className={formStyle.buttonGroup}>
                     <ButtonBar
                         visible={this.state[this.state.serverType].profile !== ''}
                         onAction={this.formAction}

@@ -67,7 +67,7 @@ export default React.createClass({
         const step = this.props.params.step || simulation.active || wfModule.steps._order[0];
         const taskFlowName = wfModule.taskFlows && wfModule.taskFlows[step] ? wfModule.taskFlows[step] : null;
 
-        const view = this.props.location.query.view || 'default';
+        const view = this.state.simulation.steps[step].view || 'default';
         const childComponent = tools[view] || wfModule.components.ViewSimulation;
 
         if(childComponent) {

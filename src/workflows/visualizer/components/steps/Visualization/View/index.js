@@ -28,7 +28,7 @@ export default React.createClass({
         };
     },
     componentWillMount(){
-        var tfid = this.props.location.query.taskflowId,
+        var tfid = this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId,
             newStateFromPacket = (pkt) => {
                 this.setState(pkt);
             };
@@ -44,10 +44,10 @@ export default React.createClass({
         });
     },
     terminateTaskflow() {
-        tfManager.terminateTaskflow(this.props.location.query.taskflowId);
+        tfManager.terminateTaskflow(this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId);
     },
     deleteTaskflow() {
-        tfManager.deleteTaskflow(this.props.location.query.taskflowId)
+        tfManager.deleteTaskflow(this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId)
             .then((resp) => {
                 return client.updateSimulationStep(this.props.simulation._id, this.props.step, {
                     view: 'default',
@@ -90,14 +90,14 @@ export default React.createClass({
         };
         return (
             <div>
-                <span className={statusList.header}>Jobs</span>
+                <h3 className={statusList.header}>Jobs</h3>
                 {this.state.jobs.map( (job) =>
                     <section key={job._id} className={statusList.statusListItem}>
                         <strong className={statusList.statusListItemContent}>{job.name}</strong>
                         <div    className={statusList.statusListItemContent}>{job.status}</div>
                     </section>
                 )}
-                <span className={statusList.header}>Taskflow tasks</span>
+                <h3 className={statusList.header}>Taskflow tasks</h3>
                 { this.state.tasks.map( (task) => {
                     if (task.log.length === 0) {
                         return (<section key={task._id} className={statusList.statusListItem}>
