@@ -137,6 +137,7 @@ export function terminateTaskflow(id) {
 }
 
 export function deleteTaskflow(id) {
+    unmonitorTaskflow(id);
     return client.deleteTaskflow(id);
 }
 
