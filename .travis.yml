@@ -18,11 +18,13 @@ notifications:
 cache:
     directories:
         - node_modules
-        - $HOME/.cache/pip
+        - $HOME/.cache
 
 compiler:
     - gcc
 before_install:
+    # Update pip
+    - pip install -U pip virtualenv
     # First install Girder
     - pushd "${HOME}/build"
     - git clone https://github.com/girder/girder.git
@@ -40,12 +42,7 @@ before_install:
     - ln -s "${HOME}/build/Kitware/HPCCloud/server/hpccloud" "${HOME}/build/girder/plugins/hpccloud"
     - ln -s "${HOME}/build/Kitware/HPCCloud/server/pvwproxy" "${HOME}/build/girder/plugins/pvwproxy"
     # Install CMake
-    - pushd "${HOME}"
-    - curl -L "http://cmake.org/files/v3.1/cmake-3.1.0-Linux-x86_64.tar.gz" | gunzip -c | tar x
-    - cd cmake-*/bin && export PATH="${PWD}:${PATH}"
-    - popd
-    - cmake --version
-    - pip install -U pip virtualenv
+    - CACHE=$HOME/.cache CMAKE_VERSION=3.1.0 CMAKE_SHORT_VERSION=3.1 source $HOME/build/girder/scripts/install_cmake.sh
     - nvm install 4.1
 
 install:
