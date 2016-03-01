@@ -23,6 +23,8 @@ cache:
 compiler:
     - gcc
 before_install:
+    # Update pip
+    - pip install -U pip
     # First install Girder
     - pushd "${HOME}/build"
     - git clone https://github.com/girder/girder.git
