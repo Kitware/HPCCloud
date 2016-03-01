@@ -1,14 +1,13 @@
-import tfManager    from '../../../../../../network/TaskflowManager';
 import ButtonBar    from '../../../../../../panels/ButtonBar';
 import client       from '../../../../../../network';
-import CollapsibleWidget from 'paraviewweb/src/React/Widgets/CollapsibleWidget'
-import layout       from 'HPCCloudStyle/Layout.mcss';
+import JobMonitor   from '../../../../../../panels/JobMonitor'
 import merge        from 'mout/src/object/merge';
 import React        from 'react';
-import statusList   from 'HPCCloudStyle/StatusList.mcss';
+import tfManager    from '../../../../../../network/TaskflowManager';
 
 export default React.createClass({
     displayName: 'pvw/view-visualization',
+
     propTypes: {
         location: React.PropTypes.object,
         project: React.PropTypes.object,
@@ -17,29 +16,21 @@ export default React.createClass({
         taskFlowName: React.PropTypes.string,
         view: React.PropTypes.string,
     },
+
     contextTypes: {
         router: React.PropTypes.object,
     },
+
     getInitialState() {
         return {
-            tasks: [], //taskflow tasks
-            jobs:  [], //hpc tasks/job
+            taskflowId: '',
             error: '',
         };
     },
+
     componentWillMount(){
-        var tfid = this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId;
-
-        this.subscription = tfManager.monitorTaskflow(tfid, (pkt) => {
-            this.setState(pkt);
-        });
-    },
-
-    componentWillUnmount() {
-        if(this.subscription) {
-            this.subscription.unsubscribe();
-            this.subscription = null;
-        }
+        const taskflowId = this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId;
+        this.setState({taskflowId});
     },
 
     visualizeTaskflow() {
@@ -49,9 +40,11 @@ export default React.createClass({
             state: this.props.location.state,
         });
     },
+
     terminateTaskflow() {
         tfManager.terminateTaskflow(this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId);
     },
+
     deleteTaskflow() {
         tfManager.deleteTaskflow(this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId)
             .then((resp) => {
@@ -71,67 +64,21 @@ export default React.createClass({
                 this.setState({error: error.data.message});
             });
     },
+
     render() {
         var actions = [
             {name: 'visualizeTaskflow', label:'Visualize', icon:''},
             {name: 'terminateTaskflow', label:'Terminate', icon:''},
-        ],
-        formatTime = (time) => {
-            var date = new Date(time),
-                hours = date.getHours().toString(),
-                minutes = date.getMinutes().toString(),
-                seconds = date.getSeconds().toString(),
-                ms = date.getMilliseconds().toString();
+        ];
 
-            hours = hours.length === 1 ? '0' + hours : hours;
-            minutes = minutes.length === 1 ? '0' + minutes : minutes;
-            seconds = seconds.length === 1 ? '0' + seconds : seconds;
-            if (ms.length < 3) {
-                while(ms.length < 3) {
-                    ms = '0' + ms;
-                }
-            }
-
-            return hours + ':' + minutes + ':' + seconds + '.' + ms;
-        };
         return (
             <div>
-                <h3 className={statusList.header}>Jobs</h3>
-                {this.state.jobs.map( (job) =>
-                    <section key={job._id} className={statusList.statusListItem}>
-                        <strong className={statusList.statusListItemContent}>{job.name}</strong>
-                        <div    className={statusList.statusListItemContent}>{job.status}</div>
-                    </section>
-                )}
-                <h3 className={statusList.header}>Taskflow tasks</h3>
-                { this.state.tasks.map( (task) => {
-                    if (task.log.length === 0) {
-                        return (<section key={task._id} className={statusList.statusListItem}>
-                            <strong className={statusList.statusListItemContent}>{task.name.split('.').pop()}</strong>
-                            <div    className={statusList.statusListItemContent}>{task.status}</div>
-                        </section>);
-                    }
-                    return <section key={task._id} className={statusList.statusListLogItem}>
-                        <div className={layout.horizontalFlexContainer}>
-                            <CollapsibleWidget title={task.name.split('.').pop()}
-                                subtitle={task.status}
-                                open={false}>
-                                <pre className={statusList.log}>
-                                    {   //reduce log array to a string with formatted entries
-                                        task.log.reduce( (prevVal, entry, index) =>
-                                            prevVal + `[${formatTime(entry.created)}] ${entry.levelname}: ${entry.msg}\n`
-                                        , '')
-                                    }
-                                </pre>
-                            </CollapsibleWidget>
-                        </div>
-                    </section>;
-                })}
+                <JobMonitor taskFlowId={ this.state.taskflowId }/>
                 <section>
-                <ButtonBar
-                    onAction={ (action) => { this[action](); }}
-                    actions={actions}
-                    error={this.state.error} />
+                    <ButtonBar
+                        onAction={ (action) => { this[action](); }}
+                        actions={actions}
+                        error={this.state.error} />
                 </section>
             </div>
         );

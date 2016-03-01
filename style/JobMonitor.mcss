@@ -1,0 +1,77 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    flex: 1;
+    font-size: 18px;
+    margin: 7px 18px 0;
+    composes: lightText from 'HPCCloudStyle/Theme.mcss';
+}
+
+.buttons {
+    text-align: right;
+    flex: 1;
+    padding-right: 20px;
+}
+
+.jobContent {
+    composes: container;
+}
+
+.listItem {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 5px 0;
+    margin: 0 18px;
+    border-bottom: 1px solid #eee;
+}
+
+.logListItem {
+    margin: 0 18px;
+    border-bottom: 1px solid #eee;
+}
+
+.log {
+    max-height: 250px;
+    overflow: auto;
+}
+
+.itemContent {
+    margin: 0 15px 0 19px;
+}
+
+.advancedIconOn {
+    composes: fa     from 'font-awesome/css/font-awesome.css';
+    composes: fa-cog from 'font-awesome/css/font-awesome.css';
+    cursor: pointer;
+}
+
+.advancedIconOff {
+    composes: advancedIconOn;
+    color: #aaa;
+}
+
+.hidden {
+    display: none;
+}
+
+.taskflowContainer {
+    composes: container;
+}
+
+.taskflowContent {
+    composes: container;
+}
+
