@@ -78,7 +78,7 @@
     flex: 1;
 
     height: 2.4em;
-    line-height: 2em;
+    line-height: 2.4em;
 }
 
 .subBar {
