@@ -8,7 +8,7 @@ import TaskflowManager  from '../../../../../../network/TaskflowManager';
 const ACTIONS = {
     terminate: {name: 'terminateTaskflow', label:'Terminate', icon:''},
     visualize: {name: 'visualizeTaskflow', label:'Visualize', icon:''},
-    rerun: {name: 'deleteTaskflow', label:'New visualization', icon:''},
+    rerun: {name: 'deleteTaskflow', label:'Rerun', icon:''},
 };
 
 export default React.createClass({

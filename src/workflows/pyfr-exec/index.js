@@ -2,11 +2,10 @@ import rootNewSimulation    from './components/root/NewSimulation';
 import rootViewSimulation   from './components/root/ViewSimulation';
 
 import stepIntroduction     from './components/steps/Introduction';
-import stepSimulation       from './components/steps/Simulation';
+import stepStartSim         from './components/steps/Simulation/Start';
+import stepViewSim          from './components/steps/Simulation/View';
 
-// FIXME no Viz implementation yet
-const stepStartViz   = null;
-const stepVisualizer = null;
+const stepStartViz = null;
 
 export default {
     name: 'PyFr-Exec',
@@ -52,12 +51,15 @@ export default {
             default: stepIntroduction,
         },
         Simulation: {
-            default: stepSimulation,
+            default: stepStartSim,
+            run: stepViewSim,
         },
         Visualization: {
             default: stepStartViz,
-            run: stepVisualizer,
         },
+    },
+    taskFlows: {
+        Simulation: 'hpccloud.taskflow.pyfr.PyFrTaskFlow',
     },
     labels: {
         Introduction: {
@@ -65,10 +67,10 @@ export default {
         },
         Simulation: {
             default: 'Simulation',
+            run: 'Simulation (running)',
         },
         Visualization: {
             default: 'Visualization',
-            run: 'Visualization (running)',
         },
     },
 }

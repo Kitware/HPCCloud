@@ -1,13 +1,14 @@
 import React                   from 'react';
-import defaultServerParameters from '../../../../../panels/run/defaults'
-import RunEC2                  from '../../../../../panels/run/RunEC2';
-import RunCluster              from '../../../../../panels/run/RunCluster';
-import RunOpenStack            from '../../../../../panels/run/RunOpenStack';
-import ButtonBar               from '../../../../../panels/ButtonBar';
 
-import client                  from '../../../../../network';
-import unique                  from 'mout/src/array/unique';
+import defaultServerParameters from '../../../../../../panels/run/defaults'
+import RunEC2                  from '../../../../../../panels/run/RunEC2';
+import RunCluster              from '../../../../../../panels/run/RunCluster';
+import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
+import ButtonBar               from '../../../../../../panels/ButtonBar';
 
+import client                  from '../../../../../../network';
+import deepClone               from 'mout/src/lang/deepClone';
+import merge                   from 'mout/src/object/merge';
 import formStyle               from 'HPCCloudStyle/ItemEditor.mcss';
 
 const CURRENT_STEP = 'Simulation';
@@ -45,17 +46,38 @@ export default React.createClass({
         this.setState({[which]: profile});
     },
     runSimulation(event) {
-        var disabled = unique([ CURRENT_STEP ].concat(this.props.simulation.disabled));
-        disabled = disabled.filter(i => (i !== undefined && i !== null && i !== NEXT_STEP));
+        var taskflowId,
+            sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0,96);
 
-        console.log('run this Simulation with:', this.state[this.state.serverType]);
-
-        client.activateSimulationStep(this.props.simulation, NEXT_STEP, disabled)
-            .then(r => {
-                this.context.router.replace(['/View/Simulation', this.props.simulation._id, NEXT_STEP].join('/'));
+        client.createTaskflow(this.props.taskFlowName)
+            .then((resp) => {
+                taskflowId = resp.data._id;
+                return client.startTaskflow(taskflowId, {
+                    cluster: {_id:this.state[this.state.serverType].profile},
+                    dataDir: '/tmp', //where the output for the sim will be
+                    sessionKey: sessionId,       //for pvw, we use this later for connecting
+                });
             })
-            .catch(err => {
-                console.log('Error: PyFrSym/run/path', err);
+            .then((resp) => {
+                return client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+                    view: 'run',
+                    metadata: {taskflowId, sessionId},
+                });
+            })
+            .then( (resp) => {
+                var newSim = deepClone(this.props.simulation);
+                newSim.steps[this.props.step].view = 'run';
+                newSim.steps[this.props.step].metadata = {taskflowId, sessionId};
+                client.invalidateSimulation(newSim);
+
+                this.context.router.replace({
+                    pathname: this.props.location.pathname,
+                    query: merge(this.props.location.query, {view: 'run'}),
+                    state: this.props.location.state,
+                });
+            })
+            .catch( (error) => {
+                this.setState({error: error.data.message});
             });
     },
     formAction(action) {
