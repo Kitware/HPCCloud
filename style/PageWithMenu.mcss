@@ -1,6 +1,7 @@
 .rootContainer {
     composes: verticalFlexContainer from './Layout.mcss';
     flex: 1;
+    position: relative;
 }
 
 .container {

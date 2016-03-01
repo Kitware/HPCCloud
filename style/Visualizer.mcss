@@ -40,7 +40,7 @@
 
 .menu {
     position: absolute;
-    top: 3.5em;
+    top: 2.2em;
     right: 10px;
     height: calc(100vh - 4.5em);
     width: 300px;
@@ -66,8 +66,8 @@
 
 .viewport {
     position: absolute;
-    top: 4em;
+    top: 2.4em;
     left: 0;
     right: 0;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 4.8em);
 }

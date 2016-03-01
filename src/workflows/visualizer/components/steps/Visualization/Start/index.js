@@ -38,15 +38,9 @@ export default React.createClass({
         profile[key] = value;
         this.setState({[server]: profile});
     },
-    //generated uuid format: p <- [a-f0-9]{4}, 'pp-p-p-p-ppp'
-    generateSessionId() {
-        var f = () => Math.floor(Math.random() * 0x10000).toString(16);
-
-        return [f() + f(), f(), f(), f(), f() + f() + f()].join('-');
-    },
     startVisualization() {
         var taskflowId,
-            sessionId = this.generateSessionId();
+            sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0,96);
         client.createTaskflow(this.props.taskFlowName)
             .then( (resp) => {
                 taskflowId = resp.data._id;
@@ -63,10 +57,9 @@ export default React.createClass({
                 });
             })
             .then( (resp) => {
-                var newSim = {};
-                deepClone(this.props.simulation, newSim);
-                newSim.view = 'run';
-                newSim.metadata = {taskflowId, sessionId};
+                var newSim = deepClone(this.props.simulation);
+                newSim.steps[this.props.step].view = 'run';
+                newSim.steps[this.props.step].metadata = {taskflowId, sessionId};
                 client.invalidateSimulation(newSim);
 
                 this.context.router.replace({
