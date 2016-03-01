@@ -104,8 +104,15 @@ client.onEvent((resp) =>{
 
 //set the instance's taskflowId
 export function monitorTaskflow(id, callback) {
-    taskflows[id] = {};
-    updateTaskFlow(id);
+    if(!taskflows[id]) {
+        taskflows[id] = {};
+        updateTaskFlow(id);
+    } else {
+        setImmediate(()=>{
+            notifyChange(id);
+        });
+    }
+
     return changeDispatcher.on(id, callback);
 }
 
