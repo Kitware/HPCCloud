@@ -158,25 +158,36 @@ class Simulation(AccessControlledModel):
         :param simulation: The simulation to be deleted
         :param name: The new simulation name
         """
+        dirty = False
         if name:
+            dirty = True
             simulation['name'] = name
 
         if description:
+            dirty = True
             simulation['description'] = description
 
         if active:
+            dirty = True
             simulation['active'] = active
 
         if disabled:
+            dirty = True
             simulation['disabled'] = disabled
 
         if status:
+            dirty = True
             simulation['status'] = status
 
         if metadata:
+            dirty = True
             simulation['metadata'] = metadata
 
-        return self.save(simulation)
+        if dirty:
+            simulation['updated'] = datetime.datetime.utcnow()
+            simulation = self.save(simulation)
+
+        return simulation
 
     def clone(self, user, simulation, name):
         """
@@ -287,4 +298,6 @@ class Simulation(AccessControlledModel):
 
         if dirty:
             simulation['updated'] = datetime.datetime.utcnow()
-            self.save(simulation)
+            simulation = self.save(simulation)
+
+        return simulation
