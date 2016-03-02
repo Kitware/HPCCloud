@@ -23,6 +23,9 @@
         "status": {
             "enum": ["editing", "running", "data"]
         },
+        "metadata": {
+            "type": "object"
+        },
         "steps": {
             "type": "object",
             "patternProperties": {
