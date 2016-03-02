@@ -60,7 +60,7 @@ export default React.createClass({
 
         client.saveSimulation(simulation, attachements)
             .then(resp => {
-                var simId = Array.isArray(resp) ? resp[0].data._id : resp.data._id;
+                var simId = Array.isArray(resp) ? resp[resp.length-1].data._id : resp.data._id;
                 this.context.router.replace('/View/Simulation/' + simId);
             })
             .catch(err => {

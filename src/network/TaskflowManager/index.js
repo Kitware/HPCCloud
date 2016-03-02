@@ -72,12 +72,14 @@ function updateTaskFlow(taskflowId) {
                 task.__taskflowId = taskflowId;
             });
             notifyChange(taskflowId);
+        })
+        .catch((err) => {
+            console.log(err);
         });
 
     client.getTaskflow(taskflowId)
         .then( resp => {
             taskflows[taskflowId].flow = resp.data;
-
             if(taskflows[taskflowId].flow && taskflows[taskflowId].flow.meta && taskflows[taskflowId].flow.meta.jobs) {
                 resp.data.meta.jobs.forEach( job => {
                     jobs[job._id] = job;
@@ -85,7 +87,9 @@ function updateTaskFlow(taskflowId) {
                     updateJobStatus(taskflowId, job._id);
                 });
             }
-
+        })
+        .catch((err) => {
+            console.log(err);
         });
 }
 

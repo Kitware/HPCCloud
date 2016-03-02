@@ -53,9 +53,20 @@ export default React.createClass({
             .then((resp) => {
                 taskflowId = resp.data._id;
                 return client.startTaskflow(taskflowId, {
-                    cluster: {_id:this.state[this.state.serverType].profile},
-                    dataDir: '/tmp', //where the output for the sim will be
-                    sessionKey: sessionId,       //for pvw, we use this later for connecting
+                    input: {
+                       folder: {
+                           id: this.props.simulation.folderId,
+                       },
+                       meshFile: {
+                           id: 'fild _id from upload',
+                       },
+                    },
+                    output: {
+                        folder : {
+                            id : 'folder to upload into',
+                       },
+                    },
+                    cluster: { _id:this.state[this.state.serverType].profile},
                 });
             })
             .then((resp) => {

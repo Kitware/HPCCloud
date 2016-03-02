@@ -9,47 +9,39 @@ export function getSimulation(id) {
     return girder.getSimulation(id);
 }
 
-function createSimulationPromise(simulation, name, file) {
-    return new Promise((resolve, reject) => {
-        var simulationResp;
-        girder.createSimulation(simulation.projectId, simulation)
-            .then((resp) => {
-                // Upload file to folder
-                simulationResp = resp;
-                return girder.createItem(resp.data.folderId, name);
-            })
-            .then((resp) => {
-                //fill item with file
-                const itemId = resp.data._id,
-                    params = {};
-                params.parentType = 'item';
-                params.parentId   = itemId;
-                params.name = name;
-                params.size = file.size;
-                console.log('Attach file to', itemId);
-                return girder.uploadFileToItem(params, file);
-            })
-            .then((resp) => {
-                resolve(simulationResp);
-            })
-            .catch((error) => {
-                const msg = error.data && error.data.message ? error.data.message : error.message;
-                console.error('upload failed:' + msg);
-                reject(error);
-            });
-    });
+function createItemForSimulation(folderId, name, file) {
+    return girder.createItem(folderId, name)
+        .then((resp) => {
+            //fill item with file
+            const itemId = resp.data._id,
+                params = {};
+            params.parentType = 'item';
+            params.parentId   = itemId;
+            params.name = name;
+            params.size = file.size;
+            console.log('Attach file to', itemId);
+            return girder.uploadFileToItem(params, file);
+        })
+        .catch((error) => {
+            const msg = error.data && error.data.message ? error.data.message : error.message;
+            console.error('upload failed:' + msg);
+        });
 }
 
 export function saveSimulation(simulation, attachments) {
     if(!simulation._id) {
-        if (attachments) {
-            const promises = [];
-            for (const file in attachments) {
-                promises.push(createSimulationPromise(simulation, file, attachments[file]));
-            }
-            return Promise.all(promises);
-        }
-        return girder.createSimulation(simulation.projectId, simulation);
+        return girder.createSimulation(simulation.projectId, simulation)
+            .then((resp) => {
+                if (attachments) {
+                    const promises = [];
+                    for (const file in attachments) {
+                        promises.push(createItemForSimulation(resp.data.folderId, file, attachments[file]));
+                    }
+                    promises.push(resp);
+                    return Promise.all(promises);
+                }
+                return (resp);
+            });
     }
 
     return girder.editSimulation(simulation);
