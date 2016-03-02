@@ -105,10 +105,12 @@ class Simulations(Resource):
         active = updates.get('active')
         disabled = updates.get('disabled')
         status = updates.get('status')
+        metadata = updates.get('metadata')
 
         return self._model.update(user, simulation, name=name,
-                                  description=description, active=active,
-                                  disabled=disabled, status=status)
+                                  metadata=metadata, description=description,
+                                  active=active, disabled=disabled,
+                                  status=status)
 
     addModel('CloneParams', {
         'id': 'CloneParams',
@@ -198,7 +200,7 @@ class Simulations(Resource):
         export = updates.get('export')
         view = updates.get('view')
 
-        self._model.update_step(
+        return self._model.update_step(
             user, simulation, stepName, status, metadata, export, view)
 
     @describeRoute(

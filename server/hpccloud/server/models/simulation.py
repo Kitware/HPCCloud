@@ -149,8 +149,8 @@ class Simulation(AccessControlledModel):
         self.remove(simulation)
         self.model('folder').remove(simulation_folder)
 
-    def update(self, user, simulation, name, description=None, active=None,
-               disabled=None, status=None):
+    def update(self, user, simulation, name, metadata=None, description=None,
+               active=None, disabled=None, status=None):
         """
         Update a simulation.
 
@@ -173,7 +173,8 @@ class Simulation(AccessControlledModel):
         if status:
             simulation['status'] = status
 
-        simulation['updated'] = datetime.datetime.utcnow()
+        if metadata:
+            simulation['metadata'] = metadata
 
         return self.save(simulation)
 
