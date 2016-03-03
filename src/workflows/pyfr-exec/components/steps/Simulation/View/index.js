@@ -46,7 +46,7 @@ export default React.createClass({
             const actions = [];
 
             pkt.jobs.forEach(job => {
-                if(job.name === 'paraview' && job.status === 'running') {
+                if(job.name === 'pyfr' && job.status === 'running') {
                     actions.push(ACTIONS.visualize);
                 }
                 if(job.status !== 'terminated') {
@@ -54,7 +54,7 @@ export default React.createClass({
                 }
             });
 
-            if(allTerminated) {
+            if(allTerminated && pkt.jobs.length) {
                 actions.push(ACTIONS.rerun);
             } else {
                 actions.push(ACTIONS.terminate);

@@ -121,7 +121,6 @@ export function monitorTaskflow(id, callback) {
 }
 
 export function unmonitorTaskflow(id) {
-    changeDispatcher.off(id);
     const taskflow = taskflows[id];
     if(taskflow && taskflow.flow && taskflow.flow.meta && taskflow.flow.meta.jobs) {
         taskflow.flow.meta.jobs.forEach(job => {
