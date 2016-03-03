@@ -129,7 +129,7 @@ def _export_solution(logger, mesh_path, input_path, output_path):
 
 @cumulus.taskflow.task
 def pyfr_terminate(task):
-    cluster = task.taskflow['cluster']
+    cluster = task.taskflow['meta']['cluster']
     for job in task.taskflow.get('meta', {}).get('jobs', []):
         terminate_job(
             cluster, job, log_write_url=None,
@@ -293,6 +293,11 @@ def upload_output(task, cluster, job, *args, **kwargs):
         'path': '.'
     }]
 
+    client = _create_girder_client(
+        task.taskflow.girder_api_url, task.taskflow.girder_token)
+
+    # Refresh state of job
+    job = client.get('jobs/%s' % job['_id'])
     upload_job_output_to_folder(cluster, job, log_write_url=None, job_dir=None,
                                 girder_token=task.taskflow.girder_token)
 
@@ -301,8 +306,6 @@ def upload_output(task, cluster, job, *args, **kwargs):
     # Now we need to export to VTK format
     imported_mesh_file_id = kwargs.pop('imported_mesh_file_id')
 
-    client = _create_girder_client(
-        task.taskflow.girder_api_url, task.taskflow.girder_token)
     solution_files = list(_list_solution_files(client, output_folder_id))
     number_files = len(solution_files)
 
