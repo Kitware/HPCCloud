@@ -237,6 +237,10 @@ def upload_output(task, cluster, job, *args, **kwargs):
     output_folder_id = parse('output.folder.id').find(kwargs)
     if output_folder_id:
         output_folder_id = output_folder_id[0].value
+        # Refresh state of job
+        client = _create_girder_client(
+                task.taskflow.girder_api_url, task.taskflow.girder_token)
+        job = client.get('jobs/%s' % job['_id'])
 
         job['output'] = [{
             'folderId': output_folder_id,
