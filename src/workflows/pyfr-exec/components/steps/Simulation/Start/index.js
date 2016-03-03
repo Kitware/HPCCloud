@@ -55,15 +55,15 @@ export default React.createClass({
                 return client.startTaskflow(taskflowId, {
                     input: {
                        folder: {
-                           id: this.props.simulation.folderId,
+                           id: this.props.simulation.metadata.inputFolder._id,
                        },
                        meshFile: {
-                           id: 'fild _id from upload',
+                           id: this.props.simulation.metadata.inputFolder.files.mesh,
                        },
                     },
                     output: {
                         folder : {
-                            id : 'folder to upload into',
+                            id : this.props.simulation.metadata.outputFolder._id,
                        },
                     },
                     cluster: { _id:this.state[this.state.serverType].profile},

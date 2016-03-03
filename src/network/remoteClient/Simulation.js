@@ -9,8 +9,8 @@ export function getSimulation(id) {
     return girder.getSimulation(id);
 }
 
-function createItemForSimulation(folderId, name, file) {
-    return girder.createItem(folderId, name)
+function createItemForSimulation(simulation, name, file) {
+    return girder.createItem(simulation.folderId, name)
         .then((resp) => {
             //fill item with file
             const itemId = resp.data._id,
@@ -22,25 +22,62 @@ function createItemForSimulation(folderId, name, file) {
             console.log('Attach file to', itemId);
             return girder.uploadFileToItem(params, file);
         })
+        .then((resp) => {
+            simulation.metadata.inputFolder.files[name] = resp.data._id;
+            return girder.editSimulation(simulation);
+        })
         .catch((error) => {
             const msg = error.data && error.data.message ? error.data.message : error.message;
             console.error('upload failed:' + msg);
         });
 }
 
+// if there's not a sim.id, create a sim with two folders input and output
+// otherwise update simulation
 export function saveSimulation(simulation, attachments) {
     if(!simulation._id) {
+        let folder, inputFolder, outputFolder;
         return girder.createSimulation(simulation.projectId, simulation)
+            // make output folder
             .then((resp) => {
+                simulation = resp.data;
+                folder = {
+                    name: 'output',
+                    parentType: 'folder',
+                    parentId: resp.data.folderId,
+                };
+                return girder.createFolder(folder);
+            })
+            // make input folder
+            .then((resp) => {
+                outputFolder = resp.data._id;
+                folder.name = 'input';
+                return girder.createFolder(folder);
+            })
+            // update sim metadata
+            .then((resp) => {
+                inputFolder = resp.data._id;
+                simulation.metadata = {
+                    inputFolder: { _id: inputFolder, files: {}},
+                    outputFolder: { _id: outputFolder, files: {}},
+                };
+                return girder.editSimulation(simulation);
+            })
+            // upload files to inputfolder if there are any,
+            // returns either promise result array with sim object as last item or simulation object.
+            .then( (resp) => {
                 if (attachments) {
                     const promises = [];
                     for (const file in attachments) {
-                        promises.push(createItemForSimulation(resp.data.folderId, file, attachments[file]));
+                        promises.push(createItemForSimulation(simulation, file, attachments[file]));
                     }
-                    promises.push(resp);
+                    promises.push(simulation);
                     return Promise.all(promises);
                 }
-                return (resp);
+                return (simulation);
+            })
+            .catch((error) => {
+                console.log(error);
             });
     }
 

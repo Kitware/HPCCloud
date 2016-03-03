@@ -30,8 +30,8 @@ export function getTaskflowStatus(id) {
 }
 
 //GET /taskflows/{id}/tasks Get all the tasks associated with this taskflow
-export function getTaskflowTaskStatuses(id) {
-    return girder.getTaskflowTaskStatuses(id);
+export function getTaskflowTasks(id) {
+    return girder.getTaskflowTasks(id);
 }
 
 //POST /taskflows/{id}/tasks Create a new task associated with this flow

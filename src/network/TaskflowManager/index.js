@@ -64,7 +64,7 @@ function updateTaskFlow(taskflowId) {
         taskflows[taskflowId] = {};
     }
 
-    client.getTaskflowTaskStatuses(taskflowId)
+    client.getTaskflowTasks(taskflowId)
         .then( resp => {
             taskflows[taskflowId].tasks = resp.data;
             taskflows[taskflowId].tasks.forEach(task => {

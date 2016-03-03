@@ -27,6 +27,18 @@ import {
 } from './Cluster';
 
 import {
+    listFolders,
+    createFolder,
+    editFolderMetaData,
+    deleteFolder,
+    getFolder,
+    editFolder,
+    downloadFolder,
+    getFolderAccess,
+    editFolderAccess,
+} from './Folder'
+
+import {
     saveAWSProfile,
     deleteAWSProfile,
     getAWSMaxInstances,
@@ -77,7 +89,7 @@ import {
     deleteTaskflow,
     startTaskflow,
     getTaskflowStatus,
-    getTaskflowTaskStatuses,
+    getTaskflowTasks,
     createNewTaskForTaskflow,
     endTaskflow,
 } from './Taskflows'
@@ -107,6 +119,17 @@ export default {
     listClusterProfiles,
     saveCluster,
     testCluster,
+
+    /* Folder */
+    listFolders,
+    createFolder,
+    editFolderMetaData,
+    deleteFolder,
+    getFolder,
+    editFolder,
+    downloadFolder,
+    getFolderAccess,
+    editFolderAccess,
 
     /* AWS */
     saveAWSProfile,
@@ -154,7 +177,7 @@ export default {
     deleteTaskflow,
     startTaskflow,
     getTaskflowStatus,
-    getTaskflowTaskStatuses,
+    getTaskflowTasks,
     createNewTaskForTaskflow,
     endTaskflow,
 }

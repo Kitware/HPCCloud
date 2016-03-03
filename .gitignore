@@ -3,4 +3,5 @@
 .sass-cache
 bundles
 node_modules/
+npm-debug.log
 *.pyc
