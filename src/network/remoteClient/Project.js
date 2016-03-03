@@ -23,7 +23,7 @@ function createProjectPromise(project, name, file) {
                     params = {};
                 params.parentType = 'item';
                 params.parentId   = itemId;
-                params.name = name;
+                params.name = file.name;
                 params.size = file.size;
                 console.log('Attach file to', itemId);
                 return girder.uploadFileToItem(params, file);

@@ -39,6 +39,15 @@ import {
 } from './Folder'
 
 import {
+    getUploadOffset,
+    downloadFile,
+    updateFileContent,
+    deleteFile,
+    editFile,
+    newFile,
+} from './File'
+
+import {
     saveAWSProfile,
     deleteAWSProfile,
     getAWSMaxInstances,
@@ -119,6 +128,14 @@ export default {
     listClusterProfiles,
     saveCluster,
     testCluster,
+
+    /* File */
+    getUploadOffset,
+    downloadFile,
+    updateFileContent,
+    deleteFile,
+    editFile,
+    newFile,
 
     /* Folder */
     listFolders,

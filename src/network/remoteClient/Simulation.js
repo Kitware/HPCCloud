@@ -15,7 +15,6 @@ function createItemForSimulation(simulation, name, file) {
             //fill item with file
             const itemId = resp.data._id,
                 params = {};
-            console.log('file: ', file, name);
             params.parentType = 'item';
             params.parentId   = itemId;
             params.name = file.name;

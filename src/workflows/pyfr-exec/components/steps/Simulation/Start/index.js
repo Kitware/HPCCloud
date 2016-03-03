@@ -51,7 +51,14 @@ export default React.createClass({
 
         client.createTaskflow(this.props.taskFlowName)
             .then((resp) => {
+                var file = {
+                    _id: this.props.simulation.metadata.inputFolder.files.ini,
+                    name: 'pyfr.ini', // the ini file must be named this.
+                };
                 taskflowId = resp.data._id;
+                return client.editFile(file);
+            })
+            .then((resp) => {
                 return client.startTaskflow(taskflowId, {
                     input: {
                        folder: {
