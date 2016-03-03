@@ -10,7 +10,7 @@ export function getSimulation(id) {
 }
 
 function createItemForSimulation(simulation, name, file) {
-    return girder.createItem(simulation.folderId, name)
+    return girder.createItem(simulation.metadata.inputFolder._id, name)
         .then((resp) => {
             //fill item with file
             const itemId = resp.data._id,

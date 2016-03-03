@@ -11,9 +11,16 @@ const FileUploadEntry = React.createClass({
     displayName: 'ItemEditor/FileUploadEntry',
 
     propTypes: {
+        accept: React.PropTypes.string,
         label: React.PropTypes.string,
         name: React.PropTypes.string,
         owner: React.PropTypes.func,
+    },
+
+    getDefaultProps() {
+        return {
+            accept: '*',
+        };
     },
 
     processFile(event) {
@@ -44,6 +51,7 @@ const FileUploadEntry = React.createClass({
                 <input
                     className={style.input}
                     data-name={this.props.name}
+                    accept={this.props.accept}
                     type='file'
                     onChange={this.processFile}/>
             </div>);
@@ -87,7 +95,7 @@ const TextEntry = React.createClass({
                     data-name={this.props.name}
                     type='text'
                     value={ this.state[this.props.name] }
-                    onChange={this.updateMetadata}/>
+                    onChange={this.updateMetadata} />
             </div>);
     },
 });

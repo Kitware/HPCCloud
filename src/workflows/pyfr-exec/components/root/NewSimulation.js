@@ -11,8 +11,8 @@ export default React.createClass({
 
     render() {
         return (<div>
-            <FileUploadEntry name='mesh' label='Mesh file (.msh)' owner={ this.props.owner }/>
-            <FileUploadEntry name='ini' label='Ini file (.ini)' owner={ this.props.owner }/>
+            <FileUploadEntry name='mesh' label='Mesh file (.msh)' accept='.msh' owner={ this.props.owner }/>
+            <FileUploadEntry name='ini' label='Ini file (.ini)' accept='.ini' owner={ this.props.owner }/>
         </div>);
     },
 });
