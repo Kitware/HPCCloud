@@ -15,9 +15,10 @@ function createItemForSimulation(simulation, name, file) {
             //fill item with file
             const itemId = resp.data._id,
                 params = {};
+            console.log('file: ', file, name);
             params.parentType = 'item';
             params.parentId   = itemId;
-            params.name = name;
+            params.name = file.name;
             params.size = file.size;
             console.log('Attach file to', itemId);
             return girder.uploadFileToItem(params, file);
