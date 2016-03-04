@@ -24,7 +24,8 @@ import shutil
 
 import cumulus.taskflow
 from cumulus.starcluster.tasks.job import download_job_input_folders, submit_job
-from cumulus.starcluster.tasks.job import monitor_job, upload_job_output_to_folder
+from cumulus.starcluster.tasks.job import monitor_job, monitor_jobs
+from cumulus.starcluster.tasks.job import upload_job_output_to_folder
 from cumulus.starcluster.tasks.job import terminate_job
 
 from girder.utility.model_importer import ModelImporter
@@ -33,6 +34,8 @@ from girder.constants import AccessType
 from girder_client import GirderClient, HttpError
 
 from hpccloud.taskflow.utility import *
+
+MESH_FILENAME = 'mesh.pyfrm'
 
 class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
     """
@@ -152,7 +155,7 @@ def import_mesh(task, *args, **kwargs):
     try:
         input_path = os.path.join(tempfile.tempdir, input_folder_id)
         output_dir =  tempfile.mkdtemp()
-        output_path = os.path.join(output_dir, 'mesh.pyfrm')
+        output_path = os.path.join(output_dir, MESH_FILENAME)
 
         client.downloadFile(mesh_file_id, input_path)
         task.logger.info('Downloading complete.')
@@ -170,8 +173,6 @@ def import_mesh(task, *args, **kwargs):
                 and int(kwargs['numberOfSlots']) > 1:
             _partition_mesh(
                 task.logger, output_path, output_dir, kwargs['numberOfSlots'])
-
-
         else:
             task.logger.info('Skipping partitioning we are running serial.')
 
@@ -198,13 +199,14 @@ def import_mesh(task, *args, **kwargs):
 
 @cumulus.taskflow.task
 def create_job(task, *args, **kwargs):
+    task.logger.info('Taskflow %s' % task.taskflow.id)
     task.taskflow.logger.info('Create PyFr job.')
     input_folder_id = kwargs['input']['folder']['id']
 
     number_of_slots = kwargs.get('numberOfSlots', 1)
 
     body = {
-        'name': 'pyfr',
+        'name': 'pyfr_run',
         'commands': [
             "mpirun -n %s pyfr run -b openmp input/mesh.pyfrm input/pyfr.ini" % number_of_slots
         ],
@@ -222,7 +224,7 @@ def create_job(task, *args, **kwargs):
 
     job = client.post('jobs', data=json.dumps(body))
 
-    task.taskflow.set('jobs', [job])
+    task.taskflow.set_metadata('jobs', [job])
 
     submit.delay(job, *args, **kwargs)
 
@@ -231,7 +233,7 @@ def submit(task, job, *args, **kwargs):
     task.taskflow.logger.info('Submitting job to cluster.')
     girder_token = task.taskflow.girder_token
     cluster = kwargs.pop('cluster')
-    task.taskflow.set('cluster', cluster)
+    task.taskflow.set_metadata('cluster', cluster)
 
     # Now download and submit job to the cluster
     task.logger.info('Uploading input files to cluster.')
@@ -243,7 +245,7 @@ def submit(task, job, *args, **kwargs):
 
 @cumulus.taskflow.task
 def submit_pyfr_job(task, cluster,  job, *args, **kwargs):
-    task.logger.info('Submitting job to cluster.')
+    task.logger.info('Submitting job %s to cluster.' % job['_id'])
     girder_token = task.taskflow.girder_token
 
     submit_job(cluster, job, log_write_url=None,
@@ -256,11 +258,9 @@ def monitor_pyfr_job(task, cluster, job, *args, **kwargs):
     task.logger.info('Monitoring job on cluster.')
     girder_token = task.taskflow.girder_token
 
-    task.taskflow.on_complete(monitor_job) \
-        .run(upload_output.s(cluster, job, *args, **kwargs))
-
-    task.taskflow.run_task(
-        monitor_job.s(cluster, job, girder_token=girder_token))
+    monitor_job.apply_async((cluster, job), {'girder_token': girder_token,
+                                             'monitor_interval': 30},
+                            link=upload_output.s(cluster, job, *args, **kwargs))
 
 NUMBER__OF_EXPORT_TASKS = 10
 
@@ -286,8 +286,55 @@ def _list_solution_files(client, folder_id):
         if len(exts) == 2 and exts[1] == 'pyfrs':
             yield file
 
+def create_export_job(task, job_name, files, job_dir):
+
+    commands = []
+    mesh_file_path = os.path.join(job_dir, 'input', MESH_FILENAME)
+    for file in files:
+        name = file['name']
+        vtk_filename = '%s.vtu' % name.rsplit('.', 1)[0]
+        output_path = os.path.join(job_dir, vtk_filename)
+        solution_file_path = os.path.join(job_dir, name)
+
+        cmd = 'pyfr export %s %s %s' % (mesh_file_path,
+                                       solution_file_path, output_path)
+        commands.append(cmd)
+
+    body = {
+        'name': job_name,
+        'commands': commands,
+        'input': [],
+        'output': []
+    }
+
+    client = _create_girder_client(
+                task.taskflow.girder_api_url, task.taskflow.girder_token)
+
+    job = client.post('jobs', data=json.dumps(body))
+
+    task.logger.info('Created export job %s' % job['_id'])
+
+    return job
+
 @cumulus.taskflow.task
-def upload_output(task, cluster, job, *args, **kwargs):
+def upload_export_output(task, _, cluster, job, *args, **kwargs):
+    output_folder_id = kwargs['output']['folder']['id']
+
+    client = _create_girder_client(
+        task.taskflow.girder_api_url, task.taskflow.girder_token)
+
+    for job_id in task.taskflow.get_metadata('export_jobs')['export_jobs']:
+        # Get job
+        job = client.get('jobs/%s' % job_id)
+        job['output'] = [{
+            'folderId': output_folder_id,
+            'path': '.'
+        }]
+        upload_job_output_to_folder(cluster, job, log_write_url=None, job_dir=None,
+                                    girder_token=task.taskflow.girder_token)
+
+@cumulus.taskflow.task
+def upload_output(task, _, cluster, job, *args, **kwargs):
     task.taskflow.logger.info('Uploading results from cluster')
     output_folder_id = kwargs['output']['folder']['id']
 
@@ -304,22 +351,48 @@ def upload_output(task, cluster, job, *args, **kwargs):
     upload_job_output_to_folder(cluster, job, log_write_url=None, job_dir=None,
                                 girder_token=task.taskflow.girder_token)
 
-    task.taskflow.logger.info('Upload complete.')
+    task.taskflow.logger.info('Upload job output complete.')
 
-    # Now we need to export to VTK format
     imported_mesh_file_id = kwargs.pop('imported_mesh_file_id')
 
     solution_files = list(_list_solution_files(client, output_folder_id))
     number_files = len(solution_files)
 
-    # The number 100 is pretty arbitrary!
-    if number_files < 100:
-        export_output.delay(
-            output_folder_id, imported_mesh_file_id, solution_files)
-    # Break into chunks a run in parallel
+    # By default export solution files to VTK format using a set of batch jobs
+    if not 'exportInTaskFlow' in kwargs or not kwargs['exportInTaskFlow']:
+
+        number_of_jobs = int(cluster['config'].get('numberOfSlots', 1))
+        task.logger.info('Generating %d export jobs' % number_of_jobs)
+
+        sim_job_dir = job['dir']
+        jobs = []
+        job_index = 1
+        for chunk in [solution_files[i::number_of_jobs] for i in xrange(number_of_jobs)]:
+            name = 'pyfr_export_%d' % job_index
+            export_job = create_export_job(task, name, chunk, sim_job_dir)
+            submit_job(cluster, export_job, log_write_url=None,
+                          girder_token=task.taskflow.girder_token, monitor=False)
+            jobs.append(export_job)
+            job_index += 1
+
+        # Update the jobs list in the metadata
+        task.taskflow.set_metadata('jobs', [j for j in jobs] +
+                                   [job])
+        # Also save just the export job ids
+        task.taskflow.set_metadata('export_jobs', [j['_id'] for j in jobs])
+
+        monitor_jobs.apply_async(
+            (cluster, jobs), {'girder_token': task.taskflow.girder_token},
+            link=upload_export_output.s(cluster, job, *args, **kwargs))
     else:
-        for chunk in [solution_files[i::NUMBER__OF_EXPORT_TASKS] for i in xrange(NUMBER__OF_EXPORT_TASKS)]:
-            export_output.delay(output_folder_id, imported_mesh_file_id, chunk)
+        # The number 100 is pretty arbitrary!
+        if number_files < 100:
+            export_output.delay(
+                output_folder_id, imported_mesh_file_id, solution_files)
+        # Break into chunks a run in parallel
+        else:
+            for chunk in [solution_files[i::NUMBER__OF_EXPORT_TASKS] for i in xrange(NUMBER__OF_EXPORT_TASKS)]:
+                export_output.delay(output_folder_id, imported_mesh_file_id, chunk)
 
 
 def _export_file(task, client, output_folder_id, mesh_path, file, output_dir):
