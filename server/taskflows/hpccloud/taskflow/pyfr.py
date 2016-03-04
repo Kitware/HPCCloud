@@ -32,6 +32,8 @@ from girder.api.rest import getCurrentUser
 from girder.constants import AccessType
 from girder_client import GirderClient, HttpError
 
+from hpccloud.taskflow.utility import *
+
 class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
     """
     {
@@ -130,10 +132,11 @@ def _export_solution(logger, mesh_path, input_path, output_path):
 @cumulus.taskflow.task
 def pyfr_terminate(task):
     cluster = task.taskflow['meta']['cluster']
-    for job in task.taskflow.get('meta', {}).get('jobs', []):
-        terminate_job(
-            cluster, job, log_write_url=None,
-            girder_token=task.taskflow.girder_token)
+    client = _create_girder_client(
+                task.taskflow.girder_api_url, task.taskflow.girder_token)
+    terminate_jobs(
+        task, client, cluster, task.taskflow.get('meta', {}).get('jobs', []))
+
 
 @cumulus.taskflow.task
 def import_mesh(task, *args, **kwargs):
