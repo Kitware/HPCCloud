@@ -84,9 +84,17 @@ export default React.createClass({
                                         open={false}>
                                         <pre className={ style.log }>
                                             {   //reduce log array to a string with formatted entries
-                                                task.log.reduce( (prevVal, entry, index) =>
-                                                    prevVal + `[${formatTime(entry.created)}] ${entry.levelname}: ${entry.msg}\n`
+                                                task.log.reduce( (prevVal, entry, index) => {
+                                                    prevVal += `[${formatTime(entry.created)}] ${entry.levelname}: ${entry.msg}\n`
+
+                                                    if (entry.exc_info) {
+                                                        prevVal += entry.exc_info.join('\n');
+                                                    }
+
+                                                    return prevVal;
+                                                }
                                                 , '')
+
                                             }
                                         </pre>
                                     </CollapsibleWidget>
