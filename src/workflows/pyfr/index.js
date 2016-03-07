@@ -10,79 +10,79 @@ const stepStartViz   = null;
 const stepVisualizer = null;
 
 export default {
-    name: 'PyFr',
-    logo: require('./logo.jpg'),
-    components: {
-        'NewProject': rootNewProject,
-        'ViewSimulation': rootViewSimulation,
+  name: 'PyFr',
+  logo: require('./logo.jpg'),
+  components: {
+    NewProject: rootNewProject,
+    ViewSimulation: rootViewSimulation,
+  },
+  config: {
+    cluster: {
+      'config.paraview.installDir': {
+        label: 'ParaView Directory',
+        description: 'Path to the home directory of ParaView.',
+      },
+      'config.pyfr.lapack': {
+        label: 'Lapack library',
+        description: 'Path to the lapack library for the PyFr execution.',
+      },
     },
-    config: {
-        cluster: {
-            'config.paraview.installDir': {
-                label: 'ParaView Directory',
-                description: 'Path to the home directory of ParaView.',
-            },
-            'config.pyfr.lapack': {
-                label: 'Lapack library',
-                description: 'Path to the lapack library for the PyFr execution.',
-            },
+  },
+  steps: {
+    _order: ['Introduction', 'Input', 'Simulation', 'Visualizer'],
+    _initial_state: {
+      Introduction: {
+        type: 'input',
+        metadata: {
+          alwaysAvailable: true,
         },
+      },
+      Input: {
+        type: 'input',
+        metadata: {
+          disabled: false,
+        },
+      },
+      Simulation: {
+        type: 'output',
+        metadata: {
+          disabled: true,
+        },
+      },
+      Visualizer: {
+        type: 'output',
+        metadata: {
+          disabled: true,
+        },
+      },
     },
-    steps: {
-        _order: [ 'Introduction', 'Input', 'Simulation', 'Visualizer' ],
-        _initial_state: {
-            Introduction: {
-                type: 'input',
-                metadata: {
-                    alwaysAvailable: true,
-                },
-            },
-            Input: {
-                type: 'input',
-                metadata: {
-                    disabled: false,
-                },
-            },
-            Simulation: {
-                type: 'output',
-                metadata: {
-                    disabled: true,
-                },
-            },
-            Visualizer: {
-                type: 'output',
-                metadata: {
-                    disabled: true,
-                },
-            },
-        },
-        Introduction: {
-            default: stepIntroduction,
-        },
-        Input: {
-            default: stepInput,
-        },
-        Simulation: {
-            default: stepSimulation,
-        },
-        Visualizer: {
-            default: stepStartViz,
-            viewer: stepVisualizer,
-        },
+    Introduction: {
+      default: stepIntroduction,
     },
-    labels: {
-        Introduction: {
-            default: 'Introduction',
-        },
-        Input: {
-            default: 'Input definition',
-        },
-        Simulation: {
-            default: 'Simulation',
-        },
-        Visualizer: {
-            default: 'Visualization',
-            run: 'Visualization (running)',
-        },
+    Input: {
+      default: stepInput,
     },
-}
+    Simulation: {
+      default: stepSimulation,
+    },
+    Visualizer: {
+      default: stepStartViz,
+      viewer: stepVisualizer,
+    },
+  },
+  labels: {
+    Introduction: {
+      default: 'Introduction',
+    },
+    Input: {
+      default: 'Input definition',
+    },
+    Simulation: {
+      default: 'Simulation',
+    },
+    Visualizer: {
+      default: 'Visualization',
+      run: 'Visualization (running)',
+    },
+  },
+};

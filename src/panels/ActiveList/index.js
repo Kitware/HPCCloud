@@ -14,45 +14,47 @@ import style from 'HPCCloudStyle/ActiveList.mcss';
 //       - onActiveChange: Callback(activeIdx, activeItem)
 
 export default React.createClass({
-    displayName: 'ActiveList',
+  displayName: 'ActiveList',
 
-    propTypes: {
-        active: React.PropTypes.number,
-        className: React.PropTypes.string,
-        list: React.PropTypes.array,
-        onActiveChange: React.PropTypes.func,
-    },
+  propTypes: {
+    active: React.PropTypes.number,
+    className: React.PropTypes.string,
+    list: React.PropTypes.array,
+    onActiveChange: React.PropTypes.func,
+  },
 
-    getDefaultProps() {
-        return {
-            className: '',
-        };
-    },
+  getDefaultProps() {
+    return {
+      className: '',
+    };
+  },
 
-    changeActive(event) {
-        var el = event.target;
-        while(el.dataset.index === undefined) {
-            el = el.parentNode;
-        }
+  changeActive(event) {
+    var el = event.target;
+    while (el.dataset.index === undefined) {
+      el = el.parentNode;
+    }
 
-        if (this.props.onActiveChange) {
-            const newIndex = parseInt(el.dataset.index, 10);
-            if(!this.props.list[newIndex].disabled) {
-                this.props.onActiveChange(newIndex, this.props.list[newIndex]);
-            }
-        }
-    },
-    render() {
-        var mapper = (el, index) => {
-            return (<li key={index}
-                className={ el.disabled ? style.unselectable : (this.props.active === index ? style.active : style.selectable) }
-                data-index={index}
-                onClick={this.changeActive}>
-                <i className={el.classPrefix}></i>
-                {el.name}
-                <i className={el.classSufix}></i>
-            </li>);
-        }
-        return (<ul className={[this.props.className, style.list].join(' ')}>{this.props.list.map(mapper)}</ul>);
-    },
-})
+    if (this.props.onActiveChange) {
+      const newIndex = parseInt(el.dataset.index, 10);
+      if (!this.props.list[newIndex].disabled) {
+        this.props.onActiveChange(newIndex, this.props.list[newIndex]);
+      }
+    }
+  },
+
+  render() {
+    var mapper = (el, index) =>
+        <li key={index}
+          className={ el.disabled ? style.unselectable : (this.props.active === index ? style.active : style.selectable) }
+          data-index={index}
+          onClick={this.changeActive}
+        >
+          <i className={el.classPrefix}></i>
+            {el.name}
+            <i className={el.classSufix}></i>
+        </li>;
+
+    return (<ul className={[this.props.className, style.list].join(' ')}>{this.props.list.map(mapper)}</ul>);
+  },
+});

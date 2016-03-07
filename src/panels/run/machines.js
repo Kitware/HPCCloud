@@ -1,3 +1,4 @@
+/* eslint-disable */
 export default [
 { 'id': 'm3.medium',    'name': 'Basic Small',       'cpu': 1, 'gpu': 0, 'memory': 3.75, 'cost': 0.07, 'storage': [4] },
 { 'id': 'm3.large',     'name': 'Basic Medium',      'cpu': 2, 'gpu': 0, 'memory': 7.5,  'cost': 0.14, 'storage': [32] },
@@ -17,4 +18,4 @@ export default [
 { 'id': 'r3.8xlarge',   'name': 'Memory XX Large', 'cpu': 32, 'gpu': 0, 'memory': 244,   'cost': 2.8,   'storage': [320,320] },
 
 { 'id': 'g2.2xlarge',   'name': 'Graphic node', 'cpu': 8, 'gpu': 1, 'memory': 15, 'cost': 0.65, 'storage': [60,60] },
-]
+];

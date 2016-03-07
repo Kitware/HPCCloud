@@ -2,27 +2,27 @@ import React from 'react';
 import style from 'HPCCloudStyle/Preferences.mcss';
 
 export const breadcrumb = {
-    paths: [
-        '/Preferences/User',
-        '/Preferences/Cluster',
-        '/Preferences/AWS',
-    ],
-    icons: [
-        style.userIcon,
-        style.clusterIcon,
-        style.ec2Icon,
-    ],
+  paths: [
+    '/Preferences/User',
+    '/Preferences/Cluster',
+    '/Preferences/AWS',
+  ],
+  icons: [
+    style.userIcon,
+    style.clusterIcon,
+    style.ec2Icon,
+  ],
 };
 
 export default React.createClass({
 
-    displayName: 'Preferences',
+  displayName: 'Preferences',
 
-    propTypes: {
-        children: React.PropTypes.oneOfType([React.PropTypes.object, React.PropTypes.array]),
-    },
+  propTypes: {
+    children: React.PropTypes.oneOfType([React.PropTypes.object, React.PropTypes.array]),
+  },
 
-    render() {
-        return <div>{ this.props.children }</div>;
-    },
+  render() {
+    return <div>{ this.props.children }</div>;
+  },
 });
