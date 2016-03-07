@@ -18,6 +18,7 @@
     "shelljs": "0.5.3"
   },
   "devDependencies": {
+    "ws": "0.8.1",
     "axios": "0.9.0",
     "font-awesome": "4.5.0",
     "gl-matrix": "2.3.1",
@@ -32,47 +33,15 @@
     "history": "1.17.0",
     "react-router": "2.0.0",
 
-    "paraviewweb": "1.2.9",
+    "paraviewweb": "1.2.11",
     "simput": "1.1.0",
-    "pvw-visualizer": "1.0.5",
+    "pvw-visualizer": "1.0.7",
 
-    "commitizen": "2.5.0",
-    "cz-conventional-changelog": "1.1.5",
-    "semantic-release": "4.3.5",
-
-    "node-libs-browser": "1.0.0",
-
-    "babel-core": "6.5.0",
-    "babel-polyfill": "6.5.0",
-    "babel-preset-es2015": "6.5.0",
-    "babel-preset-react": "6.5.0",
-    "babel-eslint": "5.0.0",
-    "babel-loader": "6.2.3",
-
-    "eslint": "1.10.3",
-    "eslint-loader": "1.2.1",
-    "eslint-plugin-babel": "3.0.0",
-    "eslint-plugin-react": "3.16.1",
-
-    "autoprefixer": "6.3.1",
-    "css-loader": "0.23.1",
-    "expose-loader": "0.7.1",
-    "file-loader": "0.8.5",
-    "html-loader": "0.4.0",
-    "json-loader": "0.5.4",
-    "postcss-loader": "0.8.0",
-    "shader-loader": "1.1.4",
-    "style-loader": "0.13.0",
-    "url-loader": "0.5.7",
-
-    "react-hot-loader": "1.3.0",
-
-    "html-webpack-plugin": "2.7.2",
-    "webpack-dev-server": "1.14.1",
-
-    "webpack": "1.12.12"
+    "kw-web-suite": "1.0.7"
   },
   "scripts": {
+    "postinstall": "fix-kw-web-suite",
+
     "install:pyfr"  : "cp ./node_modules/simput/dist/types/pyfr.js ./dist/simput-pyfr.js",
     "postinstall"   : "npm run install:pyfr",
     "check"         : "node bin/version-check.js",
@@ -90,7 +59,6 @@
   "bin": {
     "HPCCloud": "./bin/hpc-cloud-cli.js"
   },
-  "preferGlobal": true,
   "config": {
     "commitizen": {
       "path": "node_modules/cz-conventional-changelog"
