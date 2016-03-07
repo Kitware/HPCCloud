@@ -4,8 +4,8 @@ import PyFrExec     from './pyfr-exec';
 import Visualizer   from './visualizer';
 
 export default {
-    CodeSaturn,
-    PyFr,
-    PyFrExec,
-    Visualizer,
-}
+  CodeSaturn,
+  PyFr,
+  PyFrExec,
+  Visualizer,
+};

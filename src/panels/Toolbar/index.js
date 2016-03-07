@@ -4,76 +4,79 @@ import merge        from 'mout/src/object/merge';
 import style        from 'HPCCloudStyle/Toolbar.mcss';
 
 export default React.createClass({
-    displayName: 'PreferenceSubBar',
+  displayName: 'PreferenceSubBar',
 
-    propTypes: {
-        actions: React.PropTypes.array,
-        breadcrumb: React.PropTypes.object,
-        filter: React.PropTypes.bool,
-        location: React.PropTypes.object,
-        onAction: React.PropTypes.func,
-        title: React.PropTypes.string,
-    },
+  propTypes: {
+    actions: React.PropTypes.array,
+    breadcrumb: React.PropTypes.object,
+    filter: React.PropTypes.bool,
+    location: React.PropTypes.object,
+    onAction: React.PropTypes.func,
+    title: React.PropTypes.string,
+  },
 
-    contextTypes: {
-        router: React.PropTypes.object,
-    },
+  contextTypes: {
+    router: React.PropTypes.object,
+  },
 
-    getDefaultProps() {
-        return {
-            filter: false,
-            actions: [],
-            title: '',
-            breadcrumb: {
-                paths:[],
-                icons: [],
-            },
-        };
-    },
+  getDefaultProps() {
+    return {
+      filter: false,
+      actions: [],
+      title: '',
+      breadcrumb: {
+        paths: [],
+        icons: [],
+      },
+    };
+  },
 
-    updateFilter(e) {
-        const filter = e.target.value;
+  updateFilter(e) {
+    const filter = e.target.value;
 
-        this.context.router.replace({
-            pathname: this.props.location.pathname,
-            query: merge(this.props.location.query, {filter}),
-            state: this.props.location.state,
-        });
-    },
+    this.context.router.replace({
+      pathname: this.props.location.pathname,
+      query: merge(this.props.location.query, { filter }),
+      state: this.props.location.state,
+    });
+  },
 
-    onAction(event) {
-        const action = event.target.dataset.action;
-        if (this.props.onAction) {
-            this.props.onAction(action);
-        }
-    },
+  onAction(event) {
+    const action = event.target.dataset.action;
+    if (this.props.onAction) {
+      this.props.onAction(action);
+    }
+  },
 
-    render() {
-        return (
-            <nav className={ style.container }>
-                <Breadcrumb className={ style.breadcrumb } paths={ this.props.breadcrumb.paths } icons={ this.props.breadcrumb.icons }/>
+  render() {
+    return (
+      <nav className={ style.container }>
+        <Breadcrumb className={ style.breadcrumb } paths={ this.props.breadcrumb.paths } icons={ this.props.breadcrumb.icons } />
 
-                <div className={ style.title }>
-                    { this.props.title }
-                </div>
+        <div className={ style.title }>
+            { this.props.title }
+        </div>
 
-                <div className={ style.actions }>
-                    { this.props.actions.map(action => {
-                        return  <i key={action.name}
-                                    data-action={action.name}
-                                    onClick={this.onAction}
-                                    className={ [ style.actionButton, action.icon ].join(' ') }>
-                                </i>;
-                    })}
-                    { this.props.filter ?
-                        <input type='text'
-                            className={ style.filter }
-                            placeholder="filter"
-                            value={ this.props.location.query.filter || '' }
-                            onChange={ this.updateFilter }/>
-                        : null
-                    }
-                </div>
-            </nav>);
-    },
-})
+        <div className={ style.actions }>
+            { this.props.actions.map(action =>
+              <i
+                key={action.name}
+                data-action={action.name}
+                onClick={this.onAction}
+                className={ [ style.actionButton, action.icon ].join(' ') }
+              ></i>
+            )}
+            { this.props.filter ?
+                <input
+                  type="text"
+                  className={ style.filter }
+                  placeholder="filter"
+                  value={ this.props.location.query.filter || '' }
+                  onChange={ this.updateFilter }
+                />
+                : null
+            }
+        </div>
+      </nav>);
+  },
+});

@@ -9,47 +9,53 @@ import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
 export default React.createClass({
 
-    displayName: 'Preferences/User',
+  displayName: 'Preferences/User',
 
-    propTypes: {
-        menu: React.PropTypes.array,
-    },
+  propTypes: {
+    menu: React.PropTypes.array,
+  },
 
-    getDefaultProps() {
-        return {
-            menu: [
-                {name: 'Change Password', component: ChangePassword},
-                {name: 'Change Info', component: ChangeInfo},
-            ],
-        };
-    },
+  getDefaultProps() {
+    return {
+      menu: [
+        {
+          name: 'Change Password',
+          component: ChangePassword,
+        }, {
+          name: 'Change Info',
+          component: ChangeInfo,
+        },
+      ],
+    };
+  },
 
-    getInitialState() {
-        return {
-            active: 0,
-        };
-    },
+  getInitialState() {
+    return {
+      active: 0,
+    };
+  },
 
-    activeChange(active) {
-        this.setState({active});
-    },
+  activeChange(active) {
+    this.setState({ active });
+  },
 
-    formAction(actionName) {
-        this[actionName]();
-    },
+  formAction(actionName) {
+    this[actionName]();
+  },
 
-    render() {
-        return <div className={ style.rootContainer }>
-            <Toolbar title='User' breadcrumb={breadcrumb}/>
-            <div className={ style.container }>
-                <ActiveList
-                    className={ style.menu }
-                    onActiveChange={this.activeChange}
-                    active={this.state.active}
-                    list={this.props.menu}/>
-
-                {React.createElement(this.props.menu[this.state.active].component, { className: style.content })}
-            </div>
-        </div>;
-    },
+  render() {
+    return (
+      <div className={ style.rootContainer }>
+        <Toolbar title="User" breadcrumb={breadcrumb} />
+        <div className={ style.container }>
+            <ActiveList
+              className={ style.menu }
+              onActiveChange={this.activeChange}
+              active={this.state.active}
+              list={this.props.menu}
+            />
+            { React.createElement(this.props.menu[this.state.active].component, { className: style.content }) }
+        </div>
+      </div>);
+  },
 });

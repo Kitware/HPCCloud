@@ -9,17 +9,17 @@ const PROJECT_CHANGE = 'data.project.change';
 
 
 export function invalidateSimulation(simulation) {
-    notification.emit(SIMULATION_CHANGE, simulation);
+  notification.emit(SIMULATION_CHANGE, simulation);
 }
 
 export function onSimulationChange(cb) {
-    return notification.on(SIMULATION_CHANGE, cb);
+  return notification.on(SIMULATION_CHANGE, cb);
 }
 
 export function invalidateProject(project) {
-    notification.emit(PROJECT_CHANGE, project);
+  notification.emit(PROJECT_CHANGE, project);
 }
 
 export function onProjectChange(cb) {
-    return notification.on(PROJECT_CHANGE, cb);
+  return notification.on(PROJECT_CHANGE, cb);
 }

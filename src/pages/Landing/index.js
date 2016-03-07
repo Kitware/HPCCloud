@@ -6,30 +6,32 @@ const staticContent = require('./content.html');
 
 export default React.createClass({
 
-    displayName: 'HPCCloud-Landing',
+  displayName: 'HPCCloud-Landing',
 
-    contextTypes: {
-        router: React.PropTypes.object,
-    },
+  contextTypes: {
+    router: React.PropTypes.object,
+  },
 
-    componentWillMount() {
-        this.subscription = client.onAuthChange((loggedIn) => {
-            if(loggedIn) {
-                this.context.router.replace('/');
-            }
-        });
-    },
+  componentWillMount() {
+    this.subscription = client.onAuthChange((loggedIn) => {
+      if (loggedIn) {
+        this.context.router.replace('/');
+      }
+    });
+  },
 
-    componentWillUnmount() {
-        if(this.subscription) {
-            this.subscription.unsubscribe();
-            this.subscription = null;
-        }
-    },
+  componentWillUnmount() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = null;
+    }
+  },
 
-    /* eslint-disable react/no-danger */
-    render() {
-        return <div dangerouslySetInnerHTML={{ __html: staticContent.replace('CLASS', style.landingIcon) }}></div>;
-    },
-    /* eslint-enable react/no-danger */
+  /* eslint-disable react/no-danger */
+  render() {
+    return (
+      <div dangerouslySetInnerHTML={{ __html: staticContent.replace('CLASS', style.landingIcon) }}>
+      </div>);
+  },
+  /* eslint-enable react/no-danger */
 });

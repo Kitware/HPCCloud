@@ -11,91 +11,93 @@ import style                from 'HPCCloudStyle/PageWithMenu.mcss';
 
 export default React.createClass({
 
-    displayName: 'PyFrSimput',
+  displayName: 'PyFrSimput',
 
-    propTypes: {
-        convert: React.PropTypes.func,
-        model: React.PropTypes.object,
-    },
+  propTypes: {
+    convert: React.PropTypes.func,
+    model: React.PropTypes.object,
+  },
 
-    getDefaultProps() {
-        return {
-            // PyFr Simput code
-            model: Simput.types.pyfr.model,
-            convert: Simput.types.pyfr.convert,
-        };
-    },
+  getDefaultProps() {
+    return {
+      // PyFr Simput code
+      model: Simput.types.pyfr.model,
+      convert: Simput.types.pyfr.convert,
+    };
+  },
 
-    getInitialState() {
-        return {
-            // Simput root data
-            jsonData: { data: {} },
-            results: null,
+  getInitialState() {
+    return {
+      // Simput root data
+      jsonData: { data: {} },
+      results: null,
 
-            // Language support
-            labels: new SimputLabels(Simput.types.pyfr, 'en'),
-            help: Simput.types.pyfr.lang.en.help,
+      // Language support
+      labels: new SimputLabels(Simput.types.pyfr, 'en'),
+      help: Simput.types.pyfr.lang.en.help,
 
-            // UI content management
-            data: [],
-            viewData: {},
-        }
-    },
+      // UI content management
+      data: [],
+      viewData: {},
+    };
+  },
 
-    componentWillUnmount() {
-        this.saveModel();
-    },
+  componentWillUnmount() {
+    this.saveModel();
+  },
 
-    saveModel() {
-        try {
-            const results = this.props.convert(this.state.jsonData);
-            this.setState({results});
-            console.log('SAVE: JSON data', this.state.jsonData);
-            console.log('SAVE: Generated data', this.state.results);
-        } catch(e) {
-            console.log('SAVE: try/catch', e);
-        }
-    },
+  saveModel() {
+    try {
+      const results = this.props.convert(this.state.jsonData);
+      this.setState({ results });
+      console.log('SAVE: JSON data', this.state.jsonData);
+      console.log('SAVE: Generated data', this.state.results);
+    } catch (e) {
+      console.log('SAVE: try/catch', e);
+    }
+  },
 
-    updateActive(viewId, index) {
-        const data = modelGenerator(this.props.model, this.state.jsonData, viewId, index,
-                this.state.labels.activeLabels.attributes, this.state.help),
-            viewData = this.state.jsonData.data[viewId][index];
-        this.setState({data, viewData});
-        setImmediate(this.saveModel);
-    },
+  updateActive(viewId, index) {
+    const data = modelGenerator(this.props.model, this.state.jsonData, viewId, index,
+        this.state.labels.activeLabels.attributes, this.state.help),
+      viewData = this.state.jsonData.data[viewId][index];
+    this.setState({ data, viewData });
+    setImmediate(this.saveModel);
+  },
 
-    updateViewData(newData) {
-        const data = this.state.viewData,
-            keypath = newData.id.split('.'),
-            attrName = keypath.shift();
+  updateViewData(newData) {
+    const data = this.state.viewData,
+      keypath = newData.id.split('.'),
+      attrName = keypath.shift();
 
-        data[attrName][keypath.join('.')].value = newData.value;
-        this.setState({viewData: data});
-    },
+    data[attrName][keypath.join('.')].value = newData.value;
+    this.setState({ viewData: data });
+  },
 
-    render() {
-        if(!this.state.jsonData) {
-            return null;
-        }
+  render() {
+    if (!this.state.jsonData) {
+      return null;
+    }
 
-        return (
-            <div className={ style.container }>
-                <ViewMenu
-                    className={ style.menu20 }
-                    data={ this.state.jsonData }
-                    model={ this.props.model }
-                    labels={ this.state.labels }
-                    onChange={ this.updateActive }/>
+    return (
+      <div className={ style.container }>
+          <ViewMenu
+            className={ style.menu20 }
+            data={ this.state.jsonData }
+            model={ this.props.model }
+            labels={ this.state.labels }
+            onChange={ this.updateActive }
+          />
 
-                <div className={ style.content }>
-                    <PropertyPanelBlock
-                        className={ style.rootContainer }
-                        input={ this.state.data }
-                        labels={ this.state.labels }
-                        viewData={ this.state.viewData }
-                        onChange={ this.updateViewData } />
-                </div>
-            </div>);
-    },
+          <div className={ style.content }>
+              <PropertyPanelBlock
+                className={ style.rootContainer }
+                input={ this.state.data }
+                labels={ this.state.labels }
+                viewData={ this.state.viewData }
+                onChange={ this.updateViewData }
+              />
+          </div>
+      </div>);
+  },
 });

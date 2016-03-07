@@ -8,52 +8,54 @@ import breadCrumbStyle from 'HPCCloudStyle/Theme.mcss';
 
 export default React.createClass({
 
-    displayName: 'Project/All',
+  displayName: 'Project/All',
 
-    propTypes: {
-        location: React.PropTypes.object,
-    },
+  propTypes: {
+    location: React.PropTypes.object,
+  },
 
-    contextTypes: {
-        router: React.PropTypes.object,
-    },
+  contextTypes: {
+    router: React.PropTypes.object,
+  },
 
-    getInitialState() {
-        return {
-            projects: [],
-        };
-    },
+  getInitialState() {
+    return {
+      projects: [],
+    };
+  },
 
-    componentWillMount() {
-        this.updateProjectList();
-    },
+  componentWillMount() {
+    this.updateProjectList();
+  },
 
-    updateProjectList() {
-        client.listProjects()
-            .then(resp => this.setState({projects: resp.data}))
-            .catch(err => console.log('Error Project/All', err));
-    },
+  updateProjectList() {
+    client.listProjects()
+      .then(resp => this.setState({ projects: resp.data }))
+      .catch(err => console.log('Error Project/All', err));
+  },
 
-    createProject(e) {
-        const filter = '';
-        this.context.router.replace({
-            pathname: '/New/Project',
-            query: merge(this.props.location.query, {filter}),
-            state: this.props.location.state,
-        });
-    },
+  createProject(e) {
+    const filter = '';
+    this.context.router.replace({
+      pathname: '/New/Project',
+      query: merge(this.props.location.query, { filter }),
+      state: this.props.location.state,
+    });
+  },
 
-    render() {
-        return <TableListing
-                    breadcrumb={{
-                        paths: ['/'],
-                        icons: [
-                            breadCrumbStyle.breadCrumbRootIcon,
-                        ]}}
-                    location={ this.props.location }
-                    accessHelper={ ProjectHelper }
-                    items={ this.state.projects }
-                    onAction={ this.createProject }
-                    title='Projects'/>;
-    },
+  render() {
+    return (
+      <TableListing
+        breadcrumb={{
+          paths: ['/'],
+          icons: [
+            breadCrumbStyle.breadCrumbRootIcon,
+          ] }}
+        location={ this.props.location }
+        accessHelper={ ProjectHelper }
+        items={ this.state.projects }
+        onAction={ this.createProject }
+        title="Projects"
+      />);
+  },
 });
