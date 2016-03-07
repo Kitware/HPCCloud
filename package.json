@@ -33,17 +33,15 @@
     "history": "1.17.0",
     "react-router": "2.0.0",
 
-    "paraviewweb": "1.2.11",
+    "paraviewweb": "1.2.13",
     "simput": "1.1.0",
-    "pvw-visualizer": "1.0.7",
+    "pvw-visualizer": "1.0.8",
 
     "kw-web-suite": "1.0.7"
   },
   "scripts": {
-    "postinstall": "fix-kw-web-suite",
-
     "install:pyfr"  : "cp ./node_modules/simput/dist/types/pyfr.js ./dist/simput-pyfr.js",
-    "postinstall"   : "npm run install:pyfr",
+    "postinstall"   : "npm run install:pyfr && fix-kw-web-suite || true",
     "check"         : "node bin/version-check.js",
 
     "prebuild"      : "npm run check",
