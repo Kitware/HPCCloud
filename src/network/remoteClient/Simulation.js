@@ -111,16 +111,17 @@ export function getProjectSimulations(pId) {
 export function activateSimulationStep(simulation, active, disabled) {
   // Update local data
   simulation.active = active;
+
+  if (simulation.disabled.indexOf(active) !== -1) {
+    simulation.disabled.splice(simulation.disabled.indexOf(active), 1);
+  }
+
   if (disabled) {
-    simulation.disabled = disabled;
+    simulation.disabled.push(disabled);
   }
   invalidateSimulation(simulation);
 
-  return girder.editSimulation({
-    _id: simulation._id,
-    active,
-    disabled,
-  });
+  return girder.editSimulation(simulation);
 }
 
 export function getSimulationStep(id, name) {

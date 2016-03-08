@@ -2,10 +2,12 @@ import rootNewSimulation from './components/root/NewSimulation';
 import rootViewSimulation from './components/root/ViewSimulation';
 
 import stepIntroduction from './components/steps/Introduction';
-import stepStartSim from './components/steps/Simulation/Start';
-import stepViewSim from './components/steps/Simulation/View';
 
-const stepStartViz = null;
+import stepStartSim from './components/steps/Simulation/Start';
+import stepViewSim  from './components/steps/Simulation/View';
+
+import stepStartViz from './components/steps/Visualization/Start';
+import stepViewViz from './components/steps/Visualization/View';
 
 export default {
   name: 'PyFr-Exec',
@@ -27,7 +29,7 @@ export default {
     },
   },
   steps: {
-    _order: ['Introduction', 'Simulation', 'Visualization'],
+    _order: [ 'Introduction', 'Simulation', 'Visualization' ],
     _disabled: ['Visualization'],
     _active: 'Introduction',
     _initial_state: {
@@ -53,10 +55,12 @@ export default {
     },
     Visualization: {
       default: stepStartViz,
+      run: stepViewViz,
     },
   },
   taskFlows: {
     Simulation: 'hpccloud.taskflow.pyfr.PyFrTaskFlow',
+    Visualization: 'hpccloud.taskflow.paraview.ParaViewTaskFlow',
   },
   labels: {
     Introduction: {
@@ -68,6 +72,7 @@ export default {
     },
     Visualization: {
       default: 'Visualization',
+      run: 'Visualization (running)',
     },
   },
 };
