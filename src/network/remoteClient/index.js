@@ -1,106 +1,108 @@
 import {
-    onBusy,
-    onProgress,
-    onEvent,
+  onBusy,
+  onProgress,
+  onEvent,
 } from './BusyProgress';
 
 import {
-    changePassword,
-    getLoggedInPromise,
-    getUser,
-    getUserName,
-    loggedIn,
-    login,
-    logout,
-    onAuthChange,
-    registerUser,
-    resetPassword,
-    updateUser,
+  changePassword,
+  getLoggedInPromise,
+  getUser,
+  getUserName,
+  loggedIn,
+  login,
+  logout,
+  onAuthChange,
+  registerUser,
+  resetPassword,
+  updateUser,
 } from './Auth';
 
 import {
-    createCluster,
-    deleteCluster,
-    listClusterProfiles,
-    saveCluster,
-    testCluster,
+  createCluster,
+  deleteCluster,
+  listClusterProfiles,
+  saveCluster,
+  testCluster,
 } from './Cluster';
 
 import {
-    listFolders,
-    createFolder,
-    editFolderMetaData,
-    deleteFolder,
-    getFolder,
-    editFolder,
-    downloadFolder,
-    getFolderAccess,
-    editFolderAccess,
+  listFolders,
+  createFolder,
+  editFolderMetaData,
+  deleteFolder,
+  getFolder,
+  editFolder,
+  downloadFolder,
+  getFolderAccess,
+  editFolderAccess,
 } from './Folder';
 
 import {
-    getUploadOffset,
-    downloadFile,
-    updateFileContent,
-    deleteFile,
-    editFile,
-    newFile,
+  deleteFile,
+  downloadFile,
+  editFile,
+  getUploadOffset,
+  newFile,
+  updateFileContent,
+  uploadChunk,
 } from './File';
 
 import {
-    saveAWSProfile,
-    deleteAWSProfile,
-    getAWSMaxInstances,
-    listAWSProfiles,
-    listAWSRunningInstances,
+  saveAWSProfile,
+  deleteAWSProfile,
+  getAWSMaxInstances,
+  listAWSProfiles,
+  listAWSRunningInstances,
 } from './AWS';
 
 import {
-    getJobs,
-    createJob,
-    getJob,
-    updateJob,
-    deleteJob,
-    getJobLog,
-    getJobOutput,
-    getJobStatus,
-    terminateJob,
+  getJobs,
+  createJob,
+  getJob,
+  updateJob,
+  deleteJob,
+  getJobLog,
+  getJobOutput,
+  getJobStatus,
+  terminateJob,
 } from './Jobs';
 
 import {
-    listProjects,
-    getProject,
-    saveProject,
-    deleteProject,
+  listProjects,
+  getProject,
+  saveProject,
+  deleteProject,
 } from './Project';
 
 import {
-    deleteSimulation,
-    getProjectSimulations,
-    getSimulation,
-    saveSimulation,
-    activateSimulationStep,
-    getSimulationStep,
-    updateSimulationStep,
+  activateSimulationStep,
+  addEmptyFileForSimulation,
+  deleteSimulation,
+  getProjectSimulations,
+  getSimulation,
+  getSimulationStep,
+  saveSimulation,
+  updateSimulationStep,
 } from './Simulation';
 
 import {
-    invalidateSimulation,
-    onSimulationChange,
-    invalidateProject,
-    onProjectChange,
+  invalidateSimulation,
+  onSimulationChange,
+  invalidateProject,
+  onProjectChange,
 } from './Notification';
 
 import {
-    createTaskflow,
-    getTaskflow,
-    updateTaskflow,
-    deleteTaskflow,
-    startTaskflow,
-    getTaskflowStatus,
-    getTaskflowTasks,
-    createNewTaskForTaskflow,
-    endTaskflow,
+  createTaskflow,
+  getTaskflow,
+  updateTaskflow,
+  deleteTaskflow,
+  startTaskflow,
+  getTaskflowStatus,
+  getTaskflowTasks,
+  createNewTaskForTaskflow,
+  endTaskflow,
 } from './Taskflows';
 
 export default {
@@ -130,12 +132,13 @@ export default {
   testCluster,
 
   /* File */
-  getUploadOffset,
-  downloadFile,
-  updateFileContent,
   deleteFile,
+  downloadFile,
   editFile,
+  getUploadOffset,
   newFile,
+  updateFileContent,
+  uploadChunk,
 
   /* Folder */
   listFolders,
@@ -173,6 +176,7 @@ export default {
   deleteProject,
 
   /* Simulation */
+  addEmptyFileForSimulation,
   deleteSimulation,
   getProjectSimulations,
   getSimulation,

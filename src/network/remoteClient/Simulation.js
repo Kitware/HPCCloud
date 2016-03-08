@@ -32,6 +32,19 @@ function createItemForSimulation(simulation, name, file) {
     });
 }
 
+export function addEmptyFileForSimulation(simulation, name) {
+  return girder.createItem(simulation.metadata.inputFolder._id, name)
+    .then(resp => {
+      const parentId = resp.data._id;
+      return girder.newFile({
+        parentType: 'item',
+        parentId,
+        name,
+        size: 0,
+      });
+    });
+}
+
 // if there's not a sim.id, create a sim with two folders input and output
 // otherwise update simulation
 export function saveSimulation(simulation, attachments) {

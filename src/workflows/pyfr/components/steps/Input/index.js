@@ -33,6 +33,9 @@ export default React.createClass({
 
   getInitialState() {
     return {
+      // ini file container
+      iniFile: null,
+
       // Simput root data
       jsonData: { data: {} },
 
@@ -47,7 +50,28 @@ export default React.createClass({
   },
 
   componentWillMount() {
+    var iniFile = this.props.simulation.metadata.inputFolder.files.iniFile;
     var jsonData = this.props.simulation.steps[this.props.step].metadata.model;
+
+    // Create ini file container if not already here
+    if (!iniFile) {
+      const fileName = 'iniFile';
+      client.addEmptyFileForSimulation(this.props.simulation, fileName)
+        .then(resp => {
+          const { _id } = resp.data; // itemId
+
+          this.props.simulation.metadata.inputFolder.files.iniFile = _id;
+
+          this.setState({ iniFile: _id });
+
+          client.saveSimulation(this.props.simulation)
+            .then(() => {
+              client.invalidateSimulation(this.props.simulation);
+            });
+        });
+    } else if (!this.state.iniFile) {
+      this.setState({ iniFile });
+    }
 
     // Need to fill up the jsonData
     if (!jsonData) {
@@ -98,9 +122,22 @@ export default React.createClass({
 
     // Update ini file content
     try {
-      const results = this.props.convert(jsonData);
-      console.log(results);
-      // Replace content
+      if (this.state.iniFile) {
+        const convertedData = this.props.convert(jsonData);
+        const content = convertedData.results['pyfr.ini'];
+        console.log('try to save content', content.length);
+        const blob = new Blob([content], { type: 'text/plain' });
+        client.updateFileContent(this.state.iniFile, content.length)
+          .then(
+            upload => {
+              client.uploadChunk(upload.data._id, 0, blob);
+            },
+            err => {
+              console.log('Error update ini content', err);
+            });
+      } else {
+        console.log('no ini file');
+      }
     } catch (e) {
       console.log('Error when generating INI file', e);
     }
@@ -137,7 +174,6 @@ export default React.createClass({
             labels={ this.state.labels }
             onChange={ this.updateActive }
           />
-
           <div className={ style.content }>
               <PropertyPanelBlock
                 className={ style.rootContainer }
