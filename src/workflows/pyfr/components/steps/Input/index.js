@@ -4,6 +4,8 @@ import React                from 'react';
 import SimputLabels         from 'simput/src/Labels';
 import ViewMenu             from 'simput/src/ViewMenu';
 import modelGenerator       from 'simput/src/modelGenerator';
+import client               from '../../../../../network';
+import deepClone            from 'mout/src/lang/deepClone';
 
 import PropertyPanelBlock   from 'paraviewweb/src/React/Properties/PropertyPanel';
 
@@ -16,6 +18,9 @@ export default React.createClass({
   propTypes: {
     convert: React.PropTypes.func,
     model: React.PropTypes.object,
+    project: React.PropTypes.object,
+    simulation: React.PropTypes.object,
+    step: React.PropTypes.string,
   },
 
   getDefaultProps() {
@@ -30,7 +35,6 @@ export default React.createClass({
     return {
       // Simput root data
       jsonData: { data: {} },
-      results: null,
 
       // Language support
       labels: new SimputLabels(Simput.types.pyfr, 'en'),
@@ -42,18 +46,63 @@ export default React.createClass({
     };
   },
 
+  componentWillMount() {
+    var jsonData = this.props.simulation.steps[this.props.step].metadata.model;
+
+    // Need to fill up the jsonData
+    if (!jsonData) {
+      const boundaryNames = {};
+      this.props.project.metadata.boundaries.forEach(name => {
+        boundaryNames[name] = name;
+      });
+
+      jsonData = {
+        data: {},
+        type: 'pyfr',
+        external: {
+          'boundary-names': boundaryNames,
+        },
+      };
+
+      // Update step metadata
+      client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+        metadata: { model: JSON.stringify(jsonData) },
+      }).then((resp) => {
+        var newSim = deepClone(this.props.simulation);
+        newSim.steps[this.props.step].metadata.model = jsonData;
+        client.invalidateSimulation(newSim);
+      });
+    } else {
+      jsonData = JSON.parse(jsonData);
+    }
+
+    // Push model to state
+    this.setState({ jsonData });
+  },
+
   componentWillUnmount() {
     this.saveModel();
   },
 
   saveModel() {
+    const { jsonData } = this.state;
+
+    // Update step metadata
+    client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+      metadata: { model: JSON.stringify(jsonData) },
+    }).then((resp) => {
+      var newSim = deepClone(this.props.simulation);
+      newSim.steps[this.props.step].metadata.model = jsonData;
+      client.invalidateSimulation(newSim);
+    });
+
+    // Update ini file content
     try {
-      const results = this.props.convert(this.state.jsonData);
-      this.setState({ results });
-      console.log('SAVE: JSON data', this.state.jsonData);
-      console.log('SAVE: Generated data', this.state.results);
+      const results = this.props.convert(jsonData);
+      console.log(results);
+      // Replace content
     } catch (e) {
-      console.log('SAVE: try/catch', e);
+      console.log('Error when generating INI file', e);
     }
   },
 

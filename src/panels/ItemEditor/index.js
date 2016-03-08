@@ -15,6 +15,7 @@ const FileUploadEntry = React.createClass({
     label: React.PropTypes.string,
     name: React.PropTypes.string,
     owner: React.PropTypes.func,
+    postProcess: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -37,10 +38,20 @@ const FileUploadEntry = React.createClass({
       return;
     }
 
-    // Let's record attachement
+    // Let's record attachment
     const name = event.target.dataset.name;
     if (this.props.owner && name) {
       this.props.owner().addAttachement(name, file);
+    }
+
+    // Let's post process it
+    if (this.props.owner && this.props.postProcess) {
+      this.props.postProcess(file)
+        .then(metadata => {
+          for (const key in metadata) {
+            this.props.owner().addMetadata(key, metadata[key]);
+          }
+        });
     }
   },
 
