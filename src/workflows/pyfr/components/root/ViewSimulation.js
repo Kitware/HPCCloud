@@ -32,8 +32,6 @@ export default React.createClass({
     const menuList = [];
 
     PyFrModule.steps._order.forEach(name => {
-      console.log('label for', name, PyFrModule.labels);
-
       menuList.push({
         name,
         label: PyFrModule.labels[name].default,

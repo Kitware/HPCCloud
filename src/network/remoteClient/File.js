@@ -8,6 +8,10 @@ export function downloadFile(id) {
   return girder.downloadFile(id);
 }
 
+export function uploadChunk(id, offset, chunk) {
+  return girder.uploadChunk(id, offset, chunk);
+}
+
 export function updateFileContent(id, size) {
   return girder.updateFileContent(id, size);
 }
