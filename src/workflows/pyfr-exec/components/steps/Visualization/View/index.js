@@ -6,25 +6,13 @@ import React            from 'react';
 import TaskflowManager  from '../../../../../../network/TaskflowManager';
 
 const ACTIONS = {
-  terminate: {
-    name: 'terminateTaskflow',
-    label: 'Terminate',
-    icon: '',
-  },
-  visualize: {
-    name: 'visualizeTaskflow',
-    label: 'Visualize',
-    icon: '',
-  },
-  rerun: {
-    name: 'deleteTaskflow',
-    label: 'Rerun',
-    icon: '',
-  },
+  terminate: { name: 'terminateTaskflow', label: 'Terminate', icon: '' },
+  visualize: { name: 'visualizeTaskflow', label: 'Visualize', icon: '' },
+  rerun: { name: 'deleteTaskflow', label: 'Rerun', icon: '' },
 };
 
 export default React.createClass({
-  displayName: 'pyfr/view-simulation',
+  displayName: 'pyfr-exec/view-viz',
 
   propTypes: {
     location: React.PropTypes.object,
@@ -58,7 +46,7 @@ export default React.createClass({
       const actions = [];
 
       pkt.jobs.forEach(job => {
-        if (job.name === 'pyfr' && (job.status === 'running' || job.status === 'complete')) {
+        if (job.name === 'paraview' && job.status === 'running') {
           actions.push(ACTIONS.visualize);
         }
         if (job.status !== 'terminated') {
@@ -122,7 +110,7 @@ export default React.createClass({
       });
   },
 
-  onAction(action) {
+  buttonBarAction(action) {
     this[action]();
   },
 
@@ -131,12 +119,13 @@ export default React.createClass({
       <div>
         <JobMonitor taskFlowId={ this.state.taskflowId } />
         <section>
-            <ButtonBar
-              onAction={ this.onAction }
-              actions={ this.state.actions }
-              error={this.state.error}
-            />
+          <ButtonBar
+            onAction={ this.buttonBarAction }
+            actions={ this.state.actions }
+            error={this.state.error}
+          />
         </section>
-      </div>);
+      </div>
+    );
   },
 });
