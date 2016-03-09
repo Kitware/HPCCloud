@@ -93,11 +93,15 @@ export default React.createClass({
         metadata: { model: JSON.stringify(jsonData) },
       }).then((resp) => {
         var newSim = deepClone(this.props.simulation);
-        newSim.steps[this.props.step].metadata.model = jsonData;
+        newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
         client.invalidateSimulation(newSim);
       });
     } else {
-      jsonData = JSON.parse(jsonData);
+      if (typeof jsonData === 'string') {
+        jsonData = JSON.parse(jsonData);
+      } else {
+        console.log('Can not convert jsonData (?)', jsonData);
+      }
     }
 
     // Push model to state
@@ -116,7 +120,7 @@ export default React.createClass({
       metadata: { model: JSON.stringify(jsonData) },
     }).then((resp) => {
       var newSim = deepClone(this.props.simulation);
-      newSim.steps[this.props.step].metadata.model = jsonData;
+      newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
       client.invalidateSimulation(newSim);
     });
 

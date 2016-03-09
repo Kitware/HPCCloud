@@ -51,7 +51,12 @@ export default React.createClass({
   render() {
     return (
       <nav className={ style.container }>
-        <Breadcrumb className={ style.breadcrumb } paths={ this.props.breadcrumb.paths } icons={ this.props.breadcrumb.icons } />
+        <Breadcrumb
+          className={ style.breadcrumb }
+          paths={ this.props.breadcrumb.paths }
+          icons={ this.props.breadcrumb.icons }
+          active={ this.props.breadcrumb.active }
+        />
 
         <div className={ style.title }>
             { this.props.title }

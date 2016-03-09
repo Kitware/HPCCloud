@@ -162,3 +162,7 @@
     composes: breadCrumbIcon;
     composes: fa-question   from 'font-awesome/css/font-awesome.css';
 }
+
+.activeBreadCrumb {
+  color: #18e !important;
+}

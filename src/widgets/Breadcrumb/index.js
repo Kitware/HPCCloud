@@ -18,6 +18,7 @@ export default React.createClass({
   displayName: 'LinkIcon',
 
   propTypes: {
+    active: React.PropTypes.number,
     className: React.PropTypes.string,
     icons: React.PropTypes.array,
     paths: React.PropTypes.array,
@@ -25,6 +26,7 @@ export default React.createClass({
 
   getDefaultProps() {
     return {
+      active: -1,
       icons: DEFAULT_BREADCRUMB_ICONS,
     };
   },
@@ -32,8 +34,8 @@ export default React.createClass({
   render() {
     return (
       <div className={ this.props.className }>
-        {this.props.paths.map((path, index) =>
-          <LinkIcon key={index} to={path} icon={this.props.icons[index]} />
+        { this.props.paths.map((path, index) =>
+          <LinkIcon key={index} to={path} icon={this.props.icons[index]} className={ index === this.props.active ? style.activeBreadCrumb : ''} />
         )}
       </div>);
   },

@@ -9,6 +9,8 @@ import { breadcrumb }   from '..';
 
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
+const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 1 });
+
 const STATUS_TO_ICON = {
   error: style.statusErrorIcon,
   creating: style.statusCreatingIcon,
@@ -182,7 +184,7 @@ export default React.createClass({
     return (
       <div className={ style.rootContainer }>
         <Toolbar
-          breadcrumb={ breadcrumb }
+          breadcrumb={ clusterBreadCrumb }
           title="Clusters"
           actions={[{ name: 'add', icon: style.addIcon }]}
           onAction={this.addItem}
