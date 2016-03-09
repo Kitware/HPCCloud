@@ -3,11 +3,12 @@ import rootViewSimulation   from './components/root/ViewSimulation';
 
 import stepIntroduction     from './components/steps/Introduction';
 import stepInput            from './components/steps/Input';
-import stepSimulation       from './components/steps/Simulation';
 
-// FIXME no Viz implementation yet
-const stepStartViz   = null;
-const stepVisualizer = null;
+import stepStartSim from './components/steps/Simulation/Start';
+import stepViewSim  from './components/steps/Simulation/View';
+
+import stepStartViz from './components/steps/Visualization/Start';
+import stepViewViz from './components/steps/Visualization/View';
 
 export default {
   name: 'PyFr',
@@ -115,12 +116,17 @@ export default {
       default: stepInput,
     },
     Simulation: {
-      default: stepSimulation,
+      default: stepStartSim,
+      run: stepViewSim,
     },
     Visualizer: {
       default: stepStartViz,
-      viewer: stepVisualizer,
+      run: stepViewViz,
     },
+  },
+  taskFlows: {
+    Simulation: 'hpccloud.taskflow.pyfr.PyFrTaskFlow',
+    Visualization: 'hpccloud.taskflow.paraview.ParaViewTaskFlow',
   },
   labels: {
     Introduction: {
@@ -131,6 +137,7 @@ export default {
     },
     Simulation: {
       default: 'Simulation',
+      run: 'Simulation (running)',
     },
     Visualizer: {
       default: 'Visualization',
