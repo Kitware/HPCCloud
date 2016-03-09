@@ -12,6 +12,7 @@ export const breadcrumb = {
     style.clusterIcon,
     style.ec2Icon,
   ],
+  active: -1,
 };
 
 export default React.createClass({

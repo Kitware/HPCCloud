@@ -9,6 +9,8 @@ import { breadcrumb }   from '..';
 
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
+const awsBreadCrumb = Object.assign({}, breadcrumb, { active: 2 });
+
 /* eslint-disable no-alert */
 export default React.createClass({
 
@@ -113,7 +115,7 @@ export default React.createClass({
     return (
       <div className={ style.rootContainer }>
         <Toolbar
-          breadcrumb={breadcrumb}
+          breadcrumb={ awsBreadCrumb }
           title="AWS EC2"
           actions={[{ name: 'add', icon: style.addIcon }]}
           onAction={this.addItem}

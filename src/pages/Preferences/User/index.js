@@ -7,6 +7,8 @@ import { breadcrumb }   from '..';
 
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
+const userBreadCrumb = Object.assign({}, breadcrumb, { active: 0 });
+
 export default React.createClass({
 
   displayName: 'Preferences/User',
@@ -46,7 +48,7 @@ export default React.createClass({
   render() {
     return (
       <div className={ style.rootContainer }>
-        <Toolbar title="User" breadcrumb={breadcrumb} />
+        <Toolbar title="User" breadcrumb={userBreadCrumb} />
         <div className={ style.container }>
             <ActiveList
               className={ style.menu }
