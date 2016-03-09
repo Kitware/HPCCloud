@@ -54,22 +54,17 @@ export default React.createClass({
     this.setState({ taskflowId });
 
     this.subscription = TaskflowManager.monitorTaskflow(taskflowId, (pkt) => {
-      var allTerminated = true;
       const actions = [];
 
-      pkt.jobs.forEach(job => {
-        if (job.name === 'pyfr' && (job.status === 'running' || job.status === 'complete')) {
-          actions.push(ACTIONS.visualize);
-        }
-        if (job.status !== 'terminated') {
-          allTerminated = false;
-        }
-      });
-
-      if (allTerminated && pkt.jobs.length) {
-        actions.push(ACTIONS.rerun);
-      } else {
+      // some running -> terminate
+      if (pkt.jobs.some(job => job.status === 'running') && pkt.jobs.some(job => job.name === 'pyfr')) {
         actions.push(ACTIONS.terminate);
+      // every complete -> visualize
+      } else if (pkt.jobs.every(job => job.status === 'complete')) {
+        actions.push(ACTIONS.visualize);
+      // every terminated -> rerun
+      } else if (pkt.jobs.every(job => job.status === 'terminated')) {
+        actions.push(ACTIONS.rerun);
       }
 
       // Refresh ui
@@ -85,11 +80,11 @@ export default React.createClass({
   },
 
   visualizeTaskflow() {
-    client.activateSimulationStep(this.props.simulation, 'Visualization', 'Simulation')
+    client.activateSimulationStep(this.props.simulation, 'Visualization', null)
       .then((resp) => {
         this.context.router.replace({
-          pathname: this.props.location.pathname,
-          query: merge(this.props.location.query, { view: 'visualizer' }),
+          pathname: `View/Simulation/${this.props.simulation._id}/Visualization`,
+          query: merge(this.props.location.query, { view: 'default' }),
           state: this.props.location.state,
         });
       })

@@ -171,7 +171,7 @@ class Simulation(AccessControlledModel):
             dirty = True
             simulation['active'] = active
 
-        if disabled:
+        if disabled is not None:
             dirty = True
             simulation['disabled'] = disabled
 

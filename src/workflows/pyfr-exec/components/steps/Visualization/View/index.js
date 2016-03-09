@@ -42,22 +42,20 @@ export default React.createClass({
     this.setState({ taskflowId });
 
     this.subscription = TaskflowManager.monitorTaskflow(taskflowId, (pkt) => {
-      var allTerminated = true;
       const actions = [];
 
-      pkt.jobs.forEach(job => {
-        if (job.name === 'paraview' && job.status === 'running') {
-          actions.push(ACTIONS.visualize);
-        }
-        if (job.status !== 'terminated') {
-          allTerminated = false;
-        }
-      });
+      // name is paraview and status is running -> visualize
+      if (pkt.jobs.some(job => job.name === 'paraview' && job.status === 'running')) {
+        actions.push(ACTIONS.visualize);
+      }
 
-      if (allTerminated && pkt.jobs.length) {
-        actions.push(ACTIONS.rerun);
-      } else {
+      // some running -> terminate
+      if (pkt.jobs.some(job => job.status === 'running')) {
         actions.push(ACTIONS.terminate);
+      // every status complete || terminated -> rerun
+      } else if (pkt.jobs.every(job => job.status === 'complete') ||
+          pkt.jobs.every(job => job.status === 'terminated')) {
+        actions.push(ACTIONS.rerun);
       }
 
       // Refresh ui
@@ -73,7 +71,7 @@ export default React.createClass({
   },
 
   visualizeTaskflow() {
-    client.activateSimulationStep(this.props.simulation, 'Visualization', 'Simulation')
+    client.activateSimulationStep(this.props.simulation, 'Visualization', null)
       .then((resp) => {
         this.context.router.replace({
           pathname: this.props.location.pathname,
