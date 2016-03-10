@@ -86,6 +86,7 @@ export default React.createClass({
         external: {
           'boundary-names': boundaryNames,
         },
+        hideViews: [ 'backend' ],
       };
 
       // Update step metadata
