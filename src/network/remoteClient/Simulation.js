@@ -108,6 +108,11 @@ export function getProjectSimulations(pId) {
   return girder.listSimulations(pId);
 }
 
+export function updateDisabledSimulationSteps(simulation) {
+  invalidateSimulation(simulation);
+  return girder.editSimulation(simulation);
+}
+
 export function activateSimulationStep(simulation, active, disabled) {
   // Update local data
   simulation.active = active;

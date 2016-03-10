@@ -83,6 +83,7 @@ export default {
   },
   steps: {
     _order: ['Introduction', 'Input', 'Simulation', 'Visualizer'],
+    _disabled: ['Simulation', 'Visualizer'],
     _initial_state: {
       Introduction: {
         type: 'input',
@@ -92,21 +93,15 @@ export default {
       },
       Input: {
         type: 'input',
-        metadata: {
-          disabled: false,
-        },
+        metadata: {},
       },
       Simulation: {
         type: 'output',
-        metadata: {
-          disabled: true,
-        },
+        metadata: {},
       },
       Visualizer: {
         type: 'output',
-        metadata: {
-          disabled: true,
-        },
+        metadata: {},
       },
     },
     Introduction: {

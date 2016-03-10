@@ -85,6 +85,7 @@ import {
   getSimulationStep,
   saveSimulation,
   updateSimulationStep,
+  updateDisabledSimulationSteps,
 } from './Simulation';
 
 import {
@@ -186,6 +187,7 @@ export default {
   activateSimulationStep,
   getSimulationStep,
   updateSimulationStep,
+  updateDisabledSimulationSteps,
 
   /* Notifications */
   invalidateSimulation,
