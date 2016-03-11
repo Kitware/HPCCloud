@@ -15,6 +15,7 @@ export default {
   config: {
     cluster: {
       'config.paraview.installDir': {
+        type: 'text',
         label: 'ParaView Directory',
         description: 'Path to the home directory of ParaView.',
       },

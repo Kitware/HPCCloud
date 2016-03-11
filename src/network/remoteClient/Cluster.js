@@ -22,3 +22,7 @@ export function saveCluster(cluster) {
 export function testCluster(id) {
   return girder.startCluster(id);
 }
+
+export function getCluster(id) {
+  return girder.getCluster(id);
+}

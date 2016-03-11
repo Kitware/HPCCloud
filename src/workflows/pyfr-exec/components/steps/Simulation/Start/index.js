@@ -5,6 +5,7 @@ import RunEC2                  from '../../../../../../panels/run/RunEC2';
 import RunCluster              from '../../../../../../panels/run/RunCluster';
 import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
 import ButtonBar               from '../../../../../../panels/ButtonBar';
+import RuntimeBackend          from '../../../helpers/RuntimeBackend';
 
 import client                  from '../../../../../../network';
 import deepClone               from 'mout/src/lang/deepClone';
@@ -29,19 +30,42 @@ export default React.createClass({
   },
 
   getInitialState() {
+    if (defaultServerParameters.Traditional.profile) {
+      this.fetchCluster(defaultServerParameters.Traditional.profile);
+    }
     return {
       serverType: 'Traditional',
       EC2: defaultServerParameters.EC2,
       Traditional: defaultServerParameters.Traditional,
       OpenStack: defaultServerParameters.OpenStack,
+      clusters: {},
+      backend: {},
       error: '',
     };
   },
+
+  fetchCluster(clusterId) {
+    client.getCluster(clusterId)
+      .then(
+        cluster => {
+          const clusters = Object.assign({}, this.state.clusters, { [clusterId]: cluster.data });
+          this.setState({ clusters });
+        },
+        err => {
+          console.log('Error fetching cluster', clusterId, err);
+        });
+  },
+
   dataChange(key, value, which) {
     var profile = this.state[which];
     profile[key] = value;
     this.setState({ [which]: profile });
+
+    if (which === 'Traditional' && !this.state.clusters[value]) {
+      this.fetchCluster(value);
+    }
   },
+
   runSimulation(event) {
     var taskflowId,
       sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
@@ -57,6 +81,7 @@ export default React.createClass({
       })
       .then((resp) =>
         client.startTaskflow(taskflowId, {
+          backend: this.state.backend,
           input: {
             folder: {
               id: this.props.simulation.metadata.inputFolder._id,
@@ -109,7 +134,12 @@ export default React.createClass({
   },
 
   updateServerType(e) {
-    this.setState({ serverType: e.target.value });
+    const serverType = e.target.value;
+    this.setState({ serverType });
+  },
+
+  updateBakend(backend) {
+    this.setState({ backend });
   },
 
   render() {
@@ -130,6 +160,14 @@ export default React.createClass({
         serverForm = <span>no valid serverType: {this.state.serverType}</span>;
     }
 
+    let profiles = { cuda: false, openmp: [], opencl: [] };
+    if (this.state.serverType === 'Traditional') {
+      const clusterId = this.state.Traditional.profile;
+      if (this.state.clusters[clusterId] && this.state.clusters[clusterId].config && this.state.clusters[clusterId].config.pyfr) {
+        profiles = this.state.clusters[clusterId].config.pyfr;
+      }
+    }
+
     return (
       <div>
           <section className={formStyle.group}>
@@ -137,7 +175,8 @@ export default React.createClass({
               <select
                 className={formStyle.input}
                 value={this.state.serverType}
-                onChange={ this.updateServerType } >
+                onChange={ this.updateServerType }
+              >
                 <option value="Traditional">Traditional</option>
                 <option value="EC2">EC2</option>
                 <option value="OpenStack">OpenStack</option>
@@ -146,6 +185,7 @@ export default React.createClass({
           <section>
               {serverForm}
           </section>
+          <RuntimeBackend profiles={profiles} onChange={ this.updateBakend } />
           <section className={formStyle.buttonGroup}>
               <ButtonBar
                 visible={this.state[this.state.serverType].profile !== ''}

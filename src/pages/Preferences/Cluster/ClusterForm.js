@@ -1,10 +1,12 @@
 import deepEquals   from 'mout/src/lang/deepEquals';
 import React        from 'react';
 import Workflows    from '../../../workflows';
+import FormPanel    from '../../../panels/FormPanel';
 
 import style         from 'HPCCloudStyle/ItemEditor.mcss';
 
 const preventDefault = (e) => { e.preventDefault(); };
+
 const allConfigs = {};
 
 for (const wfName in Workflows) {
@@ -14,15 +16,6 @@ for (const wfName in Workflows) {
       allConfigs[propKey] = wf.config.cluster[propKey];
     }
   }
-}
-
-function getValue(obj, path) {
-  var varNames = path.split('.'),
-    result = obj;
-  while (varNames.length && result) {
-    result = result[varNames.shift()];
-  }
-  return result || '';
 }
 
 export default React.createClass({
@@ -72,22 +65,11 @@ export default React.createClass({
     }
   },
 
-    // {
-    //     name: 'new cluster',
-    //     type: 'trad',
-    //     config: {
-    //         host: 'localhost',
-    //         ssh: {
-    //             user: 'Your_Login',
-    //         },
-    //         parallelEnvironment: '',
-    //         numberOfSlots: 1,
-    //         jobOutputDir: '/tmp',
-    //         paraview: {
-    //             installDir: '/opt/paraview',
-    //         },
-    //     },
-    // },
+  mergeData(updatedData) {
+    const data = Object.assign({}, this.state.data, updatedData);
+    this.setState({ data });
+    this.props.onChange(data);
+  },
 
   render() {
     if (!this.state.data) {
@@ -177,21 +159,7 @@ export default React.createClass({
               </select>
           </section>
           <form onSubmit={ preventDefault }>
-            { Object.keys(allConfigs).map(key => {
-              const item = allConfigs[key];
-              return (
-                <section className={style.group} key={key}>
-                  <label className={style.label} title={item.description}>{item.label}</label>
-                  <input
-                    className={style.input}
-                    type="text"
-                    value={getValue(this.state.data, key)}
-                    data-key={key}
-                    onChange={this.formChange}
-                    required
-                  />
-                </section>);
-            })}
+            <FormPanel config={ allConfigs } style={ style } data={ this.state.data } onChange={ this.mergeData } />
           </form>
           { this.state.data.status !== 'running' ? null :
             <section className={style.group}>
