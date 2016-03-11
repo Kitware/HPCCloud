@@ -21,6 +21,7 @@ import {
 import {
   createCluster,
   deleteCluster,
+  getCluster,
   listClusterProfiles,
   saveCluster,
   testCluster,
@@ -127,6 +128,7 @@ export default {
   /* Clusters */
   createCluster,
   deleteCluster,
+  getCluster,
   listClusterProfiles,
   saveCluster,
   testCluster,

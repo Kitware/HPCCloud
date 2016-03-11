@@ -60,3 +60,7 @@ textarea.input {
     composes: fa-fw     from 'font-awesome/css/font-awesome.css';
     composes: fa-list   from 'font-awesome/css/font-awesome.css';
 }
+
+.hidden {
+  display: none;
+}

@@ -62,8 +62,6 @@ export default React.createClass({
   },
 
   onChange(id, value) {
-    console.log('onChange', id, value);
-
     const keyPath = id.split('.');
     let currentContainer = null;
 
