@@ -81,6 +81,7 @@ export default React.createClass({
       })
       .then((resp) =>
         client.startTaskflow(taskflowId, {
+          backend: this.state.backend,
           input: {
             folder: {
               id: this.props.simulation.metadata.inputFolder._id,
