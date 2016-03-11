@@ -129,6 +129,7 @@ export default React.createClass({
     try {
       if (this.state.iniFile) {
         const convertedData = this.props.convert(jsonData);
+        console.log(convertedData);
         const content = convertedData.results['pyfr.ini'];
         console.log('try to save content', content.length);
         const blob = new Blob([content], { type: 'text/plain' });
@@ -140,6 +141,11 @@ export default React.createClass({
             err => {
               console.log('Error update ini content', err);
             });
+        const simulationStepIndex = this.props.simulation.disabled.indexOf('Simulation');
+        if (simulationStepIndex !== -1) {
+          this.props.simulation.disabled.splice(simulationStepIndex, 1);
+          client.updateDisabledSimulationSteps(this.props.simulation);
+        }
       } else {
         console.log('no ini file');
       }
