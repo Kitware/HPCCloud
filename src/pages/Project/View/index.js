@@ -73,7 +73,7 @@ export default React.createClass({
         this.updateState();
       })
       .catch((error) => {
-        console.log('problem deleting simulations');
+        console.log('problem deleting simulations', error);
       });
   },
 

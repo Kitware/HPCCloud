@@ -34,8 +34,12 @@ export default React.createClass({
       .catch(err => console.log('Error Project/All', err));
   },
 
-  onAction(e) {
-    this[e]();
+  onAction(action, selectedItems) {
+    if (selectedItems) {
+      this[action](selectedItems);
+    } else {
+      this[action]();
+    }
   },
 
   addItem() {
@@ -47,8 +51,17 @@ export default React.createClass({
     });
   },
 
-  deleteItems() {
-    console.log('delete projects');
+  deleteItems(items) {
+    if (!confirm(`Are you sure you want to delete ${items.length === 1 ? 'this' : 'these'} ${items.length} project${items.length === 1 ? '' : 's'}?`)) {
+      return;
+    }
+    Promise.all(items.map((proj) => client.deleteProject(proj._id)))
+      .then((resp) => {
+        this.updateProjectList();
+      })
+      .catch((error) => {
+        console.log('problem deleting projects', error);
+      });
   },
 
   render() {
