@@ -14,7 +14,7 @@
     max-width: 300px;
     width: 10%;
     border-right: solid 1px #ccc;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .menu20 {
@@ -34,7 +34,7 @@
 .content {
     flex: 1;
     height: calc(100vh - 4em - 1px);
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .addIcon {

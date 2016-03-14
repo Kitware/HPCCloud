@@ -3,18 +3,27 @@ import React        from 'react';
 import Workflows    from '../../../workflows';
 import FormPanel    from '../../../panels/FormPanel';
 
+import CollapsibleWidget from 'paraviewweb/src/React/Widgets/CollapsibleWidget';
+
 import style         from 'HPCCloudStyle/ItemEditor.mcss';
 
 const preventDefault = (e) => { e.preventDefault(); };
 
 const allConfigs = {};
+const wfNames = [];
 
 for (const wfName in Workflows) {
   const wf = Workflows[wfName];
+  allConfigs[wfName] = {};
+  let foundConfig = false;
   if (wf.config && wf.config.cluster) {
     for (const propKey in wf.config.cluster) {
-      allConfigs[propKey] = wf.config.cluster[propKey];
+      allConfigs[wfName][propKey] = wf.config.cluster[propKey];
+      foundConfig = true;
     }
+  }
+  if (foundConfig) {
+    wfNames.push(wfName);
   }
 }
 
@@ -75,6 +84,8 @@ export default React.createClass({
     if (!this.state.data) {
       return null;
     }
+
+    const sepa = <hr style={{ position: 'relative', top: '-2px' }} />;
 
     return (
       <div>
@@ -158,9 +169,6 @@ export default React.createClass({
                 <option value="slurm">SLURM</option>
               </select>
           </section>
-          <form onSubmit={ preventDefault }>
-            <FormPanel config={ allConfigs } style={ style } data={ this.state.data } onChange={ this.mergeData } />
-          </form>
           { this.state.data.status !== 'running' ? null :
             <section className={style.group}>
               <label className={style.label}>Public SSH key</label>
@@ -188,6 +196,13 @@ ssh ${this.state.data.config.ssh.user}@${this.state.data.config.host} \
               </section> :
               null
           }
+          { wfNames.map(name =>
+            <CollapsibleWidget title={ Workflows[name].name } open={ false } key={name} subtitle={ sepa }>
+            <form onSubmit={ preventDefault }>
+              <FormPanel config={ allConfigs[name] } style={ style } data={ this.state.data } onChange={ this.mergeData } />
+            </form>
+            </CollapsibleWidget>
+          )}
       </div>);
   },
 });

@@ -17,16 +17,21 @@ export default React.createClass({
   },
 
   getInitialState() {
-    const state = Object.assign({ device: 'round-robin', profile: 'cuda' }, this.getStateFromProps(this.props));
+    const state = Object.assign({ device: 'round-robin', profile: 'cuda', type: 'cuda' }, this.getStateFromProps(this.props));
+    this.updateBackend(state.type, state.profile, state.device);
     return state;
   },
 
   componentWillReceiveProps(nextProps) {
     const { type, types } = this.getStateFromProps(nextProps);
+
     if (types.indexOf(this.state.type) === -1) {
       this.setState({ type, types });
+      const profile = this.props.profiles[type][0] ? this.props.profiles[type][0].name : '';
+      this.updateBackend(type, profile, this.state.device);
     } else {
       this.setState({ types });
+      this.updateBackend(this.state.type, this.state.profile, this.state.device);
     }
   },
 

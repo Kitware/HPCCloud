@@ -25,11 +25,10 @@ export default React.createClass({
       <section className={style.group}>
         <label className={style.label} title={item.description}>{item.label}</label>
         <input
-          className={style.input}
+          style={{ position: 'relative', top: '-5px' }}
           type="checkbox"
           checked={ value }
           onChange={this.editField}
-          required
         />
       </section>);
   },
