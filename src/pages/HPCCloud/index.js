@@ -66,7 +66,7 @@ export default React.createClass({
       <div className={ layout.verticalFlexContainer }>
         <div className={ theme.topBar } style={{ position: 'relative' }}>
             <div className={ this.state.isBusy ? state.isBusy : '' }>
-                <Link to="/"><i className={ theme.hpcCloudIcon }></i> HPC</Link>
+                <Link to="/"><i className={ theme.hpcCloudIcon }></i>+HPC</Link>
             </div>
 
             <div className={ theme.progressBar }
