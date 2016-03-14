@@ -172,12 +172,13 @@ export default React.createClass({
 
   render() {
     const activeData = this.state.active < this.state.clusters.length ? this.state.clusters[this.state.active] : null;
-    const actions = [{ name: 'removeItem', label: 'Delete', icon: style.deleteIcon }];
-    if (activeData) {
-      actions.push(activeData.config.ssh.publicKey && activeData.status !== 'running'
-        ? { name: 'testCluster', label: 'Test', icon: style.testIcon }
-        : { name: 'saveItem', label: 'Save', icon: style.saveIcon }
-      );
+    const actions = [
+      { name: 'removeItem', label: 'Delete', icon: style.deleteIcon },
+      { name: 'saveItem', label: 'Save', icon: style.saveIcon },
+    ];
+
+    if (activeData && activeData.config.ssh.publicKey && activeData.status !== 'running') {
+      actions.push({ name: 'testCluster', label: 'Test', icon: style.testIcon });
     }
 
     updateClusterStatusAsClassPrefix(this.state.clusters);
