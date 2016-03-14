@@ -4,6 +4,7 @@ module.exports = {
     'array-bracket-spacing': 0,
     'guard-for-in': 0,
     'max-len': [1, 160, 4, {"ignoreUrls": true}],
+    'no-alert': 0,
     'no-console': 0,
     'no-multi-spaces': 0,
     'no-nested-ternary': 0,

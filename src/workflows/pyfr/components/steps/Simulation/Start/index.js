@@ -137,7 +137,8 @@ export default React.createClass({
               <select
                 className={formStyle.input}
                 value={this.state.serverType}
-                onChange={ this.updateServerType } >
+                onChange={ this.updateServerType }
+              >
                 <option value="Traditional">Traditional</option>
                 <option value="EC2">EC2</option>
                 <option value="OpenStack">OpenStack</option>
