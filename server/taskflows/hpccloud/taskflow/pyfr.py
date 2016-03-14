@@ -368,12 +368,13 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
         jobs = []
         job_index = 1
         for chunk in [solution_files[i::number_of_jobs] for i in xrange(number_of_jobs)]:
-            name = 'pyfr_export_%d' % job_index
-            export_job = create_export_job(task, name, chunk, sim_job_dir)
-            submit_job(cluster, export_job, log_write_url=None,
-                          girder_token=task.taskflow.girder_token, monitor=False)
-            jobs.append(export_job)
-            job_index += 1
+            if chunk:
+                name = 'pyfr_export_%d' % job_index
+                export_job = create_export_job(task, name, chunk, sim_job_dir)
+                submit_job(cluster, export_job, log_write_url=None,
+                              girder_token=task.taskflow.girder_token, monitor=False)
+                jobs.append(export_job)
+                job_index += 1
 
         # Update the jobs list in the metadata
         task.taskflow.set_metadata('jobs', [j for j in jobs] +
