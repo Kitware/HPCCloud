@@ -52,7 +52,7 @@ export default React.createClass({
     if (this.props.onAction) {
       this.props.onAction(action, this.state.selected.map((index) => this.props.items[index]));
       // reset selection after action is performed on them.
-      this.setState({ selected: [] });
+      this.setState({ selected: [], actions: [TOOLBAR_ACTIONS.add] });
     }
   },
 

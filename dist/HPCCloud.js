@@ -44593,7 +44593,7 @@
 	exports.i(__webpack_require__(300), undefined);
 
 	// module
-	exports.push([module.id, ".PageWithMenu_rootContainer_2Sp5K {\n    -webkit-flex: 1;\n        -ms-flex: 1;\n            flex: 1;\n    position: relative;\n}\n\n.PageWithMenu_container_1whfI {\n}\n\n.PageWithMenu_menu_1fnpm {\n    height: calc(100vh - 4em - 1px);\n    min-width: 150px;\n    max-width: 300px;\n    width: 10%;\n    border-right: solid 1px #ccc;\n    overflow-y: scroll;\n}\n\n.PageWithMenu_menu20_KPo91 {\n    min-width: 250px;\n    max-width: 400px;\n    width: 20%;\n}\n\n.PageWithMenu_menu30_2JYja {\n    min-width: 350px;\n    max-width: 500px;\n    width: 30%;\n}\n\n.PageWithMenu_content_nEYEH {\n    -webkit-flex: 1;\n        -ms-flex: 1;\n            flex: 1;\n    height: calc(100vh - 4em - 1px);\n    overflow-y: scroll;\n}\n\n.PageWithMenu_addIcon_2hk28 {\n}\n\n.PageWithMenu_saveIcon_OBoAU {\n}\n\n.PageWithMenu_deleteIcon_1CtRh {\n}\n\n.PageWithMenu_testIcon_3z2u4 {\n}\n\n.PageWithMenu_statusErrorIcon_1fYtb {\n}\n\n.PageWithMenu_statusCreatingIcon_3kzfs {\n    margin-right: 5px;\n}\n\n.PageWithMenu_statusCreatedIcon_30lgE {\n    margin-right: 5px;\n}\n\n.PageWithMenu_statusRunningIcon_2bj3g {\n    margin-right: 5px;\n}\n\n.PageWithMenu_statusDataIcon_1vmwY {\n    margin-right: 5px;\n}\n", ""]);
+	exports.push([module.id, ".PageWithMenu_rootContainer_2Sp5K {\n    -webkit-flex: 1;\n        -ms-flex: 1;\n            flex: 1;\n    position: relative;\n}\n\n.PageWithMenu_container_1whfI {\n}\n\n.PageWithMenu_menu_1fnpm {\n    height: calc(100vh - 4em - 1px);\n    min-width: 150px;\n    max-width: 300px;\n    width: 10%;\n    border-right: solid 1px #ccc;\n    overflow-y: auto;\n}\n\n.PageWithMenu_menu20_KPo91 {\n    min-width: 250px;\n    max-width: 400px;\n    width: 20%;\n}\n\n.PageWithMenu_menu30_2JYja {\n    min-width: 350px;\n    max-width: 500px;\n    width: 30%;\n}\n\n.PageWithMenu_content_nEYEH {\n    -webkit-flex: 1;\n        -ms-flex: 1;\n            flex: 1;\n    height: calc(100vh - 4em - 1px);\n    overflow-y: auto;\n}\n\n.PageWithMenu_addIcon_2hk28 {\n}\n\n.PageWithMenu_saveIcon_OBoAU {\n}\n\n.PageWithMenu_deleteIcon_1CtRh {\n}\n\n.PageWithMenu_testIcon_3z2u4 {\n}\n\n.PageWithMenu_statusErrorIcon_1fYtb {\n}\n\n.PageWithMenu_statusCreatingIcon_3kzfs {\n    margin-right: 5px;\n}\n\n.PageWithMenu_statusCreatedIcon_30lgE {\n    margin-right: 5px;\n}\n\n.PageWithMenu_statusRunningIcon_2bj3g {\n    margin-right: 5px;\n}\n\n.PageWithMenu_statusDataIcon_1vmwY {\n    margin-right: 5px;\n}\n", ""]);
 
 	// exports
 	exports.locals = {
@@ -44817,9 +44817,10 @@
 	  },
 	  render: function render() {
 	    var activeData = this.state.active < this.state.clusters.length ? this.state.clusters[this.state.active] : null;
-	    var actions = [{ name: 'removeItem', label: 'Delete', icon: _PageWithMenu2.default.deleteIcon }];
-	    if (activeData) {
-	      actions.push(activeData.config.ssh.publicKey && activeData.status !== 'running' ? { name: 'testCluster', label: 'Test', icon: _PageWithMenu2.default.testIcon } : { name: 'saveItem', label: 'Save', icon: _PageWithMenu2.default.saveIcon });
+	    var actions = [{ name: 'removeItem', label: 'Delete', icon: _PageWithMenu2.default.deleteIcon }, { name: 'saveItem', label: 'Save', icon: _PageWithMenu2.default.saveIcon }];
+
+	    if (activeData && activeData.config.ssh.publicKey && activeData.status !== 'running') {
+	      actions.push({ name: 'testCluster', label: 'Test', icon: _PageWithMenu2.default.testIcon });
 	    }
 
 	    updateClusterStatusAsClassPrefix(this.state.clusters);
@@ -44886,6 +44887,10 @@
 
 	var _FormPanel2 = _interopRequireDefault(_FormPanel);
 
+	var _CollapsibleWidget = __webpack_require__(401);
+
+	var _CollapsibleWidget2 = _interopRequireDefault(_CollapsibleWidget);
+
 	var _ItemEditor = __webpack_require__(332);
 
 	var _ItemEditor2 = _interopRequireDefault(_ItemEditor);
@@ -44897,13 +44902,20 @@
 	};
 
 	var allConfigs = {};
+	var wfNames = [];
 
 	for (var wfName in _workflows2.default) {
 	  var wf = _workflows2.default[wfName];
+	  allConfigs[wfName] = {};
+	  var foundConfig = false;
 	  if (wf.config && wf.config.cluster) {
 	    for (var propKey in wf.config.cluster) {
-	      allConfigs[propKey] = wf.config.cluster[propKey];
+	      allConfigs[wfName][propKey] = wf.config.cluster[propKey];
+	      foundConfig = true;
 	    }
+	  }
+	  if (foundConfig) {
+	    wfNames.push(wfName);
 	  }
 	}
 
@@ -44957,9 +44969,13 @@
 	    this.props.onChange(data);
 	  },
 	  render: function render() {
+	    var _this = this;
+
 	    if (!this.state.data) {
 	      return null;
 	    }
+
+	    var sepa = _react2.default.createElement('hr', { style: { position: 'relative', top: '-2px' } });
 
 	    return _react2.default.createElement(
 	      'div',
@@ -45100,11 +45116,6 @@
 	          )
 	        )
 	      ),
-	      _react2.default.createElement(
-	        'form',
-	        { onSubmit: preventDefault },
-	        _react2.default.createElement(_FormPanel2.default, { config: allConfigs, style: _ItemEditor2.default, data: this.state.data, onChange: this.mergeData })
-	      ),
 	      this.state.data.status !== 'running' ? null : _react2.default.createElement(
 	        'section',
 	        { className: _ItemEditor2.default.group },
@@ -45135,7 +45146,18 @@
 	          rows: '3',
 	          value: 'echo "' + this.state.data.config.ssh.publicKey + '" | ssh ' + this.state.data.config.ssh.user + '@' + this.state.data.config.host + ' "umask 077 && mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"'
 	        })
-	      ) : null
+	      ) : null,
+	      wfNames.map(function (name) {
+	        return _react2.default.createElement(
+	          _CollapsibleWidget2.default,
+	          { title: _workflows2.default[name].name, open: false, key: name, subtitle: sepa },
+	          _react2.default.createElement(
+	            'form',
+	            { onSubmit: preventDefault },
+	            _react2.default.createElement(_FormPanel2.default, { config: allConfigs[name], style: _ItemEditor2.default, data: _this.state.data, onChange: _this.mergeData })
+	          )
+	        );
+	      })
 	    );
 	  }
 	});
@@ -50892,7 +50914,8 @@
 	  },
 
 	  getInitialState: function getInitialState() {
-	    var state = Object.assign({ device: 'round-robin', profile: 'cuda' }, this.getStateFromProps(this.props));
+	    var state = Object.assign({ device: 'round-robin', profile: 'cuda', type: 'cuda' }, this.getStateFromProps(this.props));
+	    this.updateBackend(state.type, state.profile, state.device);
 	    return state;
 	  },
 	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
@@ -50901,10 +50924,14 @@
 	    var type = _getStateFromProps.type;
 	    var types = _getStateFromProps.types;
 
+
 	    if (types.indexOf(this.state.type) === -1) {
 	      this.setState({ type: type, types: types });
+	      var profile = this.props.profiles[type][0] ? this.props.profiles[type][0].name : '';
+	      this.updateBackend(type, profile, this.state.device);
 	    } else {
 	      this.setState({ types: types });
+	      this.updateBackend(this.state.type, this.state.profile, this.state.device);
 	    }
 	  },
 	  getStateFromProps: function getStateFromProps(props) {
@@ -52397,11 +52424,10 @@
 	        item.label
 	      ),
 	      _react2.default.createElement('input', {
-	        className: style.input,
+	        style: { position: 'relative', top: '-5px' },
 	        type: 'checkbox',
 	        checked: value,
-	        onChange: this.editField,
-	        required: true
+	        onChange: this.editField
 	      })
 	    );
 	  }
@@ -53397,7 +53423,7 @@
 	        return _this.props.items[index];
 	      }));
 	      // reset selection after action is performed on them.
-	      this.setState({ selected: [] });
+	      this.setState({ selected: [], actions: [TOOLBAR_ACTIONS.add] });
 	    }
 	  },
 	  itemClicked: function itemClicked(e) {
@@ -54484,7 +54510,7 @@
 	            _reactRouter.Link,
 	            { to: '/' },
 	            _react2.default.createElement('i', { className: _Theme2.default.hpcCloudIcon }),
-	            ' HPC'
+	            '+HPC'
 	          )
 	        ),
 	        _react2.default.createElement('div', { className: _Theme2.default.progressBar,
