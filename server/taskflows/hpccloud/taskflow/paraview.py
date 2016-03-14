@@ -26,7 +26,7 @@ from jsonpath_rw import parse
 import cumulus.taskflow
 from cumulus.starcluster.tasks.job import download_job_input_folders, submit_job
 from cumulus.starcluster.tasks.job import monitor_job, upload_job_output_to_folder
-from cumulus.starcluster.tasks.job import job_dir
+from cumulus.starcluster.tasks.job import job_directory
 from cumulus.transport import get_connection
 
 from girder.utility.model_importer import ModelImporter
@@ -88,15 +88,7 @@ def _create_girder_client(girder_api_url, girder_token):
 
     return client
 
-def _get_job_output_dir(cluster):
-    job_output_dir \
-        = parse('config.jobOutputDir').find(cluster)
-    if job_output_dir:
-        job_output_dir = job_output_dir[0].value
-    else:
-        job_output_dir = None
 
-    return job_output_dir
 
 def validate_args(kwargs):
     required = ['dataDir', 'cluster.config.paraview.installDir', 'sessionKey']
@@ -151,7 +143,7 @@ def create_paraview_job(task, *args, **kwargs):
     task.logger.info('ParaView job created: %s' % job['_id'])
     task.taskflow.logger.info('ParaView job created.')
 
-    task.taskflow.set('jobs', [job])
+    task.taskflow.set_metadata('jobs', [job])
 
     # Upload the visualizer code
     task.logger.info('Uploading visualizer')
@@ -164,7 +156,7 @@ def create_paraview_job(task, *args, **kwargs):
         return
 
     cluster = kwargs.pop('cluster')
-    target_dir = job_dir(job, _get_job_output_dir(cluster))
+    target_dir = job_directory(cluster, job)
     target_path = os.path.join(target_dir, 'pvw-visualizer.py')
 
     with get_connection(task.taskflow.girder_token, cluster) as conn:
@@ -180,7 +172,7 @@ def submit_paraview_job(task, cluster, job, *args, **kwargs):
     girder_token = task.taskflow.girder_token
 
     # Save the cluster in the taskflow for termination
-    task.taskflow.set('cluster', cluster)
+    task.taskflow.set_metadata('cluster', cluster)
 
     params = {}
 
@@ -193,7 +185,7 @@ def submit_paraview_job(task, cluster, job, *args, **kwargs):
     if 'sessionKey' in kwargs:
         params['sessionKey'] = kwargs['sessionKey']
         # Save the sessionKey so we can clean up the proxy entry
-        task.taskflow.set('sessionKey', kwargs['sessionKey'])
+        task.taskflow.set_metadata('sessionKey', kwargs['sessionKey'])
 
     parallel_environment \
         = parse('config.parallelEnvironment').find(cluster)
@@ -202,7 +194,7 @@ def submit_paraview_job(task, cluster, job, *args, **kwargs):
         parallel_environment = parallel_environment[0].value
         params['parallelEnvironment'] = parallel_environment
 
-    job_output_dir = _get_job_output_dir(cluster)
+    job_output_dir = get_cluster_job_output_dir(cluster)
     if job_output_dir:
         params['jobOutputDir'] = job_output_dir
 
