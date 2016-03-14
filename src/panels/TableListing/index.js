@@ -13,6 +13,11 @@ import {
     itemFilter,
 } from '../../utils/Filters';
 
+const TOOLBAR_ACTIONS = {
+  add: { name: 'addItem', icon: style.addIcon },
+  delete: { name: 'deleteItems', icon: style.deleteIcon },
+};
+
 export default React.createClass({
 
   displayName: 'TableListing',
@@ -36,17 +41,52 @@ export default React.createClass({
     };
   },
 
-  toolbarAction(e) {
+  getInitialState() {
+    return {
+      selected: [],
+      actions: [TOOLBAR_ACTIONS.add],
+    };
+  },
+
+  toolbarAction(action) {
     if (this.props.onAction) {
-      this.props.onAction(e);
+      this.props.onAction(action, this.state.selected.map((index) => this.props.items[index]));
+      // reset selection after action is performed on them.
+      this.setState({ selected: [] });
     }
   },
 
-  goTo(e) {
+  itemClicked(e) {
     var linkToGo = e;
+    var selectedIndex = -1;
     const filter = '';
 
-    if (e.target) {
+    if ((e.metaKey || e.ctrlKey) && e.target) {
+      let trEl = e.target;
+      while (!trEl.dataset.index) {
+        trEl = trEl.parentNode;
+      }
+      const selected = this.state.selected;
+      const actions = this.state.actions;
+
+      selectedIndex = parseInt(trEl.dataset.index, 10);
+      if (selected.indexOf(selectedIndex) !== -1) {
+        // remove already selected cell
+        selected.splice(selected.indexOf(selectedIndex), 1);
+        if (selected.length === 0) {
+          actions.pop();
+        }
+      } else {
+        // add new cell to selection
+        if (selected.length === 0) {
+          actions.push(TOOLBAR_ACTIONS.delete);
+        }
+        selected.push(selectedIndex);
+      }
+
+      this.setState({ selected, actions });
+      return;
+    } else if (e.target) {
       let trEl = e.target;
       while (!trEl.dataset.link) {
         trEl = trEl.parentNode;
@@ -78,7 +118,7 @@ export default React.createClass({
             location={ this.props.location }
             title={this.props.title}
             breadcrumb={ this.props.breadcrumb }
-            actions={[{ name: 'addItem', icon: style.addIcon }]}
+            actions={ this.state.actions }
             onAction={ this.toolbarAction }
             filter
           />
@@ -94,17 +134,19 @@ export default React.createClass({
                   </tr>
               </thead>
               <tbody>
-                { filteredList.map(item =>
-                  <tr key={ item._id } data-link={ helper.getViewLink(item) }>
-                    <td onClick={ this.goTo } >
+                { filteredList.map((item, index) =>
+                  <tr key={ `${item._id}_${index}` } data-link={ helper.getViewLink(item) } data-index={ index }
+                    className={this.state.selected.indexOf(index) !== -1 ? style.selected : ''}
+                  >
+                    <td onClick={ this.itemClicked } >
                       <ImageIcon data={ helper.getIcon(item) } />
                     </td>
-                    <td onClick={ this.goTo } >{ helper.getName(item) }</td>
-                    <td onClick={ this.goTo } >{ helper.getDescription(item) }</td>
-                    <td onClick={ this.goTo } >{ helper.getCreationDate(item) }</td>
-                    <td onClick={ this.goTo } >{ helper.getUpdateDate(item) }</td>
+                    <td onClick={ this.itemClicked } >{ helper.getName(item) }</td>
+                    <td onClick={ this.itemClicked } >{ helper.getDescription(item) }</td>
+                    <td onClick={ this.itemClicked } >{ helper.getCreationDate(item) }</td>
+                    <td onClick={ this.itemClicked } >{ helper.getUpdateDate(item) }</td>
                     <td>
-                      <IconActionList actions={ helper.getActions(item) } onAction={ this.goTo } />
+                      <IconActionList actions={ helper.getActions(item) } onAction={ this.itemClicked } />
                     </td>
                   </tr>
                 )}

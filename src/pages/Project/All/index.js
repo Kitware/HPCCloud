@@ -34,13 +34,21 @@ export default React.createClass({
       .catch(err => console.log('Error Project/All', err));
   },
 
-  createProject(e) {
+  onAction(e) {
+    this[e]();
+  },
+
+  addItem() {
     const filter = '';
     this.context.router.replace({
       pathname: '/New/Project',
       query: merge(this.props.location.query, { filter }),
       state: this.props.location.state,
     });
+  },
+
+  deleteItems() {
+    console.log('delete projects');
   },
 
   render() {
@@ -54,7 +62,7 @@ export default React.createClass({
         location={ this.props.location }
         accessHelper={ ProjectHelper }
         items={ this.state.projects }
-        onAction={ this.createProject }
+        onAction={ this.onAction }
         title="Projects"
       />);
   },
