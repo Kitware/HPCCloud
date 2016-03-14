@@ -34,13 +34,34 @@ export default React.createClass({
       .catch(err => console.log('Error Project/All', err));
   },
 
-  createProject(e) {
+  onAction(action, selectedItems) {
+    if (selectedItems) {
+      this[action](selectedItems);
+    } else {
+      this[action]();
+    }
+  },
+
+  addItem() {
     const filter = '';
     this.context.router.replace({
       pathname: '/New/Project',
       query: merge(this.props.location.query, { filter }),
       state: this.props.location.state,
     });
+  },
+
+  deleteItems(items) {
+    if (!confirm(`Are you sure you want to delete ${items.length === 1 ? 'this' : 'these'} ${items.length} project${items.length === 1 ? '' : 's'}?`)) {
+      return;
+    }
+    Promise.all(items.map((proj) => client.deleteProject(proj._id)))
+      .then((resp) => {
+        this.updateProjectList();
+      })
+      .catch((error) => {
+        console.log('problem deleting projects', error);
+      });
   },
 
   render() {
@@ -54,7 +75,7 @@ export default React.createClass({
         location={ this.props.location }
         accessHelper={ ProjectHelper }
         items={ this.state.projects }
-        onAction={ this.createProject }
+        onAction={ this.onAction }
         title="Projects"
       />);
   },

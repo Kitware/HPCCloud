@@ -52,8 +52,29 @@ export default React.createClass({
       });
   },
 
-  createSimulation(e) {
+  onAction(action, selectedItems) {
+    if (selectedItems) {
+      this[action](selectedItems);
+    } else {
+      this[action]();
+    }
+  },
+
+  addItem() {
     this.context.router.replace(`/New/Simulation/${this.props.params.id}`);
+  },
+
+  deleteItems(items) {
+    if (!confirm(`Are you sure you want to delete ${items.length === 1 ? 'this' : 'these'} ${items.length} simulation${items.length === 1 ? '' : 's'}?`)) {
+      return;
+    }
+    Promise.all(items.map((sim) => client.deleteSimulation(sim._id)))
+      .then((resp) => {
+        this.updateState();
+      })
+      .catch((error) => {
+        console.log('problem deleting simulations', error);
+      });
   },
 
   render() {
@@ -68,7 +89,7 @@ export default React.createClass({
         location={ this.props.location }
         accessHelper={ SimulationHelper }
         items={ this.state.simulations }
-        onAction={ this.createSimulation }
+        onAction={ this.onAction }
         title="Simulations"
       />);
   },

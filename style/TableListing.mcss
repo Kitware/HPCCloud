@@ -20,7 +20,7 @@
     transition: all 0.2s ease;
 }
 
-.table > tbody > tr:hover {
+.table > tbody > tr:not(.selected):hover {
     background-color: #efefef;
 }
 
@@ -36,7 +36,22 @@
     color: #18e;
 }
 
+/* Selection styling rules */
+.selected {
+    background-color: #aaa;
+}
+
+.table > tbody > tr:nth-of-type(odd).selected {
+    background-color: #aaa;
+}
+
+/* action icons */
 .addIcon {
     composes: fa        from 'font-awesome/css/font-awesome.css';
     composes: fa-plus   from 'font-awesome/css/font-awesome.css';
+}
+
+.deleteIcon {
+    composes: fa        from 'font-awesome/css/font-awesome.css';
+    composes: fa-trash  from 'font-awesome/css/font-awesome.css';
 }
