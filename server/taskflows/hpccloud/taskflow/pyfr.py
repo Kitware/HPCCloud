@@ -21,6 +21,7 @@ import json
 import os
 import subprocess
 import shutil
+from ConfigParser import SafeConfigParser
 
 import cumulus.taskflow
 from cumulus.starcluster.tasks.job import download_job_input_folders, submit_job
@@ -36,6 +37,13 @@ from girder_client import GirderClient, HttpError
 from hpccloud.taskflow.utility import *
 
 MESH_FILENAME = 'mesh.pyfrm'
+INI_FILENAME = 'pyfr.ini'
+CONFIG_ITEM_NAME = 'ini'
+BACKEND_SECTIONS = [
+    'backend-cuda',
+    'backend-opencl',
+    'backend-openmp'
+]
 
 class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
     """
@@ -69,7 +77,7 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
         kwargs['cluster'] = cluster
 
         super(PyFrTaskFlow, self).start(
-            import_mesh.s(self,*args, **kwargs))
+            setup_input.s(self,*args, **kwargs))
 
     def terminate(self):
         self.run_task(pyfr_terminate.s())
@@ -140,9 +148,69 @@ def pyfr_terminate(task):
     terminate_jobs(
         task, client, cluster, task.taskflow.get('meta', {}).get('jobs', []))
 
+def update_config_file(task, client, *args, **kwargs):
+
+    input_folder_id = kwargs['input']['folder']['id']
+    ini_item = client.listItem(input_folder_id, name=CONFIG_ITEM_NAME)
+
+    if len(ini_item) != 1:
+        raise Exception('Unable to fetch ini item.')
+
+    ini_item = ini_item[0]
+
+    # Now fetch the file
+    files = client.get('item/%s/files' % ini_item['_id'],
+        parameters={
+            'limit': 1,
+        })
+
+    if len(files) != 1:
+        raise Exception('Uable to fetch files for item.')
+
+    ini_file = files[0]
+    if ini_file['name'] != INI_FILENAME:
+        raise Exception('Unexpected ini file name %s.' % ini_file['name'])
+
+    _, path = tempfile.mkstemp()
+
+    task.logger.info('Downloading configuration file.')
+    try:
+        with open(path, 'w') as fp:
+            client.downloadFile(ini_file['_id'], path)
+
+        task.logger.info('Removing an backend configuration from file')
+        config_parser = SafeConfigParser()
+        config_parser.optionxform = str
+        config_parser.read(path)
+
+        for section in BACKEND_SECTIONS:
+            if config_parser.remove_section(section):
+                task.logger.info('%s removed.' % section)
+
+        backend_section = 'backend-%s' % kwargs['backend']['type']
+        task.logger.info('Adding backend configuration for %s')
+        options = kwargs['backend'].copy()
+        options.pop('type', None)
+        options.pop('name', None)
+
+        config_parser.add_section(backend_section)
+        for  key, value in options.iteritems():
+            config_parser.set(backend_section, key, value)
+
+        with open(path, 'w') as fp:
+            config_parser.write(fp)
+
+        task.logger.info('Uploading updated configuration file.')
+
+        with open(path, 'r') as fp:
+            client.uploadFileContents(
+                ini_file['_id'], fp, os.path.getsize(path))
+
+    finally:
+        os.remove(path)
 
 @cumulus.taskflow.task
-def import_mesh(task, *args, **kwargs):
+def setup_input(task, *args, **kwargs):
     task.taskflow.logger.info('Importing mesh into PyFr format.')
 
     task.logger.info('Downloading input mesh.')
@@ -188,6 +256,9 @@ def import_mesh(task, *args, **kwargs):
 
         task.logger.info('Upload complete.')
 
+        task.logger.info('Updating backend configuration.')
+        update_config_file(task, client, *args, **kwargs)
+
     finally:
         if os.path.exists(input_path):
             os.remove(input_path)
@@ -205,10 +276,12 @@ def create_job(task, *args, **kwargs):
 
     number_of_slots = kwargs.get('numberOfSlots', 1)
 
+    backend = kwargs['backend']['type']
+
     body = {
         'name': 'pyfr_run',
         'commands': [
-            "mpirun -n %s pyfr run -b openmp input/mesh.pyfrm input/pyfr.ini" % number_of_slots
+            "mpirun -n %s pyfr run -b %s input/mesh.pyfrm input/pyfr.ini" % (number_of_slots, backend)
         ],
         'input': [
             {
