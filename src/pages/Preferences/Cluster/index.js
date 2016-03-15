@@ -141,6 +141,7 @@ export default React.createClass({
   saveItem() {
     const clusters = this.state.clusters;
     const cluster = clusters[this.state.active];
+
     client.saveCluster(cluster)
       .then(resp => {
         clusters[this.state.active] = resp.data;
