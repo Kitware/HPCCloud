@@ -79,7 +79,7 @@ export default {
     },
   },
   steps: {
-    _order: [ 'Introduction', 'Simulation', 'Visualization' ],
+    _order: ['Introduction', 'Simulation', 'Visualization'],
     _disabled: ['Visualization'],
     _active: 'Introduction',
     _initial_state: {

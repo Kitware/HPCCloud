@@ -34,14 +34,14 @@ export default React.createClass({
     }
   },
 
+  onAction(action, data, attachement) {
+    this[action](data, attachement);
+  },
+
   updateState(id = this.props.params.id) {
     client.getProject(id)
       .then(resp => this.setState({ project: resp.data }))
       .catch(err => console.log('Error: Project/Edit-get', err));
-  },
-
-  onAction(action, data, attachement) {
-    this[action](data, attachement);
   },
 
   editProject(data, attachement) {

@@ -119,10 +119,10 @@ export default React.createClass({
               ],
             }}
             actions={[
-                { name: 'toggleMenu',  icon: vizStyle.toggleMenuButton },
-                { name: 'nextTimeStep',  icon: vizStyle.nextButton },
-                { name: 'togglePlay',  icon: this.state.playing ? vizStyle.stopButton : vizStyle.playButton },
-                { name: 'previousTimeStep',  icon: vizStyle.previousButton },
+                { name: 'toggleMenu', icon: vizStyle.toggleMenuButton },
+                { name: 'nextTimeStep', icon: vizStyle.nextButton },
+                { name: 'togglePlay', icon: this.state.playing ? vizStyle.stopButton : vizStyle.playButton },
+                { name: 'previousTimeStep', icon: vizStyle.previousButton },
                 { name: 'resetCamera', icon: vizStyle.resetCameraButton },
             ]}
             onAction={ this.onAction }

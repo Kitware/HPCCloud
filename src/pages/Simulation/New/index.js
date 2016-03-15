@@ -34,6 +34,10 @@ export default React.createClass({
     }
   },
 
+  onAction(action, data, attachements) {
+    this[action](data, attachements);
+  },
+
   updateProject(id = this.props.params.projectId) {
     client.getProject(id)
       .then(resp => this.setState({ project: resp.data, error: false }))
@@ -42,10 +46,6 @@ export default React.createClass({
         this.setState({ _error: msg });
         console.log('Error: Sim/New-get', err);
       });
-  },
-
-  onAction(action, data, attachements) {
-    this[action](data, attachements);
   },
 
   newSimulation(data, attachements) {

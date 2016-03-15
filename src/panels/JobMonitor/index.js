@@ -56,7 +56,7 @@ export default React.createClass({
               {this.state.jobs.map(job =>
                   <section key={job._id} className={ style.listItem }>
                       <strong className={ style.itemContent }>{job.name}</strong>
-                      <div    className={ style.itemContent }>{job.status}</div>
+                      <div className={ style.itemContent }>{job.status}</div>
                   </section>
               )}
           </div>
@@ -74,7 +74,7 @@ export default React.createClass({
                       return (
                         <section key={task._id} className={ style.listItem }>
                             <strong className={ style.itemContent }>{task.name.split('.').pop()}</strong>
-                            <div    className={ style.itemContent }>{task.status}</div>
+                            <div className={ style.itemContent }>{task.status}</div>
                         </section>);
                     }
                     return (
@@ -87,13 +87,14 @@ export default React.createClass({
                           <pre className={ style.log }>
                             { // reduce log array to a string with formatted entries
                               task.log.reduce((prevVal, entry, index) => {
-                                prevVal += `[${formatTime(entry.created)}] ${entry.levelname}: ${entry.msg}\n`;
+                                var content = prevVal;
+                                content += `[${formatTime(entry.created)}] ${entry.levelname}: ${entry.msg}\n`;
 
                                 if (entry.exc_info) {
-                                  prevVal += entry.exc_info.join('\n');
+                                  content += entry.exc_info.join('\n');
                                 }
 
-                                return prevVal;
+                                return content;
                               }, '')
                             }
                           </pre>

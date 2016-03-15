@@ -36,6 +36,14 @@ export default React.createClass({
     }
   },
 
+  onAction(action, selectedItems) {
+    if (selectedItems) {
+      this[action](selectedItems);
+    } else {
+      this[action]();
+    }
+  },
+
   updateState(id = this.props.params.id) {
     client.getProject(id)
       .then(resp => this.setState({ project: resp.data }))
@@ -52,19 +60,12 @@ export default React.createClass({
       });
   },
 
-  onAction(action, selectedItems) {
-    if (selectedItems) {
-      this[action](selectedItems);
-    } else {
-      this[action]();
-    }
-  },
-
   addItem() {
     this.context.router.replace(`/New/Simulation/${this.props.params.id}`);
   },
 
   deleteItems(items) {
+    /* eslint-disable no-alert */
     if (!confirm(`Are you sure you want to delete ${items.length === 1 ? 'this' : 'these'} ${items.length} simulation${items.length === 1 ? '' : 's'}?`)) {
       return;
     }
@@ -81,7 +82,7 @@ export default React.createClass({
     return (
       <TableListing
         breadcrumb={{
-          paths: ['/', `/View/Project/${this.props.params.id}` ],
+          paths: ['/', `/View/Project/${this.props.params.id}`],
           icons: [
             breadCrumbStyle.breadCrumbRootIcon,
             breadCrumbStyle.breadCrumbProjectIcon,

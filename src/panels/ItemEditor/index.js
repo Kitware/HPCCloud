@@ -48,9 +48,9 @@ const FileUploadEntry = React.createClass({
     if (this.props.owner && this.props.postProcess) {
       this.props.postProcess(file)
         .then(metadata => {
-          for (const key in metadata) {
+          Object.keys(metadata).forEach(key => {
             this.props.owner().addMetadata(key, metadata[key]);
-          }
+          });
         });
     }
   },
@@ -148,6 +148,12 @@ export default React.createClass({
     };
   },
 
+  onAction(action) {
+    if (this.props.onAction) {
+      this.props.onAction(action, this.state, this.attachement);
+    }
+  },
+
   addAttachement(name, file) {
     const attachement = this.attachement || {};
     attachement[name] = file;
@@ -167,17 +173,11 @@ export default React.createClass({
     this.setState({ [key]: value });
   },
 
-  onAction(action) {
-    if (this.props.onAction) {
-      this.props.onAction(action, this.state, this.attachement);
-    }
-  },
-
   render() {
     return (
       <div className={ style.container }>
           <Toolbar
-            breadcrumb={ this.props.breadcrumb || { paths: ['/'], icons: [ style.listIcon ] }}
+            breadcrumb={ this.props.breadcrumb || { paths: ['/'], icons: [style.listIcon] }}
             title={ this.props.title }
           />
 

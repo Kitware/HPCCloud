@@ -79,6 +79,10 @@ export default React.createClass({
     }
   },
 
+  onAction(action) {
+    this[action]();
+  },
+
   visualizeTaskflow() {
     client.activateSimulationStep(this.props.simulation, 'Visualization', null)
       .then((resp) => {
@@ -115,10 +119,6 @@ export default React.createClass({
       .catch((error) => {
         this.setState({ error: error.data.message });
       });
-  },
-
-  onAction(action) {
-    this[action]();
   },
 
   render() {

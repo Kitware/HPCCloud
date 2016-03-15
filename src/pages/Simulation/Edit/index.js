@@ -37,6 +37,10 @@ export default React.createClass({
     }
   },
 
+  onAction(action, data, attachement) {
+    this[action](data, attachement);
+  },
+
   updateState(id = this.props.params.id) {
     client.getSimulation(id)
       .then(resp => {
@@ -52,10 +56,6 @@ export default React.createClass({
         this.setState({ _error: respErr.data.message });
         console.log('(EDIT) Error fetching sim', respErr);
       });
-  },
-
-  onAction(action, data, attachement) {
-    this[action](data, attachement);
   },
 
   saveSimulation(data) {

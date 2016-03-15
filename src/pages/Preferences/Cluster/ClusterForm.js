@@ -12,20 +12,20 @@ const preventDefault = (e) => { e.preventDefault(); };
 const allConfigs = {};
 const wfNames = [];
 
-for (const wfName in Workflows) {
+Object.keys(Workflows).forEach(wfName => {
   const wf = Workflows[wfName];
   allConfigs[wfName] = {};
   let foundConfig = false;
   if (wf.config && wf.config.cluster) {
-    for (const propKey in wf.config.cluster) {
+    Object.keys(wf.config.cluster).forEach(propKey => {
       allConfigs[wfName][propKey] = wf.config.cluster[propKey];
       foundConfig = true;
-    }
+    });
   }
   if (foundConfig) {
     wfNames.push(wfName);
   }
-}
+});
 
 export default React.createClass({
 

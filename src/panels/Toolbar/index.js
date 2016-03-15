@@ -31,6 +31,13 @@ export default React.createClass({
     };
   },
 
+  onAction(event) {
+    const action = event.target.dataset.action;
+    if (this.props.onAction) {
+      this.props.onAction(action);
+    }
+  },
+
   updateFilter(e) {
     const filter = e.target.value;
 
@@ -39,13 +46,6 @@ export default React.createClass({
       query: merge(this.props.location.query, { filter }),
       state: this.props.location.state,
     });
-  },
-
-  onAction(event) {
-    const action = event.target.dataset.action;
-    if (this.props.onAction) {
-      this.props.onAction(action);
-    }
   },
 
   render() {
@@ -68,7 +68,7 @@ export default React.createClass({
                 key={action.name}
                 data-action={action.name}
                 onClick={this.onAction}
-                className={ [ style.actionButton, action.icon ].join(' ') }
+                className={ [style.actionButton, action.icon].join(' ') }
               ></i>
             )}
             { this.props.filter ?

@@ -70,6 +70,10 @@ export default React.createClass({
     }
   },
 
+  onAction(action) {
+    this[action]();
+  },
+
   visualizeTaskflow() {
     this.context.router.replace({
       pathname: this.props.location.pathname,
@@ -100,10 +104,6 @@ export default React.createClass({
       .catch((error) => {
         this.setState({ error: error.data.message });
       });
-  },
-
-  onAction(action) {
-    this[action]();
   },
 
   render() {

@@ -26,15 +26,15 @@ export default React.createClass({
     };
   },
 
+  onAction(action, data, attachements) {
+    this[action](data, attachements);
+  },
+
   updateForm(e) {
     var key = e.target.dataset.name,
       value = e.target.value;
 
     this.setState({ [key]: value });
-  },
-
-  onAction(action, data, attachements) {
-    this[action](data, attachements);
   },
 
   newProject(data, attachements) {
