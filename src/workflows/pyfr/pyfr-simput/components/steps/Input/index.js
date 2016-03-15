@@ -50,17 +50,17 @@ export default React.createClass({
   },
 
   componentWillMount() {
-    var iniFile = this.props.simulation.metadata.inputFolder.files.iniFile;
+    var iniFile = this.props.simulation.metadata.inputFolder.files.ini;
     var jsonData = this.props.simulation.steps[this.props.step].metadata.model;
 
     // Create ini file container if not already here
     if (!iniFile) {
-      const fileName = 'iniFile';
+      const fileName = 'pyfr.ini';
       client.addEmptyFileForSimulation(this.props.simulation, fileName)
         .then(resp => {
           const { _id } = resp.data; // itemId
 
-          this.props.simulation.metadata.inputFolder.files.iniFile = _id;
+          this.props.simulation.metadata.inputFolder.files.ini = _id;
 
           this.setState({ iniFile: _id });
 
