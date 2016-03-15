@@ -1,31 +1,31 @@
-import deepEquals   from 'mout/src/lang/deepEquals';
-import React        from 'react';
-import Workflows    from '../../../workflows';
-import FormPanel    from '../../../panels/FormPanel';
+import deepEquals         from 'mout/src/lang/deepEquals';
+import React              from 'react';
+import Workflows          from '../../../workflows';
+import FormPanel          from '../../../panels/FormPanel';
+import SchedulerConfig    from '../../../panels/SchedulerConfig';
+import CollapsibleWidget  from 'paraviewweb/src/React/Widgets/CollapsibleWidget';
 
-import CollapsibleWidget from 'paraviewweb/src/React/Widgets/CollapsibleWidget';
-
-import style         from 'HPCCloudStyle/ItemEditor.mcss';
+import style              from 'HPCCloudStyle/ItemEditor.mcss';
 
 const preventDefault = (e) => { e.preventDefault(); };
 
 const allConfigs = {};
 const wfNames = [];
 
-for (const wfName in Workflows) {
+Object.keys(Workflows).forEach(wfName => {
   const wf = Workflows[wfName];
   allConfigs[wfName] = {};
   let foundConfig = false;
   if (wf.config && wf.config.cluster) {
-    for (const propKey in wf.config.cluster) {
+    Object.keys(wf.config.cluster).forEach(propKey => {
       allConfigs[wfName][propKey] = wf.config.cluster[propKey];
       foundConfig = true;
-    }
+    });
   }
   if (foundConfig) {
     wfNames.push(wfName);
   }
-}
+});
 
 export default React.createClass({
 
@@ -72,6 +72,17 @@ export default React.createClass({
       this.setState({ data });
       this.props.onChange(data);
     }
+  },
+
+  updateConfig(scheduler) {
+    const config = Object.assign(
+      {},
+      this.state.data.config,
+      { scheduler: Object.assign({}, this.state.data.config.scheduler, scheduler) });
+
+    console.log(scheduler, '=>', config);
+
+    this.mergeData({ config });
   },
 
   mergeData(updatedData) {
@@ -133,42 +144,7 @@ export default React.createClass({
                 required
               />
           </section>
-          <section className={style.group}>
-              <label className={style.label}>Number of Slots</label>
-              <input
-                className={style.input}
-                type="text"
-                value={this.state.data.config.numberOfSlots}
-                data-key="config.numberOfSlots"
-                onChange={this.formChange}
-                required
-              />
-          </section>
-          <section className={style.group}>
-              <label className={style.label}>Parallel Environment</label>
-              <input
-                className={style.input}
-                type="text"
-                value={this.state.data.config.parallelEnvironment}
-                data-key="config.parallelEnvironment"
-                onChange={this.formChange}
-                required
-              />
-          </section>
-          <section className={style.group}>
-              <label className={style.label}>Scheduler</label>
-              <select
-                className={style.input}
-                value={this.state.data.config.scheduler.type}
-                data-key="config.scheduler.type"
-                onChange={this.formChange}
-                required
-              >
-                <option value="sge">Sun Grid Engine</option>
-                <option value="pbs">PBS</option>
-                <option value="slurm">SLURM</option>
-              </select>
-          </section>
+          <SchedulerConfig config={ this.state.data.config.scheduler } onChange={ this.updateConfig } />
           { this.state.data.status !== 'running' ? null :
             <section className={style.group}>
               <label className={style.label}>Public SSH key</label>

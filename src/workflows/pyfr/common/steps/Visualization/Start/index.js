@@ -37,11 +37,17 @@ export default React.createClass({
       error: '',
     };
   },
+
+  setServerType(e) {
+    this.setState({ serverType: e.target.value });
+  },
+
   dataChange(key, value, which) {
     var profile = this.state[which];
     profile[key] = value;
     this.setState({ [which]: profile });
   },
+
   startVisualization() {
     var taskflowId,
       sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
@@ -76,12 +82,11 @@ export default React.createClass({
         this.setState({ error: error.data.message });
       });
   },
+
   formAction(action) {
     this[action]();
   },
-  setServerType(e) {
-    this.setState({ serverType: e.target.value });
-  },
+
   render() {
     var actions = [{ name: 'startVisualization', label: 'Start Visualization', icon: '' }],
       serverForm;

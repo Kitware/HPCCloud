@@ -7,7 +7,6 @@ export default {
   },
   Traditional: {
     profile: '',
-    maxRuntime: '',
   },
   OpenStack: {
     profile: '',

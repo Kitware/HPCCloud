@@ -1,6 +1,7 @@
-import client   from '../../network';
-import React    from 'react';
-import { Link } from 'react-router';
+import client           from '../../network';
+import React            from 'react';
+import { Link }         from 'react-router';
+import SchedulerConfig  from '../SchedulerConfig';
 
 import style    from 'HPCCloudStyle/ItemEditor.mcss';
 import theme    from 'HPCCloudStyle/Theme.mcss';
@@ -51,6 +52,17 @@ export default React.createClass({
     }
   },
 
+  updateRuntimeConfig(config) {
+    const runtime = Object.assign({}, config);
+    Object.assign(runtime, runtime[runtime.type]);
+
+    ['sge', 'slurm', 'pbs', 'type'].forEach(keyToDelete => {
+      delete runtime[keyToDelete];
+    });
+
+    this.props.onChange('runtime', runtime, 'Traditional');
+  },
+
   render() {
     var optionMapper = (el, index) =>
       <option
@@ -67,28 +79,26 @@ export default React.createClass({
         </div>;
     }
 
+    const clusterData = this.state.profiles.filter(item => item._id === this.props.contents.profile)[0];
+
     return (
       <div className={style.container}>
           <section className={style.group}>
-              <label className={style.label}>Cluster:</label>
+              <label className={style.label}>Cluster</label>
               <select
                 className={style.input}
                 onChange={this.dataChange}
                 data-key="profile"
-                value={this.props.contents.profile._id}
+                value={this.props.contents.profile}
               >
                 {this.state.profiles.map(optionMapper)}
               </select>
           </section>
-          <section className={style.group}>
-              <label className={style.label}>Max runtime:</label>
-              <input
-                className={style.input} type="number" min="1"
-                data-key="maxRuntime"
-                value={this.props.contents.maxRuntime}
-                onChange={this.dataChange}
-              />
-          </section>
+          <SchedulerConfig
+            config={ clusterData && clusterData.config && clusterData.config.scheduler ? clusterData.config.scheduler : {} }
+            onChange={ this.updateRuntimeConfig }
+            runtime
+          />
       </div>);
   },
 });

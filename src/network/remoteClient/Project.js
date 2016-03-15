@@ -31,7 +31,8 @@ function createItemForProject(project, name, file) {
     });
 }
 
-export function saveProject(project, attachments) {
+export function saveProject(project_, attachments) {
+  var project = project_;
   if (!project._id) {
     let folder;
     let outputFolder;
@@ -72,9 +73,9 @@ export function saveProject(project, attachments) {
       .then((resp) => {
         if (attachments) {
           const promises = [];
-          for (const file in attachments) {
+          Object.keys(attachments).forEach(file => {
             promises.push(createItemForProject(project, file, attachments[file]));
-          }
+          });
           promises.push(project);
           return Promise.all(promises);
         }

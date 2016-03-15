@@ -1,10 +1,10 @@
 import React                   from 'react';
 
-import defaultServerParameters from '../../../../../../panels/run/defaults';
-import RunEC2                  from '../../../../../../panels/run/RunEC2';
-import RunCluster              from '../../../../../../panels/run/RunCluster';
-import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
 import ButtonBar               from '../../../../../../panels/ButtonBar';
+import defaultServerParameters from '../../../../../../panels/run/defaults';
+import RunCluster              from '../../../../../../panels/run/RunCluster';
+import RunEC2                  from '../../../../../../panels/run/RunEC2';
+import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
 import RuntimeBackend          from '../../../panels/RuntimeBackend';
 
 import client                  from '../../../../../../network';
@@ -61,7 +61,7 @@ export default React.createClass({
     profile[key] = value;
     this.setState({ [which]: profile });
 
-    if (which === 'Traditional' && !this.state.clusters[value]) {
+    if (which === 'Traditional' && key === 'profile' && !this.state.clusters[value]) {
       this.fetchCluster(value);
     }
   },
@@ -80,25 +80,28 @@ export default React.createClass({
         return client.editFile(file);
       })
       .then((resp) =>
-        client.startTaskflow(taskflowId, {
-          backend: this.state.backend,
-          input: {
-            folder: {
-              id: this.props.simulation.metadata.inputFolder._id,
+        client.startTaskflow(taskflowId, Object.assign({},
+          this.state[this.state.serverType].runtime || {},
+          {
+            backend: this.state.backend,
+            input: {
+              folder: {
+                id: this.props.simulation.metadata.inputFolder._id,
+              },
+              meshFile: {
+                id: this.props.simulation.metadata.inputFolder.files.mesh,
+              },
             },
-            meshFile: {
-              id: this.props.simulation.metadata.inputFolder.files.mesh,
+            output: {
+              folder: {
+                id: this.props.simulation.metadata.outputFolder._id,
+              },
             },
-          },
-          output: {
-            folder: {
-              id: this.props.simulation.metadata.outputFolder._id,
+            cluster: {
+              _id: this.state[this.state.serverType].profile,
             },
-          },
-          cluster: {
-            _id: this.state[this.state.serverType].profile,
-          },
-        })
+          })
+        )
       )
       .then((resp) =>
         client.updateSimulationStep(this.props.simulation._id, this.props.step, {

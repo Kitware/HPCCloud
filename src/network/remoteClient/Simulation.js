@@ -47,7 +47,8 @@ export function addEmptyFileForSimulation(simulation, name) {
 
 // if there's not a sim.id, create a sim with two folders input and output
 // otherwise update simulation
-export function saveSimulation(simulation, attachments) {
+export function saveSimulation(simulation_, attachments) {
+  var simulation = simulation_;
   if (!simulation._id) {
     let folder;
     let outputFolder;
@@ -88,9 +89,9 @@ export function saveSimulation(simulation, attachments) {
       .then((resp) => {
         if (attachments) {
           const promises = [];
-          for (const file in attachments) {
+          Object.keys(attachments).forEach(file => {
             promises.push(createItemForSimulation(simulation, file, attachments[file]));
-          }
+          });
           promises.push(simulation);
           return Promise.all(promises);
         }

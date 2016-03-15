@@ -25,7 +25,6 @@ function getValue(obj, path, type = 'text') {
     return !!result;
   }
   if (type === 'profile') {
-    console.log('return profile', result);
     return result || [];
   }
   if (type === 'enum') {

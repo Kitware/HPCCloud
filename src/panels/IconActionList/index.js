@@ -32,7 +32,7 @@ export default React.createClass({
             key={action.name}
             data-action={action.name}
             onClick={this.onAction}
-            className={ [ style.actionButton, action.icon ].join(' ') }
+            className={ [style.actionButton, action.icon].join(' ') }
           ></i>
         )}
       </div>);

@@ -28,18 +28,18 @@ export default React.createClass({
     this.updateProjectList();
   },
 
-  updateProjectList() {
-    client.listProjects()
-      .then(resp => this.setState({ projects: resp.data }))
-      .catch(err => console.log('Error Project/All', err));
-  },
-
   onAction(action, selectedItems) {
     if (selectedItems) {
       this[action](selectedItems);
     } else {
       this[action]();
     }
+  },
+
+  updateProjectList() {
+    client.listProjects()
+      .then(resp => this.setState({ projects: resp.data }))
+      .catch(err => console.log('Error Project/All', err));
   },
 
   addItem() {
@@ -52,6 +52,7 @@ export default React.createClass({
   },
 
   deleteItems(items) {
+    /* eslint-disable no-alert */
     if (!confirm(`Are you sure you want to delete ${items.length === 1 ? 'this' : 'these'} ${items.length} project${items.length === 1 ? '' : 's'}?`)) {
       return;
     }

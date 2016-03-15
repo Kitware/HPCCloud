@@ -102,9 +102,9 @@ client.onEvent((resp) => {
   // if nothing was updated check the endpoints for new items.
   if (!obj) {
     // Let's refresh all taskflows
-    for (const taskflowId in taskflows) {
-      updateTaskFlow(taskflowId);
-    }
+    Object.keys(taskflows).forEach(id => {
+      updateTaskFlow(id);
+    });
   }
 });
 
