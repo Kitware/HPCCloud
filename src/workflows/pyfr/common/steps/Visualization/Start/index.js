@@ -101,7 +101,7 @@ export default React.createClass({
     return (
         <div>
             <section className={formStyle.group}>
-                <label className={formStyle.label}>Region</label>
+                <label className={formStyle.label}>Server Type</label>
                 <select className={formStyle.input} value={this.state.serverType} onChange={ this.setServerType }>
                     <option value="Traditional">Traditional</option>
                     <option value="EC2">EC2</option>
