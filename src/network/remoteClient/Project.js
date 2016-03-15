@@ -79,10 +79,11 @@ export function saveProject(project_, attachments) {
           promises.push(project);
           return Promise.all(promises);
         }
-        return (project);
+        return project;
       })
       .catch((error) => {
         console.log(error);
+        return error;
       });
   }
   return girder.updateProject(project);

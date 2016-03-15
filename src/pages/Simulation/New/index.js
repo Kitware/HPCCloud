@@ -60,7 +60,13 @@ export default React.createClass({
 
     client.saveSimulation(simulation, attachements)
       .then(resp => {
-        var simId = Array.isArray(resp) ? resp[resp.length - 1]._id : resp._id;
+        if (resp.status >= 400) {
+          this.setState({ _error: resp.data.message });
+          console.log('Error: Sim/New-save', resp.data.message);
+          return;
+        }
+
+        const simId = Array.isArray(resp) ? resp[resp.length - 1]._id : resp._id;
         this.context.router.replace(`/View/Simulation/${simId}`);
       })
       .catch(err => {

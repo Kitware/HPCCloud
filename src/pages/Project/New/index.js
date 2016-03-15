@@ -48,7 +48,13 @@ export default React.createClass({
 
     client.saveProject(project, attachements)
       .then(resp => {
-        var projId = Array.isArray(resp) ? resp[resp.length - 1]._id : resp._id;
+        if (resp.status >= 400) {
+          this.setState({ _error: resp.data.message });
+          console.log('Error: Project/New', resp.data.message);
+          return;
+        }
+
+        const projId = Array.isArray(resp) ? resp[resp.length - 1]._id : resp._id;
         this.context.router.push(`/View/Project/${projId}`);
       })
       .catch(err => {

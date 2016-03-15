@@ -99,6 +99,7 @@ export function saveSimulation(simulation_, attachments) {
       })
       .catch((error) => {
         console.log(error);
+        return error;
       });
   }
 
