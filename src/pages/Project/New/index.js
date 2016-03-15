@@ -48,7 +48,7 @@ export default React.createClass({
 
     client.saveProject(project, attachements)
       .then(resp => {
-        var projId = Array.isArray(resp) ? resp[0].data._id : resp.data._id;
+        var projId = Array.isArray(resp) ? resp[resp.length - 1]._id : resp._id;
         this.context.router.push(`/View/Project/${projId}`);
       })
       .catch(err => {
