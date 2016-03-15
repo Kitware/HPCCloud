@@ -226,23 +226,21 @@ def monitor_paraview_job(task, cluster, job, *args, **kwargs):
 def upload_output(task, cluster, job, *args, **kwargs):
     task.taskflow.logger.info('Uploading results from cluster')
 
+    # Refresh state of job
+    client = _create_girder_client(
+            task.taskflow.girder_api_url, task.taskflow.girder_token)
+    job = client.get('jobs/%s' % job['_id'])
+
     output_folder_id = parse('output.folder.id').find(kwargs)
     if output_folder_id:
         output_folder_id = output_folder_id[0].value
-        # Refresh state of job
-        client = _create_girder_client(
-                task.taskflow.girder_api_url, task.taskflow.girder_token)
-        job = client.get('jobs/%s' % job['_id'])
-
         job['output'] = [{
             'folderId': output_folder_id,
             'path': '.'
         }]
 
-        upload_job_output_to_folder(cluster, job, log_write_url=None, job_dir=None,
-                                    girder_token=task.taskflow.girder_token)
-    else:
-        task.logger.info('No output folder provided skipping upload.')
+    upload_job_output_to_folder(cluster, job, log_write_url=None, job_dir=None,
+                                girder_token=task.taskflow.girder_token)
 
     task.taskflow.logger.info('Upload complete.')
 
