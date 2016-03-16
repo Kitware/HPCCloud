@@ -7,6 +7,7 @@ export default React.createClass({
 
   propTypes: {
     config: React.PropTypes.object,
+    max: React.PropTypes.object,
     onChange: React.PropTypes.func,
     runtime: React.PropTypes.bool,
   },
@@ -26,6 +27,7 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="1"
+            max={ this.props.runtime && this.props.max && this.props.max.sge ? this.props.max.sge.numberOfSlots : null }
             value={this.props.config.sge.numberOfSlots}
             data-key="sge.numberOfSlots"
             onChange={this.updateConfig}
@@ -37,6 +39,7 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="0"
+            max={ this.props.runtime && this.props.max && this.props.max.sge ? this.props.max.sge.numberOfGpusPerNode : null }
             value={this.props.config.sge.numberOfGpusPerNode}
             data-key="sge.numberOfGpusPerNode"
             onChange={this.updateConfig}
