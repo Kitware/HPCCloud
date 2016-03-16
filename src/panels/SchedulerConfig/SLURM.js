@@ -7,6 +7,7 @@ export default React.createClass({
 
   propTypes: {
     config: React.PropTypes.object,
+    max: React.PropTypes.object,
     onChange: React.PropTypes.func,
     runtime: React.PropTypes.bool,
   },
@@ -26,6 +27,7 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="1"
+            max={ this.props.runtime && this.props.max && this.props.max.slurm ? this.props.max.slurm.numberOfNodes : null }
             value={this.props.config.slurm.numberOfNodes}
             data-key="slurm.numberOfNodes"
             onChange={this.updateConfig}
@@ -37,6 +39,7 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="1"
+            max={ this.props.runtime && this.props.max && this.props.max.slurm ? this.props.max.slurm.numberOfCoresPerNode : null }
             value={this.props.config.slurm.numberOfCoresPerNode}
             data-key="slurm.numberOfCoresPerNode"
             onChange={this.updateConfig}
@@ -48,6 +51,7 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="0"
+            max={ this.props.runtime && this.props.max && this.props.max.slurm ? this.props.max.slurm.numberOfGpusPerNode : null }
             value={this.props.config.slurm.numberOfGpusPerNode}
             data-key="slurm.numberOfGpusPerNode"
             onChange={this.updateConfig}

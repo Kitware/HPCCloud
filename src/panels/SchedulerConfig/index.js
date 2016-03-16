@@ -17,7 +17,7 @@ function addDefaults(config) {
     {
       type: 'sge',
       maxWallTime: { hours: 0, minutes: 30, seconds: 0 },
-      defaultQueue: 'default',
+      defaultQueue: '',
       sge: {
         numberOfGpusPerNode: 0,
         numberOfSlots: 1,
@@ -41,6 +41,7 @@ export default React.createClass({
 
   propTypes: {
     config: React.PropTypes.object,
+    max: React.PropTypes.object,
     onChange: React.PropTypes.func,
     runtime: React.PropTypes.bool,
   },
@@ -109,7 +110,7 @@ export default React.createClass({
             <option value="slurm">SLURM</option>
           </select>
         </section>
-        <SubConfig config={ this.state.config } runtime={ this.props.runtime} onChange={ this.updateConfig } />
+        <SubConfig config={ this.state.config } max={ this.props.max } runtime={ this.props.runtime} onChange={ this.updateConfig } />
         <section className={style.group}>
           <label className={style.label}>Max runtime</label>
           <input

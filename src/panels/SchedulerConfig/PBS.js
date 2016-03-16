@@ -7,6 +7,7 @@ export default React.createClass({
 
   propTypes: {
     config: React.PropTypes.object,
+    max: React.PropTypes.object,
     onChange: React.PropTypes.func,
     runtime: React.PropTypes.bool,
   },
@@ -26,6 +27,7 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="1"
+            max={ this.props.runtime && this.props.max && this.props.max.pbs ? this.props.max.pbs.numberOfNodes : null }
             value={this.props.config.pbs.numberOfNodes}
             data-key="pbs.numberOfNodes"
             onChange={this.updateConfig}
@@ -37,6 +39,7 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="1"
+            max={ this.props.runtime && this.props.max && this.props.max.pbs ? this.props.max.pbs.numberOfCoresPerNode : null }
             value={this.props.config.pbs.numberOfCoresPerNode}
             data-key="pbs.numberOfCoresPerNode"
             onChange={this.updateConfig}
@@ -48,6 +51,7 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="0"
+            max={ this.props.runtime && this.props.max && this.props.max.pbs ? this.props.max.pbs.numberOfGpusPerNode : null }
             value={this.props.config.pbs.numberOfGpusPerNode}
             data-key="pbs.numberOfGpusPerNode"
             onChange={this.updateConfig}
