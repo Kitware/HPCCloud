@@ -17,7 +17,7 @@ function addDefaults(config) {
     {
       type: 'sge',
       maxWallTime: { hours: 0, minutes: 30, seconds: 0 },
-      defaultQueue: 'default',
+      defaultQueue: '',
       sge: {
         numberOfGpusPerNode: 0,
         numberOfSlots: 1,
