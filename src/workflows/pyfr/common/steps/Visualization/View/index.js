@@ -73,7 +73,7 @@ export default React.createClass({
   visualizeTaskflow() {
     client.activateSimulationStep(this.props.simulation, 'Visualization', null)
       .then((resp) => {
-        this.context.router.replace({
+        this.context.router.push({
           pathname: this.props.location.pathname,
           query: merge(this.props.location.query, { view: 'visualizer' }),
           state: this.props.location.state,
