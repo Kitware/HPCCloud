@@ -10,6 +10,16 @@ const typeMapping = {
   task: tasks,
 };
 
+function addTaskCountByStatus(state) {
+  const taskStatusCount = {};
+  if (state.tasks && state.tasks.length) {
+    state.tasks.forEach(task => {
+      taskStatusCount[task.status] = (taskStatusCount[task.status] || 0) + 1;
+    });
+  }
+  return Object.assign({}, state, { taskStatusCount });
+}
+
 class Observable {}
 Monologue.mixInto(Observable);
 const changeDispatcher = new Observable();
@@ -32,7 +42,10 @@ function notifyChange(taskflowId) {
       });
     }
 
-    changeDispatcher.emit(taskflowId, event);
+    // Prevent state update in render
+    setImmediate(() => {
+      changeDispatcher.emit(taskflowId, addTaskCountByStatus(event));
+    });
   }
 }
 

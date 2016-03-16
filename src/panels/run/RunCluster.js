@@ -7,6 +7,21 @@ import SchedulerConfig  from '../SchedulerConfig';
 import style    from 'HPCCloudStyle/ItemEditor.mcss';
 import theme    from 'HPCCloudStyle/Theme.mcss';
 
+function isEmptyWallTime(walltime) {
+  if (!walltime) {
+    return true;
+  }
+
+  const undefinedKeys = ['hours', 'minutes', 'seconds'].filter(k =>
+    walltime[k] === ''
+    || walltime[k] === '0'
+    || walltime[k] === 0
+    || walltime[k] === null
+    || walltime[k] === undefined);
+
+  return undefinedKeys.length === 3;
+}
+
 export default React.createClass({
   displayName: 'panels/run/RunCluster',
 
@@ -61,6 +76,9 @@ export default React.createClass({
     ['sge', 'slurm', 'pbs', 'type', 'defaultQueue'].forEach(keyToDelete => {
       delete runtime[keyToDelete];
     });
+    if (isEmptyWallTime(runtime.maxWallTime)) {
+      delete runtime.maxWallTime;
+    }
 
     this.props.onChange('runtime', runtime, 'Traditional');
   },
