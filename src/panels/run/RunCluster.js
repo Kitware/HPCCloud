@@ -55,8 +55,9 @@ export default React.createClass({
   updateRuntimeConfig(config) {
     const runtime = Object.assign({}, config);
     Object.assign(runtime, runtime[runtime.type]);
+    runtime.queue = runtime.defaultQueue;
 
-    ['sge', 'slurm', 'pbs', 'type'].forEach(keyToDelete => {
+    ['sge', 'slurm', 'pbs', 'type', 'defaultQueue'].forEach(keyToDelete => {
       delete runtime[keyToDelete];
     });
 

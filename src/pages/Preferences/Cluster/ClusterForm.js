@@ -80,8 +80,6 @@ export default React.createClass({
       this.state.data.config,
       { scheduler: Object.assign({}, this.state.data.config.scheduler, scheduler) });
 
-    console.log(scheduler, '=>', config);
-
     this.mergeData({ config });
   },
 

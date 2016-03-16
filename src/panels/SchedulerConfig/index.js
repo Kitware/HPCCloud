@@ -12,6 +12,29 @@ const typeMapping = {
   pbs: PBS,
 };
 
+function addDefaults(config) {
+  return Object.assign(
+    {
+      type: 'sge',
+      maxWallTime: { hours: 0, minutes: 30, seconds: 0 },
+      defaultQueue: 'default',
+      sge: {
+        numberOfGpusPerNode: 0,
+        numberOfSlots: 1,
+      },
+      slurm: {
+        numberOfGpusPerNode: 0,
+        numberOfCoresPerNode: 1,
+        numberOfCores: 1,
+      },
+      pbs: {
+        numberOfGpusPerNode: 0,
+        numberOfCoresPerNode: 1,
+        numberOfCores: 1,
+      },
+    }, config);
+}
+
 export default React.createClass({
 
   displayName: 'SchedulerConfig',
@@ -30,26 +53,7 @@ export default React.createClass({
 
   getInitialState() {
     return {
-      config: Object.assign(
-        {
-          type: 'sge',
-          maxRuntime: 30,
-          defaultQueue: 'default',
-          sge: {
-            numberOfGpus: 0,
-            numberOfSlots: 1,
-          },
-          slurm: {
-            numberOfGpus: 0,
-            numberOfNodes: 1,
-            numberOfCores: 1,
-          },
-          pbs: {
-            numberOfGpus: 0,
-            numberOfNodes: 1,
-            numberOfCores: 1,
-          },
-        }, this.props.config),
+      config: addDefaults(this.props.config),
     };
   },
 
@@ -58,8 +62,8 @@ export default React.createClass({
       oldConfig = this.props.config;
 
     if (!deepEquals(config, oldConfig)) {
-      this.setState({ config });
-      this.props.onChange(config);
+      this.setState({ config: addDefaults(config) });
+      this.props.onChange(addDefaults(config));
     }
   },
 
@@ -111,14 +115,35 @@ export default React.createClass({
           <input
             className={style.input}
             type="number"
-            min="1"
-            value={this.state.config.maxRuntime}
-            data-key="maxRuntime"
+            min="0"
+            value={this.state.config.maxWallTime.hours}
+            title="Number of hours"
+            data-key="maxWallTime.hours"
+            onChange={this.updateConfig}
+          />
+          <input
+            className={style.input}
+            type="number"
+            min="0"
+            max="59"
+            value={this.state.config.maxWallTime.minutes}
+            title="Number of minutes"
+            data-key="maxWallTime.minutes"
+            onChange={this.updateConfig}
+          />
+          <input
+            className={style.input}
+            type="number"
+            min="0"
+            max="59"
+            value={this.state.config.maxWallTime.seconds}
+            title="Number of seconds"
+            data-key="maxWallTime.seconds"
             onChange={this.updateConfig}
           />
         </section>
         <section className={style.group}>
-          <label className={style.label}>Default queue</label>
+          <label className={style.label}>{ this.props.runtime ? 'Queue' : 'Default queue' }</label>
           <input
             className={style.input}
             type="text"

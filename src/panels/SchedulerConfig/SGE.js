@@ -37,8 +37,8 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="0"
-            value={this.props.config.sge.numberOfGpus}
-            data-key="sge.numberOfGpus"
+            value={this.props.config.sge.numberOfGpusPerNode}
+            data-key="sge.numberOfGpusPerNode"
             onChange={this.updateConfig}
           />
         </section>
