@@ -37,8 +37,8 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="1"
-            value={this.props.config.pbs.numberOfCores}
-            data-key="pbs.numberOfCores"
+            value={this.props.config.pbs.numberOfCoresPerNode}
+            data-key="pbs.numberOfCoresPerNode"
             onChange={this.updateConfig}
           />
         </section>
@@ -48,8 +48,8 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="0"
-            value={this.props.config.pbs.numberOfGpus}
-            data-key="pbs.numberOfGpus"
+            value={this.props.config.pbs.numberOfGpusPerNode}
+            data-key="pbs.numberOfGpusPerNode"
             onChange={this.updateConfig}
           />
         </section>

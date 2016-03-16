@@ -37,8 +37,8 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="1"
-            value={this.props.config.slurm.numberOfCores}
-            data-key="slurm.numberOfCores"
+            value={this.props.config.slurm.numberOfCoresPerNode}
+            data-key="slurm.numberOfCoresPerNode"
             onChange={this.updateConfig}
           />
         </section>
@@ -48,8 +48,8 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="0"
-            value={this.props.config.slurm.numberOfGpus}
-            data-key="slurm.numberOfGpus"
+            value={this.props.config.slurm.numberOfGpusPerNode}
+            data-key="slurm.numberOfGpusPerNode"
             onChange={this.updateConfig}
           />
         </section>
