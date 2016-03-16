@@ -245,10 +245,11 @@ def setup_input(task, *args, **kwargs):
         if not number_of_procs:
             raise Exception('Unable to determine number of mpi processes to run.')
 
+        number_of_procs = int(number_of_procs)
         kwargs['numberOfProcs']  = number_of_procs
         if number_of_procs > 1:
             _partition_mesh(
-                task.logger, output_path, output_dir, kwargs['numberOfSlots'])
+                task.logger, output_path, output_dir, number_of_procs)
         else:
             task.logger.info('Skipping partitioning we are running serial.')
 
