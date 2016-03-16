@@ -211,6 +211,7 @@ def update_config_file(task, client, *args, **kwargs):
 
 @cumulus.taskflow.task
 def setup_input(task, *args, **kwargs):
+    task.logger.info('Input parameters: %s' % kwargs)
     task.taskflow.logger.info('Importing mesh into PyFr format.')
 
     task.logger.info('Downloading input mesh.')
@@ -237,8 +238,15 @@ def setup_input(task, *args, **kwargs):
 
         task.logger.info('Partitioning the mesh.')
 
-        if 'numberOfSlots' in kwargs \
-                and int(kwargs['numberOfSlots']) > 1:
+        number_of_procs = kwargs.get('numberOfSlots')
+        if not number_of_procs:
+            number_of_procs = kwargs.get('numberOfNodes')
+
+        if not number_of_procs:
+            raise Exception('Unable to determine number of mpi processes to run.')
+
+        kwargs['numberOfProcs']  = number_of_procs
+        if number_of_procs > 1:
             _partition_mesh(
                 task.logger, output_path, output_dir, kwargs['numberOfSlots'])
         else:
@@ -274,14 +282,12 @@ def create_job(task, *args, **kwargs):
     task.taskflow.logger.info('Create PyFr job.')
     input_folder_id = kwargs['input']['folder']['id']
 
-    number_of_slots = kwargs.get('numberOfSlots', 1)
-
     backend = kwargs['backend']['type']
 
     body = {
         'name': 'pyfr_run',
         'commands': [
-            "mpirun -n %s pyfr run -b %s input/mesh.pyfrm input/pyfr.ini" % (number_of_slots, backend)
+            "mpirun -n %s pyfr run -b %s input/mesh.pyfrm input/pyfr.ini" % (kwargs['numberOfProcs'], backend)
         ],
         'input': [
             {
@@ -321,6 +327,7 @@ def submit_pyfr_job(task, cluster,  job, *args, **kwargs):
     task.logger.info('Submitting job %s to cluster.' % job['_id'])
     girder_token = task.taskflow.girder_token
 
+    job['params'] = kwargs
     submit_job(cluster, job, log_write_url=None,
                           girder_token=girder_token, monitor=False)
 
@@ -434,7 +441,7 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
     # By default export solution files to VTK format using a set of batch jobs
     if not 'exportInTaskFlow' in kwargs or not kwargs['exportInTaskFlow']:
 
-        number_of_jobs = int(cluster['config'].get('numberOfSlots', 1))
+        number_of_jobs = kwargs['numberOfProcs']
         task.logger.info('Generating %d export jobs' % number_of_jobs)
 
         sim_job_dir = job['dir']
