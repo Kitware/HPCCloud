@@ -104,7 +104,7 @@ export default React.createClass({
         )
       )
       .then((resp) =>
-        client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+        client.updateSimulationStep(this.props.simulation._id, 'Simulation', {
           view: 'run',
           metadata: {
             taskflowId, sessionId,
@@ -113,8 +113,8 @@ export default React.createClass({
       )
       .then((resp) => {
         var newSim = deepClone(this.props.simulation);
-        newSim.steps[this.props.step].view = 'run';
-        newSim.steps[this.props.step].metadata = {
+        newSim.steps.Simulation.view = 'run';
+        newSim.steps.Simulation.metadata = {
           taskflowId, sessionId,
         };
         client.invalidateSimulation(newSim);

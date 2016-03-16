@@ -50,7 +50,7 @@ export default React.createClass({
   },
 
   componentWillMount() {
-    const taskflowId = this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId;
+    const taskflowId = this.props.simulation.steps.Simulation.metadata.taskflowId;
     this.setState({ taskflowId });
 
     this.subscription = TaskflowManager.monitorTaskflow(taskflowId, (pkt) => {
