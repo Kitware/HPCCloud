@@ -1,6 +1,7 @@
 import client           from '../../network';
 import React            from 'react';
 import { Link }         from 'react-router';
+import deepClone        from 'mout/src/lang/deepClone';
 import SchedulerConfig  from '../SchedulerConfig';
 
 import style    from 'HPCCloudStyle/ItemEditor.mcss';
@@ -81,6 +82,8 @@ export default React.createClass({
     }
 
     const clusterData = this.state.profiles.filter(item => item._id === this.props.contents.profile)[0];
+    const maxData = clusterData && clusterData.config && clusterData.config.scheduler ? clusterData.config.scheduler : {};
+    const configData = deepClone(maxData);
 
     return (
       <div className={style.container}>
@@ -96,7 +99,8 @@ export default React.createClass({
               </select>
           </section>
           <SchedulerConfig
-            config={ clusterData && clusterData.config && clusterData.config.scheduler ? clusterData.config.scheduler : {} }
+            config={ configData }
+            max={ maxData }
             onChange={ this.updateRuntimeConfig }
             runtime
           />
