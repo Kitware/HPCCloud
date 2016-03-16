@@ -14,6 +14,7 @@ export default React.createClass({
 
   getInitialState() {
     return {
+      taskStatusCount: {},
       tasks: [], // taskflow tasks
       jobs: [], // hpc tasks/job
       advanced: false,
@@ -46,6 +47,9 @@ export default React.createClass({
                   Jobs
               </div>
               <div className={ style.buttons }>
+                  { Object.keys(this.state.taskStatusCount).map(status =>
+                    <span key={status} className={ style.count }>{ `${status}(${this.state.taskStatusCount[status]})` }</span>
+                  )}
                   <i
                     className={ this.state.advanced ? style.advancedIconOn : style.advancedIconOff}
                     onClick={ this.toggleAdvanced }

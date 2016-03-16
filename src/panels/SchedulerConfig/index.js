@@ -16,7 +16,7 @@ function addDefaults(config) {
   return Object.assign(
     {
       type: 'sge',
-      maxWallTime: { hours: 0, minutes: 30, seconds: 0 },
+      maxWallTime: { hours: 0, minutes: 0, seconds: 0 },
       defaultQueue: '',
       sge: {
         numberOfGpusPerNode: 0,

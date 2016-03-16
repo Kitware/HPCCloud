@@ -75,3 +75,9 @@
     composes: container;
 }
 
+.count {
+  font-size: 10px;
+  font-style: italic;
+  margin-right: 5px;
+}
+

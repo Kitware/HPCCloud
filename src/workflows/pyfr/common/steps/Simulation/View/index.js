@@ -60,7 +60,7 @@ export default React.createClass({
       if (pkt.jobs.some(job => job.status === 'running') && pkt.jobs.some(job => job.name === 'pyfr')) {
         actions.push(ACTIONS.terminate);
       // every complete -> visualize
-      } else if (pkt.jobs.every(job => job.status === 'complete')) {
+      } else if (pkt.jobs.every(job => job.status === 'complete') && pkt.tasks.every(task => task.status === 'complete')) {
         actions.push(ACTIONS.visualize);
       // every terminated -> rerun
       } else if (pkt.jobs.every(job => job.status === 'terminated')) {
