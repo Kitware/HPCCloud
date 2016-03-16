@@ -23,6 +23,8 @@ export default React.createClass({
 
   componentWillMount() {
     this.subscription = TaskflowManager.monitorTaskflow(this.props.taskFlowId, (pkt) => {
+      // Sort the tasks by created timestamp
+      pkt.tasks.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
       this.setState(pkt);
     });
   },
