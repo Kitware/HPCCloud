@@ -97,7 +97,8 @@ export default React.createClass({
                                 content += `[${formatTime(entry.created)}] ${entry.levelname}: ${entry.msg}\n`;
 
                                 if (entry.exc_info) {
-                                  content += entry.exc_info.join('\n');
+                                  content += entry.exc_info[2].join('');
+                                  content += `${entry.exc_info[0]}: ${entry.exc_info[1]}`;
                                 }
 
                                 return content;
