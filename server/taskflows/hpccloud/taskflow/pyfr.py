@@ -44,6 +44,7 @@ BACKEND_SECTIONS = [
     'backend-opencl',
     'backend-openmp'
 ]
+PYFR_MESH_EXT = 'pyfrm'
 
 class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
     """
@@ -212,67 +213,81 @@ def update_config_file(task, client, *args, **kwargs):
 @cumulus.taskflow.task
 def setup_input(task, *args, **kwargs):
     task.logger.info('Input parameters: %s' % kwargs)
-    task.taskflow.logger.info('Importing mesh into PyFr format.')
-
-    task.logger.info('Downloading input mesh.')
-    client = _create_girder_client(
-                task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     input_folder_id = kwargs['input']['folder']['id']
     mesh_file_id = kwargs['input']['meshFile']['id']
+    kwargs['meshFileId'] = mesh_file_id
 
-    try:
-        input_path = os.path.join(tempfile.tempdir, input_folder_id)
-        output_dir =  tempfile.mkdtemp()
-        output_path = os.path.join(output_dir, MESH_FILENAME)
+    number_of_procs = kwargs.get('numberOfSlots')
+    if not number_of_procs:
+        number_of_procs = kwargs.get('numberOfNodes')
 
-        client.downloadFile(mesh_file_id, input_path)
-        task.logger.info('Downloading complete.')
+    if not number_of_procs:
+        raise Exception('Unable to determine number of mpi processes to run.')
 
-        # Now get the file metadata
-        file = client.getResource('file', mesh_file_id)
-        extn = file['exts'][0]
-        task.logger.info('Converting mesh to pyfrm format.')
-        _import_mesh(task.taskflow.logger, input_path, output_path, extn)
-        task.logger.info('Conversion complete.')
+    number_of_procs = int(number_of_procs)
+    kwargs['numberOfProcs']  = number_of_procs
 
-        task.logger.info('Partitioning the mesh.')
+    client = _create_girder_client(
+        task.taskflow.girder_api_url, task.taskflow.girder_token)
 
-        number_of_procs = kwargs.get('numberOfSlots')
-        if not number_of_procs:
-            number_of_procs = kwargs.get('numberOfNodes')
+    # Get the mesh file metadata to see if we need to import
+    file = client.getResource('file/%s' % mesh_file_id)
 
-        if not number_of_procs:
-            raise Exception('Unable to determine number of mpi processes to run.')
+    import_mesh = True
+    if PYFR_MESH_EXT in file['exts']:
+        task.logger.info('Mesh is already in pyfrm format.')
+        import_mesh = False
 
-        number_of_procs = int(number_of_procs)
-        kwargs['numberOfProcs']  = number_of_procs
-        if number_of_procs > 1:
-            _partition_mesh(
-                task.logger, output_path, output_dir, number_of_procs)
-        else:
-            task.logger.info('Skipping partitioning we are running serial.')
+    if import_mesh or number_of_procs > 1:
+        task.logger.info('Downloading input mesh.')
 
-        task.logger.info('Partitioning complete.')
+        try:
+            input_path = os.path.join(tempfile.tempdir, input_folder_id)
+            output_dir =  tempfile.mkdtemp()
+            output_path = os.path.join(output_dir, MESH_FILENAME)
 
-        task.logger.info('Uploading converted mesh.')
-        size = os.path.getsize(output_path)
-        with open(output_path) as fp:
-            girder_file = client.uploadFile(
-                input_folder_id, fp, 'mesh.pyfrm', size=size,
-                parentType='folder')
-            kwargs['imported_mesh_file_id'] = girder_file['_id']
+            client.downloadFile(mesh_file_id, input_path)
+            task.logger.info('Downloading complete.')
 
-        task.logger.info('Upload complete.')
 
-        task.logger.info('Updating backend configuration.')
-        update_config_file(task, client, *args, **kwargs)
+            if import_mesh:
+                task.taskflow.logger.info('Importing mesh into PyFr format.')
 
-    finally:
-        if os.path.exists(input_path):
-            os.remove(input_path)
-        if os.path.exists(output_dir):
-            shutil.rmtree(output_dir)
+                extn = file['exts'][0]
+                task.logger.info('Converting mesh to pyfrm format.')
+                _import_mesh(task.taskflow.logger, input_path, output_path, extn)
+                task.logger.info('Conversion complete.')
+
+            task.logger.info('Partitioning the mesh.')
+
+            if number_of_procs > 1:
+                _partition_mesh(
+                    task.logger, output_path, output_dir, number_of_procs)
+            else:
+                task.logger.info('Skipping partitioning we are running on a single node.')
+
+            task.logger.info('Partitioning complete.')
+
+            task.logger.info('Uploading converted mesh.')
+            size = os.path.getsize(output_path)
+            with open(output_path) as fp:
+                girder_file = client.uploadFile(
+                    input_folder_id, fp, 'mesh.pyfrm', size=size,
+                    parentType='folder')
+                kwargs['meshFileId'] = girder_file['_id']
+
+            task.logger.info('Upload complete.')
+
+            task.logger.info('Updating backend configuration.')
+
+        finally:
+            if os.path.exists(input_path):
+                os.remove(input_path)
+            if os.path.exists(output_dir):
+                shutil.rmtree(output_dir)
+
+    update_config_file(task, client, *args, **kwargs)
 
     create_job.delay(*args, **kwargs)
 
@@ -434,7 +449,7 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
 
     task.taskflow.logger.info('Upload job output complete.')
 
-    imported_mesh_file_id = kwargs.pop('imported_mesh_file_id')
+    mesh_file_id = kwargs.pop('meshFileId')
 
     solution_files = list(_list_solution_files(client, output_folder_id))
     number_files = len(solution_files)
@@ -470,11 +485,11 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
         # The number 100 is pretty arbitrary!
         if number_files < 100:
             export_output.delay(
-                output_folder_id, imported_mesh_file_id, solution_files)
+                output_folder_id, mesh_file_id, solution_files)
         # Break into chunks a run in parallel
         else:
             for chunk in [solution_files[i::NUMBER__OF_EXPORT_TASKS] for i in xrange(NUMBER__OF_EXPORT_TASKS)]:
-                export_output.delay(output_folder_id, imported_mesh_file_id, chunk)
+                export_output.delay(output_folder_id, mesh_file_id, chunk)
 
 
 def _export_file(task, client, output_folder_id, mesh_path, file, output_dir):
