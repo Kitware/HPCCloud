@@ -25,12 +25,12 @@ function addDefaults(config) {
       slurm: {
         numberOfGpusPerNode: 0,
         numberOfCoresPerNode: 1,
-        numberOfCores: 1,
+        numberOfNodes: 1,
       },
       pbs: {
         numberOfGpusPerNode: 0,
         numberOfCoresPerNode: 1,
-        numberOfCores: 1,
+        numberOfNodes: 1,
       },
     }, config);
 }
