@@ -79,8 +79,9 @@ export default React.createClass({
         taskflowId = resp.data._id;
         return client.editFile(file);
       })
-      .then((resp) =>
-        client.startTaskflow(taskflowId, Object.assign({},
+      .then((resp) => {
+        const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
+        return client.startTaskflow(taskflowId, Object.assign({},
           this.state[this.state.serverType].runtime || {},
           {
             backend: this.state.backend,
@@ -89,7 +90,7 @@ export default React.createClass({
                 id: this.props.simulation.metadata.inputFolder._id,
               },
               meshFile: {
-                id: this.props.simulation.metadata.inputFolder.files.mesh,
+                id: meshFile,
               },
             },
             output: {
@@ -101,10 +102,10 @@ export default React.createClass({
               _id: this.state[this.state.serverType].profile,
             },
           })
-        )
-      )
+        );
+      })
       .then((resp) =>
-        client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+        client.updateSimulationStep(this.props.simulation._id, 'Simulation', {
           view: 'run',
           metadata: {
             taskflowId, sessionId,
@@ -113,8 +114,8 @@ export default React.createClass({
       )
       .then((resp) => {
         var newSim = deepClone(this.props.simulation);
-        newSim.steps[this.props.step].view = 'run';
-        newSim.steps[this.props.step].metadata = {
+        newSim.steps.Simulation.view = 'run';
+        newSim.steps.Simulation.metadata = {
           taskflowId, sessionId,
         };
         client.invalidateSimulation(newSim);

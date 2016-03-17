@@ -43,6 +43,7 @@ export default React.createClass({
     return {
       taskflowId: '',
       error: '',
+      primaryJobOutput: '',
       actions: [
         ACTIONS.terminate,
       ],
@@ -50,16 +51,18 @@ export default React.createClass({
   },
 
   componentWillMount() {
-    const taskflowId = this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId;
+    const taskflowId = this.props.simulation.steps.Simulation.metadata.taskflowId;
     this.setState({ taskflowId });
 
     this.subscription = TaskflowManager.monitorTaskflow(taskflowId, (pkt) => {
       const actions = [];
+      const primaryJob = 'pyfr_run';
+      var primaryJobOutput = '';
 
       // some running -> terminate
-      if (pkt.jobs.some(job => job.status === 'running') && pkt.jobs.some(job => job.name === 'pyfr')) {
+      if (pkt.jobs.some(job => job.status === 'running') && pkt.jobs.some(job => job.name === primaryJob)) {
         actions.push(ACTIONS.terminate);
-      // every complete -> visualize
+      // every job complete && task complete -> visualize
       } else if (pkt.jobs.every(job => job.status === 'complete') && pkt.tasks.every(task => task.status === 'complete')) {
         actions.push(ACTIONS.visualize);
       // every terminated -> rerun
@@ -67,8 +70,15 @@ export default React.createClass({
         actions.push(ACTIONS.rerun);
       }
 
+      for (let i = 0; i < pkt.jobs.length; i++) {
+        if (pkt.jobs[i].name === primaryJob) {
+          primaryJobOutput = pkt.jobs[i].dir;
+          break;
+        }
+      }
+
       // Refresh ui
-      this.setState({ actions });
+      this.setState({ actions, primaryJobOutput });
     });
   },
 
@@ -84,7 +94,13 @@ export default React.createClass({
   },
 
   visualizeTaskflow() {
-    client.activateSimulationStep(this.props.simulation, 'Visualization', null)
+    var newSim = this.props.simulation;
+    newSim.steps.Visualization.metadata.dataDir = this.state.primaryJobOutput;
+    client.saveSimulation(newSim)
+      .then((resp) => {
+        client.invalidateSimulation(newSim);
+        return client.activateSimulationStep(this.props.simulation, 'Visualization', null);
+      })
       .then((resp) => {
         this.context.router.replace({
           pathname: `View/Simulation/${this.props.simulation._id}/Visualization`,
@@ -98,13 +114,13 @@ export default React.createClass({
   },
 
   terminateTaskflow() {
-    TaskflowManager.terminateTaskflow(this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId);
+    TaskflowManager.terminateTaskflow(this.props.simulation.steps.Simulation.metadata.taskflowId);
   },
 
   deleteTaskflow() {
-    TaskflowManager.deleteTaskflow(this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId)
+    TaskflowManager.deleteTaskflow(this.props.simulation.steps.Simulation.metadata.taskflowId)
       .then((resp) =>
-        client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+        client.updateSimulationStep(this.props.simulation._id, 'Simulation', {
           view: 'default',
           metadata: {},
         })

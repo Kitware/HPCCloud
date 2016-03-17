@@ -81,8 +81,8 @@ export default {
     },
   },
   steps: {
-    _order: ['Introduction', 'Input', 'Simulation', 'Visualizer'],
-    _disabled: ['Simulation', 'Visualizer'],
+    _order: ['Introduction', 'Input', 'Simulation', 'Visualization'],
+    _disabled: ['Simulation', 'Visualization'],
     _initial_state: {
       Introduction: {
         type: 'input',
@@ -98,7 +98,7 @@ export default {
         type: 'output',
         metadata: {},
       },
-      Visualizer: {
+      Visualization: {
         type: 'output',
         metadata: {},
       },
@@ -113,7 +113,7 @@ export default {
       default: stepSimulationStart,
       run: stepSimulationView,
     },
-    Visualizer: {
+    Visualization: {
       default: stepVisualizationStart,
       run: stepVisualizationView,
     },
@@ -133,7 +133,7 @@ export default {
       default: 'Simulation',
       run: 'Simulation (running)',
     },
-    Visualizer: {
+    Visualization: {
       default: 'Visualization',
       run: 'Visualization (running)',
     },

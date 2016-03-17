@@ -189,6 +189,7 @@ export default React.createClass({
                 value={ this.state.name }
                 data-name="name"
                 onChange={ this.updateForm }
+                autoFocus
               />
           </div>
           <div className={ style.group }>

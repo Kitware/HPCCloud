@@ -50,26 +50,29 @@ export default React.createClass({
 
   startVisualization() {
     var taskflowId,
-      sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
+      sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
+      dataDir = this.props.simulation.steps.Visualization.metadata.dataDir,
+      metadata = { sessionId, dataDir }; // we add taskflowId later
     client.createTaskflow(this.props.taskFlowName)
       .then((resp) => {
         taskflowId = resp.data._id;
+        metadata.taskflowId = taskflowId;
         return client.startTaskflow(taskflowId, {
           cluster: { _id: this.state[this.state.serverType].profile },
-          dataDir: '/tmp', // where the output for the sim will be
-          sessionKey: sessionId,       // for pvw, we use this later for connecting
+          dataDir, // where the output for the sim will be
+          sessionKey: sessionId, // for pvw, we use this later for connecting
         });
       })
       .then((resp) =>
         client.updateSimulationStep(this.props.simulation._id, this.props.step, {
           view: 'run',
-          metadata: { taskflowId, sessionId },
+          metadata,
         })
       )
       .then((resp) => {
         var newSim = deepClone(this.props.simulation);
         newSim.steps[this.props.step].view = 'run';
-        newSim.steps[this.props.step].metadata = { taskflowId, sessionId };
+        newSim.steps[this.props.step].metadata = metadata;
         client.invalidateSimulation(newSim);
 
         this.context.router.replace({
@@ -79,7 +82,8 @@ export default React.createClass({
         });
       })
       .catch((error) => {
-        this.setState({ error: error.data.message });
+        var msg = error.data && error.data.message ? error.data.message : error;
+        this.setState({ error: msg });
       });
   },
 
