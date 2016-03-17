@@ -52,10 +52,11 @@ export default React.createClass({
     var taskflowId,
       sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
       dataDir = this.props.simulation.steps.Visualization.metadata.dataDir,
-      metadata = { taskflowId, sessionId, dataDir };
+      metadata = { sessionId, dataDir }; // we add taskflowId later
     client.createTaskflow(this.props.taskFlowName)
       .then((resp) => {
         taskflowId = resp.data._id;
+        metadata.taskflowId = taskflowId;
         return client.startTaskflow(taskflowId, {
           cluster: { _id: this.state[this.state.serverType].profile },
           dataDir, // where the output for the sim will be
