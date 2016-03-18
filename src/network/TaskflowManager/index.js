@@ -66,11 +66,22 @@ function onEventUpdate(type, event) {
   return obj;
 }
 
-function updateJobStatus(taskflowId, jobId) {
+function updateJob(taskflowId, jobId) {
   client.getJobStatus(jobId)
     .then(resp => {
       jobs[jobId].status = resp.data.status;
+
+      return client.getJobLog(jobId);
+    })
+    .catch(error => {
+      console.log(error);
+    })
+    .then(resp => {
+      jobs[jobId].log = resp.data.log;
       notifyChange(taskflowId);
+    })
+    .catch(error => {
+      console.log(error);
     });
 }
 
@@ -99,7 +110,7 @@ function updateTaskFlow(taskflowId) {
         resp.data.meta.jobs.forEach(job => {
           jobs[job._id] = job;
           job.__taskflowId = taskflowId;
-          updateJobStatus(taskflowId, job._id);
+          updateJob(taskflowId, job._id);
         });
       }
     })
