@@ -96,9 +96,11 @@
 
 /* Icons */
 .hpcCloudIcon {
-    composes: fa         from 'font-awesome/css/font-awesome.css';
-    composes: fa-fw      from 'font-awesome/css/font-awesome.css';
-    composes: fa-cloud   from 'font-awesome/css/font-awesome.css';
+    margin-top: 12px;
+}
+
+.hpcCloudBusyIcon {
+    composes: hpcCloudIcon;
 }
 
 .logoutIcon {
