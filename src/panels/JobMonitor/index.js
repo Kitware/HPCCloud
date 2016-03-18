@@ -59,7 +59,7 @@ export default React.createClass({
           <div className={ style.jobContent }>
             {
               this.state.jobs.map(job =>
-                <ExecutionUnit unit={job} />
+                <ExecutionUnit key={job._id} unit={job} />
               )
             }
           </div>
@@ -74,7 +74,7 @@ export default React.createClass({
               <div className={ style.taskflowContent }>
                 {
                   this.state.tasks.map(task =>
-                    <ExecutionUnit unit={task} />
+                    <ExecutionUnit key={task._id} unit={task} />
                   )
                 }
               </div>

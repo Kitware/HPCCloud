@@ -14,7 +14,7 @@ export default React.createClass({
   render() {
     if (this.props.unit.log === undefined || this.props.unit.log.length === 0) {
       return (
-        <section key={this.props.unit._id} className={ style.listItem }>
+        <section className={ style.listItem }>
           <strong className={ style.itemContent }>{this.props.unit.name.split('.').pop()}</strong>
           <div className={ style.itemContent }>{this.props.unit.status}</div>
         </section>
@@ -22,7 +22,7 @@ export default React.createClass({
     }
 
     return (
-        <section key={this.props.unit._id} className={ style.logListItem }>
+        <section className={ style.logListItem }>
           <CollapsibleWidget
             title={this.props.unit.name.split('.').pop()}
             subtitle={this.props.unit.status}
