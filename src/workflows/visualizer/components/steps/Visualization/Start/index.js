@@ -49,7 +49,7 @@ export default React.createClass({
         taskflowId = resp.data._id;
         return client.startTaskflow(taskflowId, {
           cluster: { _id: this.state[this.state.serverType].profile },
-          dataDir: '/tmp', // where the output for the sim will be
+          fileId: this.props.simulation.metadata.inputFolder.files.dataset,
           sessionKey: sessionId, // for pvw, we use this later for connecting
         });
       })

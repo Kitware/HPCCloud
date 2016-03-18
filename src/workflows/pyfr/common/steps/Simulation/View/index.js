@@ -1,10 +1,12 @@
 import ButtonBar        from '../../../../../../panels/ButtonBar';
 import client           from '../../../../../../network';
 import JobMonitor       from '../../../../../../panels/JobMonitor';
+import OutputPanel      from '../../../../../../panels/OutputPanel';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
 import TaskflowManager  from '../../../../../../network/TaskflowManager';
 
+const primaryJob = 'pyfr_run';
 const ACTIONS = {
   terminate: {
     name: 'terminateTaskflow',
@@ -41,6 +43,7 @@ export default React.createClass({
 
   getInitialState() {
     return {
+      allComplete: false,
       taskflowId: '',
       error: '',
       primaryJobOutput: '',
@@ -56,18 +59,18 @@ export default React.createClass({
 
     this.subscription = TaskflowManager.monitorTaskflow(taskflowId, (pkt) => {
       const actions = [];
-      const primaryJob = 'pyfr_run';
       var primaryJobOutput = '';
+      var allComplete = pkt.jobs.every(job => job.status === 'complete') && pkt.tasks.every(task => task.status === 'complete');
 
       // some running -> terminate
-      if (pkt.jobs.some(job => job.status === 'running') && pkt.jobs.some(job => job.name === primaryJob)) {
+      if (pkt.jobs.every(job => job.status === 'terminated')) {
+        actions.push(ACTIONS.rerun);
+      } else if (!allComplete && (pkt.jobs.length + pkt.tasks.length) > 0) {
         actions.push(ACTIONS.terminate);
       // every job complete && task complete -> visualize
-      } else if (pkt.jobs.every(job => job.status === 'complete') && pkt.tasks.every(task => task.status === 'complete')) {
+      } else if (allComplete) {
         actions.push(ACTIONS.visualize);
       // every terminated -> rerun
-      } else if (pkt.jobs.every(job => job.status === 'terminated')) {
-        actions.push(ACTIONS.rerun);
       }
 
       for (let i = 0; i < pkt.jobs.length; i++) {
@@ -78,7 +81,7 @@ export default React.createClass({
       }
 
       // Refresh ui
-      this.setState({ actions, primaryJobOutput });
+      this.setState({ actions, primaryJobOutput, allComplete });
     });
   },
 
@@ -138,9 +141,16 @@ export default React.createClass({
   },
 
   render() {
+    var outputItems;
+    var outputComponent = null;
+    if (this.state.allComplete) {
+      outputItems = [{ name: this.props.simulation.steps.Simulation.metadata.cluster, value: this.state.primaryJobOutput }];
+      outputComponent = <OutputPanel title="Output" items={outputItems} />;
+    }
     return (
       <div>
         <JobMonitor taskFlowId={ this.state.taskflowId } />
+        { outputComponent }
         <section>
             <ButtonBar
               onAction={ this.onAction }

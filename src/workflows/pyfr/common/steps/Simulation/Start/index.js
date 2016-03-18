@@ -68,6 +68,7 @@ export default React.createClass({
 
   runSimulation(event) {
     var taskflowId,
+      clusterName = this.state.clusters[this.state[this.state.serverType].profile].name,
       sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
 
     client.createTaskflow(this.props.taskFlowName)
@@ -92,6 +93,9 @@ export default React.createClass({
               meshFile: {
                 id: meshFile,
               },
+              iniFile: {
+                id: this.props.simulation.metadata.inputFolder.files.ini,
+              },
             },
             output: {
               folder: {
@@ -104,11 +108,14 @@ export default React.createClass({
           })
         );
       })
+      // update step metadata
       .then((resp) =>
         client.updateSimulationStep(this.props.simulation._id, 'Simulation', {
           view: 'run',
           metadata: {
-            taskflowId, sessionId,
+            taskflowId,
+            sessionId,
+            cluster: clusterName,
           },
         })
       )
@@ -116,7 +123,7 @@ export default React.createClass({
         var newSim = deepClone(this.props.simulation);
         newSim.steps.Simulation.view = 'run';
         newSim.steps.Simulation.metadata = {
-          taskflowId, sessionId,
+          taskflowId, sessionId, cluster: clusterName,
         };
         client.invalidateSimulation(newSim);
 
