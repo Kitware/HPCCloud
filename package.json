@@ -33,9 +33,9 @@
     "history": "1.17.0",
     "react-router": "2.0.0",
 
-    "paraviewweb": "1.2.22",
+    "paraviewweb": "1.2.23",
     "simput": "1.1.13",
-    "pvw-visualizer": "1.0.8",
+    "pvw-visualizer": "1.0.9",
 
     "kw-web-suite": "1.0.7"
   },
