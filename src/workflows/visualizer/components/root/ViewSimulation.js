@@ -72,7 +72,7 @@ export default React.createClass({
                 breadCrumbStyle.breadCrumbSimulationIcon,
               ],
             }}
-            title={ this.props.simulation.name }
+            title={ `${this.props.project.name} / ${this.props.simulation.name}` }
           />
           <div className={ style.container }>
               <ActiveList
