@@ -1,9 +1,7 @@
-import CollapsibleWidget    from 'paraviewweb/src/React/Widgets/CollapsibleWidget';
 import React                from 'react';
 import TaskflowManager      from '../../network/TaskflowManager';
-import { formatTime }       from '../../utils/Format';
-
 import style                from 'HPCCloudStyle/JobMonitor.mcss';
+import ExecutionUnit        from './ExecutionUnit.js';
 
 export default React.createClass({
   displayName: 'JobMonitor',
@@ -59,12 +57,11 @@ export default React.createClass({
               </div>
           </div>
           <div className={ style.jobContent }>
-              {this.state.jobs.map(job =>
-                  <section key={job._id} className={ style.listItem }>
-                      <strong className={ style.itemContent }>{job.name}</strong>
-                      <div className={ style.itemContent }>{job.status}</div>
-                  </section>
-              )}
+            {
+              this.state.jobs.map(job =>
+                <ExecutionUnit unit={job} />
+              )
+            }
           </div>
           <div className={ this.state.advanced ? style.taskflowContainer : style.hidden }>
               <div className={ style.toolbar }>
@@ -75,39 +72,11 @@ export default React.createClass({
                   </div>
               </div>
               <div className={ style.taskflowContent }>
-                  { this.state.tasks.map(task => {
-                    if (task.log.length === 0) {
-                      return (
-                        <section key={task._id} className={ style.listItem }>
-                            <strong className={ style.itemContent }>{task.name.split('.').pop()}</strong>
-                            <div className={ style.itemContent }>{task.status}</div>
-                        </section>);
-                    }
-                    return (
-                      <section key={task._id} className={ style.logListItem }>
-                        <CollapsibleWidget
-                          title={task.name.split('.').pop()}
-                          subtitle={task.status}
-                          open={false}
-                        >
-                          <pre className={ style.log }>
-                            { // reduce log array to a string with formatted entries
-                              task.log.reduce((prevVal, entry, index) => {
-                                var content = prevVal;
-                                content += `[${formatTime(entry.created)}] ${entry.levelname}: ${entry.msg}\n`;
-
-                                if (entry.exc_info) {
-                                  content += entry.exc_info[2].join('');
-                                  content += `${entry.exc_info[0]}: ${entry.exc_info[1]}`;
-                                }
-
-                                return content;
-                              }, '')
-                            }
-                          </pre>
-                        </CollapsibleWidget>
-                      </section>);
-                  })}
+                {
+                  this.state.tasks.map(task =>
+                    <ExecutionUnit unit={task} />
+                  )
+                }
               </div>
           </div>
       </div>);
