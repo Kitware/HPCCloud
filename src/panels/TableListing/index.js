@@ -142,9 +142,9 @@ export default React.createClass({
                       <ImageIcon data={ helper.getIcon(item) } />
                     </td>
                     <td onClick={ this.itemClicked } >{ helper.getName(item) }</td>
-                    <td onClick={ this.itemClicked } >{ helper.getDescription(item) }</td>
-                    <td onClick={ this.itemClicked } >{ helper.getCreationDate(item) }</td>
-                    <td onClick={ this.itemClicked } >{ helper.getUpdateDate(item) }</td>
+                    <td onClick={ this.itemClicked } title={ helper.getDescription(item) }>{ helper.getDescription(item, true) }</td>
+                    <td onClick={ this.itemClicked } title={helper.getCreationDate(item)}>{ helper.getCreationDate(item, true) }</td>
+                    <td onClick={ this.itemClicked } title={helper.getUpdateDate(item)}>{ helper.getUpdateDate(item, true) }</td>
                     <td>
                       <IconActionList actions={ helper.getActions(item) } onAction={ this.itemClicked } />
                     </td>

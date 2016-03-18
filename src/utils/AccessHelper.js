@@ -1,6 +1,8 @@
 import Workflow from '../workflows';
 import style from 'HPCCloudStyle/Theme.mcss';
 
+const SHORT_DESCRIPTION_SIZE = 80;
+
 export const ProjectHelper = {
 
   getIcon(project) {
@@ -13,16 +15,33 @@ export const ProjectHelper = {
     return project.name;
   },
 
-  getDescription(project) {
+  getDescription(project, short = false) {
+    if (short && project.description.length > SHORT_DESCRIPTION_SIZE) {
+      return `${project.description.substring(0, SHORT_DESCRIPTION_SIZE)}...`;
+    }
     return project.description;
   },
 
-  getCreationDate(project) {
-    return new Date(Date.parse(project.created)).toUTCString();
+  getCreationDate(project, short = false) {
+    const str = `${new Date(Date.parse(project.created)).toUTCString()}`;
+    if (short) {
+      const dateList = str.split(' ');
+      dateList.pop(); // remove time zone
+      dateList.pop(); // remove hh:mm:ss
+      return dateList.join(' ');
+    }
+    return str;
   },
 
-  getUpdateDate(project) {
-    return new Date(Date.parse(project.updated)).toUTCString();
+  getUpdateDate(project, short = false) {
+    const str = `${new Date(Date.parse(project.updated)).toUTCString()}`;
+    if (short) {
+      const dateList = str.split(' ');
+      dateList.pop(); // remove time zone
+      dateList.pop(); // remove hh:mm:ss
+      return dateList.join(' ');
+    }
+    return str;
   },
 
   getActions(project) {
@@ -57,16 +76,33 @@ export const SimulationHelper = {
     return simulation.name;
   },
 
-  getDescription(simulation) {
+  getDescription(simulation, short = false) {
+    if (short && simulation.description.length > SHORT_DESCRIPTION_SIZE) {
+      return `${simulation.description.substring(0, SHORT_DESCRIPTION_SIZE)}...`;
+    }
     return simulation.description;
   },
 
-  getCreationDate(simulation) {
-    return new Date(Date.parse(simulation.created)).toUTCString();
+  getCreationDate(simulation, short = false) {
+    const str = `${new Date(Date.parse(simulation.created)).toUTCString()}`;
+    if (short) {
+      const dateList = str.split(' ');
+      dateList.pop(); // remove time zone
+      dateList.pop(); // remove hh:mm:ss
+      return dateList.join(' ');
+    }
+    return str;
   },
 
-  getUpdateDate(simulation) {
-    return new Date(Date.parse(simulation.updated)).toUTCString();
+  getUpdateDate(simulation, short = false) {
+    const str = `${new Date(Date.parse(simulation.updated)).toUTCString()}`;
+    if (short) {
+      const dateList = str.split(' ');
+      dateList.pop(); // remove time zone
+      dateList.pop(); // remove hh:mm:ss
+      return dateList.join(' ');
+    }
+    return str;
   },
 
   getActions(simulation) {
