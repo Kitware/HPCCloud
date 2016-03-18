@@ -71,10 +71,19 @@ export default React.createClass({
     const taskFlowName = wfModule.taskFlows && wfModule.taskFlows[step] ? wfModule.taskFlows[step] : null;
 
     const view = this.props.location.query.view || this.state.simulation.steps[step].view || 'default';
-    const childComponent = tools[view] || wfModule.components.ViewSimulation;
+    const ChildComponent = tools[view] || wfModule.components.ViewSimulation;
 
-    if (childComponent) {
-      return (<div>{ React.createElement(childComponent, { project, simulation, step, view, taskFlowName, location: this.props.location }) }</div>);
+    if (ChildComponent) {
+      return (
+        <ChildComponent
+          project={project}
+          simulation={simulation}
+          step={step}
+          view={view}
+          taskFlowName={taskFlowName}
+          location={this.props.location}
+          module={wfModule}
+        />);
     }
 
     return <center>No simulation view for simulation of type {project.type}.</center>;

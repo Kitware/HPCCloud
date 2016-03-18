@@ -91,7 +91,7 @@ export default React.createClass({
         accessHelper={ SimulationHelper }
         items={ this.state.simulations }
         onAction={ this.onAction }
-        title="Simulations"
+        title={ `${this.state.project.name} / Simulations` }
       />);
   },
 });
