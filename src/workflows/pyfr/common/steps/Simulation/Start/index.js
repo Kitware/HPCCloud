@@ -112,6 +112,7 @@ export default React.createClass({
       .then((resp) =>
         client.updateSimulationStep(this.props.simulation._id, 'Simulation', {
           view: 'run',
+          status: 'running',
           metadata: {
             taskflowId,
             sessionId,

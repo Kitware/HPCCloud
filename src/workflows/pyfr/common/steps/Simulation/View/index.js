@@ -64,12 +64,18 @@ export default React.createClass({
 
       // some running -> terminate
       if (pkt.jobs.every(job => job.status === 'terminated')) {
+        client.updateSimulationStep(this.props.simulation._id, 'Simulation', {
+          status: 'created',
+        });
         actions.push(ACTIONS.rerun);
       } else if (!allComplete && (pkt.jobs.length + pkt.tasks.length) > 0) {
         actions.push(ACTIONS.terminate);
       // every job complete && task complete -> visualize
       } else if (allComplete) {
         actions.push(ACTIONS.visualize);
+        client.updateSimulationStep(this.props.simulation._id, 'Simulation', {
+          status: 'complete',
+        });
       // every terminated -> rerun
       }
 
