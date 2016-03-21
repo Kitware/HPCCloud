@@ -2,11 +2,14 @@
 .colorLightGrey {
     color: #eee;
 }
-.colorGrey {
+.colorBlue {
     color: #18e;
 }
 .colorGreen {
     color: #4ecdc4;
+}
+.colorYellow {
+    color: #fff223;
 }
 .colorLightGreen {
     color: #c8f363;
@@ -132,24 +135,28 @@
     composes: fa            from 'font-awesome/css/font-awesome.css';
     composes: fa-fw         from 'font-awesome/css/font-awesome.css';
     composes: fa-rocket     from 'font-awesome/css/font-awesome.css';
+    composes: colorGreen;
 }
 
 .simulationErrorIcon {
     composes: fa            from 'font-awesome/css/font-awesome.css';
     composes: fa-fw         from 'font-awesome/css/font-awesome.css';
     composes: fa-warning    from 'font-awesome/css/font-awesome.css';
+    composes: colorYellow;
 }
 
 .simulationTerminateIcon {
     composes: fa            from 'font-awesome/css/font-awesome.css';
     composes: fa-fw         from 'font-awesome/css/font-awesome.css';
     composes: fa-ban        from 'font-awesome/css/font-awesome.css';
+    composes: colorRed;
 }
 
 .simulationDoneIcon {
     composes: fa            from 'font-awesome/css/font-awesome.css';
     composes: fa-fw         from 'font-awesome/css/font-awesome.css';
     composes: fa-database   from 'font-awesome/css/font-awesome.css';
+    composes: colorBlue;
 }
 
 /* breadcrumb icons */
