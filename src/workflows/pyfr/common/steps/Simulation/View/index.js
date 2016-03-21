@@ -60,17 +60,31 @@ export default React.createClass({
     this.subscription = TaskflowManager.monitorTaskflow(taskflowId, (pkt) => {
       const actions = [];
       var primaryJobOutput = '';
+      var simNeedsUpdate = false;
       var allComplete = pkt.jobs.every(job => job.status === 'complete') && pkt.tasks.every(task => task.status === 'complete');
 
-      // some running -> terminate
+      // every terminated -> rerun
       if (pkt.jobs.every(job => job.status === 'terminated')) {
+        this.props.simulation.metadata.status = 'terminated';
         actions.push(ACTIONS.rerun);
+        simNeedsUpdate = true;
+      // some running -> terminate
       } else if (!allComplete && (pkt.jobs.length + pkt.tasks.length) > 0) {
+        this.props.simulation.metadata.status = 'running';
         actions.push(ACTIONS.terminate);
+        simNeedsUpdate = true;
       // every job complete && task complete -> visualize
       } else if (allComplete) {
+        this.props.simulation.metadata.status = 'complete';
         actions.push(ACTIONS.visualize);
-      // every terminated -> rerun
+        simNeedsUpdate = true;
+      }
+
+      if (simNeedsUpdate) {
+        client.saveSimulation(this.props.simulation)
+          .then(resp => {
+            client.invalidateSimulation(resp);
+          });
       }
 
       for (let i = 0; i < pkt.jobs.length; i++) {

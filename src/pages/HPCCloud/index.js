@@ -1,10 +1,11 @@
 import React    from 'react';
 import { Link } from 'react-router';
 import client   from '../../network';
+import SvgIconWidget from 'paraviewweb/src/React/Widgets/SvgIconWidget';
 
-import state    from 'HPCCloudStyle/States.mcss';
 import theme    from 'HPCCloudStyle/Theme.mcss';
 import layout   from 'HPCCloudStyle/Layout.mcss';
+import logo     from 'HPCCloudStyle/logo.svg';
 
 export default React.createClass({
 
@@ -65,8 +66,10 @@ export default React.createClass({
     return (
       <div className={ layout.verticalFlexContainer }>
         <div className={ theme.topBar } style={{ position: 'relative' }}>
-            <div className={ this.state.isBusy ? state.isBusy : '' }>
-                <Link to="/"><i className={ theme.hpcCloudIcon }></i>+HPC</Link>
+            <div className={(this.state.isBusy ? theme.hpcCloudBusyIcon : theme.hpcCloudIcon)}>
+                <Link to="/">
+                  <SvgIconWidget icon={logo} height="2.4em" width="70px" />
+                </Link>
             </div>
 
             <div className={ theme.progressBar }

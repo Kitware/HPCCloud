@@ -73,6 +73,7 @@ export default React.createClass({
         var newSim = deepClone(this.props.simulation);
         newSim.steps[this.props.step].view = 'run';
         newSim.steps[this.props.step].metadata = metadata;
+        newSim.metadata.status = 'running';
         client.invalidateSimulation(newSim);
 
         this.context.router.replace({
@@ -80,6 +81,8 @@ export default React.createClass({
           query: merge(this.props.location.query, { view: 'run' }),
           state: this.props.location.state,
         });
+
+        client.saveSimulation(newSim);
       })
       .catch((error) => {
         var msg = error.data && error.data.message ? error.data.message : error;

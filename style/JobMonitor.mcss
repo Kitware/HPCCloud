@@ -63,6 +63,12 @@
     color: #aaa;
 }
 
+.refreshIcon {
+    composes: fa     from 'font-awesome/css/font-awesome.css';
+    composes: fa-refresh from 'font-awesome/css/font-awesome.css';
+    cursor: pointer;
+}
+
 .hidden {
     display: none;
 }

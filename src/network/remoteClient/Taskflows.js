@@ -19,6 +19,10 @@ export function deleteTaskflow(id) {
   return girder.deleteTaskflow(id);
 }
 
+export function getTaskflowLog(id, offset = 0) {
+  return girder.getTaskflowLog(id, offset);
+}
+
 // PUT /taskflows/{id}/start Start the taskflow
 export function startTaskflow(id, cluster) {
   return girder.startTaskflow(id, cluster);

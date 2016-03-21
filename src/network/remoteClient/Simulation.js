@@ -73,6 +73,7 @@ export function saveSimulation(simulation_, attachments) {
       .then((resp) => {
         const inputFolder = resp.data._id;
         simulation.metadata = {
+          status: 'created',
           inputFolder: {
             _id: inputFolder,
             files: {},

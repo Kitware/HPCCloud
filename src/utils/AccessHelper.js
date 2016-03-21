@@ -63,13 +63,16 @@ export const ProjectHelper = {
 const SIMULATIONS_ICONS = {
   created: style.simulationEditIcon,
   running: style.simulationRunningIcon,
+  error: style.simulationErrorIcon,
+  terminated: style.simulationTerminateIcon,
   complete: style.simulationDoneIcon,
 };
 
 export const SimulationHelper = {
 
   getIcon(simulation) {
-    return { icon: SIMULATIONS_ICONS[simulation.steps[simulation.active].status] };
+    console.log(simulation.metadata.status);
+    return { icon: SIMULATIONS_ICONS[simulation.metadata.status] };
   },
 
   getName(simulation) {

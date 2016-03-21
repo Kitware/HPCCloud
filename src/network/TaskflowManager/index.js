@@ -161,6 +161,10 @@ export function unmonitorTaskflow(id) {
   delete taskflows[id];
 }
 
+export function getTaskflowLog(id, offset = 0) {
+  return client.getTaskflowLog(id, offset);
+}
+
 export function terminateTaskflow(id) {
   return client.endTaskflow(id);
 }
@@ -173,6 +177,7 @@ export function deleteTaskflow(id) {
 export default {
   monitorTaskflow,
   unmonitorTaskflow,
+  getTaskflowLog,
   terminateTaskflow,
   deleteTaskflow,
 };
