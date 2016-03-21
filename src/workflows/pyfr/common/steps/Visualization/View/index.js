@@ -38,28 +38,39 @@ export default React.createClass({
   },
 
   componentWillMount() {
-    const taskflowId = this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId;
+    const taskflowId = this.props.simulation.steps.Simulation.metadata.taskflowId;
     this.setState({ taskflowId });
 
     this.subscription = TaskflowManager.monitorTaskflow(taskflowId, (pkt) => {
       const actions = [];
+      var simNeedsUpdate = false;
+      var allComplete = pkt.jobs.every(job => job.status === 'complete') && pkt.tasks.every(task => task.status === 'complete');
 
-      // name is paraview and status is running -> visualize
-      if (pkt.jobs.some(job => job.name === 'paraview' && job.status === 'running')) {
-        actions.push(ACTIONS.visualize);
+      // some running -> rerun
+      if (!allComplete && (pkt.jobs.length + pkt.tasks.length) > 0) {
+        this.props.simulation.metadata.status = 'terminated';
+        actions.push(ACTIONS.terminate);
+        simNeedsUpdate = true;
+      } else if (!allComplete && (pkt.jobs.length + pkt.tasks.length) > 0) {
+        this.props.simulation.metadata.status = 'running';
+        actions.push(ACTIONS.terminate);
+        simNeedsUpdate = true;
+      // every job complete && task complete -> rerun
+      } else if (allComplete || pkt.jobs.every(job => job.status === 'terminated')) {
+        this.props.simulation.metadata.status = 'complete';
+        actions.push(ACTIONS.rerun);
+        simNeedsUpdate = true;
       }
 
-      // some running -> terminate
-      if (pkt.jobs.some(job => job.status === 'running')) {
-        actions.push(ACTIONS.terminate);
-      // every status complete || terminated -> rerun
-      } else if (pkt.jobs.every(job => job.status === 'complete') ||
-          pkt.jobs.every(job => job.status === 'terminated')) {
-        actions.push(ACTIONS.rerun);
+      if (simNeedsUpdate) {
+        client.saveSimulation(this.props.simulation)
+          .then(resp => {
+            client.invalidateSimulation(resp);
+          });
       }
 
       // Refresh ui
-      this.setState({ actions });
+      this.setState({ actions, allComplete });
     });
   },
 

@@ -112,7 +112,6 @@ export default React.createClass({
       .then((resp) =>
         client.updateSimulationStep(this.props.simulation._id, 'Simulation', {
           view: 'run',
-          status: 'running',
           metadata: {
             taskflowId,
             sessionId,
@@ -124,8 +123,11 @@ export default React.createClass({
         var newSim = deepClone(this.props.simulation);
         newSim.steps.Simulation.view = 'run';
         newSim.steps.Simulation.metadata = {
-          taskflowId, sessionId, cluster: clusterName,
+          taskflowId,
+          sessionId,
+          cluster: clusterName,
         };
+        newSim.metadata.status = 'running';
         client.invalidateSimulation(newSim);
 
         this.context.router.replace({
@@ -135,9 +137,12 @@ export default React.createClass({
           }),
           state: this.props.location.state,
         });
+
+        client.saveSimulation(newSim);
       })
       .catch((error) => {
-        this.setState({ error: error.data.message });
+        var msg = error.data && error.data.message ? error.data.message : error;
+        this.setState({ error: msg });
       });
   },
 

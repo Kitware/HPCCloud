@@ -121,6 +121,7 @@
     composes: fa-pencil     from 'font-awesome/css/font-awesome.css';
 }
 
+/* Simulation icons */
 .simulationEditIcon {
     composes: fa            from 'font-awesome/css/font-awesome.css';
     composes: fa-fw         from 'font-awesome/css/font-awesome.css';
@@ -133,12 +134,25 @@
     composes: fa-rocket     from 'font-awesome/css/font-awesome.css';
 }
 
+.simulationErrorIcon {
+    composes: fa            from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
+    composes: fa-warning    from 'font-awesome/css/font-awesome.css';
+}
+
+.simulationTerminateIcon {
+    composes: fa            from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
+    composes: fa-ban        from 'font-awesome/css/font-awesome.css';
+}
+
 .simulationDoneIcon {
     composes: fa            from 'font-awesome/css/font-awesome.css';
     composes: fa-fw         from 'font-awesome/css/font-awesome.css';
     composes: fa-database   from 'font-awesome/css/font-awesome.css';
 }
 
+/* breadcrumb icons */
 .breadCrumbIcon {
     composes: fa        from 'font-awesome/css/font-awesome.css';
     composes: fa-fw     from 'font-awesome/css/font-awesome.css';
