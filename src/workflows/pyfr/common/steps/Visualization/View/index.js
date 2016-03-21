@@ -38,7 +38,7 @@ export default React.createClass({
   },
 
   componentWillMount() {
-    const taskflowId = this.props.simulation.steps.Simulation.metadata.taskflowId;
+    const taskflowId = this.props.simulation.steps.Visualization.metadata.taskflowId;
     this.setState({ taskflowId });
 
     this.subscription = TaskflowManager.monitorTaskflow(taskflowId, (pkt) => {
@@ -46,12 +46,13 @@ export default React.createClass({
       var simNeedsUpdate = false;
       var allComplete = pkt.jobs.every(job => job.status === 'complete') && pkt.tasks.every(task => task.status === 'complete');
 
-      // some running -> rerun
+      // name is paraview and status is running -> visualize
+      if (pkt.jobs.some(job => job.name === 'paraview' && job.status === 'running')) {
+        actions.push(ACTIONS.visualize);
+      }
+
+      // jobs are still running -> terminate
       if (!allComplete && (pkt.jobs.length + pkt.tasks.length) > 0) {
-        this.props.simulation.metadata.status = 'terminated';
-        actions.push(ACTIONS.terminate);
-        simNeedsUpdate = true;
-      } else if (!allComplete && (pkt.jobs.length + pkt.tasks.length) > 0) {
         this.props.simulation.metadata.status = 'running';
         actions.push(ACTIONS.terminate);
         simNeedsUpdate = true;
