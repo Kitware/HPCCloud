@@ -11,6 +11,10 @@ const ACTIONS = {
   rerun: { name: 'deleteTaskflow', label: 'New visualization', icon: '' },
 };
 
+function getActions(actionsList, disabled) {
+  return actionsList.map((action) => Object.assign({ disabled }, ACTIONS[action]));
+}
+
 export default React.createClass({
   displayName: 'pvw/view-visualization',
 
@@ -32,8 +36,9 @@ export default React.createClass({
       taskflowId: '',
       error: '',
       actions: [
-        ACTIONS.terminate,
+        'terminate',
       ],
+      actionsDisabled: false,
     };
   },
 
@@ -43,23 +48,38 @@ export default React.createClass({
 
     this.subscription = TaskflowManager.monitorTaskflow(taskflowId, (pkt) => {
       const actions = [];
+      var simNeedsUpdate = false;
+      var actionsDisabled = this.state.actionsDisabled;
+      var allComplete = pkt.jobs.every(job => job.status === 'complete') && pkt.tasks.every(task => task.status === 'complete');
 
       // name is paraview and status is running -> visualize
       if (pkt.jobs.some(job => job.name === 'paraview' && job.status === 'running')) {
-        actions.push(ACTIONS.visualize);
+        actions.push('visualize');
       }
 
-      // some running -> terminate
-      if (pkt.jobs.some(job => job.status === 'running')) {
-        actions.push(ACTIONS.terminate);
       // every status complete || terminated -> rerun
-      } else if (pkt.jobs.every(job => job.status === 'complete') ||
+      if (pkt.jobs.every(job => job.status === 'complete') ||
           pkt.jobs.every(job => job.status === 'terminated')) {
-        actions.push(ACTIONS.rerun);
+        this.props.simulation.metadata.status = 'terminated';
+        actions.push('rerun');
+        simNeedsUpdate = true;
+        actionsDisabled = false;
+      // some running -> terminate
+      } else if (!allComplete && (pkt.jobs.length + pkt.tasks.length) > 0 && !pkt.jobs.some(job => job.status === 'terminating')) {
+        this.props.simulation.metadata.status = 'running';
+        actions.push('terminate');
+        simNeedsUpdate = true;
+      }
+
+      if (simNeedsUpdate) {
+        client.saveSimulation(this.props.simulation)
+          .then(resp => {
+            client.invalidateSimulation(resp);
+          });
       }
 
       // Refresh ui
-      this.setState({ actions });
+      this.setState({ actions, actionsDisabled });
     });
   },
 
@@ -83,6 +103,7 @@ export default React.createClass({
   },
 
   terminateTaskflow() {
+    this.setState({ actionsDisabled: true });
     TaskflowManager.terminateTaskflow(this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId);
   },
 
@@ -113,7 +134,7 @@ export default React.createClass({
           <section>
               <ButtonBar
                 onAction={ this.onAction }
-                actions={ this.state.actions }
+                actions={ getActions(this.state.actions, this.state.actionsDisabled)}
                 error={this.state.error}
               />
           </section>

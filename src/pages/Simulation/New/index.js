@@ -6,6 +6,13 @@ import client       from '../../../network';
 
 import breadCrumbStyle from 'HPCCloudStyle/Theme.mcss';
 
+function getActions(disabled) {
+  return [
+    { name: 'cancel', label: 'Cancel', disabled },
+    { name: 'newSimulation', label: 'Create simulation', disabled },
+  ];
+}
+
 export default React.createClass({
 
   displayName: 'Simulation/New',
@@ -21,6 +28,7 @@ export default React.createClass({
   getInitialState() {
     return {
       project: null,
+      buttonsDisabled: false,
     };
   },
 
@@ -58,14 +66,21 @@ export default React.createClass({
       active = stepsInfo._active || stepsInfo._order[0],
       simulation = { name, description, steps, metadata, projectId, active, disabled };
 
+    if (name.length === 0) {
+      this.setState({ _error: 'Name is required' });
+      return;
+    }
+
+    this.setState({ buttonsDisabled: true });
     client.saveSimulation(simulation, attachements)
       .then(resp => {
         if (resp.status >= 400) {
-          this.setState({ _error: resp.data.message });
+          this.setState({ _error: resp.data.message, buttonsDisabled: false });
           console.log('Error: Sim/New-save', resp.data.message);
           return;
         }
 
+        this.setState({ buttonsDisabled: false });
         const simId = Array.isArray(resp) ? resp[resp.length - 1]._id : resp._id;
         this.context.router.replace(`/View/Simulation/${simId}`);
       })
@@ -99,10 +114,7 @@ export default React.createClass({
         error={this.state._error}
         ref="container"
         title="New Simulation"
-        actions={[
-          { name: 'cancel', label: 'Cancel' },
-          { name: 'newSimulation', label: 'Create simulation' },
-        ]}
+        actions={ getActions(this.state.buttonsDisabled) }
         onAction={ this.onAction }
       >
       { workflowAddOn }

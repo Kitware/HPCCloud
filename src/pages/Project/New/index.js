@@ -45,6 +45,10 @@ export default React.createClass({
       metadata = data.metadata || {},
       project = { name, description, type, steps, metadata };
 
+    if (name.length === 0) {
+      this.setState({ _error: 'Name is required' });
+      return;
+    }
 
     client.saveProject(project, attachements)
       .then(resp => {

@@ -67,6 +67,7 @@ export default React.createClass({
         newSim.steps[this.props.step].metadata = {
           taskflowId, sessionId,
         };
+        newSim.metadata.status = 'running';
         client.invalidateSimulation(newSim);
 
         this.context.router.replace({
