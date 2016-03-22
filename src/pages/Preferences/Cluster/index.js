@@ -201,7 +201,6 @@ export default React.createClass({
   },
 
   testCluster() {
-    console.log('test');
     const cluster = this.state.clusters[this.state.active];
     this.setState({ actionsDisabled: true });
     if (cluster._id) {
