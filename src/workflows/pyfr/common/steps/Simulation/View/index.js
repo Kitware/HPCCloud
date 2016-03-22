@@ -25,6 +25,10 @@ const ACTIONS = {
   },
 };
 
+function getActions(actionsList, disabled) {
+  return actionsList.map((action) => Object.assign({ disabled }, ACTIONS[action]));
+}
+
 export default React.createClass({
   displayName: 'pyfr/common/steps/Simulation/View',
 
@@ -48,8 +52,9 @@ export default React.createClass({
       error: '',
       primaryJobOutput: '',
       actions: [
-        ACTIONS.terminate,
+        'terminate',
       ],
+      actionsDisabled: false,
     };
   },
 
@@ -61,22 +66,24 @@ export default React.createClass({
       const actions = [];
       var primaryJobOutput = '';
       var simNeedsUpdate = false;
+      var actionsDisabled = this.state.actionsDisabled;
       var allComplete = pkt.jobs.every(job => job.status === 'complete') && pkt.tasks.every(task => task.status === 'complete');
 
       // every terminated -> rerun
       if (pkt.jobs.every(job => job.status === 'terminated')) {
         this.props.simulation.metadata.status = 'terminated';
-        actions.push(ACTIONS.rerun);
+        actions.push('rerun');
         simNeedsUpdate = true;
+        actionsDisabled = false;
       // some running -> terminate
       } else if (!allComplete && (pkt.jobs.length + pkt.tasks.length) > 0) {
         this.props.simulation.metadata.status = 'running';
-        actions.push(ACTIONS.terminate);
+        actions.push('terminate');
         simNeedsUpdate = true;
       // every job complete && task complete -> visualize
       } else if (allComplete) {
         this.props.simulation.metadata.status = 'complete';
-        actions.push(ACTIONS.visualize);
+        actions.push('visualize');
         simNeedsUpdate = true;
       }
 
@@ -95,7 +102,7 @@ export default React.createClass({
       }
 
       // Refresh ui
-      this.setState({ actions, primaryJobOutput, allComplete });
+      this.setState({ actions, primaryJobOutput, allComplete, actionsDisabled });
     });
   },
 
@@ -131,6 +138,7 @@ export default React.createClass({
   },
 
   terminateTaskflow() {
+    this.setState({ actionsDisabled: true });
     TaskflowManager.terminateTaskflow(this.props.simulation.steps.Simulation.metadata.taskflowId);
   },
 
@@ -168,7 +176,7 @@ export default React.createClass({
         <section>
             <ButtonBar
               onAction={ this.onAction }
-              actions={ this.state.actions }
+              actions={ getActions(this.state.actions, this.state.actionsDisabled) }
               error={this.state.error}
             />
         </section>

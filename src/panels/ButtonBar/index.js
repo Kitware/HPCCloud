@@ -44,6 +44,7 @@ export default React.createClass({
               key={action.name}
               data-action={action.name}
               onClick={this.onAction}
+              disabled={action.disabled}
             >
               { action.label } <i className={ action.icon }></i>
             </button>
