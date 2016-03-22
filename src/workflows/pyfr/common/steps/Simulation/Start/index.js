@@ -87,6 +87,7 @@ export default React.createClass({
 
     client.createTaskflow(this.props.taskFlowName)
       .then((resp) => {
+        taskflowId = resp.data._id;
         const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
         return client.startTaskflow(taskflowId, Object.assign({},
           this.state[this.state.serverType].runtime || {},

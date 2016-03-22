@@ -40,6 +40,20 @@ function applyPreset(obj, name) {
   }
 }
 
+function getActions(disabled, test) {
+  if (test) {
+    return [
+      { name: 'removeItem', label: 'Delete', icon: style.deleteIcon, disabled },
+      { name: 'saveItem', label: 'Save', icon: style.saveIcon, disabled },
+      { name: 'testCluster', label: 'Test', icon: style.testIcon, disabled },
+    ];
+  }
+  return [
+    { name: 'removeItem', label: 'Delete', icon: style.deleteIcon, disabled },
+    { name: 'saveItem', label: 'Save', icon: style.saveIcon, disabled },
+  ];
+}
+
 // Fetch cluster preferences only once
 client.getClusterPresets()
   .then(
@@ -90,6 +104,7 @@ export default React.createClass({
     return {
       active: 0,
       clusters: [],
+      buttonsDisabled: false,
     };
   },
 
@@ -156,10 +171,15 @@ export default React.createClass({
 
     console.log('about to remove?', clusterToDelete._id);
     if (clusterToDelete._id && confirm('Are you sure you want to delete this cluster?')) {
+      this.setState({ active: newActive, actionsDisabled: true });
       client.deleteCluster(clusterToDelete._id)
-        .then(resp => this.updateState())
+        .then(resp => {
+          this.setState({ actionsDisabled: false });
+          this.updateState();
+        })
         .catch(err => {
           console.log('Error deleting cluster', err);
+          this.setState({ actionsDisabled: false });
           this.updateState();
         });
     }
@@ -168,14 +188,14 @@ export default React.createClass({
   saveItem() {
     const clusters = this.state.clusters;
     const cluster = clusters[this.state.active];
-
+    this.setState({ actionsDisabled: true });
     client.saveCluster(cluster)
       .then(resp => {
         clusters[this.state.active] = resp.data;
-        this.setState({ error: null, clusters });
+        this.setState({ error: null, clusters, actionsDisabled: false });
       })
       .catch(err => {
-        this.setState({ error: err.data.message });
+        this.setState({ error: err.data.message, actionsDisabled: false });
         console.log('Error: Pref/Cluster/save', err);
       });
   },
@@ -183,12 +203,15 @@ export default React.createClass({
   testCluster() {
     console.log('test');
     const cluster = this.state.clusters[this.state.active];
+    this.setState({ actionsDisabled: true });
     if (cluster._id) {
       client.testCluster(cluster._id)
         .then(resp => {
+          this.setState({ actionsDisabled: false });
           console.log('success test', resp.data);
         })
         .catch(err => {
+          this.setState({ actionsDisabled: false });
           console.log('error test', err);
         });
     }
@@ -200,14 +223,6 @@ export default React.createClass({
 
   render() {
     const activeData = this.state.active < this.state.clusters.length ? this.state.clusters[this.state.active] : null;
-    const actions = [
-      { name: 'removeItem', label: 'Delete', icon: style.deleteIcon },
-      { name: 'saveItem', label: 'Save', icon: style.saveIcon },
-    ];
-
-    if (activeData && activeData.config.ssh.publicKey && activeData.status !== 'running') {
-      actions.push({ name: 'testCluster', label: 'Test', icon: style.testIcon });
-    }
 
     updateClusterStatusAsClassPrefix(this.state.clusters);
     return (
@@ -234,7 +249,7 @@ export default React.createClass({
               visible={!!activeData}
               onAction={ this.formAction }
               error={ this.state.error }
-              actions={actions}
+              actions={getActions(this.state.buttonsDisabled, activeData && activeData.config.ssh.publicKey && activeData.status !== 'running')}
             />
           </div>
         </div>

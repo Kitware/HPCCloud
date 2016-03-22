@@ -76,7 +76,7 @@ export default React.createClass({
         simNeedsUpdate = true;
         actionsDisabled = false;
       // some running -> terminate
-      } else if (!allComplete && (pkt.jobs.length + pkt.tasks.length) > 0) {
+      } else if (!allComplete && (pkt.jobs.length + pkt.tasks.length) > 0 && !pkt.jobs.some(job => job.status === 'terminating')) {
         this.props.simulation.metadata.status = 'running';
         actions.push('terminate');
         simNeedsUpdate = true;
