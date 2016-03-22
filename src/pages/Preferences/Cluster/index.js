@@ -1,5 +1,6 @@
 import client           from '../../../network';
 import ClusterForm      from './ClusterForm';
+import { setPathTo }    from '../../../utils/Helper';
 import deepClone        from 'mout/src/lang/deepClone';
 import ActiveList       from '../../../panels/ActiveList';
 import Toolbar          from '../../../panels/Toolbar';
@@ -9,6 +10,7 @@ import { breadcrumb }   from '..';
 
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
+var clusterPresets = {};
 const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 1 });
 
 const STATUS_TO_ICON = {
@@ -28,6 +30,25 @@ function updateClusterStatusAsClassPrefix(clusters) {
     cluster.classPrefix = STATUS_TO_ICON[cluster.status];
   });
 }
+
+function applyPreset(obj, name) {
+  const config = clusterPresets ? clusterPresets[name] : null;
+  if (config) {
+    Object.keys(config).forEach(key => {
+      setPathTo(obj, key, config[key]);
+    });
+  }
+}
+
+// Fetch cluster preferences only once
+client.getClusterPresets()
+  .then(
+    presets => {
+      clusterPresets = presets.data;
+    },
+    error => {
+      console.log('Error fetching presets', error);
+    });
 
 /* eslint-disable no-alert */
 export default React.createClass({
@@ -110,6 +131,12 @@ export default React.createClass({
       newItem = deepClone(this.props.clusterTemplate);
     newItem.idx = clusters.length;
     clusters.push(newItem);
+
+    // FIXME
+    const profileNames = Object.keys(clusterPresets);
+    applyPreset(newItem, profileNames[Math.floor(profileNames.length * Math.random())]);
+    // FIXME
+
     this.setState({ clusters, active: clusters.length - 1 });
   },
 
