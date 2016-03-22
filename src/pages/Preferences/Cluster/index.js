@@ -5,6 +5,7 @@ import deepClone        from 'mout/src/lang/deepClone';
 import ActiveList       from '../../../panels/ActiveList';
 import Toolbar          from '../../../panels/Toolbar';
 import ButtonBar        from '../../../panels/ButtonBar';
+import PresetSelector   from '../PresetSelector';
 import React            from 'react';
 import { breadcrumb }   from '..';
 
@@ -141,16 +142,17 @@ export default React.createClass({
     this.setState({ active });
   },
 
+  presetChange(presetName) {
+    console.log(presetName);
+    applyPreset(this.state.clusters[this.state.active], presetName);
+    this.forceUpdate();
+  },
+
   addItem() {
     var clusters = this.state.clusters,
       newItem = deepClone(this.props.clusterTemplate);
     newItem.idx = clusters.length;
     clusters.push(newItem);
-
-    // FIXME
-    const profileNames = Object.keys(clusterPresets);
-    applyPreset(newItem, profileNames[Math.floor(profileNames.length * Math.random())]);
-    // FIXME
 
     this.setState({ clusters, active: clusters.length - 1 });
   },
@@ -249,7 +251,13 @@ export default React.createClass({
               onAction={ this.formAction }
               error={ this.state.error }
               actions={getActions(this.state.buttonsDisabled, activeData && activeData.config.ssh.publicKey && activeData.status !== 'running')}
-            />
+            >
+              <PresetSelector
+                contents={Object.keys(clusterPresets)}
+                onChange={this.presetChange}
+                value={''}
+              />
+            </ButtonBar>
           </div>
         </div>
       </div>);

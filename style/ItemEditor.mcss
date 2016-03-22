@@ -33,6 +33,7 @@ textarea.input {
 
 .buttonGroup {
     composes: rightRow from './Layout.mcss';
+    justify-content: space-between;
     padding: 10px 20px;
 }
 
