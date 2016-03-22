@@ -1,0 +1,54 @@
+{
+  "Beast": {
+    "config.host": "beast",
+    "config.ssh.user": "kitware",
+    "config.jobOutputDir": "/data/kitware/hpc-cloud-jobs",
+    "config.scheduler": {
+      "type": "sge",
+      "maxWallTime": { "hours": 0, "minutes": 0, "seconds": 0 },
+      "defaultQueue": "",
+      "sge": {
+        "numberOfGpusPerNode": 1,
+        "numberOfSlots": 32
+      }
+    },
+    "config.paraview.installDir": "/data/kitware/opt/paraview",
+    "config.pyfr.cuda": true,
+    "config.pyfr.opencl": [],
+    "config.pyfr.openmp": [
+      {
+        "name": "Default",
+        "cc": "",
+        "cflags": "",
+        "cblas": "/usr/lib/libblas/libblas.so",
+        "cblas-type": ""
+      }
+    ]
+  },
+  "Ulmus": {
+    "config.host": "ulmus",
+    "config.ssh.user": "test",
+    "config.jobOutputDir": "/home/test",
+    "config.scheduler": {
+      "type": "sge",
+      "maxWallTime": { "hours": 0, "minutes": 0, "seconds": 0 },
+      "defaultQueue": "",
+      "sge": {
+        "numberOfGpusPerNode": 1,
+        "numberOfSlots": 32
+      }
+    },
+    "config.paraview.installDir": "/opt/paraview",
+    "config.pyfr.cuda": true,
+    "config.pyfr.opencl": [],
+    "config.pyfr.openmp": [
+      {
+        "name": "Default",
+        "cc": "",
+        "cflags": "",
+        "cblas": "/usr/lib/libblas/libblas.so",
+        "cblas-type": ""
+      }
+    ]
+  }
+}
