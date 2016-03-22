@@ -8,6 +8,7 @@ export default React.createClass({
 
   propTypes: {
     actions: React.PropTypes.array,
+    children: React.PropTypes.object,
     error: React.PropTypes.string,
     onAction: React.PropTypes.func,
     visible: React.PropTypes.bool,
@@ -33,11 +34,13 @@ export default React.createClass({
 
     return (
       <div className={ editor.buttonGroup }>
-        <span></span>
-        <span className={ (this.props.error ? editor.errorBox : states.isHidden) }>
-          { this.props.error }
+        <span>
+          { this.props.children }
         </span>
         <div>
+          <span className={ (this.props.error ? editor.errorBox : states.isHidden) }>
+            { this.props.error }
+          </span>
           { this.props.actions.map(action =>
             <button
               className={ editor.button }
