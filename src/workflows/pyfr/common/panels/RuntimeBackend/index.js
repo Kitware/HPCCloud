@@ -13,6 +13,7 @@ export default React.createClass({
   displayName: 'pyfr-exec/RuntimeBackend',
 
   propTypes: {
+    visible: React.PropTypes.bool,
     onChange: React.PropTypes.func,
     profiles: React.PropTypes.object,
   },
@@ -102,6 +103,10 @@ export default React.createClass({
   },
 
   render() {
+    if (!this.props.visible) {
+      return null;
+    }
+
     const profiles =
       this.props.profiles && this.props.profiles[this.state.type] && Array.isArray(this.props.profiles[this.state.type])
       ? this.props.profiles[this.state.type] : [];

@@ -10,6 +10,12 @@ import { breadcrumb }   from '..';
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
 const awsBreadCrumb = Object.assign({}, breadcrumb, { active: 2 });
+function getActions(disabled) {
+  return [
+    { name: 'removeItem', label: 'Delete', icon: style.deleteIcon, disabled },
+    { name: 'saveItem', label: 'Save', icon: style.saveIcon, disabled },
+  ];
+}
 
 /* eslint-disable no-alert */
 export default React.createClass({
@@ -37,17 +43,33 @@ export default React.createClass({
       active: 0,
       profiles: [],
       error: '',
+      actionsDisabled: false,
     };
   },
 
-  componentWillMount() {
+  componentDidMount() {
+    this.subscription = client.onAuthChange(this.updateState);
     this.updateState();
   },
 
+  componentWillUnmount() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = null;
+    }
+  },
+
   updateState() {
+    if (!client.getUser()) {
+      return;
+    }
     client.listAWSProfiles()
-      .then(resp => this.setState({ profiles: resp.data }))
-      .catch(err => console.log('Error: Pref/AWS/list', err));
+      .then(resp => {
+        this.setState({ profiles: resp.data });
+      })
+      .catch(err => {
+        console.log('Error: Pref/AWS/list', err);
+      });
   },
 
   changeItem(item) {
@@ -78,13 +100,17 @@ export default React.createClass({
     } else {
       newActive = this.state.active - 1;
     }
-    this.setState({ active: newActive });
 
     if (profileToDelete._id && confirm('Are you sure you want to delete this profile?')) {
+      this.setState({ active: newActive, actionsDisabled: true });
       client.deleteAWSProfile(profileToDelete._id)
-        .then(resp => this.updateState())
+        .then(resp => {
+          this.updateState();
+          this.setState({ actionsDisabled: false });
+        })
         .catch(err => {
-          console.log('Error deleting cluster', err);
+          console.log('Error deleting ec2 profile', err);
+          this.setState({ actionsDisabled: false });
           this.updateState();
         });
     }
@@ -93,14 +119,16 @@ export default React.createClass({
   saveItem() {
     const profiles = this.state.profiles;
     const aws = profiles[this.state.active];
-
+    this.setState({ actionsDisabled: true });
     client.saveAWSProfile(aws)
       .then(resp => {
-        aws._id = resp.data._id;
-        this.setState({ profiles, error: '' });
+        if (!aws._id) {
+          aws._id = resp.data._id;
+        }
+        this.setState({ profiles, error: '', actionsDisabled: false });
       })
       .catch(err => {
-        this.setState({ error: err.data.message });
+        this.setState({ error: err.data.message, actionsDisabled: false });
         console.log('Error: Pref/AWS/save', err);
       });
   },
@@ -136,10 +164,7 @@ export default React.createClass({
               visible={!!activeData}
               onAction={ this.formAction }
               error={ this.state.error }
-              actions={[
-                  { name: 'removeItem', label: 'Delete', icon: style.saveIcon },
-                  { name: 'saveItem', label: 'Save', icon: style.deleteIcon },
-              ]}
+              actions={getActions(this.state.actionsDisabled)}
             />
           </div>
         </div>
