@@ -29,15 +29,19 @@ export default React.createClass({
   updateState() {
     this.setState({ busy: true });
     client.listAWSProfiles()
-      .then(resp => this.setState({
-        profiles: resp.data,
-        busy: false,
-      }))
-      .catch(err => {
-        console.log('Error: Sim/RunEC2', err);
+      .then((resp) => {
         this.setState({
+          profiles: resp.data,
+          profile: resp.data[0],
           busy: false,
         });
+        if (this.props.onChange) {
+          this.props.onChange('profile', resp.data[0]._id, 'EC2');
+        }
+      })
+      .catch((err) => {
+        console.log('Error: Sim/RunEC2', err);
+        this.setState({ busy: false });
       });
   },
 
@@ -76,10 +80,10 @@ export default React.createClass({
           <section className={style.group}>
               <label className={style.label}>Profile:</label>
               <select
-                onChange={this.dataChange} className={style.input}
+                className={style.input}
+                onChange={this.dataChange}
                 data-key="profile"
                 value={this.props.contents.profle}
-                defaultValue={this.state.profiles[0].name}
               >
                 {this.state.profiles.map(optionMapper)}
               </select>

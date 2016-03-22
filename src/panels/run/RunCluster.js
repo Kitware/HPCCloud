@@ -45,21 +45,20 @@ export default React.createClass({
   updateState() {
     this.setState({ busy: true });
     client.listClusterProfiles()
-      .then(
-        resp => {
-          this.setState({
-            profiles: resp.data,
-            profile: resp.data[0],
-            busy: false,
-          });
-          if (this.props.onChange) {
-            this.props.onChange('profile', resp.data[0]._id, 'Traditional');
-          }
-        },
-        err => {
-          console.log('Error: Sim/RunCluster', err);
-          this.setState({ busy: false });
+      .then((resp) => {
+        this.setState({
+          profiles: resp.data,
+          profile: resp.data[0],
+          busy: false,
         });
+        if (this.props.onChange) {
+          this.props.onChange('profile', resp.data[0]._id, 'Traditional');
+        }
+      })
+      .catch((err) => {
+        console.log('Error: Sim/RunCluster', err);
+        this.setState({ busy: false });
+      });
   },
 
   dataChange(event) {

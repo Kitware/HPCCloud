@@ -38,7 +38,8 @@ export default React.createClass({
       EC2: defaultServerParameters.EC2,
       Traditional: defaultServerParameters.Traditional,
       OpenStack: defaultServerParameters.OpenStack,
-      clusters: {},
+      tradClusters: {},
+      ec2Clusters: {},
       backend: {},
       error: '',
     };
@@ -48,12 +49,23 @@ export default React.createClass({
     client.getCluster(clusterId)
       .then(
         cluster => {
-          const clusters = Object.assign({}, this.state.clusters, { [clusterId]: cluster.data });
-          this.setState({ clusters });
+          const tradClusters = Object.assign({}, this.state.tradClusters, { [clusterId]: cluster.data });
+          this.setState({ tradClusters });
         },
         err => {
-          console.log('Error fetching cluster', clusterId, err);
+          console.log('Error fetching trad cluster', clusterId, err);
         });
+  },
+
+  fetchEc2Cluster(profileId) {
+    client.listAWSProfiles()
+      .then(cluster => {
+        const ec2Clusters = Object.assign({}, this.state.ec2Clusters, { [profileId]: cluster.data });
+        this.setState({ ec2Clusters });
+      })
+      .catch(err => {
+        console.log('Error fetching ec2 clusters', profileId, err);
+      });
   },
 
   dataChange(key, value, which) {
@@ -61,25 +73,19 @@ export default React.createClass({
     profile[key] = value;
     this.setState({ [which]: profile });
 
-    if (which === 'Traditional' && key === 'profile' && !this.state.clusters[value]) {
+    if (which === 'Traditional' && key === 'profile' && !this.state.tradClusters[value]) {
       this.fetchCluster(value);
+    } else if (which === 'EC2' && key === 'profile' && !this.state.ec2Clusters[value]) {
+      this.fetchEc2Cluster(value);
     }
   },
 
   runSimulation(event) {
     var taskflowId,
-      clusterName = this.state.clusters[this.state[this.state.serverType].profile].name,
+      clusterName = this.state.tradClusters[this.state[this.state.serverType].profile].name,
       sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
 
     client.createTaskflow(this.props.taskFlowName)
-      .then((resp) => {
-        var file = {
-          _id: this.props.simulation.metadata.inputFolder.files.ini,
-          name: 'pyfr.ini', // the ini file must be named this.
-        };
-        taskflowId = resp.data._id;
-        return client.editFile(file);
-      })
       .then((resp) => {
         const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
         return client.startTaskflow(taskflowId, Object.assign({},
@@ -180,8 +186,8 @@ export default React.createClass({
     let profiles = { cuda: false, openmp: [], opencl: [] };
     if (this.state.serverType === 'Traditional') {
       const clusterId = this.state.Traditional.profile;
-      if (this.state.clusters[clusterId] && this.state.clusters[clusterId].config && this.state.clusters[clusterId].config.pyfr) {
-        profiles = this.state.clusters[clusterId].config.pyfr;
+      if (this.state.tradClusters[clusterId] && this.state.tradClusters[clusterId].config && this.state.tradClusters[clusterId].config.pyfr) {
+        profiles = this.state.tradClusters[clusterId].config.pyfr;
       }
     }
 
@@ -202,7 +208,7 @@ export default React.createClass({
           <section>
               {serverForm}
           </section>
-          <RuntimeBackend profiles={profiles} onChange={ this.updateBakend } />
+          <RuntimeBackend profiles={profiles} onChange={ this.updateBakend } visible={this.state.serverType === 'Traditional'} />
           <section className={formStyle.buttonGroup}>
               <ButtonBar
                 visible={this.state[this.state.serverType].profile !== ''}
