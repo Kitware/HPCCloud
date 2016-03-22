@@ -57,7 +57,8 @@ export default React.createClass({
       <option
         key={ `${machine.name}_${index}` }
         value={machine.name}
-      >`${ machine.name } - ${ machine.cpu } cores - ${ machine.memory } GB ${ machine.gpu ? ' + GPU' : '' } - ${ machine.storage }`
+      >
+        { `${machine.name} - ${machine.cpu} cores - ${machine.memory}GB ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` }
       </option>;
 
     if (this.state.profiles.length === 0) {
