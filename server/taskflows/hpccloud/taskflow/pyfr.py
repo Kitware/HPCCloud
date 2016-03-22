@@ -152,32 +152,37 @@ def pyfr_terminate(task):
 def update_config_file(task, client, *args, **kwargs):
 
     input_folder_id = kwargs['input']['folder']['id']
-    ini_item = client.listItem(input_folder_id, name=CONFIG_ITEM_NAME)
+    ini_file_id = kwargs['input']['iniFile']['id']
 
-    if len(ini_item) != 1:
-        raise Exception('Unable to fetch ini item.')
+    if not ini_file_id:
+      ini_item = client.listItem(input_folder_id, name=CONFIG_ITEM_NAME)
 
-    ini_item = ini_item[0]
+      if len(ini_item) != 1:
+          raise Exception('Unable to fetch ini item.')
 
-    # Now fetch the file
-    files = client.get('item/%s/files' % ini_item['_id'],
-        parameters={
-            'limit': 1,
-        })
+      ini_item = ini_item[0]
 
-    if len(files) != 1:
-        raise Exception('Uable to fetch files for item.')
+      # Now fetch the file
+      files = client.get('item/%s/files' % ini_item['_id'],
+          parameters={
+              'limit': 1,
+          })
 
-    ini_file = files[0]
-    if ini_file['name'] != INI_FILENAME:
-        raise Exception('Unexpected ini file name %s.' % ini_file['name'])
+      if len(files) != 1:
+          raise Exception('Uable to fetch files for item.')
+
+      ini_file = files[0]
+      if ini_file['name'] != INI_FILENAME:
+          raise Exception('Unexpected ini file name %s.' % ini_file['name'])
+
+      ini_file_id = ini_file['_id']
 
     _, path = tempfile.mkstemp()
 
     task.logger.info('Downloading configuration file.')
     try:
         with open(path, 'w') as fp:
-            client.downloadFile(ini_file['_id'], path)
+            client.downloadFile(ini_file_id, path)
 
         task.logger.info('Removing an backend configuration from file')
         config_parser = SafeConfigParser()
@@ -205,7 +210,7 @@ def update_config_file(task, client, *args, **kwargs):
 
         with open(path, 'r') as fp:
             client.uploadFileContents(
-                ini_file['_id'], fp, os.path.getsize(path))
+                ini_file_id, fp, os.path.getsize(path))
 
     finally:
         os.remove(path)

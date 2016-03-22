@@ -55,8 +55,7 @@ export default React.createClass({
 
     // Create ini file container if not already here
     if (!iniFile) {
-      const fileName = 'ini';
-      client.addEmptyFileForSimulation(this.props.simulation, fileName)
+      client.addEmptyFileForSimulation(this.props.simulation, 'pyfr.ini')
         .then(resp => {
           const { _id } = resp.data; // itemId
 
