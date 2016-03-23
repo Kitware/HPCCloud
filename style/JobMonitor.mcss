@@ -52,23 +52,6 @@
     margin: 0 15px 0 19px;
 }
 
-.advancedIconOn {
-    composes: fa     from 'font-awesome/css/font-awesome.css';
-    composes: fa-cog from 'font-awesome/css/font-awesome.css';
-    cursor: pointer;
-}
-
-.advancedIconOff {
-    composes: advancedIconOn;
-    color: #aaa;
-}
-
-.refreshIcon {
-    composes: fa     from 'font-awesome/css/font-awesome.css';
-    composes: fa-refresh from 'font-awesome/css/font-awesome.css';
-    cursor: pointer;
-}
-
 .hidden {
     display: none;
 }
@@ -87,3 +70,26 @@
   margin-right: 5px;
 }
 
+/* Icons */
+.advancedIconOn {
+    composes: fa     from 'font-awesome/css/font-awesome.css';
+    composes: fa-cog from 'font-awesome/css/font-awesome.css';
+    cursor: pointer;
+}
+
+.advancedIconOff {
+    composes: advancedIconOn;
+    color: #aaa;
+}
+
+.downloadIcon {
+    composes: fa                from 'font-awesome/css/font-awesome.css';
+    composes: fa-cloud-download from 'font-awesome/css/font-awesome.css';
+    cursor: pointer;
+}
+
+.refreshIcon {
+    composes: fa         from 'font-awesome/css/font-awesome.css';
+    composes: fa-refresh from 'font-awesome/css/font-awesome.css';
+    cursor: pointer;
+}
