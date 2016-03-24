@@ -1,6 +1,4 @@
 import AWSForm          from './AWSForm';
-import client           from '../../../network';
-import deepClone        from 'mout/src/lang/deepClone';
 import ActiveList       from '../../../panels/ActiveList';
 import ButtonBar        from '../../../panels/ButtonBar';
 import Toolbar          from '../../../panels/Toolbar';
@@ -8,6 +6,10 @@ import React            from 'react';
 import { breadcrumb }   from '..';
 
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
+
+import get          from 'mout/src/object/get';
+import { connect }  from 'react-redux';
+import * as Actions from '../../../redux/actions/aws';
 
 const awsBreadCrumb = Object.assign({}, breadcrumb, { active: 2 });
 function getActions(disabled) {
@@ -18,119 +20,58 @@ function getActions(disabled) {
 }
 
 /* eslint-disable no-alert */
-export default React.createClass({
+const AWSPrefs = React.createClass({
 
   displayName: 'Preferences/AWS',
 
   propTypes: {
-    awsTemplate: React.PropTypes.object,
+    active: React.PropTypes.number,
+    list: React.PropTypes.array,
+    error: React.PropTypes.string,
+    buttonsDisabled: React.PropTypes.bool,
+
+    onUpdateItem: React.PropTypes.func,
+    onActiveChange: React.PropTypes.func,
+    onAddItem: React.PropTypes.func,
+    onRemoveItem: React.PropTypes.func,
   },
 
   getDefaultProps() {
     return {
-      awsTemplate: {
-        accessKeyId: '',
-        availabilityZone: 'us-east-1a',
-        name: 'new AWS profile',
-        regionName: 'us-east-1',
-        secretAccessKey: '',
-      },
-    };
-  },
-
-  getInitialState() {
-    return {
       active: 0,
       profiles: [],
-      error: '',
-      actionsDisabled: false,
+      error: null,
+      buttonsDisabled: false,
     };
-  },
-
-  componentDidMount() {
-    this.subscription = client.onAuthChange(this.updateState);
-    this.updateState();
-  },
-
-  componentWillUnmount() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-      this.subscription = null;
-    }
-  },
-
-  updateState() {
-    if (!client.getUser()) {
-      return;
-    }
-    client.listAWSProfiles()
-      .then(resp => {
-        this.setState({ profiles: resp.data });
-      })
-      .catch(err => {
-        console.log('Error: Pref/AWS/list', err);
-      });
   },
 
   changeItem(item) {
-    var profiles = this.state.profiles;
-    profiles[this.state.active] = item;
-    this.setState({ profiles, error: '' });
+    const { active, onUpdateItem } = this.props;
+    onUpdateItem(active, item);
   },
 
   activeChange(active) {
-    this.setState({ active, error: '' });
+    this.props.onActiveChange(active);
   },
 
   addItem() {
-    var profiles = this.state.profiles;
-    profiles.push(deepClone(this.props.awsTemplate));
-    this.setState({ profiles, active: profiles.length - 1 });
+    this.props.onAddItem();
   },
 
   removeItem() {
-    var profiles = this.state.profiles,
-      newActive;
-
-    const profileToDelete = profiles.splice(this.state.active, 1)[0];
-    if (this.state.active === 0 && profiles.length > 0) {
-      newActive = 0;
-    } else if (this.state.active === 0) {
-      newActive = null;
-    } else {
-      newActive = this.state.active - 1;
-    }
+    const { list, active, onRemoveItem } = this.props;
+    const profileToDelete = list[active];
 
     if (profileToDelete._id && confirm('Are you sure you want to delete this profile?')) {
-      this.setState({ active: newActive, actionsDisabled: true });
-      client.deleteAWSProfile(profileToDelete._id)
-        .then(resp => {
-          this.updateState();
-          this.setState({ actionsDisabled: false });
-        })
-        .catch(err => {
-          console.log('Error deleting ec2 profile', err);
-          this.setState({ actionsDisabled: false });
-          this.updateState();
-        });
+      onRemoveItem(active, profileToDelete);
+    } else {
+      onRemoveItem(active, profileToDelete);
     }
   },
 
   saveItem() {
-    const profiles = this.state.profiles;
-    const aws = profiles[this.state.active];
-    this.setState({ actionsDisabled: true });
-    client.saveAWSProfile(aws)
-      .then(resp => {
-        if (!aws._id) {
-          aws._id = resp.data._id;
-        }
-        this.setState({ profiles, error: '', actionsDisabled: false });
-      })
-      .catch(err => {
-        this.setState({ error: err.data.message, actionsDisabled: false });
-        console.log('Error: Pref/AWS/save', err);
-      });
+    const { onUpdateItem, active, list } = this.props;
+    onUpdateItem(active, list[active], true);
   },
 
   formAction(action) {
@@ -138,7 +79,8 @@ export default React.createClass({
   },
 
   render() {
-    const activeData = this.state.active < this.state.profiles.length ? this.state.profiles[this.state.active] : null;
+    const { active, list, error, buttonsDisabled } = this.props;
+    const activeData = active < list.length ? list[active] : null;
 
     return (
       <div className={ style.rootContainer }>
@@ -152,8 +94,8 @@ export default React.createClass({
           <ActiveList
             className={ style.menu }
             onActiveChange={this.activeChange}
-            active={this.state.active}
-            list={this.state.profiles}
+            active={active}
+            list={list}
           />
           <div className={ style.content }>
             <AWSForm
@@ -163,11 +105,35 @@ export default React.createClass({
             <ButtonBar
               visible={!!activeData}
               onAction={ this.formAction }
-              error={ this.state.error }
-              actions={getActions(this.state.actionsDisabled)}
+              error={ error }
+              actions={getActions(buttonsDisabled)}
             />
           </div>
         </div>
       </div>);
   },
 });
+
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  state => {
+    const localState = state.preferences.aws;
+    return {
+      active: localState.active,
+      list: localState.list,
+      buttonsDisabled: localState.pending,
+      error: get(state, 'network.error.save_aws_profile.resp.data.message'),
+    };
+  },
+  dispatch => {
+    return {
+      onUpdateItem: (index, profile, server) => dispatch(Actions.updateAWSProfile(index, profile, server)(dispatch)),
+      onActiveChange: (index) => dispatch(Actions.updateActiveProfile(index)),
+      onAddItem: () => dispatch(Actions.addAWSProfile()),
+      onRemoveItem: (index, profile) => dispatch(Actions.removeAWSProfile(index, profile)(dispatch)),
+    };
+  }
+)(AWSPrefs);

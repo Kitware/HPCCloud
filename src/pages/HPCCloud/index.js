@@ -1,72 +1,39 @@
 import React    from 'react';
 import { Link } from 'react-router';
-import client   from '../../network';
 import SvgIconWidget from 'paraviewweb/src/React/Widgets/SvgIconWidget';
 
 import theme    from 'HPCCloudStyle/Theme.mcss';
 import layout   from 'HPCCloudStyle/Layout.mcss';
 import logo     from 'HPCCloudStyle/logo.svg';
 
-export default React.createClass({
+import get                from 'mout/src/object/get';
+import { connect }        from 'react-redux';
+
+const TopBar = React.createClass({
 
   displayName: 'HPCCloud-TopBar',
 
   propTypes: {
     children: React.PropTypes.oneOfType([React.PropTypes.object, React.PropTypes.array]),
     location: React.PropTypes.object,
+    userName: React.PropTypes.string,
+    isBusy: React.PropTypes.bool,
+    progress: React.PropTypes.number,
   },
 
-  getInitialState() {
+  getDefaultProps() {
     return {
-      loggedIn: client.loggedIn(),
+      userName: null,
       isBusy: false,
       progress: 0,
     };
-  },
-
-  componentWillMount() {
-    this.subscription = client.onAuthChange(this.updateAuth);
-    this.busySubscription = client.onBusy(this.updateBusy);
-    this.progressSubscription = client.onProgress(this.updateProgress);
-  },
-
-  componentWillUnmount() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-      this.subscription = null;
-    }
-
-    if (this.busySubscription) {
-      this.busySubscription.unsubscribe();
-      this.busySubscription = null;
-    }
-  },
-
-  updateAuth(loggedIn) {
-    this.setState({
-      loggedIn: !!loggedIn,
-    });
-  },
-
-  updateBusy(isBusy) {
-    this.setState({ isBusy });
-  },
-
-  updateProgress({ current, total }) {
-    const progress = Math.floor(current / total * 100);
-    this.setState({ progress });
-    if (progress === 100) {
-      setTimeout(() => {
-        this.setState({ progress: 0 });
-      }, 2000);
-    }
   },
 
   render() {
     return (
       <div className={ layout.verticalFlexContainer }>
         <div className={ theme.topBar } style={{ position: 'relative' }}>
-            <div className={(this.state.isBusy ? theme.hpcCloudBusyIcon : theme.hpcCloudIcon)}>
+            <div className={(this.props.isBusy ? theme.hpcCloudBusyIcon : theme.hpcCloudIcon)}>
                 <Link to="/">
                   <SvgIconWidget icon={logo} height="1.35em" width="70px" />
                 </Link>
@@ -74,15 +41,15 @@ export default React.createClass({
 
             <div className={ theme.progressBar }
               style={{
-                width: `${this.state.progress}%`,
-                opacity: (this.state.progress === 100 ? '0' : '1.0'),
+                width: `${this.props.progress}%`,
+                opacity: (this.props.progress === 100 ? '0' : '1.0'),
               }}
             >
             </div>
 
-            { this.state.loggedIn ? (
+            { this.props.userName ? (
                 <div className={ theme.capitalizeRightText }>
-                    <Link className={ theme.topBarText } to="/Preferences">{ client.getUserName() }</Link>
+                    <Link className={ theme.topBarText } to="/Preferences">{ this.props.userName }</Link>
                     <Link to="/Logout" className={ theme.logout }><i className={ theme.logoutIcon }></i></Link>
                 </div>
             ) : (
@@ -98,3 +65,23 @@ export default React.createClass({
       </div>);
   },
 });
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  state => {
+    const firstName = get(state, 'auth.user.firstName');
+    const lastName = get(state, 'auth.user.lastName');
+    const pendingRequests = get(state, 'network.pending') || {};
+    const numberOfPendingRequest = Object.keys(pendingRequests).length;
+    const progress = numberOfPendingRequest
+      ? (100 * Object.keys(pendingRequests).map(item => item.progress).reduce((a, b) => a + b) / numberOfPendingRequest)
+      : 0;
+    return {
+      userName: firstName ? `${firstName} ${lastName}` : null,
+      isBusy: !!numberOfPendingRequest,
+      progress,
+    };
+  }
+)(TopBar);

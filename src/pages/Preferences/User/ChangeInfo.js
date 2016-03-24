@@ -1,16 +1,23 @@
 import React        from 'react';
 import ButtonBar    from '../../../panels/ButtonBar';
-import client       from '../../../network';
 
 import style        from 'HPCCloudStyle/ItemEditor.mcss';
 
-export default React.createClass({
+import get          from 'mout/src/object/get';
+import { connect }  from 'react-redux';
+import * as Actions from '../../../redux/actions/user';
+
+const ChangeInfo = React.createClass({
 
   displayName: 'User/ChangeInfo',
 
   propTypes: {
     buttons: React.PropTypes.array,
     className: React.PropTypes.string,
+    error: React.PropTypes.string,
+    success: React.PropTypes.bool,
+    user: React.PropTypes.object,
+    onUpdateUser: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -19,58 +26,23 @@ export default React.createClass({
         name: 'updateUser',
         label: 'Save',
       }],
-    };
-  },
-
-  getInitialState() {
-    return {
-      error: '',
+      error: null,
       success: false,
-      oldPassword: '',
-      password: '',
-      confirm: '',
       user: {},
-      buttons: this.props.buttons,
     };
-  },
-
-  componentWillMount() {
-    this.updateState();
-  },
-
-  updateState() {
-    this.setState({ user: client.getUser() });
   },
 
   changeForm(event) {
-    var key = event.target.dataset.key,
-      user = this.state.user;
-    user[key] = event.target.value;
-    this.setState({ user });
+    const key = event.target.dataset.key;
+    const value = event.target.value;
+    this.props.onUpdateUser(Object.assign({}, this.props.user, { [key]: value }));
   },
 
   handleSubmit(event) {
-    event.preventDefault();
-    this.updateUser();
-  },
-
-  updateUser() {
-    const buttons = this.state.buttons,
-      newInfo = {
-        firstName: this.state.user.firstName,
-        lastName: this.state.user.lastName,
-        email: this.state.user.email,
-        _id: this.state.user._id,
-      };
-    client.updateUser(newInfo)
-      .then(resp => {
-        buttons[0].icon = style.validIcon;
-        this.setState({ buttons, error: '', success: true });
-      })
-      .catch(err => {
-        buttons[0].icon = '';
-        this.setState({ buttons, error: err.data.message });
-      });
+    if (event && event.preventDefault) {
+      event.preventDefault();
+    }
+    this.props.onUpdateUser(this.props.user, true);
   },
 
   render() {
@@ -85,7 +57,7 @@ export default React.createClass({
               placeholder="First name"
               onChange={this.changeForm}
               data-key="firstName"
-              value={this.state.user.firstName}
+              value={this.props.user.firstName}
               required
             />
           </section>
@@ -97,7 +69,7 @@ export default React.createClass({
               placeholder="Last name"
               onChange={this.changeForm}
               data-key="lastName"
-              value={this.state.user.lastName}
+              value={this.props.user.lastName}
               required
             />
           </section>
@@ -109,16 +81,40 @@ export default React.createClass({
               placeholder="Email"
               onChange={this.changeForm}
               data-key="email"
-              value={this.state.user.email}
+              value={this.props.user.email}
               required
             />
           </section>
         </form>
         <ButtonBar
-          onAction={ this.updateUser }
-          error={ this.state.error }
-          actions={this.state.buttons}
+          onAction={ this.handleSubmit }
+          error={ this.props.error }
+          actions={this.props.buttons}
         />
       </div>);
   },
 });
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  state => {
+    const error = get(state, 'network.error.user_update.resp.data.message');
+    const success = !!get(state, 'network.success.user_update');
+    return {
+      user: state.auth.user,
+      error,
+      buttons: [{
+        name: 'updateUser',
+        label: 'Save',
+        icon: success ? style.validIcon : '',
+      }],
+    };
+  },
+  dispatch => {
+    return {
+      onUpdateUser: (user, server) => dispatch(Actions.updateUser(user, server)(dispatch)),
+    };
+  }
+)(ChangeInfo);

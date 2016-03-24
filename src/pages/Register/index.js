@@ -1,20 +1,36 @@
 import React  from 'react';
 import style  from 'HPCCloudStyle/Login.mcss';
-import client from '../../network';
 
-export default React.createClass({
+import get          from 'mout/src/object/get';
+import { connect }  from 'react-redux';
+import { register }    from '../../redux/actions/user';
+
+const Register = React.createClass({
 
   displayName: 'Register',
+
+  propTypes: {
+    error: React.PropTypes.string,
+    onRegister: React.PropTypes.func,
+  },
 
   contextTypes: {
     router: React.PropTypes.object,
   },
 
+  getDefaultProps() {
+    return {
+      error: null,
+      onRegister: (user) => console.log('register', user),
+    };
+  },
+
   getInitialState() {
     return {
-      error: false,
       password: '',
       confirm: '',
+      requestCount: 0,
+      resetCount: 0,
     };
   },
 
@@ -39,25 +55,18 @@ export default React.createClass({
   },
 
   resetError() {
-    if (this.state.error) {
-      this.setState({ error: false });
-    }
+    this.setState({ resetCount: this.state.requestCount });
   },
 
   handleSubmit(event) {
     event.preventDefault();
-    if (!this.state.error) {
+    if (this.state.resetCount === this.state.requestCount) {
       const user = {};
       ['login', 'firstName', 'lastName', 'email', 'password'].forEach(key => {
         user[key] = this.refs[key].value;
       });
-      client.registerUser(user)
-        .then(resp => {
-          this.context.router.replace('/Login');
-        })
-        .catch(resp => {
-          this.setState({ error: resp.data.message });
-        });
+      this.setState({ requestCount: this.state.requestCount + 1 });
+      this.props.onRegister(user);
     }
   },
 
@@ -114,12 +123,32 @@ export default React.createClass({
             required
           />
           <div>
-              <button className={style.loginButton} disabled={!!this.state.error}>Register</button>
+              <button
+                className={style.loginButton}
+                disabled={!!this.props.error && (this.state.resetCount !== this.state.requestCount)}
+              >Register</button>
           </div>
-          {!!this.state.error && (
-              <p className={style.warningBox}>{this.state.error}</p>
+          {(!!this.props.error && this.state.requestCount !== this.state.resetCount) && (
+              <p className={style.warningBox}>{this.props.error}</p>
           )}
         </form>
       </center>);
   },
 });
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  state => {
+    return {
+      error: get(state, 'network.error.user_register.resp.data.message'),
+    };
+  },
+  dispatch => {
+    return {
+      onRegister: ({ firstName, lastName, login, email, password }) => dispatch(register(firstName, lastName, login, email, password)),
+    };
+  }
+)(Register);
+
