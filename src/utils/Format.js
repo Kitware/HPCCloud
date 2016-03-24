@@ -17,7 +17,18 @@ export function formatTime(time) {
   return `${hours}:${minutes}:${seconds}.${ms}`;
 }
 
+export function formatFileSize(bytes, precision = 1) {
+  if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) {
+    return 'unknown size';
+  } else if (bytes === 0) {
+    return '0 bytes';
+  }
+  const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'],
+    number = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, Math.floor(number))).toFixed(precision)} ${units[number]}`;
+}
 
 export default {
   formatTime,
 };
+
