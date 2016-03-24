@@ -1,7 +1,7 @@
 import client from '../../network';
 import * as netActions from './network';
 import * as routingActions from './router';
-import store from '..';
+import { store } from '..';
 
 export const LOGGED_IN = 'LOGGED_IN';
 export const AUTH_PENDING = 'AUTH_PENDING';
@@ -115,6 +115,28 @@ export function changePassword(oldPassword, newPassword) {
         });
 
     return action;
+  };
+}
+
+export function updateUser(user, pushOnServer = false) {
+  return dispatch => {
+    if (pushOnServer) {
+      const action = netActions.addNetworkCall('user_update', 'Update user informations');
+      const { _id, firstName, lastName, email } = user;
+
+      client.updateUser({ _id, firstName, lastName, email })
+        .then(
+          resp => {
+            dispatch(netActions.successNetworkCall(action.id, resp));
+            dispatch(loggedIn(resp.data));
+          },
+          err => {
+            dispatch(netActions.errorNetworkCall(action.id, err));
+          });
+
+      return action;
+    }
+    return loggedIn(user);
   };
 }
 

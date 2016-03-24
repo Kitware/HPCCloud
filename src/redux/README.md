@@ -15,12 +15,17 @@
   },
   preferences: {
     clusters: {
+      pending: false,
       list: [
         { name, config, state }
       ],
       active: 0,
+      presets: {
+        [name]: { prop: value, ... }
+      }
     },
     aws: {
+      pending: false,
       list: [],
       active: 0,
     }

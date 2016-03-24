@@ -6,7 +6,7 @@ import { syncHistoryWithStore, routerMiddleware } from 'react-router-redux';
 
 const routingMiddleware = routerMiddleware(hashHistory);
 
-export const store = createStore(reducers, applyMiddleware(thunk, routingMiddleware));
+export const store = createStore(reducers, applyMiddleware(routingMiddleware, thunk));
 export const history = syncHistoryWithStore(hashHistory, store);
 
 export default store;
