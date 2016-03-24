@@ -4,6 +4,7 @@ import JobMonitor       from '../../../../../../panels/JobMonitor';
 import OutputPanel      from '../../../../../../panels/OutputPanel';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
+import style            from 'HPCCloudStyle/JobMonitor.mcss';
 import TaskflowManager  from '../../../../../../network/TaskflowManager';
 
 const primaryJob = 'pyfr_run';
@@ -50,7 +51,8 @@ export default React.createClass({
       allComplete: false,
       taskflowId: '',
       error: '',
-      primaryJobOutput: '',
+      primaryJobOutput: '', // string of the file system output directory of the primary job
+      wfOutput: [], // array of objects with: {name: $filename, value: JSX <a href=api/v1/item/$id/download>}
       actions: [
         'terminate',
       ],
@@ -94,7 +96,7 @@ export default React.createClass({
           });
       }
 
-      for (let i = 0; i < pkt.jobs.length; i++) {
+      for (let i = 0; i < pkt.jobs.length && !primaryJobOutput; i++) {
         if (pkt.jobs[i].name === primaryJob) {
           primaryJobOutput = pkt.jobs[i].dir;
           break;
@@ -106,6 +108,31 @@ export default React.createClass({
     });
   },
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextState.primaryJobOutput && nextState.wfOutput.length === 0) {
+      client.listItems({ folderId: this.props.simulation.metadata.outputFolder._id })
+        .then((resp) => {
+          var promises = resp.data.map((item) => client.getItem(item._id));
+          return Promise.all(promises);
+        })
+        .then((resps) => {
+          var wfOutput = resps.map(item => ({
+            name: item.data.name,
+            value: <a href={`api/v1/item/${item.data._id}/download`} target="_blank">
+              <i className={style.downloadIcon}></i> { item.data._id }
+            </a>,
+          }));
+          this.setState({ wfOutput });
+        })
+        .catch((err) => {
+          var msg = err.data && err.data.message ? err.data.message : err;
+          console.log(msg);
+        });
+    }
+
+    return true;
+  },
+
   componentWillUnmount() {
     if (this.subscription) {
       this.subscription.unsubscribe();
@@ -115,6 +142,10 @@ export default React.createClass({
 
   onAction(action) {
     this[action]();
+  },
+
+  fetchWfOutput() {
+    console.log('should fetch wf output');
   },
 
   visualizeTaskflow() {
@@ -166,7 +197,8 @@ export default React.createClass({
     var outputItems;
     var outputComponent = null;
     if (this.state.allComplete) {
-      outputItems = [{ name: this.props.simulation.steps.Simulation.metadata.cluster, value: this.state.primaryJobOutput }];
+      outputItems = [{ name: this.props.simulation.steps.Simulation.metadata.cluster, value: this.state.primaryJobOutput }]
+        .concat(this.state.wfOutput);
       outputComponent = <OutputPanel title="Output" items={outputItems} />;
     }
     return (

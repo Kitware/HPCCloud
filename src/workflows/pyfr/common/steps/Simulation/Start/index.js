@@ -210,14 +210,12 @@ export default React.createClass({
               {serverForm}
           </section>
           <RuntimeBackend profiles={profiles} onChange={ this.updateBakend } visible={this.state.serverType === 'Traditional'} />
-          <section className={formStyle.buttonGroup}>
-              <ButtonBar
-                visible={this.state[this.state.serverType].profile !== ''}
-                onAction={this.formAction}
-                actions={actions}
-                error={this.state.error}
-              />
-          </section>
+          <ButtonBar
+            visible={this.state[this.state.serverType].profile !== ''}
+            onAction={this.formAction}
+            actions={actions}
+            error={this.state.error}
+          />
       </div>);
   },
 });

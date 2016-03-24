@@ -1,8 +1,10 @@
 import {
-  onBusy,
-  onProgress,
-  onEvent,
-} from './BusyProgress';
+  saveAWSProfile,
+  deleteAWSProfile,
+  getAWSMaxInstances,
+  listAWSProfiles,
+  listAWSRunningInstances,
+} from './AWS';
 
 import {
   changePassword,
@@ -17,6 +19,12 @@ import {
   resetPassword,
   updateUser,
 } from './Auth';
+
+import {
+  onBusy,
+  onProgress,
+  onEvent,
+} from './BusyProgress';
 
 import {
   createCluster,
@@ -51,12 +59,17 @@ import {
 } from './File';
 
 import {
-  saveAWSProfile,
-  deleteAWSProfile,
-  getAWSMaxInstances,
-  listAWSProfiles,
-  listAWSRunningInstances,
-} from './AWS';
+  downloadItem,
+  updateItemMetadata,
+  listItems,
+  createItem,
+  listFiles,
+  getItemRootPath,
+  getItem,
+  deleteItem,
+  editItem,
+  copyItem,
+} from './Item';
 
 import {
   getJobs,
@@ -110,12 +123,7 @@ import {
 } from './Taskflows';
 
 export default {
-  /* BusyProgress */
-  onBusy,
-  onProgress,
-  onEvent,
-
-  /* User */
+  /* Auth/User */
   changePassword,
   getLoggedInPromise,
   getUser,
@@ -127,6 +135,18 @@ export default {
   registerUser,
   resetPassword,
   updateUser,
+
+  /* AWS */
+  saveAWSProfile,
+  deleteAWSProfile,
+  getAWSMaxInstances,
+  listAWSProfiles,
+  listAWSRunningInstances,
+
+  /* BusyProgress */
+  onBusy,
+  onProgress,
+  onEvent,
 
   /* Clusters */
   createCluster,
@@ -157,12 +177,17 @@ export default {
   getFolderAccess,
   editFolderAccess,
 
-  /* AWS */
-  saveAWSProfile,
-  deleteAWSProfile,
-  getAWSMaxInstances,
-  listAWSProfiles,
-  listAWSRunningInstances,
+  /* Item */
+  downloadItem,
+  updateItemMetadata,
+  listItems,
+  createItem,
+  listFiles,
+  getItemRootPath,
+  getItem,
+  deleteItem,
+  editItem,
+  copyItem,
 
   /* Jobs */
   getJobs,
