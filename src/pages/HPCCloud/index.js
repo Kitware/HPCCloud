@@ -68,7 +68,7 @@ export default React.createClass({
         <div className={ theme.topBar } style={{ position: 'relative' }}>
             <div className={(this.state.isBusy ? theme.hpcCloudBusyIcon : theme.hpcCloudIcon)}>
                 <Link to="/">
-                  <SvgIconWidget icon={logo} height="2.4em" width="70px" />
+                  <SvgIconWidget icon={logo} height="1.35em" width="70px" />
                 </Link>
             </div>
 

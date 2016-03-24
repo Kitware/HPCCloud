@@ -99,7 +99,7 @@
 
 /* Icons */
 .hpcCloudIcon {
-    margin-top: 12px;
+    line-height: 0;
 }
 
 .hpcCloudBusyIcon {
