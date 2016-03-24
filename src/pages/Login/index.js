@@ -1,62 +1,37 @@
 import React    from 'react';
 import { Link } from 'react-router';
-import client   from '../../network';
 
 import style    from 'HPCCloudStyle/Login.mcss';
 import layout   from 'HPCCloudStyle/Layout.mcss';
 
-export default React.createClass({
+import get          from 'mout/src/object/get';
+import { connect }  from 'react-redux';
+import { login }    from '../../redux/actions/user';
+
+const Login = React.createClass({
 
   displayName: 'Login',
 
   propTypes: {
     location: React.PropTypes.object,
+    error: React.PropTypes.bool,
+    onLogin: React.PropTypes.func,
   },
 
   contextTypes: {
     router: React.PropTypes.object,
   },
 
-  getInitialState() {
+  getDefaultProps() {
     return {
       error: false,
+      onLogin: (username, password) => console.log('login', username, '...password'),
     };
-  },
-
-  componentWillMount() {
-    this.subscription = client.onAuthChange((loggedIn) => {
-      // FIXME handle state...
-      if (loggedIn) {
-        this.context.router.replace('/');
-      }
-    });
-  },
-
-  componentWillUnmount() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-      this.subscription = null;
-    }
   },
 
   handleSubmit(event) {
     event.preventDefault();
-    client.login(this.refs.login.value, this.refs.pass.value)
-      .then(resp => {
-        const { location } = this.props;
-
-        if (location.state && location.state.nextPathname) {
-          this.context.router.replace(location.state.nextPathname);
-        } else {
-          this.context.router.replace('/');
-        }
-      })
-      .catch(err => {
-        this.setState({
-          error: true,
-          message: err.data.message,
-        });
-      });
+    this.props.onLogin(this.refs.login.value, this.refs.pass.value);
   },
 
   render() {
@@ -75,10 +50,26 @@ export default React.createClass({
                         <Link to={'/Forgot'}>Forget password?</Link>
                     </div>
                 </div>
-                {this.state.error && (
+                {this.props.error && (
                     <p className={style.errorBox}>Bad login information</p>
                 )}
             </form>
         </div>);
   },
 });
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  state => {
+    return {
+      error: !!get(state, 'network.error.user_login'),
+    };
+  },
+  dispatch => {
+    return {
+      onLogin: (username, password) => dispatch(login(username, password)),
+    };
+  }
+)(Login);
