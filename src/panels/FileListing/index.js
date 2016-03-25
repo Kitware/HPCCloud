@@ -39,15 +39,26 @@ export default React.createClass({
     } else {
       folders = {};
     }
+
+    // restore from cache, no need to requery folders and files
+    if (this.state.folders[folderId] && this.state.folders[folderId].files.length) {
+      folders[folderId].open = open;
+      this.setState({ folders });
+      return;
+    }
+
+    // get items for folder
     client.listItems({ folderId })
       .then((resp) => {
         var promises = resp.data.map((item) => client.getItem(item._id));
         return Promise.all(promises);
       })
+      // get folders for folder
       .then((resps) => {
         items = resps.map(item => item.data);
         return client.listFolders({ parentId: folderId, parentType: 'folder' });
       })
+      // setState with new folders and items
       .then((resp) => {
         var depth = parentFolder ? this.state.folders[folderId].depth + 1 : 0;
         items = items.concat(resp.data);
@@ -70,6 +81,7 @@ export default React.createClass({
     var value,
       depth = this.state.folders[file.folderId] ? this.state.folders[file.folderId].depth + 1 : 0;
 
+    // size === 0 ? file size : file size and download button
     if (file.size === 0) {
       value = (<span><em>{formatFileSize(file.size)}</em></span>);
     } else {
