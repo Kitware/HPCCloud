@@ -41,11 +41,12 @@ export default React.createClass({
           {advancedControl}
         </div>
         <div className={ this.state.open ? style.taskflowContainer : style.hidden }>
-          {this.props.items.map((el, index) =>
-            <section key={`${el.name}_${index}`} className={ style.listItem }>
-              <strong className={ style.itemContent }>{ el.name }</strong> <span>{ el.value }</span>
-            </section>
-          )}
+          {this.props.items.map((el, index) => {
+            if (!el) {return null;}
+            return (<section key={`${el.name}_${index}`} className={ style.listItem }>
+                          <strong className={ style.itemContent }>{ el.name }</strong> <span>{ el.value }</span>
+                        </section>);
+          }) }
         </div>
       </div>
     );
