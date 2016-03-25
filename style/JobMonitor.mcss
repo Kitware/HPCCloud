@@ -82,14 +82,31 @@
     color: #aaa;
 }
 
+.refreshIcon {
+    composes: fa         from 'font-awesome/css/font-awesome.css';
+    composes: fa-refresh from 'font-awesome/css/font-awesome.css';
+    cursor: pointer;
+}
+
 .downloadIcon {
     composes: fa                from 'font-awesome/css/font-awesome.css';
     composes: fa-cloud-download from 'font-awesome/css/font-awesome.css';
     cursor: pointer;
 }
 
-.refreshIcon {
-    composes: fa         from 'font-awesome/css/font-awesome.css';
-    composes: fa-refresh from 'font-awesome/css/font-awesome.css';
+.folderIcon {
+    composes: fa                from 'font-awesome/css/font-awesome.css';
+    composes: fa-folder from 'font-awesome/css/font-awesome.css';
     cursor: pointer;
+}
+
+.folderOpenIcon {
+    composes: fa                from 'font-awesome/css/font-awesome.css';
+    composes: fa-folder-open from 'font-awesome/css/font-awesome.css';
+    cursor: pointer;
+}
+
+.fileIcon {
+    composes: fa      from 'font-awesome/css/font-awesome.css';
+    composes: fa-file-o from 'font-awesome/css/font-awesome.css';
 }
