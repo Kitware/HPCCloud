@@ -1,4 +1,6 @@
-import deepClone         from 'mout/src/lang/deepClone';
+import deepClone          from 'mout/src/lang/deepClone';
+import set                from 'mout/src/object/set';
+
 import React              from 'react';
 import Workflows          from '../../../workflows';
 import FormPanel          from '../../../panels/FormPanel';
@@ -37,23 +39,12 @@ export default React.createClass({
   },
 
   formChange(event) {
-    var keyPath = event.target.dataset.key.split('.'),
-      currentContainer;
+    const propName = event.target.dataset.key;
+    const value = event.target.value;
+
     if (this.props.onChange) {
-      const lastKey = keyPath.pop(),
-        valueToSave = event.target.value,
-        data = deepClone(this.props.data);
-
-      currentContainer = data;
-      while (keyPath.length) {
-        const nextKey = keyPath.shift();
-        if (!currentContainer[nextKey]) {
-          currentContainer[nextKey] = {};
-        }
-        currentContainer = currentContainer[nextKey];
-      }
-
-      currentContainer[lastKey] = valueToSave;
+      const data = deepClone(this.props.data);
+      set(data, propName, value);
       this.props.onChange(data);
     }
   },

@@ -1,44 +1,36 @@
 import React    from 'react';
-import client   from '../../network';
-
 import style    from 'HPCCloudStyle/Login.mcss';
 import layout   from 'HPCCloudStyle/Layout.mcss';
 
-export default React.createClass({
+import get                from 'mout/src/object/get';
+import { connect }        from 'react-redux';
+import { forgetPassword } from '../../redux/actions/user';
+
+const ForgotPassword = React.createClass({
 
   displayName: 'ForgotPassword',
 
   propTypes: {
-    location: React.PropTypes.object,
+    error: React.PropTypes.string,
+    success: React.PropTypes.string,
+    onResetPassword: React.PropTypes.func,
   },
 
   contextTypes: {
     router: React.PropTypes.object,
   },
 
-  getInitialState() {
+  getDefaultProps() {
     return {
       error: null,
       success: null,
+      onResetPassword: () => {},
     };
   },
 
   handleSubmit(event) {
     event.preventDefault();
-    const email = this.refs.email.value;
-    client.resetPassword(email)
-      .then(resp => {
-        this.setState({
-          error: null,
-          success: resp.data.message,
-        });
-      })
-      .catch(err => {
-        this.setState({
-          error: err.data.message,
-          success: null,
-        });
-      });
+    this.props.onResetPassword(this.refs.email.value);
   },
 
   render() {
@@ -53,13 +45,30 @@ export default React.createClass({
               <div>
                   <button className={style.loginButton}>Send <i className={ style.sendIcon }></i></button>
               </div>
-              {this.state.error && (
-                  <p className={style.errorBox}>{this.state.error}</p>
+              {this.props.error && (
+                  <p className={style.errorBox}>{this.props.error}</p>
               )}
-              {this.state.success && (
-                  <p className={style.successBox}>{this.state.success}</p>
+              {this.props.success && (
+                  <p className={style.successBox}>{this.props.success}</p>
               )}
           </form>
       </div>);
   },
 });
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  state => {
+    return {
+      error: get(state, 'network.error.user_forget.resp.data.message'),
+      success: get(state, 'network.success.user_forget.resp.data.message'),
+    };
+  },
+  dispatch => {
+    return {
+      onResetPassword: (email) => dispatch(forgetPassword(email)),
+    };
+  }
+)(ForgotPassword);

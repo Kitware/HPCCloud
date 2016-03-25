@@ -1,51 +1,53 @@
 import React        from 'react';
 import ButtonBar    from '../../../panels/ButtonBar';
-import client       from '../../../network';
 
 import style        from 'HPCCloudStyle/ItemEditor.mcss';
 
-export default React.createClass({
+import get          from 'mout/src/object/get';
+import { connect }  from 'react-redux';
+import * as Actions from '../../../redux/actions/user';
+
+function getActions(icon, disabled = false) {
+  return [{
+    name: 'changePass',
+    label: 'Change password',
+    icon,
+    disabled,
+  }];
+}
+
+const ChangePassword = React.createClass({
 
   displayName: 'User/ChangePassword',
 
   propTypes: {
-    buttons: React.PropTypes.array,
+    icon: React.PropTypes.string,
     className: React.PropTypes.string,
+    error: React.PropTypes.string,
+    onPasswordChange: React.PropTypes.func,
   },
 
   getDefaultProps() {
     return {
-      buttons: [{
-        name: 'changePass',
-        label: 'Change password',
-      }],
+      error: null,
     };
   },
 
   getInitialState() {
     return {
-      error: '',
-      success: false,
       oldPassword: '',
       password: '',
       confirm: '',
-      buttons: this.props.buttons,
     };
   },
 
   oldPasswordChange(event) {
-    var newState = {
-      oldPassword: event.target.value,
-      error: '',
-    };
+    var newState = { oldPassword: event.target.value };
     this.setState(newState);
   },
 
   passwordChange(event) {
-    var newState = {
-      password: event.target.value,
-      error: '',
-    };
+    var newState = { password: event.target.value };
     this.passwordCheck(event.target.value, this.state.confirm, newState);
     this.setState(newState);
   },
@@ -60,29 +62,27 @@ export default React.createClass({
     if (password !== confirm) {
       obj.error = 'passwords do not match';
     } else {
-      obj.error = '';
+      obj.error = null;
     }
   },
 
   handleSubmit(event) {
-    event.preventDefault();
-    this.changePassword();
-  },
+    if (event && event.preventDefault) {
+      event.preventDefault();
+    }
 
-  changePassword() {
-    const buttons = this.state.buttons;
-    client.changePassword(this.state.oldPassword, this.state.password)
-      .then(resp => {
-        buttons[0].icon = style.validIcon;
-        this.setState({ buttons, error: '', success: true });
-      })
-      .catch(err => {
-        buttons[0].icon = '';
-        this.setState({ buttons, error: err.data.message });
-      });
+    const { oldPassword, password } = this.state;
+    this.props.onPasswordChange(oldPassword, password);
+    this.setState({
+      oldPassword: '',
+      password: '',
+      confirm: '',
+    });
   },
 
   render() {
+    const { oldPassword, password, error } = this.state;
+    const canClick = (oldPassword.length > 0 && password.length > 0 && !error);
     return (
       <div className={ this.props.className }>
         <form onSumbit={this.handleSubmit}>
@@ -121,10 +121,30 @@ export default React.createClass({
           </section>
         </form>
         <ButtonBar
-          onAction={ this.changePassword }
-          error={ this.state.error }
-          actions={this.state.buttons}
+          onAction={ this.handleSubmit }
+          error={ this.state.error ? this.state.error : this.props.error }
+          actions={getActions(this.props.icon, !canClick)}
         />
       </div>);
   },
 });
+
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  state => {
+    const error = get(state, 'network.error.user_updatePassword.resp.data.message');
+    const success = !!get(state, 'network.success.user_updatePassword');
+    return {
+      error,
+      icon: success ? style.validIcon : '',
+    };
+  },
+  dispatch => {
+    return {
+      onPasswordChange: (old, newPass) => dispatch(Actions.changePassword(old, newPass)(dispatch)),
+    };
+  }
+)(ChangePassword);
