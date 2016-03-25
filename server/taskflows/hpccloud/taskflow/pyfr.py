@@ -36,9 +36,6 @@ from girder_client import GirderClient, HttpError
 
 from hpccloud.taskflow.utility import *
 
-MESH_FILENAME = 'mesh.pyfrm'
-INI_FILENAME = 'pyfr.ini'
-CONFIG_ITEM_NAME = 'ini'
 BACKEND_SECTIONS = [
     'backend-cuda',
     'backend-opencl',
@@ -151,31 +148,7 @@ def pyfr_terminate(task):
 
 def update_config_file(task, client, *args, **kwargs):
 
-    input_folder_id = kwargs['input']['folder']['id']
     ini_file_id = kwargs['input']['iniFile']['id']
-
-    if not ini_file_id:
-      ini_item = client.listItem(input_folder_id, name=CONFIG_ITEM_NAME)
-
-      if len(ini_item) != 1:
-          raise Exception('Unable to fetch ini item.')
-
-      ini_item = ini_item[0]
-
-      # Now fetch the file
-      files = client.get('item/%s/files' % ini_item['_id'],
-          parameters={
-              'limit': 1,
-          })
-
-      if len(files) != 1:
-          raise Exception('Uable to fetch files for item.')
-
-      ini_file = files[0]
-      if ini_file['name'] != INI_FILENAME:
-          raise Exception('Unexpected ini file name %s.' % ini_file['name'])
-
-      ini_file_id = ini_file['_id']
 
     _, path = tempfile.mkstemp()
 
@@ -237,20 +210,24 @@ def setup_input(task, *args, **kwargs):
         task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     # Get the mesh file metadata to see if we need to import
-    file = client.getResource('file/%s' % mesh_file_id)
+    mesh_file = client.getResource('file/%s' % mesh_file_id)
+
 
     import_mesh = True
-    if PYFR_MESH_EXT in file['exts']:
+    if PYFR_MESH_EXT in mesh_file['exts']:
         task.logger.info('Mesh is already in pyfrm format.')
+        kwargs['meshFilename'] = mesh_file['name']
         import_mesh = False
 
     if import_mesh or number_of_procs > 1:
         task.logger.info('Downloading input mesh.')
 
         try:
-            input_path = os.path.join(tempfile.tempdir, input_folder_id)
+            _, input_path = tempfile.mkstemp()
             output_dir =  tempfile.mkdtemp()
-            output_path = os.path.join(output_dir, MESH_FILENAME)
+            mesh_filename = '%s.pyfrm' % (mesh_file['name'].rsplit('.', 1)[0])
+            output_path = os.path.join(output_dir, mesh_filename)
+            kwargs['meshFilename'] = mesh_filename
 
             client.downloadFile(mesh_file_id, input_path)
             task.logger.info('Downloading complete.')
@@ -259,7 +236,7 @@ def setup_input(task, *args, **kwargs):
             if import_mesh:
                 task.taskflow.logger.info('Importing mesh into PyFr format.')
 
-                extn = file['exts'][0]
+                extn = mesh_file['exts'][0]
                 task.logger.info('Converting mesh to pyfrm format.')
                 _import_mesh(task.taskflow.logger, input_path, output_path, extn)
                 task.logger.info('Conversion complete.')
@@ -278,7 +255,7 @@ def setup_input(task, *args, **kwargs):
             size = os.path.getsize(output_path)
             with open(output_path) as fp:
                 girder_file = client.uploadFile(
-                    input_folder_id, fp, 'mesh.pyfrm', size=size,
+                    input_folder_id, fp, mesh_filename, size=size,
                     parentType='folder')
                 kwargs['meshFileId'] = girder_file['_id']
 
@@ -294,6 +271,10 @@ def setup_input(task, *args, **kwargs):
 
     update_config_file(task, client, *args, **kwargs)
 
+    ini_file_id = kwargs['input']['iniFile']['id']
+    ini_file = client.getResource('file/%s' % ini_file_id)
+    kwargs['iniFilename'] = ini_file['name']
+
     create_job.delay(*args, **kwargs)
 
 
@@ -308,7 +289,11 @@ def create_job(task, *args, **kwargs):
     body = {
         'name': 'pyfr_run',
         'commands': [
-            "mpirun -n %s pyfr run -b %s input/mesh.pyfrm input/pyfr.ini" % (kwargs['numberOfProcs'], backend)
+            "mpirun -n %s pyfr run -b %s input/%s input/%s" % (
+                kwargs['numberOfProcs'],
+                backend,
+                kwargs['meshFilename'],
+                kwargs['iniFilename'])
         ],
         'input': [
             {
@@ -387,10 +372,10 @@ def _list_solution_files(client, folder_id):
         if len(exts) == 2 and exts[1] == 'pyfrs':
             yield file
 
-def create_export_job(task, job_name, files, job_dir):
+def create_export_job(task, job_name, files, job_dir, mesh_filename):
 
     commands = []
-    mesh_file_path = os.path.join(job_dir, 'input', MESH_FILENAME)
+    mesh_file_path = os.path.join(job_dir, 'input', mesh_filename)
     for file in files:
         name = file['name']
         vtk_filename = '%s.vtu' % name.rsplit('.', 1)[0]
@@ -471,7 +456,9 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
         for chunk in [solution_files[i::number_of_jobs] for i in xrange(number_of_jobs)]:
             if chunk:
                 name = 'pyfr_export_%d' % job_index
-                export_job = create_export_job(task, name, chunk, sim_job_dir)
+                mesh_filename = kwargs['meshFilename']
+                export_job = create_export_job(
+                    task, name, chunk, sim_job_dir, mesh_filename)
                 submit_job(cluster, export_job, log_write_url=None,
                               girder_token=task.taskflow.girder_token, monitor=False)
                 jobs.append(export_job)
