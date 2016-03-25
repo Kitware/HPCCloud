@@ -1,7 +1,7 @@
 import json
 from jsonpath_rw import parse
 
-from cumulus.starcluster.tasks.job import terminate_job
+from cumulus.tasks.job import terminate_job
 from cumulus.constants import JobState
 
 

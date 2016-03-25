@@ -24,10 +24,10 @@ import shutil
 from ConfigParser import SafeConfigParser
 
 import cumulus.taskflow
-from cumulus.starcluster.tasks.job import download_job_input_folders, submit_job
-from cumulus.starcluster.tasks.job import monitor_job, monitor_jobs
-from cumulus.starcluster.tasks.job import upload_job_output_to_folder
-from cumulus.starcluster.tasks.job import terminate_job
+from cumulus.tasks.job import download_job_input_folders, submit_job
+from cumulus.tasks.job import monitor_job, monitor_jobs
+from cumulus.tasks.job import upload_job_output_to_folder
+from cumulus.tasks.job import terminate_job
 
 from girder.utility.model_importer import ModelImporter
 from girder.api.rest import getCurrentUser

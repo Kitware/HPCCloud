@@ -24,9 +24,9 @@ import sys
 from jsonpath_rw import parse
 
 import cumulus.taskflow
-from cumulus.starcluster.tasks.job import download_job_input_folders, submit_job
-from cumulus.starcluster.tasks.job import monitor_job, upload_job_output_to_folder
-from cumulus.starcluster.tasks.job import job_directory
+from cumulus.tasks.job import download_job_input_folders, submit_job
+from cumulus.tasks.job import monitor_job, upload_job_output_to_folder
+from cumulus.tasks.job import job_directory
 from cumulus.transport import get_connection
 
 from girder.utility.model_importer import ModelImporter
