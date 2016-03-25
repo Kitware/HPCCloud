@@ -17,8 +17,12 @@
     justify-content: flex-start;
 }
 
-.breadcrumb i {
-    padding: 7px 17px;
+.breadcrumb a {
+    padding: 1px 10px;
+}
+
+.breadcrumb a:first-child {
+    padding-left: 12px;
 }
 
 .actions {
