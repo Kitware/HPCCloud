@@ -10,6 +10,7 @@ import style from 'HPCCloudStyle/PageWithMenu.mcss';
 import get          from 'mout/src/object/get';
 import { connect }  from 'react-redux';
 import * as Actions from '../../../redux/actions/aws';
+import { dispatch } from '../../../redux';
 
 const awsBreadCrumb = Object.assign({}, breadcrumb, { active: 2 });
 function getActions(disabled) {
@@ -128,12 +129,12 @@ export default connect(
       error: get(state, 'network.error.save_aws_profile.resp.data.message'),
     };
   },
-  dispatch => {
+  () => {
     return {
-      onUpdateItem: (index, profile, server) => dispatch(Actions.updateAWSProfile(index, profile, server)(dispatch)),
+      onUpdateItem: (index, profile, server) => dispatch(Actions.updateAWSProfile(index, profile, server)),
       onActiveChange: (index) => dispatch(Actions.updateActiveProfile(index)),
       onAddItem: () => dispatch(Actions.addAWSProfile()),
-      onRemoveItem: (index, profile) => dispatch(Actions.removeAWSProfile(index, profile)(dispatch)),
+      onRemoveItem: (index, profile) => dispatch(Actions.removeAWSProfile(index, profile)),
     };
   }
 )(AWSPrefs);

@@ -5,6 +5,7 @@ import layout   from 'HPCCloudStyle/Layout.mcss';
 import get                from 'mout/src/object/get';
 import { connect }        from 'react-redux';
 import { forgetPassword } from '../../redux/actions/user';
+import { dispatch }       from '../../redux';
 
 const ForgotPassword = React.createClass({
 
@@ -66,7 +67,7 @@ export default connect(
       success: get(state, 'network.success.user_forget.resp.data.message'),
     };
   },
-  dispatch => {
+  () => {
     return {
       onResetPassword: (email) => dispatch(forgetPassword(email)),
     };
