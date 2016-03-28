@@ -75,7 +75,7 @@ export default React.createClass({
           <div className={ this.state.advanced ? style.taskflowContainer : style.hidden }>
               <div className={ style.toolbar }>
                   <div className={ style.title }>
-                      Taskflow tasks
+                      Workflow tasks
                   </div>
                   <div className={ style.buttons }>
                   </div>
@@ -89,7 +89,7 @@ export default React.createClass({
               </div>
               <div className={ style.toolbar }>
                   <div className={ style.title }>
-                      Taskflow log
+                      Workflow log
                   </div>
                   <div className={ style.buttons }>
                     <i className={style.refreshIcon} onClick={this.refreshTaskflowLog}></i>
