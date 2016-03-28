@@ -12,6 +12,7 @@ import style from 'HPCCloudStyle/PageWithMenu.mcss';
 import get          from 'mout/src/object/get';
 import { connect }  from 'react-redux';
 import * as Actions from '../../../redux/actions/clusters';
+import { dispatch } from '../../../redux';
 
 const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 1 });
 
@@ -156,14 +157,14 @@ export default connect(
       error: get(state, 'network.error.save_cluster.resp.data.message'),
     };
   },
-  dispatch => {
+  () => {
     return {
-      onUpdateItem: (index, cluster, server) => dispatch(Actions.updateCluster(index, cluster, server)(dispatch)),
+      onUpdateItem: (index, cluster, server) => dispatch(Actions.updateCluster(index, cluster, server)),
       onActiveChange: (index) => dispatch(Actions.updateActiveCluster(index)),
       onApplyPreset: (index, presetName) => dispatch(Actions.applyPreset(index, presetName)),
       onAddItem: () => dispatch(Actions.addCluster()),
-      onRemoveItem: (index, cluster) => dispatch(Actions.removeCluster(index, cluster)(dispatch)),
-      onTestCluster: (index, cluster) => dispatch(Actions.testCluster(index, cluster)(dispatch)),
+      onRemoveItem: (index, cluster) => dispatch(Actions.removeCluster(index, cluster)),
+      onTestCluster: (index, cluster) => dispatch(Actions.testCluster(index, cluster)),
     };
   }
 )(ClusterPrefs);

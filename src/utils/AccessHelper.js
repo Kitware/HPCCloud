@@ -47,7 +47,7 @@ export const ProjectHelper = {
   getActions(project) {
     return [{
       icon: style.editIcon,
-      name: `/Edit/Project/${project._id}`,
+      name: `edit:${project._id}`,
     }];
   },
 
@@ -109,7 +109,7 @@ export const SimulationHelper = {
   },
 
   getActions(simulation) {
-    return [{ icon: style.editIcon, name: `/Edit/Simulation/${simulation._id}` }];
+    return [{ icon: style.editIcon, name: `edit:${simulation._id}` }];
   },
 
   getViewLink(simulation) {

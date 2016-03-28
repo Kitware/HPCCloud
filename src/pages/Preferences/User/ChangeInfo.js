@@ -6,6 +6,7 @@ import style        from 'HPCCloudStyle/ItemEditor.mcss';
 import get          from 'mout/src/object/get';
 import { connect }  from 'react-redux';
 import * as Actions from '../../../redux/actions/user';
+import { dispatch } from '../../../redux';
 
 const ChangeInfo = React.createClass({
 
@@ -112,9 +113,9 @@ export default connect(
       }],
     };
   },
-  dispatch => {
+  () => {
     return {
-      onUpdateUser: (user, server) => dispatch(Actions.updateUser(user, server)(dispatch)),
+      onUpdateUser: (user, server) => dispatch(Actions.updateUser(user, server)),
     };
   }
 )(ChangeInfo);

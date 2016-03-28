@@ -1,121 +1,106 @@
 import ItemEditor from '../../../panels/ItemEditor';
 import React      from 'react';
 import Workflows  from '../../../workflows';
-import merge      from 'mout/src/object/merge';
-import client     from '../../../network';
 
 import breadCrumbStyle  from 'HPCCloudStyle/Theme.mcss';
 
+import { connect }  from 'react-redux';
+import get          from 'mout/src/object/get';
+import { dispatch } from '../../../redux';
+import * as Actions from '../../../redux/actions/projects';
+import * as Router  from '../../../redux/actions/router';
+
 /* eslint-disable no-alert */
-export default React.createClass({
+const SimulationEdit = React.createClass({
 
   displayName: 'Simulation/Edit',
 
   propTypes: {
     params: React.PropTypes.object,
-  },
+    error: React.PropTypes.string,
+    project: React.PropTypes.object,
+    simulation: React.PropTypes.object,
 
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
-
-  getInitialState() {
-    return {
-      _error: '',
-      project: null,
-      simulation: null,
-    };
-  },
-
-  componentWillMount() {
-    this.updateState();
-  },
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.params.id !== this.props.params.id) {
-      this.updateState(nextProps.params.id);
-    }
+    onSave: React.PropTypes.func,
+    onDelete: React.PropTypes.func,
+    onCancel: React.PropTypes.func,
   },
 
   onAction(action, data, attachement) {
     this[action](data, attachement);
   },
 
-  updateState(id = this.props.params.id) {
-    client.getSimulation(id)
-      .then(resp => {
-        this.setState({ simulation: resp.data });
-        client.getProject(resp.data.projectId)
-          .then(pr => this.setState({ project: pr.data }))
-          .catch(respErr => {
-            this.setState({ _error: respErr.data.message });
-            console.log('(EDIT) Error fetching project', respErr);
-          });
-      })
-      .catch(respErr => {
-        this.setState({ _error: respErr.data.message });
-        console.log('(EDIT) Error fetching sim', respErr);
-      });
-  },
-
-  saveSimulation(data) {
-    const simulation = merge(this.state.simulation, data);
-
-    client.saveSimulation(simulation)
-      .then(resp => this.context.router.replace(`/View/Project/${this.state.simulation.projectId}`))
-      .catch(err => {
-        this.setState({ _error: err.data.message });
-        console.log('(Edit) error saving', err);
-      });
+  editSimulation(data, attachement) {
+    this.props.onSave(Object.assign({}, this.props.simulation, data));
   },
 
   cancel() {
-    this.context.router.replace(`/View/Project/${this.state.simulation.projectId}`);
+    this.props.onCancel(`/View/Project/${this.props.simulation.projectId}`);
   },
 
   delete() {
     if (!confirm('Are you sure you want to delete this simulation?')) {
       return;
     }
-    client.deleteSimulation(this.state.simulation._id)
-      .then(resp => this.context.router.replace(`/View/Project/${this.state.simulation.projectId}`))
-      .catch(err => {
-        this.setState({ _error: err.data.message });
-        console.log('(EDIT) Error delete sim', err);
-      });
+    this.props.onDelete(this.props.simulation, `/View/Project/${this.props.simulation.projectId}`);
   },
 
   render() {
-    if (!this.state.simulation || !this.state.project) {
+    if (!this.props.simulation || !this.props.project) {
       return null;
     }
 
-    const projectId = this.state.simulation.projectId;
-    const childComponent = this.state.project.type ? Workflows[this.state.project.type].components.EditSimulation : null;
+    const { simulation, project, error } = this.props;
+    const projectId = simulation.projectId;
+    const childComponent = project.type ? Workflows[project.type].components.EditSimulation : null;
     const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container }) : null;
 
     return (
       <ItemEditor
         breadcrumb={{
-          paths: ['/', `/View/Project/${projectId}`, `/View/Simulation/${this.state.simulation._id}`],
+          paths: ['/', `/View/Project/${projectId}`, `/View/Simulation/${simulation._id}`],
           icons: [
             breadCrumbStyle.breadCrumbRootIcon,
             breadCrumbStyle.breadCrumbProjectIcon,
             breadCrumbStyle.breadCrumbSimulationIcon,
           ],
         }}
-        name={this.state.simulation.name}
-        description={this.state.simulation.description}
-        error={this.state._error}
+        name={simulation.name}
+        description={simulation.description}
+        error={error}
         ref="container"
         title="Edit Simulation"
         actions={[
           { name: 'delete', label: 'Delete simulation' },
           { name: 'cancel', label: 'Cancel' },
-          { name: 'saveSimulation', label: 'Save simulation' }]}
+          { name: 'editSimulation', label: 'Save simulation' }]}
         onAction={ this.onAction }
       >
       { workflowAddOn }
       </ItemEditor>);
   },
 });
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  (state, props) => {
+    const project = state.projects.mapById[state.projects.active];
+    const simulations = state.projects.simulations[state.projects.active];
+    const simulation = simulations.mapById[simulations.active];
+    return {
+      error: get(state, 'network.error.save_simulation.resp.data.message')
+          || get(state, `network.error.delete_simulation_${props.params.id}.resp.data.message`),
+      project,
+      simulation,
+    };
+  },
+  () => {
+    return {
+      onSave: (simulation) => dispatch(Actions.saveSimulation(simulation)),
+      onDelete: (simulation, location) => dispatch(Actions.deleteSimulation(simulation, location)),
+      onCancel: (path) => dispatch(Router.replace(path)),
+    };
+  }
+)(SimulationEdit);

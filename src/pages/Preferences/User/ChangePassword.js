@@ -6,6 +6,7 @@ import style        from 'HPCCloudStyle/ItemEditor.mcss';
 import get          from 'mout/src/object/get';
 import { connect }  from 'react-redux';
 import * as Actions from '../../../redux/actions/user';
+import { dispatch } from '../../../redux';
 
 function getActions(icon, disabled = false) {
   return [{
@@ -142,9 +143,9 @@ export default connect(
       icon: success ? style.validIcon : '',
     };
   },
-  dispatch => {
+  () => {
     return {
-      onPasswordChange: (old, newPass) => dispatch(Actions.changePassword(old, newPass)(dispatch)),
+      onPasswordChange: (old, newPass) => dispatch(Actions.changePassword(old, newPass)),
     };
   }
 )(ChangePassword);

@@ -6,6 +6,7 @@ import layout   from 'HPCCloudStyle/Layout.mcss';
 
 import get          from 'mout/src/object/get';
 import { connect }  from 'react-redux';
+import { dispatch } from '../../redux';
 import { login }    from '../../redux/actions/user';
 
 const Login = React.createClass({
@@ -67,7 +68,7 @@ export default connect(
       error: !!get(state, 'network.error.user_login'),
     };
   },
-  dispatch => {
+  () => {
     return {
       onLogin: (username, password) => dispatch(login(username, password)),
     };

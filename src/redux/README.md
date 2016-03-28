@@ -17,7 +17,7 @@
     clusters: {
       pending: false,
       list: [
-        { name, config, state }
+        { name, config, status }
       ],
       active: 0,
       presets: {
@@ -30,38 +30,26 @@
       active: 0,
     }
   },
-  taskflows: {
-    234534: {
-      tasks: {},
-      jobs: {},
-      status: {
-        complete: 3,
-        running: 2,
-      }
-    } 
-  },
   projects: {
-    35345: {
-      id_, 
-      name, 
-      simulations: {
-        567567: {
-          id_,
-          name, 
-          description,
-          steps: {
+    workflowNames: [{ label: 'Saturn', value: 'saturn' }, ...],
+    list: [ '2345', '3456345' ],
+    active: '2345', // or null
+    mapById: {
+      '2345' : {
+        _id: 2345,
+        name: 'sdfsdf',
+        description: '',
+      }
+    },
+    simulations: {
+      [pid]: {
+        list: ['2345', '567657'],
+        active: '2345',
+        mapById: {
 
-          },
-          meta: {
-
-          }
-        }
-      },
+        },
+      }
     }
   },
-  active: {
-    project: 35345,
-    simulation: 567567,
-  }
 }
 ```

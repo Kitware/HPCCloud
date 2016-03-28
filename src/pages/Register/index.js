@@ -3,7 +3,8 @@ import style  from 'HPCCloudStyle/Login.mcss';
 
 import get          from 'mout/src/object/get';
 import { connect }  from 'react-redux';
-import { register }    from '../../redux/actions/user';
+import { dispatch } from '../../redux';
+import { register } from '../../redux/actions/user';
 
 const Register = React.createClass({
 
@@ -145,7 +146,7 @@ export default connect(
       error: get(state, 'network.error.user_register.resp.data.message'),
     };
   },
-  dispatch => {
+  () => {
     return {
       onRegister: ({ firstName, lastName, login, email, password }) => dispatch(register(firstName, lastName, login, email, password)),
     };

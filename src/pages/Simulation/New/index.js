@@ -2,9 +2,14 @@ import ItemEditor   from '../../../panels/ItemEditor';
 import React        from 'react';
 
 import Workflows    from '../../../workflows';
-import client       from '../../../network';
 
 import breadCrumbStyle from 'HPCCloudStyle/Theme.mcss';
+
+import { connect }  from 'react-redux';
+import get          from 'mout/src/object/get';
+import { dispatch } from '../../../redux';
+import * as Actions from '../../../redux/actions/projects';
+import * as Router  from '../../../redux/actions/router';
 
 function getActions(disabled) {
   return [
@@ -13,111 +18,94 @@ function getActions(disabled) {
   ];
 }
 
-export default React.createClass({
+const SimulationNew = React.createClass({
 
   displayName: 'Simulation/New',
 
   propTypes: {
     params: React.PropTypes.object,
-  },
-
-  contextTypes: {
-    router: React.PropTypes.object,
+    error: React.PropTypes.string,
+    project: React.PropTypes.object,
+    buttonsDisabled: React.PropTypes.bool,
+    onSave: React.PropTypes.func,
+    onCancel: React.PropTypes.func,
   },
 
   getInitialState() {
     return {
-      project: null,
-      buttonsDisabled: false,
+      _error: null,
     };
-  },
-
-  componentWillMount() {
-    this.updateProject();
-  },
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.params.projectId !== this.props.params.projectId) {
-      this.updateProject(nextProps.params.projectId);
-    }
   },
 
   onAction(action, data, attachements) {
     this[action](data, attachements);
   },
 
-  updateProject(id = this.props.params.projectId) {
-    client.getProject(id)
-      .then(resp => this.setState({ project: resp.data, error: false }))
-      .catch(err => {
-        var msg = err.data ? err.data.message : err.toString();
-        this.setState({ _error: msg });
-        console.log('Error: Sim/New-get', err);
-      });
-  },
-
   newSimulation(data, attachements) {
     const { name, description } = data,
       projectId = this.props.params.projectId,
       metadata = {},
-      stepsInfo = Workflows[this.state.project.type].steps,
+      stepsInfo = Workflows[this.props.project.type].steps,
       steps = stepsInfo._initial_state,
       disabled = stepsInfo._disabled || [],
       active = stepsInfo._active || stepsInfo._order[0],
       simulation = { name, description, steps, metadata, projectId, active, disabled };
 
-    if (name.length === 0) {
-      this.setState({ _error: 'Name is required' });
-      return;
+    if (name && name.length) {
+      this.props.onSave(simulation, attachements);
+    } else {
+      this.setState({ _error: 'The project need to have a name' });
     }
-
-    this.setState({ buttonsDisabled: true });
-    client.saveSimulation(simulation, attachements)
-      .then(resp => {
-        if (resp.status >= 400) {
-          this.setState({ _error: resp.data.message, buttonsDisabled: false });
-          console.log('Error: Sim/New-save', resp.data.message);
-          return;
-        }
-
-        this.setState({ buttonsDisabled: false });
-        const simId = Array.isArray(resp) ? resp[resp.length - 1]._id : resp._id;
-        this.context.router.replace(`/View/Simulation/${simId}`);
-      })
-      .catch(err => {
-        this.setState({ _error: err.data.message });
-        console.log('Error: Sim/New-save', err);
-      });
   },
 
   cancel() {
-    this.context.router.replace(`/View/Project/${this.props.params.projectId}`);
+    this.props.onCancel(`/View/Project/${this.props.params.projectId}`);
   },
 
   render() {
-    if (!this.state.project) {
+    if (!this.props.project) {
       return null;
     }
 
-    const type = this.state.project.type;
+    const type = this.props.project.type;
     const childComponent = type ? Workflows[type].components.NewSimulation : null;
     const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container }) : null;
     return (
       <ItemEditor
         breadcrumb={{
-          paths: ['/', `/View/Project/${this.state.project._id}`],
+          paths: ['/', `/View/Project/${this.props.project._id}`],
           icons: [
             breadCrumbStyle.breadCrumbRootIcon,
             breadCrumbStyle.breadCrumbProjectIcon,
           ],
         }}
-        error={this.state._error}
+        error={ this.state._error || this.props.error }
         ref="container"
         title="New Simulation"
-        actions={ getActions(this.state.buttonsDisabled) }
+        actions={ getActions(this.props.buttonsDisabled) }
         onAction={ this.onAction }
       >
       { workflowAddOn }
       </ItemEditor>);
   },
 });
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  (state, props) => {
+    return {
+      project: state.projects.mapById[state.projects.active || props.params.id],
+      buttonsDisabled: !!get(state, 'network.pending.save_simulation'),
+      error: get(state, 'network.error.save_simulation.resp.data.message'),
+    };
+  },
+  () => {
+    return {
+      onSave: (simulation, attachements) => dispatch(Actions.saveSimulation(simulation, attachements)),
+      onCancel: (location) => dispatch(Router.replace(location)),
+    };
+  }
+)(SimulationNew);
+

@@ -1,14 +1,13 @@
 import client from '../../network';
 import * as netActions from './network';
 import * as routingActions from './router';
-import { store } from '..';
+import { dispatch } from '..';
 
 export const LOGGED_IN = 'LOGGED_IN';
 export const AUTH_PENDING = 'AUTH_PENDING';
 export const LOGOUT = 'LOGOUT';
 
 /* eslint-disable no-shadow */
-
 export function authenticationPending(pending = true) {
   return {
     type: AUTH_PENDING,
@@ -143,8 +142,8 @@ export function updateUser(user, pushOnServer = false) {
 // Auto trigger actions on authentication change...
 client.onAuthChange(authenticated => {
   if (authenticated) {
-    store.dispatch(loggedIn(client.getUser()));
+    dispatch(loggedIn(client.getUser()));
   } else {
-    store.dispatch({ type: LOGOUT });
+    dispatch({ type: LOGOUT });
   }
 });

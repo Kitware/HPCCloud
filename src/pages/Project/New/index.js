@@ -2,27 +2,30 @@ import ItemEditor   from '../../../panels/ItemEditor';
 import React        from 'react';
 import Workflows    from '../../../workflows';
 
-import client       from '../../../network';
-
 import style        from 'HPCCloudStyle/ItemEditor.mcss';
 
-const wfTypes = Object.keys(Workflows).map(value => {
-  const label = Workflows[value].name;
-  return { value, label };
-});
+import { connect }  from 'react-redux';
+import get          from 'mout/src/object/get';
+import { dispatch } from '../../../redux';
+import * as Actions from '../../../redux/actions/projects';
+import * as Router  from '../../../redux/actions/router';
 
-export default React.createClass({
+const ProjectNew = React.createClass({
 
   displayName: 'Project/New',
 
-  contextTypes: {
-    router: React.PropTypes.object,
+  propTypes: {
+    location: React.PropTypes.object,
+    workflowNames: React.PropTypes.array,
+    error: React.PropTypes.string,
+    onSave: React.PropTypes.func,
+    onCancel: React.PropTypes.func,
   },
 
   getInitialState() {
     return {
-      _error: '',
-      type: wfTypes[0].value,
+      _error: null,
+      type: this.props.workflowNames[0].value,
     };
   },
 
@@ -45,31 +48,15 @@ export default React.createClass({
       metadata = data.metadata || {},
       project = { name, description, type, steps, metadata };
 
-    if (name.length === 0) {
-      this.setState({ _error: 'Name is required' });
-      return;
+    if (name && name.length) {
+      this.props.onSave(project, attachements);
+    } else {
+      this.setState({ _error: 'The project need to have a name' });
     }
-
-    client.saveProject(project, attachements)
-      .then(resp => {
-        if (resp.status >= 400) {
-          this.setState({ _error: resp.data.message });
-          console.log('Error: Project/New', resp.data.message);
-          return;
-        }
-
-        const projId = Array.isArray(resp) ? resp[resp.length - 1]._id : resp._id;
-        this.context.router.push(`/View/Project/${projId}`);
-      })
-      .catch(err => {
-        const msg = err.data && err.data.message ? err.data.message : err.message;
-        this.setState({ _error: msg });
-        console.log('Error: Project/New', err);
-      });
   },
 
   cancel() {
-    this.context.router.replace('/');
+    this.props.onCancel();
   },
 
   render() {
@@ -77,7 +64,7 @@ export default React.createClass({
     const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container }) : null;
     return (
       <ItemEditor
-        error={this.state._error}
+        error={ this.state._error || this.props.error }
         ref="container"
         title="New Project"
         actions={[
@@ -94,7 +81,7 @@ export default React.createClass({
               onChange={ this.updateForm }
               value={this.state.type}
             >
-              { wfTypes.map(i =>
+              { this.props.workflowNames.map(i =>
                 <option key={i.value} value={i.value}>{i.label}</option>
               )}
             </select>
@@ -103,3 +90,21 @@ export default React.createClass({
       </ItemEditor>);
   },
 });
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  state => {
+    return {
+      workflowNames: state.projects.workflowNames,
+      error: get(state, 'network.error.save_project.resp.data.message'),
+    };
+  },
+  () => {
+    return {
+      onSave: (project, attachements) => dispatch(Actions.saveProject(project, attachements)),
+      onCancel: () => dispatch(Router.replace('/')),
+    };
+  }
+)(ProjectNew);

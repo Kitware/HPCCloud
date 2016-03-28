@@ -1,6 +1,6 @@
 import * as netActions  from './network';
 import client           from '../../network';
-import store            from '..';
+import { dispatch }     from '..';
 
 export const ADD_CLUSTER = 'ADD_CLUSTER';
 export const UPDATE_ACTIVE_CLUSTER = 'UPDATE_ACTIVE_CLUSTER';
@@ -155,20 +155,20 @@ export function testCluster(index, cluster) {
 
 client.onEvent((e) => {
   if (e.type === 'cluster.status') {
-    store.dispatch(fetchClusters());
+    dispatch(fetchClusters());
   }
 });
 
 // No need to be authenticated
 setImmediate(() => {
-  store.dispatch(fetchClusterPresets());
+  dispatch(fetchClusterPresets());
 });
 
 // Auto trigger actions on authentication change...
 client.onAuthChange(authenticated => {
   if (authenticated) {
-    store.dispatch(fetchClusters());
+    dispatch(fetchClusters());
   } else {
-    store.dispatch(updateClusters([]));
+    dispatch(updateClusters([]));
   }
 });
