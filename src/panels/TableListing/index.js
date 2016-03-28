@@ -56,8 +56,12 @@ export default React.createClass({
     }
   },
 
+  lineAction(action) {
+    const [name, id] = action.split(':');
+    this.props.onAction(name, id);
+  },
+
   itemClicked(e) {
-    var linkToGo = e;
     var selectedIndex = -1;
     const filter = '';
 
@@ -91,20 +95,16 @@ export default React.createClass({
       while (!trEl.dataset.link) {
         trEl = trEl.parentNode;
       }
-      linkToGo = trEl.dataset.link;
+      const linkToGo = trEl.dataset.link;
+      const id = this.props.items[parseInt(trEl.dataset.index, 10)]._id;
 
-      this.context.router.push({
+      const location = {
         pathname: linkToGo,
         query: merge(this.props.location.query, { filter }),
         state: this.props.location.state,
-      });
+      };
+      this.props.onAction('click', { location, id });
     }
-
-    this.context.router.push({
-      pathname: linkToGo,
-      query: merge(this.props.location.query, { filter }),
-      state: this.props.location.state,
-    });
   },
 
   render() {
@@ -146,7 +146,7 @@ export default React.createClass({
                     <td onClick={ this.itemClicked } title={helper.getCreationDate(item)}>{ helper.getCreationDate(item, true) }</td>
                     <td onClick={ this.itemClicked } title={helper.getUpdateDate(item)}>{ helper.getUpdateDate(item, true) }</td>
                     <td>
-                      <IconActionList actions={ helper.getActions(item) } onAction={ this.itemClicked } />
+                      <IconActionList actions={ helper.getActions(item) } onAction={ this.lineAction } />
                     </td>
                   </tr>
                 )}
