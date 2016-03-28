@@ -76,15 +76,12 @@ export function saveProject(project_, attachments) {
           Object.keys(attachments).forEach(file => {
             promises.push(createItemForProject(project, file, attachments[file]));
           });
-          promises.push(project);
+          promises.push(new Promise((a, r) => { a({ data: project }); }));
           return Promise.all(promises);
         }
-        return project;
+        return new Promise((a, r) => { a({ data: project }); });
       })
-      .catch((error) => {
-        console.log(error);
-        return error;
-      });
+      .catch((error) => new Promise((a, r) => { r(error); }));
   }
   return girder.updateProject(project);
 }

@@ -93,10 +93,10 @@ export function saveSimulation(simulation_, attachments) {
           Object.keys(attachments).forEach(file => {
             promises.push(createItemForSimulation(simulation, file, attachments[file]));
           });
-          promises.push(simulation);
+          promises.push(new Promise((a, r) => { a({ data: simulation }); }));
           return Promise.all(promises);
         }
-        return (simulation);
+        return new Promise((a, r) => { a({ data: simulation }); });
       })
       .catch((error) => {
         console.log(error);
