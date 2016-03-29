@@ -7,12 +7,17 @@ import RunEC2                  from '../../../../../../panels/run/RunEC2';
 import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
 import RuntimeBackend          from '../../../panels/RuntimeBackend';
 
-import client                  from '../../../../../../network';
-import deepClone               from 'mout/src/lang/deepClone';
+// import client                  from '../../../../../../network';
+// import deepClone               from 'mout/src/lang/deepClone';
 import merge                   from 'mout/src/object/merge';
 import formStyle               from 'HPCCloudStyle/ItemEditor.mcss';
 
-export default React.createClass({
+import { connect } from 'react-redux';
+import get          from 'mout/src/object/get';
+import { dispatch } from '../../../../../../redux';
+import * as Actions from '../../../../../../redux/actions/taskflows';
+
+const SimulationStart = React.createClass({
 
   displayName: 'pyfr/common/steps/Simulation/Start',
 
@@ -23,133 +28,80 @@ export default React.createClass({
     step: React.PropTypes.string,
     taskFlowName: React.PropTypes.string,
     view: React.PropTypes.string,
-  },
 
-  contextTypes: {
-    router: React.PropTypes.object,
+    error: React.PropTypes.string,
+    tradClusters: React.PropTypes.object,
+    ec2Clusters: React.PropTypes.object,
+    onRun: React.PropTypes.func,
   },
 
   getInitialState() {
-    if (defaultServerParameters.Traditional.profile) {
-      this.fetchCluster(defaultServerParameters.Traditional.profile);
-    }
     return {
       serverType: 'Traditional',
       EC2: defaultServerParameters.EC2,
       Traditional: defaultServerParameters.Traditional,
       OpenStack: defaultServerParameters.OpenStack,
-      tradClusters: {},
-      ec2Clusters: {},
+
       backend: {},
       error: '',
     };
-  },
-
-  fetchCluster(clusterId) {
-    client.getCluster(clusterId)
-      .then(
-        cluster => {
-          const tradClusters = Object.assign({}, this.state.tradClusters, { [clusterId]: cluster.data });
-          this.setState({ tradClusters });
-        },
-        err => {
-          console.log('Error fetching trad cluster', clusterId, err);
-        });
-  },
-
-  fetchEc2Cluster(profileId) {
-    client.listAWSProfiles()
-      .then(cluster => {
-        const ec2Clusters = Object.assign({}, this.state.ec2Clusters, { [profileId]: cluster.data });
-        this.setState({ ec2Clusters });
-      })
-      .catch(err => {
-        console.log('Error fetching ec2 clusters', profileId, err);
-      });
   },
 
   dataChange(key, value, which) {
     var profile = this.state[which];
     profile[key] = value;
     this.setState({ [which]: profile });
-
-    if (which === 'Traditional' && key === 'profile' && !this.state.tradClusters[value]) {
-      this.fetchCluster(value);
-    } else if (which === 'EC2' && key === 'profile' && !this.state.ec2Clusters[value]) {
-      this.fetchEc2Cluster(value);
-    }
   },
 
-  runSimulation(event) {
-    var taskflowId,
-      clusterName = this.state.tradClusters[this.state[this.state.serverType].profile].name,
-      sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
+  runSimulation() {
+    const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
+    var clusterName = this.props.tradClusters[this.state[this.state.serverType].profile].name,
+      sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
+      payload = Object.assign({},
+        this.state[this.state.serverType].runtime || {},
+        {
+          backend: this.state.backend,
+          input: {
+            folder: {
+              id: this.props.simulation.metadata.inputFolder._id,
+            },
+            meshFile: {
+              id: meshFile,
+            },
+            iniFile: {
+              id: this.props.simulation.metadata.inputFolder.files.ini,
+            },
+          },
+          output: {
+            folder: {
+              id: this.props.simulation.metadata.outputFolder._id,
+            },
+          },
+          cluster: {
+            _id: this.state[this.state.serverType].profile,
+          },
+        });
 
-    client.createTaskflow(this.props.taskFlowName)
-      .then((resp) => {
-        taskflowId = resp.data._id;
-        const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
-        return client.startTaskflow(taskflowId, Object.assign({},
-          this.state[this.state.serverType].runtime || {},
-          {
-            backend: this.state.backend,
-            input: {
-              folder: {
-                id: this.props.simulation.metadata.inputFolder._id,
-              },
-              meshFile: {
-                id: meshFile,
-              },
-              iniFile: {
-                id: this.props.simulation.metadata.inputFolder.files.ini,
-              },
-            },
-            output: {
-              folder: {
-                id: this.props.simulation.metadata.outputFolder._id,
-              },
-            },
-            cluster: {
-              _id: this.state[this.state.serverType].profile,
-            },
-          })
-        );
-      })
-      // update step metadata
-      .then((resp) =>
-        client.updateSimulationStep(this.props.simulation._id, 'Simulation', {
+    this.props.onRun(
+      this.props.taskFlowName,
+      payload,
+      {
+        id: this.props.simulation._id,
+        step: 'Simulation',
+        data: {
           view: 'run',
           metadata: {
-            taskflowId,
             sessionId,
             cluster: clusterName,
           },
-        })
-      )
-      .then((resp) => {
-        var newSim = deepClone(this.props.simulation);
-        newSim.steps.Simulation.view = 'run';
-        newSim.steps.Simulation.metadata = {
-          taskflowId,
-          sessionId,
-          cluster: clusterName,
-        };
-        newSim.metadata.status = 'running';
-        client.invalidateSimulation(newSim);
-
-        this.context.router.replace({
-          pathname: this.props.location.pathname,
-          query: merge(this.props.location.query, {
-            view: 'run',
-          }),
-          state: this.props.location.state,
-        });
-
-        client.saveSimulation(newSim);
-      })
-      .catch((error) => {
-        var msg = error.data && error.data.message ? error.data.message : error;
-        this.setState({ error: msg });
+        },
+      },
+      {
+        pathname: this.props.location.pathname,
+        query: merge(this.props.location.query, {
+          view: 'run',
+        }),
+        state: this.props.location.state,
       });
   },
 
@@ -187,8 +139,8 @@ export default React.createClass({
     let profiles = { cuda: false, openmp: [], opencl: [] };
     if (this.state.serverType === 'Traditional') {
       const clusterId = this.state.Traditional.profile;
-      if (this.state.tradClusters[clusterId] && this.state.tradClusters[clusterId].config && this.state.tradClusters[clusterId].config.pyfr) {
-        profiles = this.state.tradClusters[clusterId].config.pyfr;
+      if (this.props.tradClusters[clusterId] && this.props.tradClusters[clusterId].config && this.props.tradClusters[clusterId].config.pyfr) {
+        profiles = this.props.tradClusters[clusterId].config.pyfr;
       }
     }
 
@@ -214,8 +166,28 @@ export default React.createClass({
             visible={this.state[this.state.serverType].profile !== ''}
             onAction={this.formAction}
             actions={actions}
-            error={this.state.error}
+            error={ this.props.error || this.state.error }
           />
       </div>);
   },
 });
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  state => {
+    return {
+      error: get(state, 'network.error.create_taskflow.resp.data.message')
+        || get(state, 'network.error.start_taskflow.resp.data.message'),
+      ec2Clusters: state.preferences.aws.mapById,
+      tradClusters: state.preferences.clusters.mapById,
+    };
+  },
+  () => {
+    return {
+      onRun: (taskflowName, payload, simulationStep, location) => dispatch(Actions.createTaskflow(taskflowName, payload, simulationStep, location)),
+    };
+  }
+)(SimulationStart);
+

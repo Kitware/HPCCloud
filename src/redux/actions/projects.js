@@ -2,7 +2,8 @@ import client           from '../../network';
 import * as netActions  from './network';
 import { dispatch }     from '../index.js';
 
-import * as router      from './router';
+import * as router          from './router';
+import * as TaskflowActions from './taskflows';
 
 export const FETCH_PROJECT_LIST = 'FETCH_PROJECT_LIST';
 export const UPDATE_PROJECT_LIST = 'UPDATE_PROJECT_LIST';
@@ -31,8 +32,13 @@ export function fetchProjectSimulations(id) {
     client.getProjectSimulations(id)
       .then(
         resp => {
+          const simulations = resp.data;
           dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(updateProjectSimulations(id, resp.data));
+          dispatch(updateProjectSimulations(id, simulations));
+
+          simulations.forEach(simulation => {
+            dispatch(TaskflowActions.updateTaskflowFromSimulation(simulation));
+          });
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
@@ -110,7 +116,7 @@ export function saveProject(project, attachements) {
   };
 }
 
-export function saveSimulation(simulation, attachements) {
+export function saveSimulation(simulation, attachements, location) {
   return dispatch => {
     const action = netActions.addNetworkCall('save_simulation', `Save simulation ${simulation.name}`);
 
@@ -120,7 +126,9 @@ export function saveSimulation(simulation, attachements) {
           dispatch(netActions.successNetworkCall(action.id, resp));
           const respWithSim = Array.isArray(resp) ? resp[resp.length - 1] : resp;
           dispatch(updateSimulation(respWithSim.data));
-          dispatch(router.push(`/View/Project/${respWithSim.data.projectId}`));
+          if (location) { // `/View/Project/${respWithSim.data.projectId}`
+            dispatch(router.push(location));
+          }
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
@@ -173,6 +181,27 @@ export function setActiveSimulation(id, location) {
       return router.push(location);
     }
     return updateActive;
+  };
+}
+
+export function updateSimulationStep(id, stepName, data, location) {
+  return dispatch => {
+    const action = netActions.addNetworkCall(`update_simulation_step_${id}`, 'Update simulation step');
+
+    client.updateSimulationStep(id, stepName, data)
+      .then(
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(updateSimulation(resp.data));
+          if (location) {
+            dispatch(router.replace(location));
+          }
+        },
+        error => {
+          dispatch(netActions.errorNetworkCall(action.id, error));
+        });
+
+    return action;
   };
 }
 

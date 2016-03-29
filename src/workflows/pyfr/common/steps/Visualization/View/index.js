@@ -1,9 +1,13 @@
 import ButtonBar        from '../../../../../../panels/ButtonBar';
-import client           from '../../../../../../network';
 import JobMonitor       from '../../../../../../panels/JobMonitor';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
-import TaskflowManager  from '../../../../../../network/TaskflowManager';
+
+import { connect }      from 'react-redux';
+import { dispatch }     from '../../../../../../redux';
+import * as Actions     from '../../../../../../redux/actions/taskflows';
+import * as SimActions  from '../../../../../../redux/actions/projects';
+
 
 const ACTIONS = {
   terminate: { name: 'terminateTaskflow', label: 'Terminate', icon: '' },
@@ -15,7 +19,7 @@ function getActions(actionsList, disabled) {
   return actionsList.map((action) => Object.assign({ disabled }, ACTIONS[action]));
 }
 
-export default React.createClass({
+const VisualizationView = React.createClass({
   displayName: 'pyfr/common/steps/Visualization/View',
 
   propTypes: {
@@ -25,107 +29,48 @@ export default React.createClass({
     step: React.PropTypes.string,
     taskFlowName: React.PropTypes.string,
     view: React.PropTypes.string,
-  },
 
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
+    onTerminateTaskflow: React.PropTypes.func,
+    onDeleteTaskflow: React.PropTypes.func,
+    onVisualizeTaskflow: React.PropTypes.func,
+    onStatusChange: React.PropTypes.func,
 
-  getInitialState() {
-    return {
-      taskflowId: '',
-      error: '',
-      actions: [
-        'terminate',
-      ],
-      actionsDisabled: false,
-    };
-  },
-
-  componentWillMount() {
-    const taskflowId = this.props.simulation.steps.Visualization.metadata.taskflowId;
-    this.setState({ taskflowId });
-
-    this.subscription = TaskflowManager.monitorTaskflow(taskflowId, (pkt) => {
-      const actions = [];
-      var simNeedsUpdate = false;
-      var actionsDisabled = this.state.actionsDisabled;
-      var allComplete = pkt.jobs.every(job => job.status === 'complete') && pkt.tasks.every(task => task.status === 'complete');
-
-      // name is paraview and status is running -> visualize
-      if (pkt.jobs.some(job => job.name === 'paraview' && job.status === 'running')) {
-        actions.push('visualize');
-      }
-
-      // every job complete && task complete -> rerun
-      if (allComplete || pkt.jobs.every(job => job.status === 'terminated')) {
-        this.props.simulation.metadata.status = 'complete';
-        actions.push('rerun');
-        simNeedsUpdate = true;
-        actionsDisabled = false;
-      // jobs are still running -> terminate
-      } else if (!allComplete && (pkt.jobs.length + pkt.tasks.length) > 0 && !pkt.jobs.some(job => job.status === 'terminating')) {
-        this.props.simulation.metadata.status = 'running';
-        actions.push('terminate');
-        simNeedsUpdate = true;
-      }
-
-      if (simNeedsUpdate) {
-        client.saveSimulation(this.props.simulation)
-          .then(resp => {
-            client.invalidateSimulation(resp);
-          });
-      }
-
-      // Refresh ui
-      this.setState({ actions, allComplete, actionsDisabled });
-    });
-  },
-
-  componentWillUnmount() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-      this.subscription = null;
-    }
+    taskflowId: React.PropTypes.string,
+    taskflow: React.PropTypes.object,
+    error: React.PropTypes.string,
   },
 
   visualizeTaskflow() {
-    client.activateSimulationStep(this.props.simulation, 'Visualization', null)
-      .then((resp) => {
-        this.context.router.push({
-          pathname: this.props.location.pathname,
-          query: merge(this.props.location.query, { view: 'visualizer' }),
-          state: this.props.location.state,
-        });
-      })
-      .catch((err) => {
-        console.log('error: ', err);
-      });
+    const newSimState = Object.assign({}, this.props.simulation, { active: 'Visualization' });
+    const location = {
+      pathname: this.props.location.pathname,
+      query: merge(this.props.location.query, { view: 'visualizer' }),
+      state: this.props.location.state,
+    };
+
+    this.props.onVisualizeTaskflow(newSimState, location);
   },
 
   terminateTaskflow() {
-    this.setState({ actionsDisabled: true });
-    TaskflowManager.terminateTaskflow(this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId);
+    this.props.onTerminateTaskflow(this.props.taskflowId);
   },
 
   deleteTaskflow() {
-    TaskflowManager.deleteTaskflow(this.props.simulation.steps[this.props.simulation.active].metadata.taskflowId)
-      .then((resp) =>
-        client.updateSimulationStep(this.props.simulation._id, this.props.step, {
-          view: 'default',
-          metadata: {},
-        })
-      )
-      .then((resp) => {
-        this.context.router.replace({
-          pathname: this.props.location.pathname,
-          query: { view: 'default' },
-          state: this.props.location.state,
-        });
-      })
-      .catch((error) => {
-        this.setState({ error: error.data.message });
-      });
+    const simulationStep = {
+      id: this.props.simulation._id,
+      step: 'Visualization',
+      data: {
+        view: 'default',
+        metadata: {},
+      },
+    };
+    const location = {
+      pathname: this.props.location.pathname,
+      query: { view: 'default' },
+      state: this.props.location.state,
+    };
+
+    this.props.onDeleteTaskflow(this.props.taskflowId, simulationStep, location);
   },
 
   buttonBarAction(action) {
@@ -133,17 +78,79 @@ export default React.createClass({
   },
 
   render() {
+    if (!this.props.taskflow) {
+      return null;
+    }
+
+    const { taskflow, taskflowId, simulation, error } = this.props;
+    const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
+    const tasks = Object.keys(taskflow.taskMapById).map(id => taskflow.taskMapById[id]);
+    const allComplete = jobs.every(job => job.status === 'complete') && tasks.every(task => task.status === 'complete');
+    const actions = [];
+    const simulationStatus = [simulation.metadata.status];
+
+    // name is paraview and status is running -> visualize
+    if (jobs.some(job => job.name === 'paraview' && job.status === 'running')) {
+      actions.push('visualize');
+    }
+
+    if (allComplete || jobs.every(job => job.status === 'terminated')) {
+      // every job complete && task complete -> rerun
+      simulationStatus.push('complete');
+      actions.push('rerun');
+    } else if (!allComplete && (jobs.length + tasks.length) > 0 && !jobs.some(job => job.status === 'terminating')) {
+      // jobs are still running -> terminate
+      simulationStatus.push('running');
+      actions.push('terminate');
+    }
+
+    // Need to update simulation status
+    // if (simulationStatus.length === 2 && simulationStatus[0] !== simulationStatus[1]) {
+    //   this.props.onStatusChange(simulation, simulationStatus[1]);
+    // }
+
     return (
       <div>
-        <JobMonitor taskFlowId={ this.state.taskflowId } />
+        <JobMonitor taskFlowId={ taskflowId } />
         <section>
           <ButtonBar
             onAction={ this.buttonBarAction }
-            actions={ getActions(this.state.actions, this.state.actionsDisabled) }
-            error={this.state.error}
+            actions={ getActions(actions, false) }
+            error={ error }
           />
         </section>
       </div>
     );
   },
 });
+
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  (state, props) => {
+    var taskflowId = null;
+    const activeProject = state.projects.active;
+    const activeSimulation = activeProject ? state.projects.simulations[activeProject].active : null;
+
+    if (activeSimulation) {
+      const simulation = state.projects.simulations[activeProject].mapById[activeSimulation];
+      taskflowId = simulation.steps.Visualization.metadata.taskflowId;
+    }
+
+    return {
+      taskflowId,
+      taskflow: taskflowId ? state.taskflows.mapById[taskflowId] : null,
+      error: null,
+    };
+  },
+  () => {
+    return {
+      onStatusChange: (simulation, status) => dispatch(SimActions.saveSimulation(Object.assign({}, simulation, { status }))),
+      onVisualizeTaskflow: (sim, location) => dispatch(SimActions.saveSimulation(sim, null, location)),
+      onDeleteTaskflow: (id, simulationStep, location) => dispatch(Actions.deleteTaskflow(id, simulationStep, location)),
+      onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
+    };
+  }
+)(VisualizationView);
