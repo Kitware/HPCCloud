@@ -4,19 +4,22 @@ const initialState = {
   pending: {},
   success: {},
   error: {},
+  backlog: [],
 };
 
 export default function networkReducer(state = initialState, action) {
   switch (action.type) {
+
     case Actions.ADD_NETWORK_CALL: {
       const { id, label, progress, ts } = action;
       const pending = Object.assign({}, state.pending, { [id]: { id, label, progress, ts } });
       const success = Object.assign({}, state.success);
       const error = Object.assign({}, state.error);
+      const backlog = [].concat(state.backlog, success[id], error[id]).filter(el => !!el);
       delete success[id];
       delete error[id];
 
-      return Object.assign({}, { pending, success, error });
+      return Object.assign({}, { pending, success, error, backlog });
     }
 
     case Actions.SUCCESS_NETWORK_CALL: {

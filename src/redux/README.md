@@ -12,6 +12,7 @@
     },
     success: {},
     error: {},
+    log: [ {contents of pending, success, and errors sorted by timestap} ],
   },
   preferences: {
     clusters: {

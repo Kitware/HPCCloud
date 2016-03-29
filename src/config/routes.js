@@ -11,6 +11,7 @@ import PreferencesCluster   from '../pages/Preferences/Cluster';
 import PreferencesOpenStack from '../pages/Preferences/OpenStack';
 import PreferencesUser      from '../pages/Preferences/User';
 import PreferencesStatus    from '../pages/Preferences/ServerStatus';
+import PreferencesNetwork   from '../pages/Preferences/Network';
 import ProjectAll           from '../pages/Project/All';
 import ProjectEdit          from '../pages/Project/Edit';
 import ProjectNew           from '../pages/Project/New';
@@ -160,6 +161,9 @@ export default {
         }, {
           path: 'Status',
           component: PreferencesStatus,
+        }, {
+          path: 'Network',
+          component: PreferencesNetwork,
         }, {
           path: 'OpenStack',
           component: PreferencesOpenStack,

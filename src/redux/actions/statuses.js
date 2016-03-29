@@ -6,6 +6,8 @@ export const UPDATE_ACTIVE_TYPE = 'UPDATE_ACTIVE_TYPE';
 export const UPDATE_STATUS_LIST = 'UPDATE_STATUS_LIST';
 export const PENDING_CLUSTER_NETWORK = 'PENDING_CLUSTER_NETWORK';
 
+/* eslint-disable no-shadow */
+
 export function updateActiveType(index) {
   return { type: UPDATE_ACTIVE_TYPE, index };
 }
