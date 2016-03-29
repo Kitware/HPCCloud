@@ -103,7 +103,7 @@ export default connect(
   },
   () => {
     return {
-      onSave: (simulation, attachements) => dispatch(Actions.saveSimulation(simulation, attachements)),
+      onSave: (simulation, attachements) => dispatch(Actions.saveSimulation(simulation, attachements, `/View/Project/${simulation.projectId}`)),
       onCancel: (location) => dispatch(Router.replace(location)),
     };
   }

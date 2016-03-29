@@ -25,19 +25,20 @@ if (history) {
   history.listen(location => {
     var path = location.pathname.split('/');
 
-    // [ 'View|Edit', 'Project|Simulation', '${ID}']
+    // Remove any nested path => [ 'View|Edit', 'Project|Simulation', '${ID}']
     while (path.length > 4) {
       path.pop();
     }
 
+    // Extract id / type
     const id = path.pop();
     const type = path.pop();
+
+    // Activate the proper type
     if (type === 'Simulation') {
-      console.log('update active sim', id);
       dispatch(ProjectActions.setActiveSimulation(id));
     }
     if (type === 'Project') {
-      console.log('update active proj', id);
       dispatch(ProjectActions.setActiveProject(id));
     }
   });

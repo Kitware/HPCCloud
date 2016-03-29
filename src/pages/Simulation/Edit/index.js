@@ -98,7 +98,7 @@ export default connect(
   },
   () => {
     return {
-      onSave: (simulation) => dispatch(Actions.saveSimulation(simulation)),
+      onSave: (simulation) => dispatch(Actions.saveSimulation(simulation, null, `/View/Project/${simulation.projectId}`)),
       onDelete: (simulation, location) => dispatch(Actions.deleteSimulation(simulation, location)),
       onCancel: (path) => dispatch(Router.replace(path)),
     };

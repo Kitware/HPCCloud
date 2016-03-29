@@ -21,6 +21,9 @@
         { name, config, status }
       ],
       active: 0,
+      mapById: {
+        [_id]: { name, config, status },
+      }
       presets: {
         [name]: { prop: value, ... }
       }
@@ -29,10 +32,32 @@
       pending: false,
       list: [],
       active: 0,
+      mapById: {
+        [_id]: { ... },
+      }
     },
     statuses: {
       clusters: [ {...} ],
       ec2: [ {...} ],
+    }
+  },
+  taskflows: {
+    mapById: {
+      [id]: {
+        flow: { taskflow... },
+        taskMapById: {
+          [id] : { task... }
+        },
+        jobMapById: {
+          [id] : { job... }
+        },
+      }
+    },
+    taskflowMapByTaskId: {
+      [taskId]: ${taskflowId},
+    },
+    taskflowMapByJobId: {
+      [jobId]: ${taskflowId},
     }
   },
   projects: {

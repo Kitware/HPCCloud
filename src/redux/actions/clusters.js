@@ -18,6 +18,7 @@ export const TESTING_CLUSTER = 'TESTING_CLUSTER';
 export function addCluster() {
   return { type: ADD_CLUSTER };
 }
+
 export function applyPreset(index, name) {
   return { type: CLUSTER_APPLY_PRESET, index, name };
 }

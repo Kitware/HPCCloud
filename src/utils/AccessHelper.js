@@ -71,7 +71,6 @@ const SIMULATIONS_ICONS = {
 export const SimulationHelper = {
 
   getIcon(simulation) {
-    console.log(simulation.metadata.status);
     return { icon: SIMULATIONS_ICONS[simulation.metadata.status] };
   },
 

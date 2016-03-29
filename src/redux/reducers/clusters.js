@@ -7,6 +7,7 @@ const initialState = {
   list: [],
   active: 0,
   pending: false,
+  mapById: {},
 };
 
 const clusterTemplate = {
@@ -75,9 +76,17 @@ export default function clustersReducer(state = initialState, action) {
     }
 
     case Actions.REMOVE_CLUSTER: {
-      const list = state.list.splice(action.index, 1);
+      const list = state.list.filter((item, idx) => idx !== action.index);
+      const cluster = state.list.filter((item, idx) => idx === action.index)[0];
       const active = (state.active < list.length) ? state.active : (list.length - 1);
-      return Object.assign({}, state, { list, active });
+      const newState = Object.assign({}, state, { list, active });
+
+      if (cluster && cluster._id && state.mapById[cluster._id]) {
+        const mapById = Object.assign({}, state.mapById);
+        delete mapById[cluster._id];
+        return Object.assign(newState, { mapById });
+      }
+      return newState;
     }
 
     case Actions.UPDATE_ACTIVE_CLUSTER: {
@@ -91,7 +100,13 @@ export default function clustersReducer(state = initialState, action) {
       const list = action.clusters;
       const active = (state.active < list.length) ? state.active : (list.length - 1);
       updateIcon(list);
-      return Object.assign({}, state, { list, active });
+      const mapById = {};
+      list.forEach(cluster => {
+        if (cluster._id) {
+          mapById[cluster._id] = cluster;
+        }
+      });
+      return Object.assign({}, state, { list, active, mapById });
     }
 
     case Actions.UPDATE_CLUSTER_PRESETS: {
@@ -109,6 +124,11 @@ export default function clustersReducer(state = initialState, action) {
         state.list.slice(index + 1));
       const active = (state.active < list.length) ? state.active : (list.length - 1);
 
+      if (cluster._id) {
+        const mapById = Object.assign({}, state.mapById, { [cluster._id]: cluster });
+        return Object.assign({}, state, { list, active, mapById });
+      }
+
       return Object.assign({}, state, { list, active });
     }
 
@@ -120,6 +140,11 @@ export default function clustersReducer(state = initialState, action) {
         cluster,
         state.list.slice(index + 1));
       const active = (state.active < list.length) ? state.active : (list.length - 1);
+
+      if (cluster._id) {
+        const mapById = Object.assign({}, state.mapById, { [cluster._id]: cluster });
+        return Object.assign({}, state, { list, active, mapById });
+      }
 
       return Object.assign({}, state, { list, active });
     }

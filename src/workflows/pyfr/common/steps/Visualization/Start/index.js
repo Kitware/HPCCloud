@@ -6,12 +6,15 @@ import RunCluster              from '../../../../../../panels/run/RunCluster';
 import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
 import ButtonBar               from '../../../../../../panels/ButtonBar';
 
-import client                  from '../../../../../../network';
-import deepClone               from 'mout/src/lang/deepClone';
 import merge                   from 'mout/src/object/merge';
 import formStyle               from 'HPCCloudStyle/ItemEditor.mcss';
 
-export default React.createClass({
+import { connect }  from 'react-redux';
+import get          from 'mout/src/object/get';
+import { dispatch } from '../../../../../../redux';
+import * as Actions from '../../../../../../redux/actions/taskflows';
+
+const VisualizationStart = React.createClass({
 
   displayName: 'pyfr/common/steps/Visualization/Start',
 
@@ -22,10 +25,11 @@ export default React.createClass({
     step: React.PropTypes.string,
     taskFlowName: React.PropTypes.string,
     view: React.PropTypes.string,
-  },
 
-  contextTypes: {
-    router: React.PropTypes.object,
+    error: React.PropTypes.string,
+    tradClusters: React.PropTypes.object,
+    ec2Clusters: React.PropTypes.object,
+    onRun: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -38,9 +42,6 @@ export default React.createClass({
     };
   },
 
-  setServerType(e) {
-    this.setState({ serverType: e.target.value });
-  },
 
   dataChange(key, value, which) {
     var profile = this.state[which];
@@ -49,49 +50,39 @@ export default React.createClass({
   },
 
   startVisualization() {
-    var taskflowId,
-      sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
-      dataDir = this.props.simulation.steps.Visualization.metadata.dataDir,
-      metadata = { sessionId, dataDir }; // we add taskflowId later
-    client.createTaskflow(this.props.taskFlowName)
-      .then((resp) => {
-        taskflowId = resp.data._id;
-        metadata.taskflowId = taskflowId;
-        return client.startTaskflow(taskflowId, {
-          cluster: { _id: this.state[this.state.serverType].profile },
-          dataDir, // where the output for the sim will be
-          sessionKey: sessionId, // for pvw, we use this later for connecting
-        });
-      })
-      .then((resp) =>
-        client.updateSimulationStep(this.props.simulation._id, this.props.step, {
-          view: 'run',
-          metadata,
-        })
-      )
-      .then((resp) => {
-        var newSim = deepClone(this.props.simulation);
-        newSim.steps[this.props.step].view = 'run';
-        newSim.steps[this.props.step].metadata = metadata;
-        newSim.metadata.status = 'running';
-        client.invalidateSimulation(newSim);
+    const sessionKey = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
+    const dataDir = this.props.simulation.steps.Visualization.metadata.dataDir;
+    const payload = {
+      cluster: { _id: this.state[this.state.serverType].profile },
+      dataDir, // where the output for the sim will be
+      sessionKey, // for pvw, we use this later for connecting
+    };
+    const simStepUpdate = {
+      id: this.props.simulation._id,
+      step: 'Visualization',
+      data: {
+        view: 'run',
+        metadata: {
+          sessionId: sessionKey,
+          dataDir,
+        },
+      },
+    };
+    const location = {
+      pathname: this.props.location.pathname,
+      query: merge(this.props.location.query, { view: 'run' }),
+      state: this.props.location.state,
+    };
 
-        this.context.router.replace({
-          pathname: this.props.location.pathname,
-          query: merge(this.props.location.query, { view: 'run' }),
-          state: this.props.location.state,
-        });
-
-        client.saveSimulation(newSim);
-      })
-      .catch((error) => {
-        var msg = error.data && error.data.message ? error.data.message : error;
-        this.setState({ error: msg });
-      });
+    this.props.onRun(this.props.taskFlowName, payload, simStepUpdate, location);
   },
 
   formAction(action) {
     this[action]();
+  },
+
+  updateServerType(e) {
+    this.setState({ serverType: e.target.value });
   },
 
   render() {
@@ -114,7 +105,7 @@ export default React.createClass({
         <div>
             <section className={formStyle.group}>
                 <label className={formStyle.label}>Server Type</label>
-                <select className={formStyle.input} value={this.state.serverType} onChange={ this.setServerType }>
+                <select className={formStyle.input} value={this.state.serverType} onChange={ this.updateServerType }>
                     <option value="Traditional">Traditional</option>
                     <option value="EC2">EC2</option>
                     <option value="OpenStack">OpenStack</option>
@@ -128,10 +119,30 @@ export default React.createClass({
                   visible={this.state[this.state.serverType].profile !== ''}
                   onAction={this.formAction}
                   actions={actions}
-                  error={this.state.error}
+                  error={this.props.error}
                 />
             </section>
         </div>
     );
   },
 });
+
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  (state, props) => {
+    return {
+      error: get(state, 'network.error.create_taskflow.resp.data.message')
+        || get(state, 'network.error.start_taskflow.resp.data.message'),
+      ec2Clusters: state.preferences.aws.mapById,
+      tradClusters: state.preferences.clusters.mapById,
+    };
+  },
+  () => {
+    return {
+      onRun: (taskflowName, payload, simulationStep, location) => dispatch(Actions.createTaskflow(taskflowName, payload, simulationStep, location)),
+    };
+  }
+)(VisualizationStart);
