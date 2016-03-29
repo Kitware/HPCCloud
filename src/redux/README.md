@@ -28,6 +28,11 @@
       pending: false,
       list: [],
       active: 0,
+    },
+    statuses: {
+      active: 0,
+      list: ['EC2', 'Cluster'],
+      activeData: [ {...} ]
     }
   },
   projects: {

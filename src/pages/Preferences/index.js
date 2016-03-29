@@ -6,11 +6,13 @@ export const breadcrumb = {
     '/Preferences/User',
     '/Preferences/Cluster',
     '/Preferences/AWS',
+    '/Preferences/Status',
   ],
   icons: [
     style.userIcon,
     style.clusterIcon,
     style.ec2Icon,
+    style.statusIcon,
   ],
   active: -1,
 };

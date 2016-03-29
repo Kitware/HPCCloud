@@ -24,6 +24,12 @@ export function configure(config = { girderAPI: '/api/v1' }) {
 if (history) {
   history.listen(location => {
     var path = location.pathname.split('/');
+
+    // [ 'View|Edit', 'Project|Simulation', '${ID}']
+    while (path.length > 4) {
+      path.pop();
+    }
+
     const id = path.pop();
     const type = path.pop();
     if (type === 'Simulation') {
