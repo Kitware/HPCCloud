@@ -17,24 +17,52 @@
     background-color: lightblue;
 }
 
+/* Icons */
 .preferenceIcon {
-    composes: fa        from 'font-awesome/css/font-awesome.css';
-    composes: fa-fw     from 'font-awesome/css/font-awesome.css';
+    composes: fa    from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw from 'font-awesome/css/font-awesome.css';
     color: black;
 }
 
 .userIcon {
     composes: preferenceIcon;
-    composes: fa-user   from 'font-awesome/css/font-awesome.css';
+    composes: fa-user from 'font-awesome/css/font-awesome.css';
 }
 
 .clusterIcon {
     composes: preferenceIcon;
-    composes: fa-share-alt  from 'font-awesome/css/font-awesome.css';
+    composes: fa-share-alt from 'font-awesome/css/font-awesome.css';
 }
-
 
 .ec2Icon {
     composes: preferenceIcon;
-    composes: fa-mixcloud   from 'font-awesome/css/font-awesome.css';
+    composes: fa-mixcloud from 'font-awesome/css/font-awesome.css';
+}
+
+.statusIcon {
+    composes: preferenceIcon;
+    composes: fa-info from 'font-awesome/css/font-awesome.css';
+}
+
+.networkIcon {
+    composes: preferenceIcon;
+    composes: fa-terminal from 'font-awesome/css/font-awesome.css';
+}
+
+.networkPendingIcon {
+    composes: preferenceIcon;
+    composes: fa-ellipsis-h from 'font-awesome/css/font-awesome.css';
+    composes: colorYellow from 'HPCCloudStyle/Theme.mcss';
+}
+
+.networkSuccessIcon {
+    composes: preferenceIcon;
+    composes: fa-check from 'font-awesome/css/font-awesome.css';
+    composes: colorGreen from 'HPCCloudStyle/Theme.mcss';
+}
+
+.networkErrorIcon {
+    composes: preferenceIcon;
+    composes: fa-warning from 'font-awesome/css/font-awesome.css';
+    composes: colorRed from 'HPCCloudStyle/Theme.mcss';
 }

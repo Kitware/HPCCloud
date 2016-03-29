@@ -30,10 +30,7 @@ export default React.createClass({
   },
 
   changeActive(event) {
-    var el = event.target;
-    while (el.dataset.index === undefined) {
-      el = el.parentNode;
-    }
+    var el = event.currentTarget;
 
     if (this.props.onActiveChange) {
       const newIndex = parseInt(el.dataset.index, 10);

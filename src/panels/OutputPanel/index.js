@@ -7,12 +7,14 @@ export default React.createClass({
     advanced: React.PropTypes.bool,
     items: React.PropTypes.array,
     title: React.PropTypes.string,
+    subtitle: React.PropTypes.string,
   },
   getDefaultProps() {
     return {
       advanced: false,
       items: [],
       title: '',
+      subtitle: '',
     };
   },
   getInitialState() {
@@ -27,7 +29,7 @@ export default React.createClass({
     var advancedControl = null;
     if (this.props.advanced) {
       advancedControl = (<div className={ style.buttons }>
-        <span key={status} className={ style.count }>{ `files(${this.props.items.length})` }</span>
+        <span key={status} className={ style.count }>{ this.props.subtitle ? `${this.props.subtitle}(${this.props.items.length})` : null }</span>
         <i
           className={ this.state.open ? style.advancedIconOn : style.advancedIconOff}
           onClick={ this.toggleAdvanced }

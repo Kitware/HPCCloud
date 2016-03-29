@@ -12,6 +12,7 @@
     },
     success: {},
     error: {},
+    backlog: [ {contents of outdated pending, success, and errors} ],
   },
   preferences: {
     clusters: {
@@ -28,6 +29,10 @@
       pending: false,
       list: [],
       active: 0,
+    },
+    statuses: {
+      clusters: [ {...} ],
+      ec2: [ {...} ],
     }
   },
   projects: {
