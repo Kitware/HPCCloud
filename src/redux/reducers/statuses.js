@@ -1,28 +1,23 @@
 import * as Actions from '../actions/statuses';
 
 const initialState = {
-  list: [
-    { name: 'EC2' },
-    { name: 'Clusters' },
-  ],
-  active: 0,
-  activeData: [],
-  pending: false,
+  ec2: [],
+  clusters: [],
 };
 
 export default function statusesReducer(state = initialState, action) {
   switch (action.type) {
-    case Actions.UPDATE_ACTIVE_TYPE: {
+    case Actions.UPDATE_EC2_LIST: {
       return Object.assign(
         {},
         state,
-        { active: action.index });
+        { ec2: action.list });
     }
-    case Actions.UPDATE_STATUS_LIST: {
+    case Actions.UPDATE_CLUSTERS_LIST: {
       return Object.assign(
         {},
         state,
-        { activeData: action.list });
+        { clusters: action.list });
     }
     default:
       return state;

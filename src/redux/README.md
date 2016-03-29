@@ -12,7 +12,7 @@
     },
     success: {},
     error: {},
-    log: [ {contents of pending, success, and errors sorted by timestap} ],
+    backlog: [ {contents of outdated pending, success, and errors} ],
   },
   preferences: {
     clusters: {
@@ -31,9 +31,8 @@
       active: 0,
     },
     statuses: {
-      active: 0,
-      list: ['EC2', 'Cluster'],
-      activeData: [ {...} ]
+      clusters: [ {...} ],
+      ec2: [ {...} ],
     }
   },
   projects: {
