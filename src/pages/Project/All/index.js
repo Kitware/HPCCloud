@@ -82,7 +82,7 @@ export default connect(
     return {
       onActivate: (id, location) => dispatch(Actions.setActiveProject(id, location)),
       onDeleteItem: (project) => dispatch(Actions.deleteProject(project)),
-      onLocationChange: location => dispatch(Router.replace(location)),
+      onLocationChange: location => dispatch(Router.push(location)),
     };
   }
 )(ProjectAll);

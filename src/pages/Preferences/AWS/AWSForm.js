@@ -94,6 +94,7 @@ export default React.createClass({
               value={this.state.data.name}
               data-key="name"
               onChange={this.formChange}
+              disabled={this.state.data._id}
               required
             />
           </section>
@@ -105,6 +106,7 @@ export default React.createClass({
                 value={this.state.data.accessKeyId}
                 data-key="accessKeyId"
                 onChange={this.formChange}
+                disabled={this.state.data._id}
                 required
               />
           </section>
@@ -117,6 +119,7 @@ export default React.createClass({
                     value={this.state.data.secretAccessKey}
                     data-key="secretAccessKey"
                     onChange={this.formChange}
+                    disabled={this.state.data._id}
                     required
                   />
               </section>
@@ -128,6 +131,7 @@ export default React.createClass({
                 value={this.state.data.regionName}
                 data-key="regionName"
                 onChange={this.formChange}
+                disabled={this.state.data._id}
                 required
               >
                 { Object.keys(this.props.regions).map((reg, index) =>
@@ -142,6 +146,7 @@ export default React.createClass({
                 value={this.state.data.availabilityZone}
                 data-key="availabilityZone"
                 onChange={this.formChange}
+                disabled={this.state.data._id}
                 required
               >
                 { this.props.regions[this.state.data.regionName].map((zone, index) =>

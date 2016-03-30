@@ -74,7 +74,6 @@ export function removeAWSProfile(index, profile) {
 
 export function updateAWSProfile(index, profile, pushToServer = false) {
   return dispatch => {
-    const saveAction = { type: SAVE_AWS_PROFILE, index, profile };
     if (pushToServer) {
       const action = netActions.addNetworkCall('save_aws_profile', 'Save cluster');
       dispatch(pendingNetworkCall(true));
@@ -90,7 +89,7 @@ export function updateAWSProfile(index, profile, pushToServer = false) {
             dispatch(pendingNetworkCall(false));
           });
     }
-    return saveAction;
+    return { type: SAVE_AWS_PROFILE, index, profile };
   };
 }
 

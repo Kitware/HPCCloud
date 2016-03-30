@@ -92,7 +92,6 @@ const visualizationView = React.createClass({
     }
 
     const { taskflow, taskflowId, simulation, error } = this.props;
-    console.log(taskflow);
     const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
     const tasks = Object.keys(taskflow.taskMapById).map(id => taskflow.taskMapById[id]);
     const allComplete = jobs.every(job => job.status === 'complete') && tasks.every(task => task.status === 'complete');
