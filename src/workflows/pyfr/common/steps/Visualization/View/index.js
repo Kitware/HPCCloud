@@ -78,7 +78,7 @@ const VisualizationView = React.createClass({
   },
 
   render() {
-    if (!this.props.taskflow) {
+    if (!this.props.taskflow || !this.props.taskflow.flow) {
       return null;
     }
 
