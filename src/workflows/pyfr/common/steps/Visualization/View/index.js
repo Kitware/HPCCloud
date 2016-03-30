@@ -111,7 +111,7 @@ const VisualizationView = React.createClass({
 
     return (
       <div>
-        <JobMonitor taskFlowId={ taskflowId } />
+        <JobMonitor taskflowId={ taskflowId } />
         <section>
           <ButtonBar
             onAction={ this.buttonBarAction }

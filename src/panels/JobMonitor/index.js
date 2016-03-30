@@ -1,47 +1,33 @@
 import React                from 'react';
-import TaskflowManager      from '../../network/TaskflowManager';
 import ExecutionUnit        from './ExecutionUnit.js';
 import style                from 'HPCCloudStyle/JobMonitor.mcss';
 
-export default React.createClass({
+import { connect }  from 'react-redux';
+
+const JobMonitor = React.createClass({
   displayName: 'JobMonitor',
 
   propTypes: {
-    taskFlowId: React.PropTypes.string,
+    taskflowId: React.PropTypes.string,
+    tasks: React.PropTypes.array,
+    jobs: React.PropTypes.array,
+    taskStatusCount: React.PropTypes.object,
+    taskflowLog: React.PropTypes.array,
   },
 
   getInitialState() {
     return {
-      taskflowLog: [],
-      taskStatusCount: {},
-      tasks: [], // taskflow tasks
-      jobs: [], // hpc tasks/job
       advanced: false,
     };
   },
 
-  componentWillMount() {
-    this.refreshTaskflowLog();
-    this.subscription = TaskflowManager.monitorTaskflow(this.props.taskFlowId, (pkt) => {
-      // Sort the tasks by created timestamp
-      pkt.tasks.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
-      this.setState(pkt);
-    });
-  },
 
-  componentWillUnmount() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-      this.subscription = null;
-    }
-  },
-
-  refreshTaskflowLog() {
-    TaskflowManager.getTaskflowLog(this.props.taskFlowId)
-      .then(resp => {
-        this.setState({ taskflowLog: resp.data.log });
-      });
-  },
+  // refreshTaskflowLog() {
+  //   TaskflowManager.getTaskflowLog(this.props.taskFlowId)
+  //     .then(resp => {
+  //       this.setState({ taskflowLog: resp.data.log });
+  //     });
+  // },
 
   toggleAdvanced() {
     const advanced = !this.state.advanced;
@@ -56,8 +42,8 @@ export default React.createClass({
                   Jobs
               </div>
               <div className={ style.buttons }>
-                  { Object.keys(this.state.taskStatusCount).map(status =>
-                    <span key={status} className={ style.count }>{ `${status}(${this.state.taskStatusCount[status]})` }</span>
+                  { Object.keys(this.props.taskStatusCount).map(status =>
+                    <span key={status} className={ style.count }>{ `${status}(${this.props.taskStatusCount[status]})` }</span>
                   )}
                   <i
                     className={ this.state.advanced ? style.advancedIconOn : style.advancedIconOff}
@@ -67,7 +53,7 @@ export default React.createClass({
           </div>
           <div className={ style.jobContent }>
             {
-              this.state.jobs.map(job =>
+              this.props.jobs.map(job =>
                 <ExecutionUnit key={job._id} unit={job} />
               )
             }
@@ -82,7 +68,7 @@ export default React.createClass({
               </div>
               <div className={ style.taskflowContent }>
                 {
-                  this.state.tasks.map(task =>
+                  this.props.tasks.map(task =>
                     <ExecutionUnit key={task._id} unit={task} />
                   )
                 }
@@ -97,10 +83,53 @@ export default React.createClass({
               </div>
               <div className={ style.taskflowContent }>
                 {
-                  <ExecutionUnit key={this.props.taskFlowId} unit={{ name: 'Log', log: this.state.taskflowLog }} />
+                  <ExecutionUnit key={this.props.taskflowId} unit={{ name: 'Log', log: this.props.taskflowLog }} />
                 }
               </div>
           </div>
       </div>);
   },
 });
+
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  (state, props) => {
+    const { taskflowId } = props;
+    const taskflow = taskflowId ? state.taskflows.mapById[taskflowId] : null;
+    const tasks = [];
+    const jobs = [];
+    const taskStatusCount = {};
+    const taskflowLog = [];
+
+    if (taskflow) {
+      Object.keys(taskflow.taskMapById).forEach(id => {
+        tasks.push(taskflow.taskMapById[id]);
+        const status = taskflow.taskMapById[id].status;
+        if (taskStatusCount[status]) {
+          taskStatusCount[status]++;
+        } else {
+          taskStatusCount[status] = 1;
+        }
+      });
+      Object.keys(taskflow.jobMapById).forEach(id => {
+        jobs.push(taskflow.jobMapById[id]);
+      });
+    }
+
+    // Sort the tasks by created timestamp
+    tasks.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
+
+    // FIXME need to fill taskflowLog
+
+    return {
+      tasks,
+      jobs,
+      taskStatusCount,
+      taskflowLog,
+    };
+  }
+)(JobMonitor);
+

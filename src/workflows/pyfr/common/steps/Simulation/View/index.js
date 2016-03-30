@@ -147,7 +147,7 @@ const SimualtionView = React.createClass({
 
     return (
       <div>
-        <JobMonitor taskFlowId={ taskflowId } />
+        <JobMonitor taskflowId={ taskflowId } />
         { fileListing }
         <section>
             <ButtonBar
