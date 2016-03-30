@@ -40,6 +40,9 @@ export default function projectsReducer(state = initialState, action) {
       const sim = simulations[id] || Helper.initialState;
       simulations[id] = Helper.updateList(sim, action.simulations);
 
+      // Simulation map is kept somewhere else
+      delete simulations[id].mapById;
+
       if (state.pendingActiveSimulation && simulations[id].list.indexOf(state.pendingActiveSimulation) !== -1) {
         simulations[id] = Helper.updateActive(simulations[id], state.pendingActiveSimulation);
         const coreState = Helper.updateActive(state, id);
@@ -55,6 +58,10 @@ export default function projectsReducer(state = initialState, action) {
       const simulations = Object.assign({}, state.simulations);
       const sims = simulations[id] || Helper.initialState;
       simulations[id] = Helper.removeItem(sims, action.simulation._id);
+
+      // Simulation map is kept somewhere else
+      delete simulations[id].mapById;
+
       return Object.assign({}, state, { simulations });
     }
 
@@ -66,6 +73,10 @@ export default function projectsReducer(state = initialState, action) {
         return Object.assign({}, state, { pendingActiveSimulation: action.id });
       }
       simulations[id] = Helper.updateActive(sims, action.id);
+
+      // Simulation map is kept somewhere else
+      delete simulations[id].mapById;
+
       return Object.assign({}, state, { simulations });
     }
 
@@ -74,6 +85,10 @@ export default function projectsReducer(state = initialState, action) {
       const simulations = Object.assign({}, state.simulations);
       const sims = simulations[id] || Helper.initialState;
       simulations[id] = Helper.updateItem(sims, action.simulation);
+
+      // Simulation map is kept somewhere else
+      delete simulations[id].mapById;
+
       return Object.assign({}, state, { simulations });
     }
 

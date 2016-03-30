@@ -59,7 +59,7 @@ export default connect(
   state => {
     const project = state.projects.mapById[state.projects.active];
     const simulations = state.projects.simulations[state.projects.active];
-    const simulation = simulations ? simulations.mapById[simulations.active] : null;
+    const simulation = simulations ? state.simulations.mapById[simulations.active] : null;
 
     return {
       project,

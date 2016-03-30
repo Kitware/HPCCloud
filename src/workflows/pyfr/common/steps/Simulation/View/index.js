@@ -171,7 +171,7 @@ export default connect(
     const activeSimulation = activeProject ? state.projects.simulations[activeProject].active : null;
 
     if (activeSimulation) {
-      const simulation = state.projects.simulations[activeProject].mapById[activeSimulation];
+      const simulation = state.simulations.mapById[activeSimulation];
       taskflowId = simulation.steps.Simulation.metadata.taskflowId;
     }
 
