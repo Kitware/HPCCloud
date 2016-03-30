@@ -25,6 +25,7 @@ store.subscribe(() => {
   if (state.taskflows.updateLogs.length > 0) {
     state.taskflows.updateLogs.forEach((taskflowId) => {
       // fetch the log of the taskflow id
+      // when all comlpleted: fetch folder
       // update the simulation status if it's different than the current
     });
   }
