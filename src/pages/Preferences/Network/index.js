@@ -25,10 +25,13 @@ const StatusPage = React.createClass({
   },
 
   networkMapper(el, index) {
-    if (!el.label) {
-      return null;
-    }
-    return { name: el.label, value: (<span>{el.state} <i className={iconMap[el.state]}></i></span>) };
+    // if (!el.label) {
+    //   return null;
+    // }
+    return {
+      name: <span title={JSON.stringify(el, null, '  ')}><i className={iconMap[el.state]}></i> {el.label ? el.label : '__'}</span>,
+      value: (<span>{el.state}</span>),
+    };
   },
 
   render() {
@@ -56,8 +59,8 @@ export default connect(
       Object.keys(localState.pending).map((id) => Object.assign({ state: 'pending' }, localState.pending[id])),
       Object.keys(localState.success).map((id) => Object.assign({ state: 'success' }, localState.success[id])),
       Object.keys(localState.error).map((id) => Object.assign({ state: 'error' }, localState.error[id])))
-      .sort((a, b) => a.ts < b.ts);
-    console.log(log);
+      .sort((a, b) => Number(b.ts) - Number(a.ts));
+    // console.log(log);
     return {
       log,
     };

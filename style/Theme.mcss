@@ -20,11 +20,14 @@
 .colorRed {
     color: #c54d57;
 }
+.colorBlack {
+    color: #222;
+}
 
 /* Toolbars / Headers */
 .topBar {
     composes: topBar from 'HPCCloudStyle/Layout.mcss';
-    background: #222;
+    background-color: #222;
     color: #ededed;
     letter-spacing: 0.025em;
     font-size: 1.05em;

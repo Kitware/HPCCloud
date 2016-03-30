@@ -64,7 +64,6 @@ export function fetchClusterPresets() {
 export function fetchClusters() {
   return dispatch => {
     const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
-
     dispatch(pendingNetworkCall(true));
     client.listClusterProfiles()
       .then(

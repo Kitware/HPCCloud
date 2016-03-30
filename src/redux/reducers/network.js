@@ -23,11 +23,14 @@ export default function networkReducer(state = initialState, action) {
     }
 
     case Actions.SUCCESS_NETWORK_CALL: {
+      if (!state.pending[action.id]) {
+        // FIXME: strange behavior where action.id is null
+        return state;
+      }
       const pending = Object.assign({}, state.pending);
       const callToMove = Object.assign({}, pending[action.id], { resp: action.resp });
       const success = Object.assign({}, state.success, { [action.id]: callToMove });
       delete pending[action.id];
-
       return Object.assign({}, state, { pending, success });
     }
 

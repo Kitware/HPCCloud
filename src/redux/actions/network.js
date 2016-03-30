@@ -27,7 +27,6 @@ export function errorNetworkCall(id, resp) {
   };
 }
 
-
 export function progressNetworkCall(id, progress = 0.5) {
   return {
     type: PROGRESS_NETWORK_CALL,
