@@ -33,7 +33,7 @@ const ProjectEdit = React.createClass({
   },
 
   cancel() {
-    this.props.onCancel(`/View/Project/${this.props.project._id}`);
+    this.props.onCancel('/');
   },
 
   delete() {

@@ -16,7 +16,7 @@ export default function taskflowsReducer(state = initialState, action) {
           jobMapById[job._id] = job;
         });
       }
-      const simulation = state.mapById[action.taskflow._id].simulation;
+      const simulation = state.mapById[action.taskflow._id] ? state.mapById[action.taskflow._id].simulation : null;
       const mapById = Object.assign(
         {},
         state.mapById,
