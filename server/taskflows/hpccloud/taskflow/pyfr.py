@@ -28,7 +28,7 @@ from cumulus.tasks.job import download_job_input_folders, submit_job
 from cumulus.tasks.job import monitor_job, monitor_jobs
 from cumulus.tasks.job import upload_job_output_to_folder
 from cumulus.tasks.job import terminate_job
-
+from cumulus.transport.files.download import download_path_from_cluster
 from girder.utility.model_importer import ModelImporter
 from girder.api.rest import getCurrentUser
 from girder.constants import AccessType
@@ -412,13 +412,20 @@ def upload_export_output(task, _, cluster, job, *args, **kwargs):
 
     for job_id in task.taskflow.get_metadata('export_jobs')['export_jobs']:
         # Get job
-        job = client.get('jobs/%s' % job_id)
-        job['output'] = [{
+        export_job = client.get('jobs/%s' % job_id)
+        export_job['output'] = [{
             'folderId': output_folder_id,
             'path': '.'
         }]
-        upload_job_output_to_folder(cluster, job, log_write_url=None, job_dir=None,
-                                    girder_token=task.taskflow.girder_token)
+
+        upload_job_output_to_folder(cluster, export_job, log_write_url=None,
+            job_dir=None, girder_token=task.taskflow.girder_token)
+
+    # Upload the vtu files
+    girder_token = task.taskflow.girder_token
+    download_path_from_cluster(cluster, girder_token, output_folder_id, job['dir'],
+                               include=['^.*\\.vtu$'])
+
 
 @cumulus.taskflow.task
 def upload_output(task, _, cluster, job, *args, **kwargs):
