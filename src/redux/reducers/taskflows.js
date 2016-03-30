@@ -24,9 +24,25 @@ export default function taskflowsReducer(state = initialState, action) {
           flow: action.taskflow,
           jobMapById,
           taskMapById: {},
+          log: [],
           simulation,
         } });
       return Object.assign({}, state, { mapById });
+    }
+
+    case Actions.UPDATE_TASKFLOW_LOG: {
+      const newLog = action.log;
+      const mapById = Object.assign({}, state.mapById);
+      const taskflow = Object.assign({}, state.mapById[action.taskflowId]);
+      taskflow.log = newLog;
+      mapById[action.taskflowId] = taskflow;
+
+      return Object.assign({}, state, { mapById });
+    }
+
+    case Actions.CLEAR_UPDATE_LOG: {
+      const updateLogs = [];
+      return Object.assign({}, state, { updateLogs });
     }
 
     case Actions.UPDATE_TASKFLOW_JOB_LOG: {

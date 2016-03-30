@@ -20,7 +20,6 @@ export function updateActiveProfile(index) {
 }
 
 export function pendingNetworkCall(pending = false) {
-  console.log('pending', pending);
   return { type: PENDING_AWS_NETWORK, pending };
 }
 

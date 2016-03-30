@@ -9,6 +9,7 @@ import { Provider }       from 'react-redux';
 import routes                       from './config/routes';
 import { store, history, dispatch } from './redux';
 import * as ProjectActions          from './redux/actions/projects';
+import * as TaskflowActions         from './redux/actions/taskflows';
 
 // Setup application and pages
 const container = document.querySelector('.react-container');
@@ -21,10 +22,12 @@ export function configure(config = { girderAPI: '/api/v1' }) {
 }
 
 store.subscribe(() => {
-  const state = store.getState();
-  if (state.taskflows.updateLogs.length > 0) {
-    state.taskflows.updateLogs.forEach((taskflowId) => {
+  if (store.getState().taskflows.updateLogs.length > 0) {
+    const updateLogs = store.getState().taskflows.updateLogs;
+    dispatch(TaskflowActions.clearUpdateLog());
+    updateLogs.forEach((taskflowId) => {
       // fetch the log of the taskflow id
+      dispatch(TaskflowActions.updateTaskflowLog(taskflowId));
       // when all comlpleted: fetch folder
       // update the simulation status if it's different than the current
     });

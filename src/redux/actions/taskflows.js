@@ -4,6 +4,8 @@ import client           from '../../network';
 import { store, dispatch } from '..';
 
 export const ADD_TASKFLOW = 'ADD_TASKFLOW';
+export const UPDATE_TASKFLOW_LOG = 'UPDATE_TASKFLOW_LOG';
+export const CLEAR_UPDATE_LOG = 'CLEAR_UPDATE_LOG';
 export const UPDATE_TASKFLOW_JOB_LOG = 'UPDATE_TASKFLOW_JOB_LOG';
 export const UPDATE_TASKFLOW_JOB_STATUS = 'UPDATE_TASKFLOW_JOB_STATUS';
 export const UPDATE_TASKFLOW_TASKS = 'UPDATE_TASKFLOW_TASKS';
@@ -15,6 +17,10 @@ export const DELETE_TASKFLOW = 'DELETE_TASKFLOW';
 
 export function addTaskflow(taskflow) {
   return { type: ADD_TASKFLOW, taskflow };
+}
+
+export function clearUpdateLog() {
+  return { type: CLEAR_UPDATE_LOG };
 }
 
 export function startTaskflow(id, payload, simulationStep, location) {
@@ -63,6 +69,21 @@ export function createTaskflow(taskFlowName, payload, simulationStep, location) 
           dispatch(netActions.errorNetworkCall(action.id, error));
         });
 
+    return action;
+  };
+}
+
+export function updateTaskflowLog(taskflowId) {
+  return dispatch => {
+    const action = netActions.addNetworkCall(`taskflow_log_${taskflowId}`, 'Check taskflow log');
+    client.getTaskflowLog(taskflowId)
+      .then(resp => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch({ type: UPDATE_TASKFLOW_LOG, taskflowId, log: resp.data.log });
+      })
+      .catch(error => {
+        dispatch(netActions.errorNetworkCall(action.id, error));
+      });
     return action;
   };
 }

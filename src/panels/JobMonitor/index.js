@@ -77,9 +77,7 @@ const JobMonitor = React.createClass({
                   <div className={ style.title }>
                       Workflow log
                   </div>
-                  <div className={ style.buttons }>
-                    <i className={style.refreshIcon} onClick={this.refreshTaskflowLog}></i>
-                  </div>
+                  <div className={ style.buttons }></div>
               </div>
               <div className={ style.taskflowContent }>
                 {
@@ -102,7 +100,7 @@ export default connect(
     const tasks = [];
     const jobs = [];
     const taskStatusCount = {};
-    const taskflowLog = [];
+    var taskflowLog = [];
 
     if (taskflow) {
       Object.keys(taskflow.taskMapById).forEach(id => {
@@ -117,6 +115,8 @@ export default connect(
       Object.keys(taskflow.jobMapById).forEach(id => {
         jobs.push(taskflow.jobMapById[id]);
       });
+      // console.log(taskflow.log);
+      taskflowLog = taskflow.log;
     }
 
     // Sort the tasks by created timestamp
