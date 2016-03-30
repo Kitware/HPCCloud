@@ -15,11 +15,8 @@ const StatusPage = React.createClass({
   displayName: 'Preferences/Status',
 
   propTypes: {
-    active: React.PropTypes.number,
-    activeData: React.PropTypes.array,
-    list: React.PropTypes.array,
-    error: React.PropTypes.string,
-    onActiveChange: React.PropTypes.func,
+    ec2: React.PropTypes.array,
+    clusters: React.PropTypes.array,
   },
 
   getDefaultProps() {
@@ -27,10 +24,6 @@ const StatusPage = React.createClass({
       ec2: [],
       clusters: [],
     };
-  },
-
-  activeChange(active) {
-    this.props.onActiveChange(active);
   },
 
   serverMapper(el, index) {
@@ -56,14 +49,12 @@ const StatusPage = React.createClass({
 });
 
 // Binding
-
 export default connect(
   state => {
     const localState = state.preferences.statuses;
     return {
       ec2: localState.ec2,
       clusters: localState.clusters,
-      // activeData: localState.activeData,
     };
   }
 )(StatusPage);
