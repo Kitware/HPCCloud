@@ -77,7 +77,7 @@ export default connect(
       return { project: { name: 'No project found' }, simulations: [], error: 'No project found' };
     }
     const projectSims = state.projects.simulations[project._id];
-    const simulations = projectSims ? projectSims.list.map(id => projectSims.mapById[id]) : [];
+    const simulations = projectSims ? projectSims.list.map(id => state.simulations.mapById[id]).filter(i => !!i) : [];
     return {
       project,
       simulations,

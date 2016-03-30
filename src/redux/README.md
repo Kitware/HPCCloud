@@ -78,14 +78,13 @@
       [project id]: {
         list: ['2345', '567657'],
         active: '2345',
-        mapById: {
-          [simId]: { ...full simulation object }
-        },
       }
     }
   },
-  simulationsMapById: {
-    [simId]: { ...full simulation object }
+  simulations: {
+    mapById: {
+      [simId]: { ...full simulation object }
+    }
   },
 }
 ```

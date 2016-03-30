@@ -88,7 +88,7 @@ export default connect(
   (state, props) => {
     const project = state.projects.mapById[state.projects.active];
     const simulations = state.projects.simulations[state.projects.active];
-    const simulation = simulations.mapById[simulations.active];
+    const simulation = state.simulations.mapById[simulations.active];
     return {
       error: get(state, 'network.error.save_simulation.resp.data.message')
           || get(state, `network.error.delete_simulation_${props.params.id}.resp.data.message`),
