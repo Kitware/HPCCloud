@@ -52,7 +52,12 @@
           [id] : { job... }
         },
         log: [ ...log entries ],
-        simulation: id
+        simulation: id,
+        primaryJob: 'pyfr_run',
+        stepName: 'Simulation', // Only provided for primaryJob retreival
+        actions: [ 'rerun', 'terminate' ],
+        allComplete: false,
+        outputDirectory: '/opt/hpccloud-jobs/23452345234',
       }
     },
     taskflowMapByTaskId: {

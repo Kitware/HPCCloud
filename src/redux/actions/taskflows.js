@@ -12,11 +12,12 @@ export const UPDATE_TASKFLOW_TASKS = 'UPDATE_TASKFLOW_TASKS';
 export const UPDATE_TASKFLOW_TASK_STATUS = 'UPDATE_TASKFLOW_TASK_STATUS';
 export const BIND_SIMULATION_TO_TASKFLOW = 'BIND_SIMULATION_TO_TASKFLOW';
 export const DELETE_TASKFLOW = 'DELETE_TASKFLOW';
+export const UPDATE_TASKFLOW_METADATA = 'UPDATE_TASKFLOW_METADATA';
 
 /* eslint-disable no-shadow */
 
-export function addTaskflow(taskflow) {
-  return { type: ADD_TASKFLOW, taskflow };
+export function addTaskflow(taskflow, primaryJob = null) {
+  return { type: ADD_TASKFLOW, taskflow, primaryJob };
 }
 
 export function clearUpdateLog() {
@@ -41,9 +42,6 @@ export function startTaskflow(id, payload, simulationStep, location) {
                 simulationStep.data.metadata,
                 { taskflowId: id }) });
             dispatch(projActions.updateSimulationStep(simulationStep.id, simulationStep.step, data, location));
-
-            // FIXME update simulation status to running
-            console.log('need to update sim status to running');
           }
         },
         error => {
@@ -54,7 +52,7 @@ export function startTaskflow(id, payload, simulationStep, location) {
   };
 }
 
-export function createTaskflow(taskFlowName, payload, simulationStep, location) {
+export function createTaskflow(taskFlowName, primaryJob, payload, simulationStep, location) {
   return dispatch => {
     const action = netActions.addNetworkCall('create_taskflow', 'Create taskflow');
 
@@ -62,7 +60,7 @@ export function createTaskflow(taskFlowName, payload, simulationStep, location) 
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(addTaskflow(resp.data));
+          dispatch(addTaskflow(resp.data, primaryJob));
           dispatch(startTaskflow(resp.data._id, payload, simulationStep, location));
         },
         error => {
@@ -189,8 +187,8 @@ export function updateAllTaskflows() {
   };
 }
 
-export function attachSimulationToTaskflow(simulationId, taskflowId) {
-  return { type: BIND_SIMULATION_TO_TASKFLOW, taskflowId, simulationId };
+export function attachSimulationToTaskflow(simulationId, taskflowId, stepName) {
+  return { type: BIND_SIMULATION_TO_TASKFLOW, taskflowId, simulationId, stepName };
 }
 
 export function updateTaskflowFromSimulation(simulation) {
@@ -199,7 +197,7 @@ export function updateTaskflowFromSimulation(simulation) {
       const taskflowId = simulation.steps[name].metadata.taskflowId;
       if (taskflowId) {
         dispatch(fetchTaskflow(taskflowId));
-        dispatch(attachSimulationToTaskflow(simulation._id, taskflowId));
+        dispatch(attachSimulationToTaskflow(simulation._id, taskflowId, name));
       }
     });
 
@@ -243,6 +241,10 @@ export function terminateTaskflow(id) {
 
     return action;
   };
+}
+
+export function updateTaskflowMetadata(id, actions, allComplete, outputDirectory, primaryJob) {
+  return { type: UPDATE_TASKFLOW_METADATA, id, actions, allComplete, outputDirectory, primaryJob };
 }
 
 // ----------------------------------------------------------------------------

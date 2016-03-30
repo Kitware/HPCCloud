@@ -17,12 +17,18 @@ export function updateList(state, itemList, idKey = '_id') {
 }
 
 export function removeItem(state, id) {
-  if (state.mapById[id] || state.list.indexOf(id) !== -1) {
+  var mapById = state.mapById;
+  if (mapById && mapById[id]) {
+    mapById = Object.assign({}, state.mapById);
+    delete mapById[id];
+  }
+  if (state.list.indexOf(id) !== -1) {
     const list = state.list.filter(item => item !== id);
     const active = (state.active === id) ? null : state.active;
-    const mapById = Object.assign({}, state.mapById);
-    delete mapById[id];
-    return Object.assign({}, state, { list, active, mapById });
+    if (mapById) {
+      return Object.assign({}, state, { list, active, mapById });
+    }
+    return Object.assign({}, state, { list, active });
   }
   return state;
 }

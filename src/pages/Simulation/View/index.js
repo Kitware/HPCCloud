@@ -31,7 +31,7 @@ const SimulationView = React.createClass({
     const wfModule = Workflows[project.type];
     const step = this.props.params.step || simulation.active || wfModule.steps._order[0];
     const taskFlowName = wfModule.taskFlows && wfModule.taskFlows[step] ? wfModule.taskFlows[step] : null;
-
+    const primaryJob = wfModule.taskFlows && wfModule.primaryJobs[step] ? wfModule.primaryJobs[step] : null;
     const view = this.props.location.query.view || this.props.simulation.steps[step].view || 'default';
     const ChildComponent = tools[view] || wfModule.components.ViewSimulation;
 
@@ -43,6 +43,7 @@ const SimulationView = React.createClass({
           step={step}
           view={view}
           taskFlowName={taskFlowName}
+          primaryJob={primaryJob}
           location={this.props.location}
           module={wfModule}
         />);

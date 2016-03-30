@@ -1,4 +1,5 @@
 import ButtonBar        from '../../../../../../panels/ButtonBar';
+import FileListing      from '../../../../../../panels/FileListing';
 import JobMonitor       from '../../../../../../panels/JobMonitor';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
@@ -28,12 +29,12 @@ const VisualizationView = React.createClass({
     simulation: React.PropTypes.object,
     step: React.PropTypes.string,
     taskFlowName: React.PropTypes.string,
+    primaryJob: React.PropTypes.string,
     view: React.PropTypes.string,
 
     onTerminateTaskflow: React.PropTypes.func,
     onDeleteTaskflow: React.PropTypes.func,
     onVisualizeTaskflow: React.PropTypes.func,
-    onStatusChange: React.PropTypes.func,
 
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
@@ -82,36 +83,24 @@ const VisualizationView = React.createClass({
       return null;
     }
 
-    const { taskflow, taskflowId, simulation, error } = this.props;
+    const { taskflow, taskflowId, error, simulation } = this.props;
     const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
-    const tasks = Object.keys(taskflow.taskMapById).map(id => taskflow.taskMapById[id]);
-    const allComplete = jobs.every(job => job.status === 'complete') && tasks.every(task => task.status === 'complete');
     const actions = [];
-    const simulationStatus = [simulation.metadata.status];
 
     // name is paraview and status is running -> visualize
-    if (jobs.some(job => job.name === 'paraview' && job.status === 'running')) {
+    if (jobs.some(job => job.name === this.props.primaryJob && job.status === 'running')) {
       actions.push('visualize');
     }
 
-    if (allComplete || jobs.every(job => job.status === 'terminated')) {
-      // every job complete && task complete -> rerun
-      simulationStatus.push('complete');
-      actions.push('rerun');
-    } else if (!allComplete && (jobs.length + tasks.length) > 0 && !jobs.some(job => job.status === 'terminating')) {
-      // jobs are still running -> terminate
-      simulationStatus.push('running');
-      actions.push('terminate');
-    }
-
-    // Need to update simulation status
-    // if (simulationStatus.length === 2 && simulationStatus[0] !== simulationStatus[1]) {
-    //   this.props.onStatusChange(simulation, simulationStatus[1]);
-    // }
+    taskflow.actions.forEach(action => {
+      actions.push(action);
+    });
 
     return (
       <div>
         <JobMonitor taskflowId={ taskflowId } />
+        <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />
+        <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />
         <section>
           <ButtonBar
             onAction={ this.buttonBarAction }
@@ -147,7 +136,6 @@ export default connect(
   },
   () => {
     return {
-      onStatusChange: (simulation, status) => dispatch(SimActions.saveSimulation(Object.assign({}, simulation, { status }))),
       onVisualizeTaskflow: (sim, location) => dispatch(SimActions.saveSimulation(sim, null, location)),
       onDeleteTaskflow: (id, simulationStep, location) => dispatch(Actions.deleteTaskflow(id, simulationStep, location)),
       onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),

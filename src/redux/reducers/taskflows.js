@@ -7,6 +7,17 @@ const initialState = {
   updateLogs: [],
 };
 
+const initialTaskflow = {
+  taskMapById: {},
+  log: [],
+  actions: [],
+  // simulation: null,      // Keep them undefined initially
+  // primaryJob: null,      // Keep them undefined initially
+  // stepName: null,        // Keep them undefined initially
+  // allComplete: false,    // Keep them undefined initially
+  // outputDirectory: null, // Keep them undefined initially
+};
+
 export default function taskflowsReducer(state = initialState, action) {
   switch (action.type) {
     case Actions.ADD_TASKFLOW: {
@@ -14,19 +25,26 @@ export default function taskflowsReducer(state = initialState, action) {
       if (action.taskflow.meta && action.taskflow.meta.jobs) {
         action.taskflow.meta.jobs.forEach(job => {
           jobMapById[job._id] = job;
+          // Keep the previous status if available
+          if (state.mapById[action.taskflow._id] && state.mapById[action.taskflow._id].jobMapById && state.mapById[action.taskflow._id].jobMapById[job._id]) {
+            jobMapById[job._id].status = state.mapById[action.taskflow._id].jobMapById[job._id].status;
+          }
         });
       }
-      const simulation = state.mapById[action.taskflow._id] ? state.mapById[action.taskflow._id].simulation : null;
+      const taskflow = Object.assign(
+        {},
+        initialTaskflow,
+        state.mapById[action.taskflow._id],
+        {
+          flow: action.taskflow,
+          jobMapById,
+          primaryJob: action.primaryJob,
+
+        });
       const mapById = Object.assign(
         {},
         state.mapById,
-        { [action.taskflow._id]: {
-          flow: action.taskflow,
-          jobMapById,
-          taskMapById: {},
-          log: [],
-          simulation,
-        } });
+        { [action.taskflow._id]: taskflow });
       return Object.assign({}, state, { mapById });
     }
 
@@ -60,7 +78,8 @@ export default function taskflowsReducer(state = initialState, action) {
       const { taskflowId, jobId, status } = action;
 
       const taskflow = state.mapById[taskflowId];
-      if (taskflow.taskMapById[jobId] && taskflow.taskMapById[jobId].status === status) {
+      if (taskflow.jobMapById[jobId] && taskflow.jobMapById[jobId].status === status) {
+        // console.log('job status skip', taskflow.allComplete, Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id].status));
         return state;
       }
 
@@ -95,6 +114,7 @@ export default function taskflowsReducer(state = initialState, action) {
 
       const taskflow = state.mapById[taskflowId];
       if (taskflow.taskMapById[taskId] && taskflow.taskMapById[taskId].status === status) {
+        // console.log('task status skip', taskflow.allComplete, Object.keys(taskflow.taskMapById).map(id => taskflow.taskMapById[id].status));
         return state;
       }
 
@@ -111,9 +131,9 @@ export default function taskflowsReducer(state = initialState, action) {
     }
 
     case Actions.BIND_SIMULATION_TO_TASKFLOW: {
-      const { simulationId, taskflowId } = action;
+      const { simulationId, taskflowId, stepName } = action;
 
-      const taskflow = Object.assign({}, state.mapById[taskflowId], { simulation: simulationId });
+      const taskflow = Object.assign({}, state.mapById[taskflowId], { simulation: simulationId, stepName });
       const mapById = Object.assign({}, state.mapById, { [taskflowId]: taskflow });
 
       return Object.assign({}, state, { mapById });
@@ -140,6 +160,13 @@ export default function taskflowsReducer(state = initialState, action) {
 
       delete mapById[id];
       return Object.assign({}, state, { mapById, taskflowMapByTaskId, taskflowMapByJobId });
+    }
+
+    case Actions.UPDATE_TASKFLOW_METADATA: {
+      const { id, actions, allComplete, outputDirectory, primaryJob } = action;
+      const mapById = Object.assign({}, state.mapById);
+      mapById[id] = Object.assign({}, mapById[id], { actions, allComplete, outputDirectory, primaryJob });
+      return Object.assign({}, state, { mapById });
     }
 
     default:
