@@ -1,19 +1,22 @@
 import { combineReducers } from 'redux';
-
-import auth     from './auth';
-import network  from './network';
-import projects  from './projects';
-import simulations  from './simulations';
-import taskflows  from './taskflows';
-import preferences  from './preferences';
 import { routerReducer }  from 'react-router-redux';
+
+import auth         from './auth';
+import fs           from './fs';
+import network      from './network';
+import preferences  from './preferences';
+import projects     from './projects';
+import simulations  from './simulations';
+import taskflows    from './taskflows';
 
 export default combineReducers({
   auth,
+  fs,
   network,
   preferences,
   projects,
   simulations,
   taskflows,
+
   routing: routerReducer,
 });

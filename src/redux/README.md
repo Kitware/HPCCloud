@@ -86,5 +86,17 @@
       [simId]: { ...full simulation object }
     }
   },
+  fs: {
+    folderMapById: {
+      [id]: {
+        folder: { full folder },
+        folderChildren: [ ids... ],
+        itemChildren: [ ids... ], 
+      }
+    },
+    itemMapById: {
+      [id]: { fullItem },
+    }
+  }
 }
 ```
