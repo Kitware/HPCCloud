@@ -1,6 +1,6 @@
 import ButtonBar        from '../../../../../../panels/ButtonBar';
 import JobMonitor       from '../../../../../../panels/JobMonitor';
-// import FileListing      from '../../../../../../panels/FileListing';
+import FileListing      from '../../../../../../panels/FileListing';
 import deepClone        from 'mout/src/lang/deepClone';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
@@ -137,10 +137,10 @@ const SimualtionView = React.createClass({
 
     // Build file listing components
     const fileListing = [];
-    // if (primaryJobOutput.length) {
-    //   fileListing.push(<FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />);
-    //   fileListing.push(<FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />);
-    // }
+    if (primaryJobOutput.length) {
+      fileListing.push(<FileListing key="file_listing_input" title="Input Files" folderId={simulation.metadata.inputFolder._id} />);
+      fileListing.push(<FileListing key="file_listing_output" title="Output Files" folderId={simulation.metadata.outputFolder._id} />);
+    }
 
     // Update local property
     this.primaryJobOutput = primaryJobOutput[0];
