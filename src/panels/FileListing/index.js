@@ -1,16 +1,51 @@
-import client from '../../network';
 import { formatFileSize } from '../../utils/Format';
 import React from 'react';
 import style from 'HPCCloudStyle/JobMonitor.mcss';
 
+import { connect }  from 'react-redux';
+import { dispatch } from '../../redux';
+import * as Actions from '../../redux/actions/fs';
+
 const indentWidth = 20;
 
-export default React.createClass({
+function buildFolders(fs, id, container = {}, depth = -1) {
+  const folder = fs.folderMapById[id];
+  const children = [];
+
+  // Fill container
+  container[id] = { children, depth };
+
+  // Fill children
+  if (folder) {
+    // - items first
+    folder.itemChildren.forEach(itemId => {
+      const item = fs.itemMapById[itemId];
+      if (item) {
+        children.push(item);
+      }
+    });
+    // - folders last
+    folder.folderChildren.forEach(folderId => {
+      if (fs.folderMapById[folderId]) {
+        const childFolder = fs.folderMapById[folderId].folder;
+        if (childFolder) {
+          children.push(childFolder);
+          buildFolders(fs, childFolder._id, container, depth + 1);
+        }
+      }
+    });
+  }
+
+  return container;
+}
+
+const FileListing = React.createClass({
   displayName: 'FileListing',
 
   propTypes: {
     folderId: React.PropTypes.string.isRequired,
     title: React.PropTypes.string.isRequired,
+    folders: React.PropTypes.object, // { [id]: { children: [..], depth: 0 } }
   },
 
   getDefaultProps() {
@@ -21,65 +56,14 @@ export default React.createClass({
 
   getInitialState() {
     return {
-      folders: {}, // object of folders: {id, files:[...files for folder], open: true|false}
-      items: [],   // array of top level files for this.props.folderId
+      isFolderOpened: {}, // object of folders: {id: open(true|false) }
       open: false,
     };
   },
 
-  componentDidMount() {
-    this.updateState(this.props.folderId);
-  },
-
-  updateState(folderId, parentFolder = false, open = false) {
-    var items,
-      folders;
-    if (parentFolder) {
-      folders = this.state.folders;
-    } else {
-      folders = {};
-    }
-
-    // restore from cache, no need to requery folders and files
-    if (this.state.folders[folderId] && this.state.folders[folderId].files.length) {
-      folders[folderId].open = open;
-      this.setState({ folders });
-      return;
-    }
-
-    // get items for folder
-    client.listItems({ folderId })
-      .then((resp) => {
-        var promises = resp.data.map((item) => client.getItem(item._id));
-        return Promise.all(promises);
-      })
-      // get folders for folder
-      .then((resps) => {
-        items = resps.map(item => item.data);
-        return client.listFolders({ parentId: folderId, parentType: 'folder' });
-      })
-      // setState with new folders and items
-      .then((resp) => {
-        var depth = parentFolder ? this.state.folders[folderId].depth + 1 : 0;
-        items = items.concat(resp.data);
-        resp.data.forEach((folder) => { folders[folder._id] = { open: false, files: [], depth }; });
-        if (parentFolder) {
-          folders[folderId].open = open;
-          folders[folderId].files = items;
-          this.setState({ folders });
-        } else {
-          this.setState({ folders, items });
-        }
-      })
-      .catch((err) => {
-        var msg = err.data && err.data.message ? err.data.message : err;
-        console.log(msg);
-      });
-  },
-
   fileMapper(file, index) {
     var value,
-      depth = this.state.folders[file.folderId] ? this.state.folders[file.folderId].depth + 1 : 0;
+      depth = this.props.folders[file.folderId] ? this.props.folders[file.folderId].depth + 1 : 0;
 
     // size === 0 ? file size : file size and download button
     if (file.size === 0) {
@@ -101,7 +85,7 @@ export default React.createClass({
   },
 
   folderMapper(folder, index) {
-    var depth = this.state.folders[folder._id].depth;
+    var depth = this.props.folders[folder._id].depth;
     return (<section key={`${folder.name}_${index}`} className={ style.listItem } onClick={this.openFolder} data-folder-id={folder._id}>
       <strong className={ style.itemContent } style={{ paddingLeft: depth * indentWidth }}>
         <i className={style.folderIcon}></i> {folder.name}
@@ -111,7 +95,7 @@ export default React.createClass({
   },
 
   openFolderMapper(folder, index) {
-    var depth = this.state.folders[folder._id].depth;
+    var depth = this.props.folders[folder._id].depth;
     return (<div key={`${folder.name}_${index}`}>
       <section className={ style.listItem } onClick={this.openFolder} data-folder-id={folder._id}>
         <strong className={ style.itemContent } style={{ paddingLeft: depth * indentWidth }}>
@@ -119,7 +103,7 @@ export default React.createClass({
         </strong>
         <span>...</span>
       </section>
-      { this.state.folders[folder._id].files.map(this.superMapper)}
+      { this.props.folders[folder._id].children.map(this.superMapper)}
     </div>);
   },
 
@@ -128,7 +112,7 @@ export default React.createClass({
     if (el._modelType === 'item') {
       return this.fileMapper(el, index);
     } else if (el._modelType === 'folder') {
-      if (this.state.folders[el._id].open) {
+      if (this.state.isFolderOpened[el._id]) {
         return this.openFolderMapper(el, index);
       }
       return this.folderMapper(el, index);
@@ -141,8 +125,10 @@ export default React.createClass({
   },
 
   openFolder(e) {
-    var id = e.currentTarget.dataset.folderId;
-    this.updateState(id, true, !this.state.folders[id].open);
+    const isFolderOpened = this.state.isFolderOpened;
+    const id = e.currentTarget.dataset.folderId;
+    isFolderOpened[id] = !isFolderOpened[id];
+    this.setState({ isFolderOpened });
   },
 
   render() {
@@ -150,7 +136,7 @@ export default React.createClass({
       <div className={ style.toolbar }>
         <div className={ style.title }>{this.props.title}</div>
         <div className={ style.buttons }>
-          <span key={status} className={ style.count }>{ `files(${this.state.items.length})` }</span>
+          <span key={status} className={ style.count }>{ `files(${this.props.folders[this.props.folderId].children.length})` }</span>
           <i
             className={ this.state.open ? style.advancedIconOn : style.advancedIconOff}
             onClick={ this.toggleAdvanced }
@@ -158,8 +144,28 @@ export default React.createClass({
         </div>
       </div>
       <div className={ this.state.open ? style.taskflowContainer : style.hidden }>
-        {this.state.items.map(this.superMapper)}
+        {this.props.folders[this.props.folderId].children.map(this.superMapper)}
       </div>
     </div>);
   },
 });
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+const pendingRequests = [];
+
+export default connect(
+  (state, props) => {
+    // FIXME that should be managed inside the state manager
+    if (!state.fs.folderMapById[props.folderId] && pendingRequests.indexOf(props.folderId) === -1) {
+      pendingRequests.push(props.folderId);
+      setImmediate(() => {
+        dispatch(Actions.fetchFolder(props.folderId));
+      });
+    }
+
+    return {
+      folders: buildFolders(state.fs, props.folderId),
+    };
+  }
+)(FileListing);
