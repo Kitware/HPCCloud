@@ -8,6 +8,7 @@ export const UPDATE_TASKFLOW_JOB_LOG = 'UPDATE_TASKFLOW_JOB_LOG';
 export const UPDATE_TASKFLOW_JOB_STATUS = 'UPDATE_TASKFLOW_JOB_STATUS';
 export const UPDATE_TASKFLOW_TASKS = 'UPDATE_TASKFLOW_TASKS';
 export const UPDATE_TASKFLOW_TASK_STATUS = 'UPDATE_TASKFLOW_TASK_STATUS';
+export const BIND_SIMULATION_TO_TASKFLOW = 'BIND_SIMULATION_TO_TASKFLOW';
 export const DELETE_TASKFLOW = 'DELETE_TASKFLOW';
 
 /* eslint-disable no-shadow */
@@ -148,6 +149,7 @@ export function fetchTaskflow(id) {
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
+          dispatch({ type: DELETE_TASKFLOW, id: action.id });
         });
 
     dispatch(fetchTaskflowTasks(id));
@@ -166,12 +168,17 @@ export function updateAllTaskflows() {
   };
 }
 
+export function attachSimulationToTaskflow(simulationId, taskflowId) {
+  return { type: BIND_SIMULATION_TO_TASKFLOW, taskflowId, simulationId };
+}
+
 export function updateTaskflowFromSimulation(simulation) {
   return dispatch => {
     Object.keys(simulation.steps).forEach(name => {
       const taskflowId = simulation.steps[name].metadata.taskflowId;
       if (taskflowId) {
         dispatch(fetchTaskflow(taskflowId));
+        dispatch(attachSimulationToTaskflow(simulation._id, taskflowId));
       }
     });
 

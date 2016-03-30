@@ -21,27 +21,30 @@
 .preferenceIcon {
     composes: fa    from 'font-awesome/css/font-awesome.css';
     composes: fa-fw from 'font-awesome/css/font-awesome.css';
-    color: black;
 }
 
 .userIcon {
     composes: preferenceIcon;
     composes: fa-user from 'font-awesome/css/font-awesome.css';
+    composes: colorBlack from 'HPCCloudStyle/Theme.mcss';
 }
 
 .clusterIcon {
     composes: preferenceIcon;
     composes: fa-share-alt from 'font-awesome/css/font-awesome.css';
+    composes: colorBlack from 'HPCCloudStyle/Theme.mcss';
 }
 
 .ec2Icon {
     composes: preferenceIcon;
     composes: fa-mixcloud from 'font-awesome/css/font-awesome.css';
+    composes: colorBlack from 'HPCCloudStyle/Theme.mcss';
 }
 
 .statusIcon {
     composes: preferenceIcon;
     composes: fa-info from 'font-awesome/css/font-awesome.css';
+    composes: colorBlack from 'HPCCloudStyle/Theme.mcss';
 }
 
 .networkIcon {
@@ -52,7 +55,7 @@
 .networkPendingIcon {
     composes: preferenceIcon;
     composes: fa-ellipsis-h from 'font-awesome/css/font-awesome.css';
-    composes: colorYellow from 'HPCCloudStyle/Theme.mcss';
+    composes: colorBlue from 'HPCCloudStyle/Theme.mcss';
 }
 
 .networkSuccessIcon {

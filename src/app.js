@@ -20,6 +20,15 @@ export function configure(config = { girderAPI: '/api/v1' }) {
     </Provider>, container);
 }
 
+store.subscribe(() => {
+  const state = store.getState();
+  if (state.taskflows.updateLogs.length > 0) {
+    state.taskflows.updateLogs.forEach((taskflowId) => {
+      // fetch the log of the taskflow id
+      // update the simulation status if it's different than the current
+    });
+  }
+});
 
 if (history) {
   history.listen(location => {

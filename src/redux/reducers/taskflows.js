@@ -4,6 +4,7 @@ const initialState = {
   mapById: {},
   taskflowMapByTaskId: {},
   taskflowMapByJobId: {},
+  updateLogs: [],
 };
 
 export default function taskflowsReducer(state = initialState, action) {
@@ -15,13 +16,16 @@ export default function taskflowsReducer(state = initialState, action) {
           jobMapById[job._id] = job;
         });
       }
+      const simulation = state.mapById[action.taskflow._id].simulation;
       const mapById = Object.assign(
         {},
         state.mapById,
         { [action.taskflow._id]: {
           flow: action.taskflow,
           jobMapById,
-          taskMapById: {} } });
+          taskMapById: {},
+          simulation,
+        } });
       return Object.assign({}, state, { mapById });
     }
 
@@ -38,11 +42,20 @@ export default function taskflowsReducer(state = initialState, action) {
 
     case Actions.UPDATE_TASKFLOW_JOB_STATUS: {
       const { taskflowId, jobId, status } = action;
+
       const taskflow = state.mapById[taskflowId];
+      if (taskflow.taskMapById[jobId] && taskflow.taskMapById[jobId].status === status) {
+        return state;
+      }
+
       const job = Object.assign({}, taskflow.jobMapById[jobId], { status });
       const jobMapById = Object.assign({}, taskflow.jobMapById, { [jobId]: job });
       const newTaskflow = Object.assign({}, taskflow, { jobMapById });
       const mapById = Object.assign({}, state.mapById, { [taskflowId]: newTaskflow });
+      if (state.updateLogs.indexOf(taskflowId) === -1) {
+        const updateLogs = [].concat(state.updateLogs, taskflowId);
+        return Object.assign({}, state, { mapById, updateLogs });
+      }
 
       return Object.assign({}, state, { mapById });
     }
@@ -65,17 +78,52 @@ export default function taskflowsReducer(state = initialState, action) {
       const { taskflowId, taskId, status } = action;
 
       const taskflow = state.mapById[taskflowId];
+      if (taskflow.taskMapById[taskId] && taskflow.taskMapById[taskId].status === status) {
+        return state;
+      }
+
       const task = Object.assign({}, taskflow.taskMapById[taskId], { status });
       const taskMapById = Object.assign({}, taskflow.taskMapById, { [taskId]: task });
       const newTaskflow = Object.assign({}, taskflow, { taskMapById });
       const mapById = Object.assign({}, state.mapById, { [taskflowId]: newTaskflow });
+      if (state.updateLogs.indexOf(taskflowId) === -1) {
+        const updateLogs = [].concat(state.updateLogs, taskflowId);
+        return Object.assign({}, state, { mapById, updateLogs });
+      }
+
+      return Object.assign({}, state, { mapById });
+    }
+
+    case Actions.BIND_SIMULATION_TO_TASKFLOW: {
+      const { simulationId, taskflowId } = action;
+
+      const taskflow = Object.assign({}, state.mapById[taskflowId], { simulation: simulationId });
+      const mapById = Object.assign({}, state.mapById, { [taskflowId]: taskflow });
 
       return Object.assign({}, state, { mapById });
     }
 
     case Actions.DELETE_TASKFLOW: {
-      // Not sure to know what to do here...
-      return state;
+      const { id } = action;
+
+      const taskflowMapByTaskId = {};
+      Object.keys(state.taskflowMapByTaskId).forEach((key) => {
+        if (state.taskflowMapByTaskId[key] !== id) {
+          taskflowMapByTaskId[key] = state.taskflowMapByTaskId[key];
+        }
+      });
+
+      const taskflowMapByJobId = {};
+      Object.keys(state.taskflowMapByJobId).forEach((key) => {
+        if (state.taskflowMapByJobId[key] !== id) {
+          taskflowMapByJobId[key] = state.taskflowMapByJobId[key];
+        }
+      });
+
+      const mapById = Object.assign({}, state.mapById);
+
+      delete mapById[id];
+      return Object.assign({}, state, { mapById, taskflowMapByTaskId, taskflowMapByJobId });
     }
 
     default:

@@ -30,7 +30,6 @@ export function updateAWSProfiles(profiles) {
 export function fetchAWSProfiles() {
   return dispatch => {
     const action = netActions.addNetworkCall('fetch_aws_profiles', 'Retreive AWS profiles');
-
     dispatch(pendingNetworkCall(true));
     client.listAWSProfiles()
       .then(
