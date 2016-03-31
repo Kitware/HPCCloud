@@ -83,7 +83,7 @@ export default connect(
     return {
       onSave: (project) => dispatch(Actions.saveProject(project)),
       onDelete: (project) => dispatch(Actions.deleteProject(project)),
-      onCancel: (path) => dispatch(Router.replace(path)),
+      onCancel: (path) => dispatch(Router.goBack()),
     };
   }
 )(ProjectEdit);

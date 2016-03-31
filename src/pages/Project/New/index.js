@@ -51,7 +51,7 @@ const ProjectNew = React.createClass({
     if (name && name.length) {
       this.props.onSave(project, attachements);
     } else {
-      this.setState({ _error: 'The project need to have a name' });
+      this.setState({ _error: 'The project needs to have a name' });
     }
   },
 

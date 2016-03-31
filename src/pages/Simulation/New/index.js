@@ -54,7 +54,7 @@ const SimulationNew = React.createClass({
     if (name && name.length) {
       this.props.onSave(simulation, attachements);
     } else {
-      this.setState({ _error: 'The project need to have a name' });
+      this.setState({ _error: 'The simulation needs to have a name' });
     }
   },
 

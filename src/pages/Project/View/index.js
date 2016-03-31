@@ -87,7 +87,7 @@ export default connect(
   () => {
     return {
       onActivate: (id, location) => dispatch(Actions.setActiveSimulation(id, location)),
-      onLocationChange: location => dispatch(Router.replace(location)),
+      onLocationChange: location => dispatch(Router.push(location)),
       onDelete: (simulation) => dispatch(Actions.deleteSimulation(simulation)),
     };
   }

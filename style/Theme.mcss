@@ -24,10 +24,18 @@
     color: #222;
 }
 
+/* Background colors */
+.bgGreen {
+    background-color: #4ecdc4;
+}
+.bgBlack {
+    background-color: #222;
+}
+
 /* Toolbars / Headers */
 .topBar {
     composes: topBar from 'HPCCloudStyle/Layout.mcss';
-    background-color: #222;
+    composes: bgBlack;
     color: #ededed;
     letter-spacing: 0.025em;
     font-size: 1.05em;
@@ -45,6 +53,7 @@
 }
 
 .topBar a:hover, .topBar a:active {
+    /* colorGreen, cannot compose this */
     color: #4ecdc4;
 }
 
@@ -58,11 +67,11 @@
 }
 
 .progressBar {
+    composes: bgGreen;
     position: absolute;
     width: 0px;
     height: 2px;
     transition: width 1s linear, opacity 1.5s linear;
-    background-color: #4ecdc4;
     left: 0;
     top: 0;
 }
@@ -103,6 +112,10 @@
 /* Icons */
 .hpcCloudIcon {
     line-height: 0;
+}
+
+.hpcCloudIcon a {
+    outline: 0;
 }
 
 .hpcCloudBusyIcon {
@@ -166,7 +179,7 @@
 .breadCrumbIcon {
     composes: fa        from 'font-awesome/css/font-awesome.css';
     composes: fa-fw     from 'font-awesome/css/font-awesome.css';
-    color: black;
+    composes: colorBlack;
 }
 
 .breadCrumbRootIcon {
@@ -189,6 +202,10 @@
     composes: fa-question   from 'font-awesome/css/font-awesome.css';
 }
 
+.breadCrumb {
+    composes: colorBlack;
+}
+
 .activeBreadCrumb {
-  color: #18e !important;
+    composes: colorBlue;
 }
