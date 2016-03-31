@@ -4,6 +4,7 @@ import JobMonitor       from '../../../../../../panels/JobMonitor';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
 
+import get              from 'mout/src/object/get';
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
@@ -38,6 +39,7 @@ const VisualizationView = React.createClass({
 
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
+    buttonsDisabled: React.PropTypes.bool,
     error: React.PropTypes.string,
   },
 
@@ -83,7 +85,7 @@ const VisualizationView = React.createClass({
       return null;
     }
 
-    const { taskflow, taskflowId, error, simulation } = this.props;
+    const { taskflow, taskflowId, error, simulation, buttonsDisabled } = this.props;
     const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
     const actions = [];
 
@@ -104,7 +106,7 @@ const VisualizationView = React.createClass({
         <section>
           <ButtonBar
             onAction={ this.buttonBarAction }
-            actions={ getActions(actions, false) }
+            actions={ getActions(actions, buttonsDisabled) }
             error={ error }
           />
         </section>
@@ -131,6 +133,8 @@ export default connect(
     return {
       taskflowId,
       taskflow: taskflowId ? state.taskflows.mapById[taskflowId] : null,
+      buttonsDisabled: !!get(state, 'network.pending.terminate_taskflow') ||
+                       !!get(state, 'network.pending.delete_taskflow'),
       error: null,
     };
   },

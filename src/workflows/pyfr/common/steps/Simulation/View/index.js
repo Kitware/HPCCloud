@@ -5,6 +5,7 @@ import deepClone        from 'mout/src/lang/deepClone';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
 
+import get              from 'mout/src/object/get';
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
@@ -50,6 +51,7 @@ const SimualtionView = React.createClass({
 
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
+    buttonsDisabled: React.PropTypes.bool,
     error: React.PropTypes.string,
   },
 
@@ -98,7 +100,7 @@ const SimualtionView = React.createClass({
       return null;
     }
 
-    const { taskflow, taskflowId, simulation, error } = this.props;
+    const { taskflow, taskflowId, simulation, buttonsDisabled, error } = this.props;
     const actions = [].concat(taskflow.actions);
 
     // Extract meaningful information from props
@@ -114,7 +116,7 @@ const SimualtionView = React.createClass({
         <section>
             <ButtonBar
               onAction={ this.onAction }
-              actions={ getActions(actions, false) }
+              actions={ getActions(actions, buttonsDisabled) }
               error={ error}
             />
         </section>
@@ -140,6 +142,8 @@ export default connect(
     return {
       taskflowId,
       taskflow: taskflowId ? state.taskflows.mapById[taskflowId] : null,
+      buttonsDisabled: !!get(state, 'network.pending.terminate_taskflow') ||
+                       !!get(state, 'network.pending.delete_taskflow'),
       error: null,
     };
   },

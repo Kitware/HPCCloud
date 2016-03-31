@@ -46,16 +46,24 @@ const AWSPrefs = React.createClass({
     };
   },
 
+  getInitialState() {
+    return {
+      _error: null,
+    };
+  },
+
   changeItem(item) {
     const { active, onUpdateItem } = this.props;
     onUpdateItem(active, item);
   },
 
   activeChange(active) {
+    this.setState({ _error: '' });
     this.props.onActiveChange(active);
   },
 
   addItem() {
+    this.setState({ _error: '' });
     this.props.onAddItem();
   },
 
@@ -68,10 +76,24 @@ const AWSPrefs = React.createClass({
     } else {
       onRemoveItem(active, profileToDelete);
     }
+    this.setState({ _error: '' });
   },
 
   saveItem() {
     const { onUpdateItem, active, list } = this.props;
+    console.log(list[active]);
+    const contents = list[active];
+    if (contents._id) {
+      this.setState({ _error: 'Profile cannot be modified once saved' });
+      return;
+    } else if (!contents.name) {
+      this.setState({ _error: 'Name cannot be empty' });
+      return;
+    } else if (!contents.accessKeyId) {
+      this.setState({ _error: 'Access keys are required' });
+      return;
+    }
+    this.setState({ _error: '' });
     onUpdateItem(active, list[active], true);
   },
 
@@ -106,7 +128,7 @@ const AWSPrefs = React.createClass({
             <ButtonBar
               visible={!!activeData}
               onAction={ this.formAction }
-              error={ error }
+              error={ this.state._error || error }
               actions={getActions(buttonsDisabled)}
             />
           </div>
