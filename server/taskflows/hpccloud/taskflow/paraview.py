@@ -132,7 +132,7 @@ def create_paraview_job(task, *args, **kwargs):
         raise Exception(msg)
 
     with open(script_path, 'r') as fp:
-        commands = fp.readlines()
+        commands = fp.read().splitlines()
 
     body = {
         'name': 'paraview',
