@@ -29,6 +29,7 @@ const visualizationView = React.createClass({
     simulation: React.PropTypes.object,
     step: React.PropTypes.string,
     taskFlowName: React.PropTypes.string,
+    primaryJob: React.PropTypes.string,
     view: React.PropTypes.string,
 
     onTerminateTaskflow: React.PropTypes.func,
@@ -86,9 +87,10 @@ const visualizationView = React.createClass({
 
     const { taskflow, taskflowId, error, simulation } = this.props;
     const actions = [].concat(taskflow.actions);
+    const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
 
     // Extract meaningful information from props
-    if (taskflow.allComplete) {
+    if (jobs.some(job => job.name === this.props.primaryJob && job.status === 'running')) {
       actions.push('visualize');
     }
 
