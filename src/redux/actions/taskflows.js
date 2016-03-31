@@ -179,9 +179,12 @@ export function fetchTaskflow(id) {
 
 export function updateAllTaskflows() {
   return dispatch => {
-    Object.keys(store.getState().taskflows.mapById).forEach(id => {
-      dispatch(fetchTaskflow(id));
-      dispatch(fetchTaskflowTasks(id));
+    const state = store.getState();
+    Object.keys(state.taskflows.mapById).forEach(id => {
+      if (state.taskflows.mapById[id].status !== 'complete') {
+        dispatch(fetchTaskflow(id));
+        dispatch(fetchTaskflowTasks(id));
+      }
     });
     return { type: 'NOOP' };
   };
