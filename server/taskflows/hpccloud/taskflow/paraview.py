@@ -16,11 +16,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 ###############################################################################
-import tempfile
 import json
 import os
-import subprocess
-import sys
 from jsonpath_rw import parse
 
 import cumulus.taskflow
@@ -28,6 +25,7 @@ from cumulus.tasks.job import download_job_input_folders, submit_job
 from cumulus.tasks.job import monitor_job, upload_job_output_to_folder
 from cumulus.tasks.job import job_directory
 from cumulus.transport import get_connection
+from cumulus.transport.files.upload import upload_file
 
 from girder.utility.model_importer import ModelImporter
 from girder.api.rest import getCurrentUser
@@ -91,12 +89,16 @@ def _create_girder_client(girder_api_url, girder_token):
 
 
 def validate_args(kwargs):
-    required = ['dataDir', 'cluster.config.paraview.installDir', 'sessionKey']
+    required = ['cluster.config.paraview.installDir', 'sessionKey']
 
     for r in required:
         if not parse(r).find(kwargs):
             raise Exception('Required parameter %s not provide to taskflow.'
                             %  r)
+
+    if not parse('dataDir') and not parse('input.file.id'):
+        raise Exception('\'dataDir\' or \'input.file.id\' must be provided.')
+
 
 @cumulus.taskflow.task
 def paraview_terminate(task):
@@ -166,6 +168,28 @@ def create_paraview_job(task, *args, **kwargs):
 
     submit_paraview_job.delay(cluster, job,  *args, **kwargs)
 
+def upload_input(task, cluster, job, *args, **kwargs):
+    file_id = parse('input.file.id').find(kwargs)
+    if file_id:
+        file_id = file_id[0].value
+        task.logger.info('Visualizing file ID: %s' % file_id)
+        job['params']['dataDir'] = '.'
+
+        # Fetch the file
+        girder_client = _create_girder_client(
+            task.taskflow.girder_api_url, task.taskflow.girder_token)
+        file = girder_client.getResource('file', file_id)
+
+        # Set the file to load
+        filename = file['name']
+        job['params']['fileName'] = filename
+        task.logger.info('Filename is: %s' % filename)
+
+        task.logger.info('Uploading file to cluster.')
+        job_dir = job_directory(cluster, job)
+        upload_file(cluster, task.taskflow.girder_token, file, job_dir)
+        task.logger.info('Upload complete.')
+
 @cumulus.taskflow.task
 def submit_paraview_job(task, cluster, job, *args, **kwargs):
     task.taskflow.logger.info('Submitting job to cluster.')
@@ -205,6 +229,9 @@ def submit_paraview_job(task, cluster, job, *args, **kwargs):
         params['paraviewInstallDir'] = paraview_install_dir
 
     job['params'] = params
+
+    # Before we submit the job upload any file we may have been given
+    upload_input(task, cluster, job, *args, **kwargs)
 
     submit_job(cluster, job, log_write_url=None,
                           girder_token=girder_token, monitor=False)

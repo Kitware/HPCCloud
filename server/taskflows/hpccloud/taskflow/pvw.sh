@@ -42,7 +42,7 @@ export LD_LIBRARY_PATH=${PARAVIEW_DIR}/lib/${LIB_VERSION_DIR}
 export DISPLAY=:0
 
 # First run pvpython
-${PV_PYTHON} ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} --data-dir {{dataDir}}
+${PV_PYTHON} ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} --data-dir {{dataDir}} {{ '--load-file %s' % fileName if fileName else '' }}
 
 # Remove proxy entry
 curl --silent --show-error -o /dev/null -X DELETE "{{ baseUrl }}/proxy/${KEY}"
