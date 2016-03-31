@@ -98,10 +98,7 @@ export function saveSimulation(simulation_, attachments) {
         }
         return new Promise((a, r) => { a({ data: simulation }); });
       })
-      .catch((error) => {
-        console.log(error);
-        return error;
-      });
+      .catch((error) => new Promise((a, r) => { r(error); }));
   }
 
   return girder.editSimulation(simulation);
