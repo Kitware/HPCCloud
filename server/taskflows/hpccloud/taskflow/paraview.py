@@ -78,7 +78,7 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
                 if e.status != 404:
                     self.logger.error('Unable to delete job: %s' % job_id)
 
-        cleanup_proxy_entries.delay()
+        self.run_task(cleanup_proxy_entries.s())
 
 def _create_girder_client(girder_api_url, girder_token):
     client = GirderClient(apiUrl=girder_api_url)
