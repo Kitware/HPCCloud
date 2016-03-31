@@ -6,12 +6,14 @@ import RunCluster              from '../../../../../../panels/run/RunCluster';
 import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
 import ButtonBar               from '../../../../../../panels/ButtonBar';
 
-import client                  from '../../../../../../network';
 import formStyle               from 'HPCCloudStyle/ItemEditor.mcss';
-import merge                   from 'mout/src/object/merge';
-import deepClone               from 'mout/src/lang/deepClone';
 
-export default React.createClass({
+import { connect }  from 'react-redux';
+import get          from 'mout/src/object/get';
+import { dispatch } from '../../../../../../redux';
+import * as Actions from '../../../../../../redux/actions/taskflows';
+
+const VisualizationStart = React.createClass({
   displayName: 'pvw/start-visualization',
   propTypes: {
     location: React.PropTypes.object,
@@ -19,11 +21,15 @@ export default React.createClass({
     simulation: React.PropTypes.object,
     step: React.PropTypes.string,
     taskFlowName: React.PropTypes.string,
+    primaryJob: React.PropTypes.string,
     view: React.PropTypes.string,
+
+    error: React.PropTypes.string,
+    tradClusters: React.PropTypes.object,
+    ec2Clusters: React.PropTypes.object,
+    onRun: React.PropTypes.func,
   },
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
+
   getInitialState() {
     return {
       serverType: 'Traditional',
@@ -33,54 +39,37 @@ export default React.createClass({
       error: '',
     };
   },
-  componentWillMount() {
 
-  },
   dataChange(key, value, server) {
     var profile = this.state[server];
     profile[key] = value;
     this.setState({ [server]: profile });
   },
-  startVisualization() {
-    var taskflowId,
-      sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
-    client.createTaskflow(this.props.taskFlowName)
-      .then((resp) => {
-        taskflowId = resp.data._id;
-        return client.startTaskflow(taskflowId, {
-          cluster: { _id: this.state[this.state.serverType].profile },
-          fileId: this.props.simulation.metadata.inputFolder.files.dataset,
-          sessionKey: sessionId, // for pvw, we use this later for connecting
-        });
-      })
-      .then((resp) =>
-        client.updateSimulationStep(this.props.simulation._id, this.props.step, {
-          view: 'run',
-          metadata: {
-            taskflowId, sessionId,
-          },
-        })
-      )
-      .then((resp) => {
-        var newSim = deepClone(this.props.simulation);
-        newSim.steps[this.props.step].view = 'run';
-        newSim.steps[this.props.step].metadata = {
-          taskflowId, sessionId,
-        };
-        newSim.metadata.status = 'running';
-        client.invalidateSimulation(newSim);
 
-        this.context.router.replace({
-          pathname: this.props.location.pathname,
-          query: merge(this.props.location.query, {
-            view: 'run',
-          }),
-          state: this.props.location.state,
-        });
-      })
-      .catch((error) => {
-        this.setState({ error: error.data.message });
-      });
+  startVisualization() {
+    const sessionKey = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
+    const payload = {
+      cluster: { _id: this.state[this.state.serverType].profile },
+      sessionKey, // for pvw, we use this later for connecting
+      fileId: this.props.simulation.metadata.inputFolder.files.dataset,
+    };
+    const simStepUpdate = {
+      id: this.props.simulation._id,
+      step: 'Visualization',
+      data: {
+        view: 'run',
+        metadata: {
+          sessionId: sessionKey,
+        },
+      },
+    };
+    const location = {
+      pathname: this.props.location.pathname,
+      query: Object.assign({}, this.props.location.query, { view: 'run' }),
+      state: this.props.location.state,
+    };
+
+    this.props.onRun(this.props.taskFlowName, this.props.primaryJob, payload, simStepUpdate, location);
   },
 
   formAction(action) {
@@ -137,3 +126,24 @@ export default React.createClass({
       </div>);
   },
 });
+
+// Binding --------------------------------------------------------------------
+/* eslint-disable arrow-body-style */
+
+export default connect(
+  (state, props) => {
+    return {
+      error: get(state, 'network.error.create_taskflow.resp.data.message')
+        || get(state, 'network.error.start_taskflow.resp.data.message'),
+      ec2Clusters: state.preferences.aws.mapById,
+      tradClusters: state.preferences.clusters.mapById,
+    };
+  },
+  () => {
+    return {
+      onRun: (taskflowName, primaryJob, payload, simulationStep, location) =>
+        dispatch(Actions.createTaskflow(taskflowName, primaryJob, payload, simulationStep, location)),
+    };
+  }
+)(VisualizationStart);
+

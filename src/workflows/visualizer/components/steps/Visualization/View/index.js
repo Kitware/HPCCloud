@@ -2,14 +2,13 @@ import ButtonBar        from '../../../../../../panels/ButtonBar';
 import FileListing      from '../../../../../../panels/FileListing';
 import JobMonitor       from '../../../../../../panels/JobMonitor';
 
-import deepClone        from 'mout/src/lang/deepClone';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
 
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
-import * as SimActions  from '../../../../../../redux/actions/projects';
+import * as Router      from '../../../../../../redux/actions/router';
 
 const ACTIONS = {
   terminate: { name: 'terminateTaskflow', label: 'Terminate', icon: '' },
@@ -55,12 +54,7 @@ const visualizationView = React.createClass({
       query: merge(this.props.location.query, { view: 'default' }),
       state: this.props.location.state,
     };
-    const newSimState = deepClone(this.props.simulation);
-    newSimState.steps.Visualization.metadata.dataDir = this.primaryJobOutput;
-    newSimState.active = 'Visualization';
-    newSimState.disabled = newSimState.disabled.filter(step => step !== 'Visualization');
-
-    this.props.onVisualizeTaskflow(newSimState, location);
+    this.props.onVisualizeTaskflow(location);
   },
 
   terminateTaskflow() {
@@ -132,11 +126,7 @@ export default connect(
     };
   },
   () => ({
-    onVisualizeTaskflow: (sim, location) => {
-      dispatch(SimActions.saveSimulation(sim, null));
-      const metadata = sim.steps.Visualization.metadata;
-      dispatch(SimActions.updateSimulationStep(sim._id, 'Visualization', { metadata }, location));
-    },
+    onVisualizeTaskflow: (location) => dispatch(Router.push(location)),
     onDeleteTaskflow: (id, simulationStep, location) => dispatch(Actions.deleteTaskflow(id, simulationStep, location)),
     onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
   })
