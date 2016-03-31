@@ -51,7 +51,11 @@ const VisualizationStart = React.createClass({
     const payload = {
       cluster: { _id: this.state[this.state.serverType].profile },
       sessionKey, // for pvw, we use this later for connecting
-      fileId: this.props.simulation.metadata.inputFolder.files.dataset,
+      input: {
+        file: {
+          id: this.props.simulation.metadata.inputFolder.files.dataset,
+        },
+      },
     };
     const simStepUpdate = {
       id: this.props.simulation._id,
