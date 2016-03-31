@@ -1,15 +1,16 @@
 import 'normalize.css';
 import 'HPCCloudStyle/global.mcss';
 
-import React              from 'react';
-import { render }         from 'react-dom';
-import { Router }         from 'react-router';
-import { Provider }       from 'react-redux';
+import React        from 'react';
+import { render }   from 'react-dom';
+import { Router }   from 'react-router';
+import { Provider } from 'react-redux';
 
 import routes                       from './config/routes';
 import { store, history, dispatch } from './redux';
 import * as ProjectActions          from './redux/actions/projects';
 import * as TaskflowActions         from './redux/actions/taskflows';
+import * as Behavior                from './StateTransitionBehavior';
 
 // Setup application and pages
 const container = document.querySelector('.react-container');
@@ -22,14 +23,16 @@ export function configure(config = { girderAPI: '/api/v1' }) {
 }
 
 store.subscribe(() => {
-  if (store.getState().taskflows.updateLogs.length > 0) {
-    const updateLogs = store.getState().taskflows.updateLogs;
+  const state = store.getState();
+  if (state.taskflows.updateLogs.length > 0) {
+    const updateLogs = state.taskflows.updateLogs;
     dispatch(TaskflowActions.clearUpdateLog());
     updateLogs.forEach((taskflowId) => {
       // fetch the log of the taskflow id
       dispatch(TaskflowActions.updateTaskflowLog(taskflowId));
-      // when all comlpleted: fetch folder
-      // update the simulation status if it's different than the current
+      // Handle any behavior from taskflow change
+      const taskflow = state.taskflows.mapById[taskflowId];
+      Behavior.handleTaskflowChange(state, taskflow);
     });
   }
 });

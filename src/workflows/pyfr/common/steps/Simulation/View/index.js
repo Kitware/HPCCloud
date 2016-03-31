@@ -10,7 +10,6 @@ import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
 import * as SimActions  from '../../../../../../redux/actions/projects';
 
-const primaryJob = 'pyfr_run';
 const ACTIONS = {
   terminate: {
     name: 'terminateTaskflow',
@@ -42,12 +41,12 @@ const SimualtionView = React.createClass({
     simulation: React.PropTypes.object,
     step: React.PropTypes.string,
     taskFlowName: React.PropTypes.string,
+    primaryJob: React.PropTypes.string,
     view: React.PropTypes.string,
 
     onTerminateTaskflow: React.PropTypes.func,
     onDeleteTaskflow: React.PropTypes.func,
     onVisualizeTaskflow: React.PropTypes.func,
-    onStatusChange: React.PropTypes.func,
 
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
@@ -65,7 +64,7 @@ const SimualtionView = React.createClass({
       state: this.props.location.state,
     };
     const newSimState = deepClone(this.props.simulation);
-    newSimState.steps.Visualization.metadata.dataDir = this.primaryJobOutput;
+    newSimState.steps.Visualization.metadata.dataDir = this.props.taskflow.outputDirectory;
     newSimState.active = 'Visualization';
     newSimState.disabled = newSimState.disabled.filter(step => step !== 'Visualization');
 
@@ -100,55 +99,18 @@ const SimualtionView = React.createClass({
     }
 
     const { taskflow, taskflowId, simulation, error } = this.props;
-    const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
-    const tasks = Object.keys(taskflow.taskMapById).map(id => taskflow.taskMapById[id]);
-    const allComplete = jobs.every(job => job.status === 'complete') && tasks.every(task => task.status === 'complete');
-    const actions = [];
-    const simulationStatus = [simulation.metadata.status];
-    const primaryJobOutput = [];
+    const actions = [].concat(taskflow.actions);
 
     // Extract meaningful information from props
-    if (jobs.every(job => job.status === 'terminated')) {
-      // every terminated -> rerun
-      simulationStatus.push('terminated');
-      actions.push('rerun');
-    } else if (!allComplete && (jobs.length + tasks.length) > 0 && !jobs.some(job => job.status === 'terminating')) {
-      // some running -> terminate
-      simulationStatus.push('running');
-      actions.push('terminate');
-    // every job complete && task complete -> visualize
-    } else if (allComplete) {
-      simulationStatus.push('complete');
+    if (taskflow.allComplete) {
       actions.push('visualize');
     }
-
-    // Need to update simulation status
-    // if (simulationStatus.length === 2 && simulationStatus[0] !== simulationStatus[1]) {
-    //   this.props.onStatusChange(simulation, simulationStatus[1]);
-    // }
-
-    // Find job output directory
-    for (let i = 0; i < jobs.length; i++) {
-      if (jobs[i].name === primaryJob) {
-        primaryJobOutput.push(jobs[i].dir);
-        break;
-      }
-    }
-
-    // Build file listing components
-    const fileListing = [];
-    if (primaryJobOutput.length) {
-      fileListing.push(<FileListing key="file_listing_input" title="Input Files" folderId={simulation.metadata.inputFolder._id} />);
-      fileListing.push(<FileListing key="file_listing_output" title="Output Files" folderId={simulation.metadata.outputFolder._id} />);
-    }
-
-    // Update local property
-    this.primaryJobOutput = primaryJobOutput[0];
 
     return (
       <div>
         <JobMonitor taskflowId={ taskflowId } />
-        { fileListing }
+        <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />
+        <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />
         <section>
             <ButtonBar
               onAction={ this.onAction }
@@ -183,7 +145,6 @@ export default connect(
   },
   () => {
     return {
-      onStatusChange: (simulation, status) => dispatch(SimActions.saveSimulation(Object.assign({}, simulation, { status }))),
       onVisualizeTaskflow: (sim, location) => {
         dispatch(SimActions.saveSimulation(sim, null));
         const metadata = sim.steps.Visualization.metadata;

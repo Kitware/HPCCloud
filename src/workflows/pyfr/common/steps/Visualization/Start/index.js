@@ -24,6 +24,7 @@ const VisualizationStart = React.createClass({
     simulation: React.PropTypes.object,
     step: React.PropTypes.string,
     taskFlowName: React.PropTypes.string,
+    primaryJob: React.PropTypes.string,
     view: React.PropTypes.string,
 
     error: React.PropTypes.string,
@@ -74,7 +75,7 @@ const VisualizationStart = React.createClass({
       state: this.props.location.state,
     };
 
-    this.props.onRun(this.props.taskFlowName, payload, simStepUpdate, location);
+    this.props.onRun(this.props.taskFlowName, this.props.primaryJob, payload, simStepUpdate, location);
   },
 
   formAction(action) {
@@ -142,7 +143,8 @@ export default connect(
   },
   () => {
     return {
-      onRun: (taskflowName, payload, simulationStep, location) => dispatch(Actions.createTaskflow(taskflowName, payload, simulationStep, location)),
+      onRun: (taskflowName, primaryJob, payload, simulationStep, location) =>
+        dispatch(Actions.createTaskflow(taskflowName, primaryJob, payload, simulationStep, location)),
     };
   }
 )(VisualizationStart);

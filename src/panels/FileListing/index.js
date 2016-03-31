@@ -17,14 +17,7 @@ function buildFolders(fs, id, container = {}, depth = -1) {
 
   // Fill children
   if (folder) {
-    // - items first
-    folder.itemChildren.forEach(itemId => {
-      const item = fs.itemMapById[itemId];
-      if (item) {
-        children.push(item);
-      }
-    });
-    // - folders last
+    // - folders first
     folder.folderChildren.forEach(folderId => {
       if (fs.folderMapById[folderId]) {
         const childFolder = fs.folderMapById[folderId].folder;
@@ -32,6 +25,14 @@ function buildFolders(fs, id, container = {}, depth = -1) {
           children.push(childFolder);
           buildFolders(fs, childFolder._id, container, depth + 1);
         }
+      }
+    });
+
+    // - items after
+    folder.itemChildren.forEach(itemId => {
+      const item = fs.itemMapById[itemId];
+      if (item) {
+        children.push(item);
       }
     });
   }

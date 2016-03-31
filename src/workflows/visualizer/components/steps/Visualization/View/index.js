@@ -1,10 +1,10 @@
 import ButtonBar        from '../../../../../../panels/ButtonBar';
+import FileListing      from '../../../../../../panels/FileListing';
 import JobMonitor       from '../../../../../../panels/JobMonitor';
 
 import deepClone        from 'mout/src/lang/deepClone';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
-// import TaskflowManager  from '../../../../../../network/TaskflowManager';
 
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
@@ -35,7 +35,6 @@ const visualizationView = React.createClass({
     onTerminateTaskflow: React.PropTypes.func,
     onDeleteTaskflow: React.PropTypes.func,
     onVisualizeTaskflow: React.PropTypes.func,
-    onStatusChange: React.PropTypes.func,
 
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
@@ -91,31 +90,19 @@ const visualizationView = React.createClass({
       return null;
     }
 
-    const { taskflow, taskflowId, simulation, error } = this.props;
-    const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
-    const tasks = Object.keys(taskflow.taskMapById).map(id => taskflow.taskMapById[id]);
-    const allComplete = jobs.every(job => job.status === 'complete') && tasks.every(task => task.status === 'complete');
-    const actions = [];
-    const simulationStatus = [simulation.metadata.status];
+    const { taskflow, taskflowId, error, simulation } = this.props;
+    const actions = [].concat(taskflow.actions);
 
     // Extract meaningful information from props
-    if (jobs.every(job => job.status === 'terminated')) {
-      // every terminated -> rerun
-      simulationStatus.push('terminated');
-      actions.push('rerun');
-    } else if (!allComplete && (jobs.length + tasks.length) > 0 && !jobs.some(job => job.status === 'terminating')) {
-      // some running -> terminate
-      simulationStatus.push('running');
-      actions.push('terminate');
-    // every job complete && task complete -> visualize
-    } else if (allComplete) {
-      simulationStatus.push('complete');
+    if (taskflow.allComplete) {
       actions.push('visualize');
     }
 
     return (
       <div>
           <JobMonitor taskflowId={ taskflowId } />
+          <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />
+          <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />
           <section>
               <ButtonBar
                 onAction={ this.onAction }
@@ -145,7 +132,6 @@ export default connect(
     };
   },
   () => ({
-    onStatusChange: (simulation, status) => dispatch(SimActions.saveSimulation(Object.assign({}, simulation, { status }))),
     onVisualizeTaskflow: (sim, location) => {
       dispatch(SimActions.saveSimulation(sim, null));
       const metadata = sim.steps.Visualization.metadata;
