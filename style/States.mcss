@@ -8,11 +8,11 @@
 }
 
 .isClickable:hover {
+    /* colorBlue */
     color: #18e;
 }
 
-
 .isBusy {
-    color: #4ecdc4;
+    composes: colorGreen from 'HPCCloudStyle/Theme.mcss';
     transition: color .25s ease;
 }

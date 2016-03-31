@@ -1,7 +1,7 @@
 .container {
     composes: subBar from 'HPCCloudStyle/Layout.mcss';
     background: #ccc;
-    color: #222;
+    composes: colorBlack from 'HPCCloudStyle/Theme.mcss';
 }
 
 .filter {

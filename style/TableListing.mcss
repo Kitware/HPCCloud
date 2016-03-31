@@ -33,6 +33,7 @@
 }
 
 .table > tbody > tr > td:last-child:hover {
+    /* colorBlue, cannot compose this */
     color: #18e;
 }
 
