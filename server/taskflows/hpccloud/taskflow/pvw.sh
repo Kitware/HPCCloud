@@ -27,7 +27,7 @@ JOB_OUTPUT_DIR="{{ cluster.config.jobOutputDir if cluster.config.jobOutputDir el
 IPADDRESS=`curl -s --connect-timeout 2 http://169.254.169.254/latest/meta-data/local-ipv4`
 
 if [ -z "$IPADDRESS" ]; then
-IPADDRESS=${HOSTNAME}
+IPADDRESS=`hostname`
 fi
 
 WEBSOCKET_PORT=`python -c "${GET_PORT_PYTHON_CMD}"`
