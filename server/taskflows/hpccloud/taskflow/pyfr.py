@@ -450,6 +450,14 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
     mesh_file_id = kwargs.pop('meshFileId')
 
     solution_files = list(_list_solution_files(client, output_folder_id))
+    # Generate and save the first vtu file that should be loaded for this
+    # run. This can then be used to know which file to open as part of any viz
+    # step.
+    file_names = [f['name'] for f in solution_files]
+    file_names.sort()
+    vtu_file = '%s.vtu' % file_names[0].rsplit('.', 1)[0]
+    task.taskflow.set_metadata('vtuFile', vtu_file)
+
     number_files = len(solution_files)
 
     # By default export solution files to VTK format using a set of batch jobs

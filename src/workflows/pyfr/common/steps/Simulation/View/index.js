@@ -67,6 +67,7 @@ const SimualtionView = React.createClass({
     };
     const newSimState = deepClone(this.props.simulation);
     newSimState.steps.Visualization.metadata.dataDir = this.props.taskflow.outputDirectory;
+    newSimState.steps.Visualization.metadata.fileName = this.props.taskflow.flow.meta.vtuFile;
     newSimState.active = 'Visualization';
     newSimState.disabled = newSimState.disabled.filter(step => step !== 'Visualization');
 

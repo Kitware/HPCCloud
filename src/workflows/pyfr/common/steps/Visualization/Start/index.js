@@ -53,9 +53,11 @@ const VisualizationStart = React.createClass({
   startVisualization() {
     const sessionKey = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
     const dataDir = this.props.simulation.steps.Visualization.metadata.dataDir;
+    const fileName = this.props.simulation.steps.Visualization.metadata.fileName;
     const payload = {
       cluster: { _id: this.state[this.state.serverType].profile },
       dataDir, // where the output for the sim will be
+      fileName, // the file to load
       sessionKey, // for pvw, we use this later for connecting
     };
     const simStepUpdate = {
