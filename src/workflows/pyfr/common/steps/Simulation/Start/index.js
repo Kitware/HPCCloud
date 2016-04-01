@@ -56,8 +56,13 @@ const SimulationStart = React.createClass({
 
   runSimulation() {
     const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
-    var clusterName = this.props.tradClusters[this.state[this.state.serverType].profile].name,
+    var clusterName,
       sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
+      payload;
+
+
+    if (this.state.serverType === 'Traditional') {
+      clusterName = this.props.tradClusters[this.state[this.state.serverType].profile].name;
       payload = Object.assign({},
         this.state[this.state.serverType].runtime || {},
         {
@@ -82,6 +87,36 @@ const SimulationStart = React.createClass({
             _id: this.state[this.state.serverType].profile,
           },
         });
+    } else if (this.state.serverType === 'EC2') {
+      clusterName = this.props.ec2Clusters[this.state[this.state.serverType].profile].name;
+      payload = Object.assign({},
+        this.state[this.state.serverType].runtime || {},
+        {
+          backend: this.state.backend,
+          input: {
+            folder: {
+              id: this.props.simulation.metadata.inputFolder._id,
+            },
+            meshFile: {
+              id: meshFile,
+            },
+            iniFile: {
+              id: this.props.simulation.metadata.inputFolder.files.ini,
+            },
+          },
+          output: {
+            folder: {
+              id: this.props.simulation.metadata.outputFolder._id,
+            },
+          },
+          cluster: {
+            serverType: 'ec2',
+            machine: this.state[this.state.serverType].machine,
+            clusterSize: parseFloat(this.state[this.state.serverType].clusterSize),
+            volumeSize: parseFloat(this.state[this.state.serverType].volumeSize),
+          },
+        });
+    }
 
     this.props.onRun(
       this.props.taskFlowName,

@@ -115,7 +115,7 @@ const VisualizationStart = React.createClass({
             <section>
                 {serverForm}
             </section>
-            <section className={formStyle.buttonGroup}>
+            <section>
                 <ButtonBar
                   visible={this.state[this.state.serverType].profile !== ''}
                   onAction={this.formAction}
