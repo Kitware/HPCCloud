@@ -30,9 +30,9 @@ store.subscribe(() => {
     updateLogs.forEach((taskflowId) => {
       // fetch the log of the taskflow id
       dispatch(TaskflowActions.updateTaskflowLog(taskflowId));
+
       // Handle any behavior from taskflow change
-      const taskflow = state.taskflows.mapById[taskflowId];
-      Behavior.handleTaskflowChange(state, taskflow);
+      Behavior.handleTaskflowChange(state, state.taskflows.mapById[taskflowId]);
     });
   }
 });
