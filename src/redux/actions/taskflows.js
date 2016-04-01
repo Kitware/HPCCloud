@@ -20,6 +20,10 @@ export function addTaskflow(taskflow, primaryJob = null) {
   return { type: ADD_TASKFLOW, taskflow, primaryJob };
 }
 
+export function attachSimulationToTaskflow(simulationId, taskflowId, stepName) {
+  return { type: BIND_SIMULATION_TO_TASKFLOW, taskflowId, simulationId, stepName };
+}
+
 export function clearUpdateLog() {
   return { type: CLEAR_UPDATE_LOG };
 }
@@ -61,6 +65,7 @@ export function createTaskflow(taskFlowName, primaryJob, payload, simulationStep
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(addTaskflow(resp.data, primaryJob));
+          dispatch(attachSimulationToTaskflow(simulationStep.id, resp.data._id, simulationStep.step));
           dispatch(startTaskflow(resp.data._id, payload, simulationStep, location));
         },
         error => {
@@ -157,7 +162,7 @@ export function fetchTaskflow(id) {
         resp => {
           const taskflow = resp.data;
           dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch({ type: ADD_TASKFLOW, taskflow });
+          dispatch(addTaskflow(taskflow));
 
           if (taskflow.meta && taskflow.meta.jobs) {
             taskflow.meta.jobs.forEach(job => {
@@ -188,10 +193,6 @@ export function updateAllTaskflows() {
     });
     return { type: 'NOOP' };
   };
-}
-
-export function attachSimulationToTaskflow(simulationId, taskflowId, stepName) {
-  return { type: BIND_SIMULATION_TO_TASKFLOW, taskflowId, simulationId, stepName };
 }
 
 export function updateTaskflowFromSimulation(simulation) {

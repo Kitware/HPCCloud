@@ -35,7 +35,7 @@ const TopBar = React.createClass({
         <div className={ theme.topBar } style={{ position: 'relative' }}>
             <div className={(this.props.isBusy ? theme.hpcCloudBusyIcon : theme.hpcCloudIcon)}>
                 <Link to="/">
-                  <SvgIconWidget icon={logo} height="1.35em" width="70px" />
+                  <SvgIconWidget icon={logo} height="1.6em" width="70px" />
                 </Link>
             </div>
 
