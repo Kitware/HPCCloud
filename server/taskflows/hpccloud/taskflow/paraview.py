@@ -203,6 +203,9 @@ def submit_paraview_job(task, cluster, job, *args, **kwargs):
     if 'dataDir' in kwargs:
         params['dataDir'] = kwargs['dataDir']
 
+    if 'fileName' in kwargs:
+        params['fileName'] = kwargs['fileName']
+
     if 'simulationJobId' in kwargs:
         params['simulationJobId'] = kwargs['simulationJobId']
 
