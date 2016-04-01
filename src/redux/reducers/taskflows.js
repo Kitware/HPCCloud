@@ -106,6 +106,11 @@ export default function taskflowsReducer(state = initialState, action) {
       const task = Object.assign({}, state.mapById[taskflowId], { taskMapById });
       const mapById = Object.assign({}, state.mapById, { [taskflowId]: task });
 
+      if (state.updateLogs.indexOf(taskflowId) === -1) {
+        const updateLogs = [].concat(state.updateLogs, taskflowId);
+        return Object.assign({}, state, { taskflowMapByTaskId, mapById, updateLogs });
+      }
+
       return Object.assign({}, state, { taskflowMapByTaskId, mapById });
     }
 
@@ -166,6 +171,7 @@ export default function taskflowsReducer(state = initialState, action) {
       const { id, actions, allComplete, outputDirectory, primaryJob } = action;
       const mapById = Object.assign({}, state.mapById);
       mapById[id] = Object.assign({}, mapById[id], { actions, allComplete, outputDirectory, primaryJob });
+      // console.log('update actions', id, actions);
       return Object.assign({}, state, { mapById });
     }
 

@@ -87,11 +87,15 @@ const visualizationView = React.createClass({
 
     const { taskflow, taskflowId, error, simulation } = this.props;
     const actions = [].concat(taskflow.actions);
+    const tasks = Object.keys(taskflow.taskMapById).map(id => taskflow.taskMapById[id]);
     const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
 
     // Extract meaningful information from props
     if (jobs.some(job => job.name === this.props.primaryJob && job.status === 'running')) {
       actions.push('visualize');
+    } else if (jobs.every(job => job.status === 'complete') &&
+        tasks.every(task => task.status === 'complete')) {
+      actions.push('rerun');
     }
 
     return (

@@ -138,7 +138,6 @@ export default connect(
       const simulation = state.simulations.mapById[activeSimulation];
       taskflowId = simulation.steps.Simulation.metadata.taskflowId;
     }
-
     return {
       taskflowId,
       taskflow: taskflowId ? state.taskflows.mapById[taskflowId] : null,

@@ -106,8 +106,7 @@ const VisualizationStart = React.createClass({
       <div>
           <section className={formStyle.group}>
               <label className={formStyle.label}>Server Type</label>
-              <select
-                className={formStyle.input}
+              <select className={formStyle.input}
                 value={this.state.serverType}
                 onChange={ this.updateServerType }
               >
@@ -119,7 +118,7 @@ const VisualizationStart = React.createClass({
           <section>
               {serverForm}
           </section>
-          <section className={formStyle.buttonGroup}>
+          <section>
               <ButtonBar
                 visible={this.state[this.state.serverType].profile !== ''}
                 onAction={this.formAction}

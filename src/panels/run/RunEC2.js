@@ -46,8 +46,9 @@ export default React.createClass({
   },
 
   dataChange(event) {
+    console.log(event.currentTarget.dataset.key, event.target.value);
     if (this.props.onChange) {
-      this.props.onChange(event.target.dataset.key, event.target.value, 'EC2');
+      this.props.onChange(event.currentTarget.dataset.key, event.target.value, 'EC2');
     }
   },
 
@@ -59,10 +60,10 @@ export default React.createClass({
       >{el.name}</option>;
     var machineMapper = (machine, index) =>
       <option
-        key={ `${machine.name}_${index}` }
-        value={machine.name}
+        key={machine.id}
+        value={machine.id}
       >
-        { `${machine.name} - ${machine.cpu} cores - ${machine.memory}GB ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` }
+        { `${machine.name} - ${machine.cpu} core${machine.cpu > 1 ? 's' : ''} - ${machine.memory}GB ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` }
       </option>;
 
     if (this.state.profiles.length === 0) {
@@ -74,7 +75,6 @@ export default React.createClass({
             </span>
         </div>;
     }
-
     return (
       <div className={style.container}>
           <section className={style.group}>
@@ -93,8 +93,7 @@ export default React.createClass({
               <select
                 onChange={this.dataChange} className={style.input}
                 data-key="machine"
-                value={this.props.contents.machine}
-                defaultValue={machines[0]}
+                defaultValue={machines[0].id}
               >
                 {machines.map(machineMapper)}
               </select>
