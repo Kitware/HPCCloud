@@ -14,10 +14,16 @@ export function handleTaskflowChange(state, taskflow) {
   }
 
   let primaryJob = taskflow.primaryJob;
+  let jobs,
+    tasks;
   const outputDirectory = [];
   const actions = [];
-  const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
-  const tasks = Object.keys(taskflow.taskMapById).map(id => taskflow.taskMapById[id]);
+  try {
+    jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
+    tasks = Object.keys(taskflow.taskMapById).map(id => taskflow.taskMapById[id]);
+  } catch (e) {
+    return;
+  }
   const allComplete = jobs.every(job => job.status === 'complete') && tasks.every(task => task.status === 'complete');
   const simulationStatus = [];
 
@@ -62,10 +68,10 @@ export function handleTaskflowChange(state, taskflow) {
   }
 
   // Update taslkfow meta
-  if (allComplete !== taskflow.allComplete
-    || outputDirectory[0] !== taskflow.outputDirectory
-    || !equals(actions, taskflow.actions)
-    || primaryJob !== taskflow.primaryJob) {
+  if (allComplete !== taskflow.allComplete ||
+    outputDirectory[0] !== taskflow.outputDirectory ||
+    !equals(actions, taskflow.actions) ||
+    primaryJob !== taskflow.primaryJob) {
     dispatch(TaskflowActions.updateTaskflowMetadata(taskflow.flow._id, actions, allComplete, outputDirectory[0], primaryJob));
 
     // Update simulation folders when all tasks/jobs are done
