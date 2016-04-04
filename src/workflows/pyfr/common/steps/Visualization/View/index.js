@@ -44,7 +44,6 @@ const VisualizationView = React.createClass({
   },
 
   visualizeTaskflow() {
-    console.log('visualize');
     const newSimState = Object.assign({}, this.props.simulation, { active: 'Visualization' });
     const location = {
       pathname: this.props.location.pathname,

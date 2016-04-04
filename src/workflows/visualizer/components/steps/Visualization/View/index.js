@@ -8,7 +8,7 @@ import React            from 'react';
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
-import * as Router      from '../../../../../../redux/actions/router';
+import * as SimActions  from '../../../../../../redux/actions/projects';
 
 const ACTIONS = {
   terminate: { name: 'terminateTaskflow', label: 'Terminate', icon: '' },
@@ -50,12 +50,14 @@ const visualizationView = React.createClass({
   },
 
   visualizeTaskflow() {
+    const newSimState = Object.assign({}, this.props.simulation, { active: 'Visualization' });
     const location = {
-      pathname: `View/Simulation/${this.props.simulation._id}/Visualization`,
-      query: merge(this.props.location.query, { view: 'default' }),
+      pathname: this.props.location.pathname,
+      query: merge(this.props.location.query, { view: 'visualizer' }),
       state: this.props.location.state,
     };
-    this.props.onVisualizeTaskflow(location);
+
+    this.props.onVisualizeTaskflow(newSimState, location);
   },
 
   terminateTaskflow() {
@@ -132,7 +134,7 @@ export default connect(
     };
   },
   () => ({
-    onVisualizeTaskflow: (location) => dispatch(Router.push(location)),
+    onVisualizeTaskflow: (sim, location) => dispatch(SimActions.saveSimulation(sim, null, location)),
     onDeleteTaskflow: (id, simulationStep, location) => dispatch(Actions.deleteTaskflow(id, simulationStep, location)),
     onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
   })
