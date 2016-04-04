@@ -35,7 +35,7 @@
       "defaultQueue": "",
       "sge": {
         "numberOfGpusPerNode": 1,
-        "numberOfSlots": 32
+        "numberOfSlots": 1
       }
     },
     "config.paraview.installDir": "/opt/paraview",
