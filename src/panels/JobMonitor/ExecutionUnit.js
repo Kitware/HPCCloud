@@ -31,8 +31,12 @@ export default React.createClass({
             <pre className={ style.log }>
             { // reduce log array to a string with formatted entries
               this.props.unit.log.reduce((prevVal, entry, index) => {
-                var content = prevVal;
-                content += `[${formatTime(entry.created)}] ${entry.levelname}: ${entry.msg}\n`;
+                let content = prevVal;
+                let msg = entry.msg;
+                if (msg !== null && typeof msg === 'object') {
+                  msg = JSON.stringify(msg, null, 2);
+                }
+                content += `[${formatTime(entry.created)}] ${entry.levelname}: ${msg}\n`;
 
                 if (entry.exc_info) {
                   content += entry.exc_info[2].join('');
