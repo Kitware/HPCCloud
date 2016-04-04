@@ -55,11 +55,22 @@ const VisualizationStart = React.createClass({
     const dataDir = this.props.simulation.steps.Visualization.metadata.dataDir;
     const fileName = this.props.simulation.steps.Visualization.metadata.fileName;
     const payload = {
-      cluster: { _id: this.state[this.state.serverType].profile },
       dataDir, // where the output for the sim will be
       fileName, // the file to load
       sessionKey, // for pvw, we use this later for connecting
     };
+
+    if (this.state.serverType === 'Traditional') {
+      payload.cluster = { _id: this.state[this.state.serverType].profile };
+    } else if (this.state.serverType === 'EC2') {
+      payload.cluster = {
+        type: 'ec2',
+        machineType: this.state[this.state.serverType].machine,
+        clusterSize: this.state[this.state.serverType].clusterSize,
+        profileId: this.state[this.state.serverType]._id,
+      };
+    }
+
     const simStepUpdate = {
       id: this.props.simulation._id,
       step: 'Visualization',
