@@ -88,7 +88,10 @@ const SimulationStart = React.createClass({
           },
         });
     } else if (this.state.serverType === 'EC2') {
-      clusterName = this.props.ec2Clusters[this.state[this.state.serverType].profile].name;
+      // clusterName = this.props.ec2Clusters[this.state[this.state.serverType].profile].name;
+      const profileId = this.state[this.state.serverType].profile._id;
+      const clusterSize = !isNaN(parseFloat(this.state[this.state.serverType].clusterSize)) ? parseFloat(this.state[this.state.serverType].clusterSize) : 1;
+      clusterName = this.state[this.state.serverType].profile.name;
       payload = Object.assign({},
         this.state[this.state.serverType].runtime || {},
         {
@@ -111,9 +114,10 @@ const SimulationStart = React.createClass({
           },
           cluster: {
             serverType: 'ec2',
+            name: clusterName,
             machineType: this.state[this.state.serverType].machine,
-            clusterSize: parseFloat(this.state[this.state.serverType].clusterSize),
-            profileId: this.state[this.state.serverType].profile,
+            clusterSize,
+            profileId,
             // volumeSize: parseFloat(this.state[this.state.serverType].volumeSize),
           },
         });

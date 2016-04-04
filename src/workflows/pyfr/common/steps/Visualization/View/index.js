@@ -44,6 +44,7 @@ const VisualizationView = React.createClass({
   },
 
   visualizeTaskflow() {
+    console.log('visualize');
     const newSimState = Object.assign({}, this.props.simulation, { active: 'Visualization' });
     const location = {
       pathname: this.props.location.pathname,
@@ -84,19 +85,18 @@ const VisualizationView = React.createClass({
     if (!this.props.taskflow || !this.props.taskflow.flow) {
       return null;
     }
-
     const { taskflow, taskflowId, error, simulation, buttonsDisabled } = this.props;
     const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
     const actions = [];
+
+    taskflow.actions.forEach(action => {
+      actions.push(action);
+    });
 
     // name is paraview and status is running -> visualize
     if (jobs.some(job => job.name === this.props.primaryJob && job.status === 'running')) {
       actions.push('visualize');
     }
-
-    taskflow.actions.forEach(action => {
-      actions.push(action);
-    });
 
     return (
       <div>
