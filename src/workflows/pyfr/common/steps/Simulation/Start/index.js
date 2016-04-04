@@ -111,9 +111,10 @@ const SimulationStart = React.createClass({
           },
           cluster: {
             serverType: 'ec2',
-            machine: this.state[this.state.serverType].machine,
+            machineType: this.state[this.state.serverType].machine,
             clusterSize: parseFloat(this.state[this.state.serverType].clusterSize),
-            volumeSize: parseFloat(this.state[this.state.serverType].volumeSize),
+            profileId: this.state[this.state.serverType].profile,
+            // volumeSize: parseFloat(this.state[this.state.serverType].volumeSize),
           },
         });
     }
