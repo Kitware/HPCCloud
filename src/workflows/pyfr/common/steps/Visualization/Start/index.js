@@ -5,6 +5,7 @@ import RunEC2                  from '../../../../../../panels/run/RunEC2';
 import RunCluster              from '../../../../../../panels/run/RunCluster';
 import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
 import ButtonBar               from '../../../../../../panels/ButtonBar';
+import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 
 import merge                   from 'mout/src/object/merge';
 import formStyle               from 'HPCCloudStyle/ItemEditor.mcss';
@@ -61,14 +62,14 @@ const VisualizationStart = React.createClass({
     };
 
     if (this.state.serverType === 'Traditional') {
-      payload.cluster = { _id: this.state[this.state.serverType].profile };
+      payload.cluster = ClusterPayloads.tradClusterPayload(this.state[this.state.serverType].profile);
     } else if (this.state.serverType === 'EC2') {
-      payload.cluster = {
-        type: 'ec2',
-        machineType: this.state[this.state.serverType].machine,
-        clusterSize: this.state[this.state.serverType].clusterSize,
-        profileId: this.state[this.state.serverType]._id,
-      };
+      payload.cluster = ClusterPayloads.ec2ClusterPayload(
+        this.state[this.state.serverType].profile.name,
+        this.state[this.state.serverType].machine,
+        this.state[this.state.serverType].clusterSize,
+        this.state[this.state.serverType]._id
+      );
     }
 
     const simStepUpdate = {

@@ -5,6 +5,7 @@ import defaultServerParameters from '../../../../../../panels/run/defaults';
 import RunCluster              from '../../../../../../panels/run/RunCluster';
 import RunEC2                  from '../../../../../../panels/run/RunEC2';
 import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
+import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 import RuntimeBackend          from '../../../panels/RuntimeBackend';
 
 // import client                  from '../../../../../../network';
@@ -83,15 +84,9 @@ const SimulationStart = React.createClass({
               id: this.props.simulation.metadata.outputFolder._id,
             },
           },
-          cluster: {
-            _id: this.state[this.state.serverType].profile,
-          },
+          cluster: ClusterPayloads.tradClusterPayload(this.state[this.state.serverType].profile),
         });
     } else if (this.state.serverType === 'EC2') {
-      // clusterName = this.props.ec2Clusters[this.state[this.state.serverType].profile].name;
-      const profileId = this.state[this.state.serverType].profile._id;
-      const clusterSize = !isNaN(parseFloat(this.state[this.state.serverType].clusterSize)) ? parseFloat(this.state[this.state.serverType].clusterSize) : 1;
-      clusterName = this.state[this.state.serverType].profile.name;
       payload = Object.assign({},
         this.state[this.state.serverType].runtime || {},
         {
@@ -112,14 +107,12 @@ const SimulationStart = React.createClass({
               id: this.props.simulation.metadata.outputFolder._id,
             },
           },
-          cluster: {
-            serverType: 'ec2',
-            name: clusterName,
-            machineType: this.state[this.state.serverType].machine,
-            clusterSize,
-            profileId,
-            // volumeSize: parseFloat(this.state[this.state.serverType].volumeSize),
-          },
+          cluster: ClusterPayloads.ec2ClusterPayload(
+            this.state[this.state.serverType].profile.name,
+            this.state[this.state.serverType].machine,
+            this.state[this.state.serverType].clusterSize,
+            this.state[this.state.serverType].profile._id
+          ),
         });
     }
 
