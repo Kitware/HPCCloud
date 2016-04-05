@@ -8,8 +8,12 @@ export function tradClusterPayload(id) {
 }
 
 export function ec2ClusterPayload(name, machineType, clusterSize = 1, profileId) {
-  if (!name || !machineType || !profileId) {
-    throw Error('missing parameters in ec2 cluster payload');
+  if (!name) {
+    throw Error('missing `name` in ec2 cluster payload');
+  } else if (!machineType) {
+    throw Error('missing `machineType` in ec2 cluster payload');
+  } else if (!profileId) {
+    throw Error('missing `profileId` in ec2 cluster payload');
   }
 
   let _clusterSize = parseFloat(clusterSize);

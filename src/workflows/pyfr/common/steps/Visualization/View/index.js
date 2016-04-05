@@ -95,6 +95,8 @@ const VisualizationView = React.createClass({
     // name is paraview and status is running -> visualize
     if (jobs.some(job => job.name === this.props.primaryJob && job.status === 'running')) {
       actions.push('visualize');
+    } else if (taskflow.allComplete) {
+      actions.push('rerun');
     }
 
     return (

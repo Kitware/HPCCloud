@@ -66,7 +66,7 @@ const VisualizationStart = React.createClass({
         this.state[this.state.serverType].name,
         this.state[this.state.serverType].machine,
         this.state[this.state.serverType].clusterSize,
-        this.state[this.state.serverType]._id
+        this.state[this.state.serverType].profile
       );
     }
 
