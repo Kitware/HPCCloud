@@ -5,6 +5,7 @@ import RunEC2                  from '../../../../../../panels/run/RunEC2';
 import RunCluster              from '../../../../../../panels/run/RunCluster';
 import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
 import ButtonBar               from '../../../../../../panels/ButtonBar';
+import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 
 import merge                   from 'mout/src/object/merge';
 import formStyle               from 'HPCCloudStyle/ItemEditor.mcss';
@@ -55,11 +56,22 @@ const VisualizationStart = React.createClass({
     const dataDir = this.props.simulation.steps.Visualization.metadata.dataDir;
     const fileName = this.props.simulation.steps.Visualization.metadata.fileName;
     const payload = {
-      cluster: { _id: this.state[this.state.serverType].profile },
       dataDir, // where the output for the sim will be
       fileName, // the file to load
       sessionKey, // for pvw, we use this later for connecting
     };
+
+    if (this.state.serverType === 'Traditional') {
+      payload.cluster = ClusterPayloads.tradClusterPayload(this.state[this.state.serverType].profile);
+    } else if (this.state.serverType === 'EC2') {
+      payload.cluster = ClusterPayloads.ec2ClusterPayload(
+        this.state[this.state.serverType].profile.name,
+        this.state[this.state.serverType].machine,
+        this.state[this.state.serverType].clusterSize,
+        this.state[this.state.serverType]._id
+      );
+    }
+
     const simStepUpdate = {
       id: this.props.simulation._id,
       step: 'Visualization',

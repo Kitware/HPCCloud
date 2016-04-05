@@ -46,9 +46,15 @@ export default React.createClass({
   },
 
   dataChange(event) {
-    console.log(event.currentTarget.dataset.key, event.target.value);
+    var key = event.currentTarget.dataset.key,
+      value = event.target.value;
+
+    if (key === 'profile') {
+      value = this.state.profiles[value];
+    }
+
     if (this.props.onChange) {
-      this.props.onChange(event.currentTarget.dataset.key, event.target.value, 'EC2');
+      this.props.onChange(key, value, 'EC2');
     }
   },
 
@@ -56,7 +62,7 @@ export default React.createClass({
     var optionMapper = (el, index) =>
       <option
         key={ `${el.name}_${index}` }
-        value={el.name}
+        value={index}
       >{el.name}</option>;
     var machineMapper = (machine, index) =>
       <option
