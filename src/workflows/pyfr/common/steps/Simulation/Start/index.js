@@ -108,10 +108,10 @@ const SimulationStart = React.createClass({
             },
           },
           cluster: ClusterPayloads.ec2ClusterPayload(
-            this.state[this.state.serverType].profile.name,
+            this.state[this.state.serverType].name,
             this.state[this.state.serverType].machine,
             this.state[this.state.serverType].clusterSize,
-            this.state[this.state.serverType].profile._id
+            this.state[this.state.serverType].profile
           ),
         });
     }
