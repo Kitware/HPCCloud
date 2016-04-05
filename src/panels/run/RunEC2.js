@@ -84,6 +84,15 @@ export default React.createClass({
     return (
       <div className={style.container}>
           <section className={style.group}>
+              <label className={style.label}>Name:</label>
+              <input
+                className={style.input}
+                data-key="name"
+                value={this.props.contents.name}
+                onChange={this.dataChange} required
+              />
+          </section>
+          <section className={style.group}>
               <label className={style.label}>Profile:</label>
               <select
                 className={style.input}

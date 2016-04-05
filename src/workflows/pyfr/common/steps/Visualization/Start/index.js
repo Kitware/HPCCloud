@@ -65,7 +65,7 @@ const VisualizationStart = React.createClass({
       payload.cluster = ClusterPayloads.tradClusterPayload(this.state[this.state.serverType].profile);
     } else if (this.state.serverType === 'EC2') {
       payload.cluster = ClusterPayloads.ec2ClusterPayload(
-        this.state[this.state.serverType].profile.name,
+        this.state[this.state.serverType].name,
         this.state[this.state.serverType].machine,
         this.state[this.state.serverType].clusterSize,
         this.state[this.state.serverType]._id
