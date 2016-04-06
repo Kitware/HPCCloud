@@ -34,6 +34,11 @@ const ProjectView = React.createClass({
 
   deleteItems(items) {
     /* eslint-disable no-alert */
+    if (items.some(sim => sim.metadata.status === 'running')) {
+      alert('You cannot delete a running simulation, terminate it and try again.');
+      return;
+    }
+
     if (!confirm(`Are you sure you want to delete ${items.length === 1 ? 'this' : 'these'} ${items.length} simulation${items.length === 1 ? '' : 's'}?`)) {
       return;
     }

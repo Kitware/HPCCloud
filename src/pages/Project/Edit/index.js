@@ -60,8 +60,8 @@ const ProjectEdit = React.createClass({
         ref="container"
         title="Edit Project"
         actions={[
-          { name: 'delete', label: 'Delete project' },
           { name: 'cancel', label: 'Cancel' },
+          { name: 'delete', label: 'Delete project' },
           { name: 'editProject', label: 'Save project' }]}
         onAction={ this.onAction }
       >{ workflowAddOn }</ItemEditor>);

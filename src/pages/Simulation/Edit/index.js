@@ -71,8 +71,8 @@ const SimulationEdit = React.createClass({
         ref="container"
         title="Edit Simulation"
         actions={[
-          { name: 'delete', label: 'Delete simulation' },
           { name: 'cancel', label: 'Cancel' },
+          { name: 'delete', label: 'Delete simulation', disabled: this.props.simulation.metadata.status === 'running' },
           { name: 'editSimulation', label: 'Save simulation' }]}
         onAction={ this.onAction }
       >
