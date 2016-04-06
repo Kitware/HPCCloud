@@ -40,6 +40,8 @@ const ClusterPrefs = React.createClass({
     presetNames: React.PropTypes.array,
     list: React.PropTypes.array,
     error: React.PropTypes.string,
+    simulations: React.PropTypes.object,
+    taskflows: React.PropTypes.array,
     buttonsDisabled: React.PropTypes.bool,
     onUpdateItem: React.PropTypes.func,
     onActiveChange: React.PropTypes.func,
@@ -59,12 +61,17 @@ const ClusterPrefs = React.createClass({
     };
   },
 
+  getInitialState() {
+    return { _error: null };
+  },
+
   changeItem(item) {
     const { active, onUpdateItem } = this.props;
     onUpdateItem(active, item);
   },
 
   activeChange(active) {
+    this.setState({ _error: null });
     this.props.onActiveChange(active);
   },
 
@@ -72,27 +79,46 @@ const ClusterPrefs = React.createClass({
     this.props.onApplyPreset(this.props.active, presetName);
   },
 
+  clusterHasSimulation(id) {
+    for (let i = 0; i < this.props.taskflows.length; i++) {
+      if (this.props.taskflows[i].flow.meta.cluster._id === id) {
+        return this.props.taskflows[i].simulation;
+      }
+    }
+
+    return false;
+  },
+
   addItem() {
+    this.setState({ _error: null });
     this.props.onAddItem();
   },
 
   removeItem() {
     const { list, active, onRemoveItem } = this.props;
     const clusterToDelete = list[active];
-    if (clusterToDelete._id && confirm('Are you sure you want to delete this cluster?')) {
+    const clusterSimulation = this.clusterHasSimulation(clusterToDelete._id);
+    if (clusterSimulation && this.props.simulations[clusterSimulation]) {
+      this.setState({ _error: `This cluster is associated with simulation "${this.props.simulations[clusterSimulation].name}"` });
+      return;
+    } else if (clusterToDelete._id && confirm('Are you sure you want to delete this cluster?')) {
       onRemoveItem(active, clusterToDelete);
-    } else {
+    } else if (!clusterToDelete._id) {
       onRemoveItem(active, clusterToDelete);
     }
+
+    this.setState({ _error: null });
   },
 
   saveItem() {
     const { onUpdateItem, active, list } = this.props;
+    this.setState({ _error: null });
     onUpdateItem(active, list[active], true);
   },
 
   testCluster() {
     const { onTestCluster, list, active } = this.props;
+    this.setState({ _error: null });
     onTestCluster(active, list[active]);
   },
 
@@ -127,7 +153,7 @@ const ClusterPrefs = React.createClass({
             <ButtonBar
               visible={!!activeData}
               onAction={ this.formAction }
-              error={ error }
+              error={ error || this.state._error }
               actions={getActions(buttonsDisabled, activeData && activeData.config.ssh.publicKey && activeData.status !== 'running')}
             >
               <PresetSelector
@@ -149,12 +175,16 @@ const ClusterPrefs = React.createClass({
 export default connect(
   state => {
     const localState = state.preferences.clusters;
+    const simulations = state.simulations.mapById;
+    const taskflows = Object.keys(state.taskflows.mapById).map((tf) => state.taskflows.mapById[tf]);
     return {
       presetNames: Object.keys(localState.presets || {}),
       active: localState.active,
       list: localState.list,
       buttonsDisabled: localState.pending,
       error: get(state, 'network.error.save_cluster.resp.data.message'),
+      taskflows,
+      simulations,
     };
   },
   () => {

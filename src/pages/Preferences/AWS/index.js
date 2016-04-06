@@ -47,9 +47,7 @@ const AWSPrefs = React.createClass({
   },
 
   getInitialState() {
-    return {
-      _error: null,
-    };
+    return { _error: null };
   },
 
   changeItem(item) {
@@ -58,12 +56,12 @@ const AWSPrefs = React.createClass({
   },
 
   activeChange(active) {
-    this.setState({ _error: '' });
+    this.setState({ _error: null });
     this.props.onActiveChange(active);
   },
 
   addItem() {
-    this.setState({ _error: '' });
+    this.setState({ _error: null });
     this.props.onAddItem();
   },
 
@@ -73,10 +71,10 @@ const AWSPrefs = React.createClass({
 
     if (profileToDelete._id && confirm('Are you sure you want to delete this profile?')) {
       onRemoveItem(active, profileToDelete);
-    } else {
+    } else if (!profileToDelete._id) {
       onRemoveItem(active, profileToDelete);
     }
-    this.setState({ _error: '' });
+    this.setState({ _error: null });
   },
 
   saveItem() {
@@ -93,7 +91,7 @@ const AWSPrefs = React.createClass({
       this.setState({ _error: 'Access keys are required' });
       return;
     }
-    this.setState({ _error: '' });
+    this.setState({ _error: null });
     onUpdateItem(active, list[active], true);
   },
 
