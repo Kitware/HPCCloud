@@ -38,7 +38,7 @@ const VisualizationStart = React.createClass({
       EC2: defaultServerParameters.EC2,
       Traditional: defaultServerParameters.Traditional,
       OpenStack: defaultServerParameters.OpenStack,
-      error: '',
+      error: null,
     };
   },
 
