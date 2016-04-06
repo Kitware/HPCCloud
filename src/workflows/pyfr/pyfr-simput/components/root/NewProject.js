@@ -32,7 +32,7 @@ function extractPhysicalNames(file) {
 
 export default React.createClass({
 
-  displayName: 'Project/New/PyFr',
+  displayName: 'Project/New/PyFR',
 
   propTypes: {
     owner: React.PropTypes.func,

@@ -13,7 +13,7 @@ import style                from 'HPCCloudStyle/PageWithMenu.mcss';
 
 export default React.createClass({
 
-  displayName: 'PyFrSimput',
+  displayName: 'PyFRSimput',
 
   propTypes: {
     convert: React.PropTypes.func,

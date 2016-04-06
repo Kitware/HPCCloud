@@ -8,7 +8,7 @@ import stepVisualizationStart from '../common/steps/Visualization/Start';
 import stepVisualizationView  from '../common/steps/Visualization/View';
 
 export default {
-  name: 'PyFr (Runtime)',
+  name: 'PyFR (Runtime)',
   logo: require('./logo.jpg'),
   components: {
     NewSimulation: rootNewSimulation,
@@ -24,35 +24,35 @@ export default {
       'config.pyfr.cuda': {
         type: 'bool',
         label: 'Cuda enabled',
-        description: 'Check if the cluster is able to run Cuda for PyFr',
+        description: 'Check if the cluster is able to run Cuda for PyFR',
       },
       'config.pyfr.opencl': {
         type: 'profile',
         label: 'OpenCL configurations',
-        description: 'Set of options that can be used with the OpenCL backend for PyFr',
+        description: 'Set of options that can be used with the OpenCL backend for PyFR',
         profile: {
           'platform-id': {
             type: 'text',
             label: 'Platform ID',
-            description: 'OpenCL backend for PyFr: platform-id',
+            description: 'OpenCL backend for PyFR: platform-id',
           },
           'device-type': {
             type: 'enum',
             label: 'Device type',
             values: ['all', 'cpu', 'gpu', 'accelerator'],
-            description: 'OpenCL backend for PyFr: platform-id',
+            description: 'OpenCL backend for PyFR: platform-id',
           },
           'device-id': {
             type: 'text',
             label: 'Device ID',
-            description: 'OpenCL backend for PyFr: device-id',
+            description: 'OpenCL backend for PyFR: device-id',
           },
         },
       },
       'config.pyfr.openmp': {
         type: 'profile',
         label: 'OpenMP configurations',
-        description: 'Set of options that can be used with the OpenMP backend for PyFr',
+        description: 'Set of options that can be used with the OpenMP backend for PyFR',
         profile: {
           cc: {
             type: 'text',
