@@ -105,6 +105,9 @@ def paraview_terminate(task):
     cluster = parse('meta.cluster').find(task.taskflow)
     if cluster:
         cluster = cluster[0].value
+    else:
+        raise Exception('Unable to extract cluster from taskflow. '
+                        'Unable to terminate ParaView job.')
 
     client = _create_girder_client(
             task.taskflow.girder_api_url, task.taskflow.girder_token)
