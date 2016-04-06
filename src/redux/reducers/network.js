@@ -49,6 +49,19 @@ export default function networkReducer(state = initialState, action) {
       return Object.assign({}, state, { pending });
     }
 
+    case Actions.INVLIDATE_ERROR: {
+      const id = action.id;
+      const error = Object.assign({}, state.error);
+
+      if (error[`delete_project_${id}`].resp.data.message) {
+        error[`delete_project_${id}`].resp.data.invalid = true;
+      } else if (error.save_project.resp.data.message) {
+        error.save_project.resp.data.invalid = true;
+      }
+
+      return Object.assign({}, state, { error });
+    }
+
     default:
       return state;
   }

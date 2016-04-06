@@ -6,8 +6,9 @@ import Workflows    from '../../../workflows';
 import { connect }  from 'react-redux';
 import get          from 'mout/src/object/get';
 import { dispatch } from '../../../redux';
-import * as Actions from '../../../redux/actions/projects';
 import * as Router  from '../../../redux/actions/router';
+import * as Actions from '../../../redux/actions/projects';
+import * as NetActions from '../../../redux/actions/network';
 
 /* eslint-disable no-alert */
 const ProjectEdit = React.createClass({
@@ -22,6 +23,13 @@ const ProjectEdit = React.createClass({
     onSave: React.PropTypes.func,
     onDelete: React.PropTypes.func,
     onCancel: React.PropTypes.func,
+    invalidateError: React.PropTypes.func,
+  },
+
+  componentWillUnmount() {
+    if (this.props.error) {
+      this.props.invalidateError(this.props.project._id);
+    }
   },
 
   onAction(action, data, attachement) {
@@ -74,8 +82,14 @@ const ProjectEdit = React.createClass({
 
 export default connect(
   (state, props) => {
+    var error;
+    if (!get(state, 'network.error.save_project.resp.data.invalid') &&
+      !get(state, `network.error.delete_project_${props.params.id}.resp.data.invalid`)) {
+      error = get(state, 'network.error.save_project.resp.data.message') || get(state, `network.error.delete_project_${props.params.id}.resp.data.message`);
+    }
+
     return {
-      error: get(state, 'network.error.save_project.resp.data.message') || get(state, `network.error.delete_project_${props.params.id}.resp.data.message`),
+      error,
       project: state.projects.mapById[props.params.id],
     };
   },
@@ -84,6 +98,7 @@ export default connect(
       onSave: (project) => dispatch(Actions.saveProject(project)),
       onDelete: (project) => dispatch(Actions.deleteProject(project)),
       onCancel: (path) => dispatch(Router.goBack()),
+      invalidateError: (id) => dispatch(NetActions.invalidateError(id)),
     };
   }
 )(ProjectEdit);
