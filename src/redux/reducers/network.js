@@ -49,7 +49,7 @@ export default function networkReducer(state = initialState, action) {
       return Object.assign({}, state, { pending });
     }
 
-    case Actions.INVLIDATE_ERROR: {
+    case Actions.INVALIDATE_ERROR: {
       const id = action.id;
       const error = Object.assign({}, state.error);
 
