@@ -1,6 +1,8 @@
 import React from 'react';
 import style from 'HPCCloudStyle/Layout.mcss';
 
+// used for empty placeholders on some pages
+
 const classes = [
   style.verticalFlexContainer,
   style.fullWidth,
@@ -10,17 +12,13 @@ const classes = [
   style.textCenter,
 ].join(' ');
 
-export default React.createClass({
-  displayName: 'EmptyPlaceholder',
+const placeholder = (props) => (
+  <div className={ classes }>
+    { props.phrase }
+  </div>
+);
 
-  propTypes: {
-    phrase: React.PropTypes.string,
-  },
+placeholder.displayName = 'EmptyPlaceholder';
+placeholder.propTypes = { phrase: React.PropTypes.string };
 
-  render() {
-    return (
-      <div className={ classes }>
-        {this.props.phrase}
-      </div>);
-  },
-});
+export default placeholder;

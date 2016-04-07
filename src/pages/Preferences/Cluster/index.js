@@ -3,10 +3,12 @@ import ClusterForm      from './ClusterForm';
 import ActiveList       from '../../../panels/ActiveList';
 import Toolbar          from '../../../panels/Toolbar';
 import ButtonBar        from '../../../panels/ButtonBar';
+import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
 import PresetSelector   from '../PresetSelector';
 import React            from 'react';
 import { breadcrumb }   from '..';
 
+import theme from 'HPCCloudStyle/Theme.mcss';
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
 import get          from 'mout/src/object/get';
@@ -43,6 +45,7 @@ const ClusterPrefs = React.createClass({
     simulations: React.PropTypes.object,
     taskflows: React.PropTypes.array,
     buttonsDisabled: React.PropTypes.bool,
+
     onUpdateItem: React.PropTypes.func,
     onActiveChange: React.PropTypes.func,
     onApplyPreset: React.PropTypes.func,
@@ -130,6 +133,35 @@ const ClusterPrefs = React.createClass({
     const { active, list, error, buttonsDisabled, presetNames } = this.props;
     const activeData = active < list.length ? list[active] : null;
 
+    let content = null;
+    if (list && list.length) {
+      content = (<div className={ style.content }>
+        <ClusterForm
+          data={activeData}
+          onChange={ this.changeItem }
+        />
+        <ButtonBar
+          visible={!!activeData}
+          onAction={ this.formAction }
+          error={ error || this.state._error }
+          actions={getActions(buttonsDisabled, activeData && activeData.config.ssh.publicKey && activeData.status !== 'running')}
+        >
+          <PresetSelector
+            contents={presetNames}
+            onChange={this.presetChange}
+            value={''}
+          />
+        </ButtonBar>
+      </div>);
+    } else {
+      content = (<EmptyPlaceholder phrase={
+        <span>
+          There are no Clusters available <br />
+          You can create some with the <i className={theme.addIcon}></i> above
+        </span> }
+      />);
+    }
+
     return (
       <div className={ style.rootContainer }>
         <Toolbar
@@ -145,24 +177,7 @@ const ClusterPrefs = React.createClass({
             active={active}
             list={list}
           />
-          <div className={ style.content }>
-            <ClusterForm
-              data={activeData}
-              onChange={ this.changeItem }
-            />
-            <ButtonBar
-              visible={!!activeData}
-              onAction={ this.formAction }
-              error={ error || this.state._error }
-              actions={getActions(buttonsDisabled, activeData && activeData.config.ssh.publicKey && activeData.status !== 'running')}
-            >
-              <PresetSelector
-                contents={presetNames}
-                onChange={this.presetChange}
-                value={''}
-              />
-            </ButtonBar>
-          </div>
+          { content }
         </div>
       </div>);
   },
