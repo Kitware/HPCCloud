@@ -42,8 +42,10 @@ const JobMonitor = React.createClass({
                   Jobs
               </div>
               <div className={ style.buttons }>
-                  { Object.keys(this.props.taskStatusCount).map(status =>
-                    <span key={status} className={ style.count }>{ `${status}(${this.props.taskStatusCount[status]})` }</span>
+                  { Object.keys(this.props.taskStatusCount).map((status, index) =>
+                    <span key={`${status}_${index}`} className={ style.count }>
+                      {`${status}(${this.props.taskStatusCount[status]})` }
+                    </span>
                   )}
                   <i
                     className={ this.state.advanced ? style.advancedIconOn : style.advancedIconOff}

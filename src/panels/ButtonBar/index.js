@@ -41,10 +41,10 @@ export default React.createClass({
           <span className={ (this.props.error ? editor.errorBox : states.isHidden) }>
             { this.props.error }
           </span>
-          { this.props.actions.map(action =>
+          { this.props.actions.map((action, index) =>
             <button
               className={ editor.button }
-              key={action.name}
+              key={`${action.name}_${index}`}
               data-action={action.name}
               onClick={this.onAction}
               disabled={action.disabled}

@@ -42,7 +42,7 @@ export default React.createClass({
 
   render() {
     var mapper = (el, index) =>
-        <li key={index}
+        <li key={`${el.name}_${index}`}
           className={ el.disabled ? style.unselectable : (this.props.active === index ? style.active : style.selectable) }
           data-index={index}
           onClick={this.changeActive}

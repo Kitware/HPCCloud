@@ -77,7 +77,7 @@ const FileListing = React.createClass({
         </a>
       </span>);
     }
-    return (<section key={`${file.name}_${index}`} className={ style.listItem }>
+    return (<section key={`${file._id}_${index}`} className={ style.listItem }>
       <strong className={ style.itemContent } style={{ paddingLeft: depth * indentWidth }}>
         <i className={style.fileIcon}></i> {file.name}
       </strong>
@@ -87,7 +87,7 @@ const FileListing = React.createClass({
 
   folderMapper(folder, index) {
     var depth = this.props.folders[folder._id].depth;
-    return (<section key={`${folder.name}_${index}`} className={ style.listItem } onClick={this.openFolder} data-folder-id={folder._id}>
+    return (<section key={`${folder._id}_${index}`} className={ style.listItem } onClick={this.openFolder} data-folder-id={folder._id}>
       <strong className={ style.itemContent } style={{ paddingLeft: depth * indentWidth }}>
         <i className={style.folderIcon}></i> {folder.name}
       </strong>
@@ -97,7 +97,7 @@ const FileListing = React.createClass({
 
   openFolderMapper(folder, index) {
     var depth = this.props.folders[folder._id].depth;
-    return (<div key={`${folder.name}_${index}`}>
+    return (<div key={`${folder._id}_${index}`}>
       <section className={ style.listItem } onClick={this.openFolder} data-folder-id={folder._id}>
         <strong className={ style.itemContent } style={{ paddingLeft: depth * indentWidth }}>
           <i className={style.folderOpenIcon}></i> {folder.name}
@@ -137,7 +137,7 @@ const FileListing = React.createClass({
       <div className={ style.toolbar }>
         <div className={ style.title }>{this.props.title}</div>
         <div className={ style.buttons }>
-          <span key={status} className={ style.count }>{ `files(${this.props.folders[this.props.folderId].children.length})` }</span>
+          <span className={ style.count }>{ `files(${this.props.folders[this.props.folderId].children.length})` }</span>
           <i
             className={ this.state.open ? style.advancedIconOn : style.advancedIconOff}
             onClick={ this.toggleAdvanced }

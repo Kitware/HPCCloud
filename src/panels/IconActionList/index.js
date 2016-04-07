@@ -27,9 +27,9 @@ export default React.createClass({
   render() {
     return (
       <div className={ this.props.className }>
-        { this.props.actions.map(action =>
+        { this.props.actions.map((action, index) =>
           <i
-            key={action.name}
+            key={`${action.name}_${index}`}
             data-action={action.name}
             onClick={this.onAction}
             className={ [style.actionButton, action.icon].join(' ') }
