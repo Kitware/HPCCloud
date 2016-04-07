@@ -149,7 +149,7 @@ const SimulationStart = React.createClass({
     this.setState({ serverType });
   },
 
-  updateBakend(backend) {
+  updateBackend(backend) {
     this.setState({ backend });
   },
 
@@ -196,7 +196,7 @@ const SimulationStart = React.createClass({
           <section>
               {serverForm}
           </section>
-          <RuntimeBackend profiles={profiles} onChange={ this.updateBakend } visible={this.state.serverType === 'Traditional'} />
+          <RuntimeBackend profiles={profiles} onChange={ this.updateBackend } visible={this.state.serverType === 'Traditional'} />
           <ButtonBar
             visible={this.state[this.state.serverType].profile !== ''}
             onAction={this.formAction}
@@ -226,4 +226,3 @@ export default connect(
     };
   }
 )(SimulationStart);
-

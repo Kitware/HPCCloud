@@ -8,7 +8,7 @@ import breadCrumbStyle  from 'HPCCloudStyle/Theme.mcss';
 
 export default React.createClass({
 
-  displayName: 'PyFRSimulation',
+  displayName: 'PyFrSimulation',
 
   propTypes: {
     module: React.PropTypes.object,
