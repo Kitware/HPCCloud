@@ -29,7 +29,7 @@ export default React.createClass({
     var advancedControl = null;
     if (this.props.advanced) {
       advancedControl = (<div className={ style.buttons }>
-        <span key={status} className={ style.count }>{ this.props.subtitle ? `${this.props.subtitle}(${this.props.items.length})` : null }</span>
+        <span className={ style.count }>{ this.props.subtitle ? `${this.props.subtitle}(${this.props.items.length})` : null }</span>
         <i
           className={ this.state.open ? style.advancedIconOn : style.advancedIconOff}
           onClick={ this.toggleAdvanced }

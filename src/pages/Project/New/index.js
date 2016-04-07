@@ -81,8 +81,8 @@ const ProjectNew = React.createClass({
               onChange={ this.updateForm }
               value={this.state.type}
             >
-              { this.props.workflowNames.map(i =>
-                <option key={i.value} value={i.value}>{i.label}</option>
+              { this.props.workflowNames.map((el, index) =>
+                <option key={`${el.label}_${el.value}_${index}`} value={el.value}>{el.label}</option>
               )}
             </select>
         </section>

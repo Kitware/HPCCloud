@@ -119,8 +119,8 @@ export default React.createClass({
                 value={this.state.type}
                 onChange={ this.updateActiveType }
               >
-                { this.state.types.map(key =>
-                  <option value={ key } key={ key }>{ TYPES[key] }</option>
+                { this.state.types.map((key, index) =>
+                  <option key={ `${key}_${index}` } value={ key }>{ TYPES[key] }</option>
                 )}
               </select>
           </section>
@@ -142,8 +142,8 @@ export default React.createClass({
                 value={this.state.profile}
                 onChange={ this.updateActiveProfile }
               >
-                { profiles.map(profile =>
-                  <option value={ profile.name } key={ profile.name }>{ profile.name }</option>
+                { profiles.map((profile, index) =>
+                  <option key={ `${profile.name}_${index}` } value={ profile.name }>{ profile.name }</option>
                 )}
               </select>
           </section>

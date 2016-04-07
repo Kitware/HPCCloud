@@ -68,7 +68,7 @@ export default React.createClass({
       return null;
     }
 
-    const sepa = <hr style={{ position: 'relative', top: '-2px' }} />;
+    const separator = <hr style={{ position: 'relative', top: '-2px' }} />;
 
     return (
       <div>
@@ -144,11 +144,11 @@ ssh ${this.props.data.config.ssh.user}@${this.props.data.config.host} \
               </section> :
               null
           }
-          { wfNames.map(name =>
-            <CollapsibleWidget title={ Workflows[name].name } open={ false } key={name} subtitle={ sepa }>
-            <form onSubmit={ preventDefault }>
-              <FormPanel config={ allConfigs[name] } style={ style } data={ this.props.data } onChange={ this.mergeData } />
-            </form>
+          { wfNames.map((name, index) =>
+            <CollapsibleWidget title={ Workflows[name].name } open={ false } key={`${name}_${index}`} subtitle={ separator }>
+              <form onSubmit={ preventDefault }>
+                <FormPanel config={ allConfigs[name] } style={ style } data={ this.props.data } onChange={ this.mergeData } />
+              </form>
             </CollapsibleWidget>
           )}
       </div>);

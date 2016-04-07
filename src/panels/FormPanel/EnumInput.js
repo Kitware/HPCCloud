@@ -30,8 +30,8 @@ export default React.createClass({
           value={ value }
           onChange={this.editField}
         >
-        { item.values.map(option =>
-          <option key={ option } value={ option }>{ option }</option>
+        { item.values.map((option, index) =>
+          <option key={`${option}_${index}`} value={ option }>{ option }</option>
         )}
         </select>
       </section>);

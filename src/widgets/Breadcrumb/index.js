@@ -35,7 +35,10 @@ export default React.createClass({
     return (
       <div className={ this.props.className }>
         { this.props.paths.map((path, index) =>
-          <LinkIcon key={index} to={path} icon={this.props.icons[index]} className={ index === this.props.active ? style.activeBreadCrumb : style.breadCrumb} />
+          <LinkIcon key={`${path}_${index}`} to={path}
+            icon={this.props.icons[index]}
+            className={ index === this.props.active ? style.activeBreadCrumb : style.breadCrumb}
+          />
         )}
       </div>);
   },
