@@ -140,6 +140,12 @@
     composes: fa-pencil     from 'font-awesome/css/font-awesome.css';
 }
 
+.addIcon {
+    composes: fa      from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw   from 'font-awesome/css/font-awesome.css';
+    composes: fa-plus from 'font-awesome/css/font-awesome.css';
+}
+
 /* Simulation icons */
 .simulationEditIcon {
     composes: fa            from 'font-awesome/css/font-awesome.css';

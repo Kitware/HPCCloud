@@ -54,6 +54,10 @@
     width: 100%;
 }
 
+.halfHeight {
+    height: 50vh;
+}
+
 .horizontalPadding {
     padding-left: 10px;
     padding-right: 10px;

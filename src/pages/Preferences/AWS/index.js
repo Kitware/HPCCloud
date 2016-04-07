@@ -3,8 +3,10 @@ import ActiveList       from '../../../panels/ActiveList';
 import ButtonBar        from '../../../panels/ButtonBar';
 import Toolbar          from '../../../panels/Toolbar';
 import React            from 'react';
+import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
 import { breadcrumb }   from '..';
 
+import theme from 'HPCCloudStyle/Theme.mcss';
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
 import get          from 'mout/src/object/get';
@@ -103,6 +105,29 @@ const AWSPrefs = React.createClass({
     const { active, list, error, buttonsDisabled } = this.props;
     const activeData = active < list.length ? list[active] : null;
 
+    let content = null;
+    if (list.length) {
+      content = (<div className={ style.content }>
+        <AWSForm
+          data={activeData}
+          onChange={ this.changeItem }
+        />
+        <ButtonBar
+          visible={!!activeData}
+          onAction={ this.formAction }
+          error={ this.state._error || error }
+          actions={getActions(buttonsDisabled)}
+        />
+      </div>);
+    } else {
+      content = (<EmptyPlaceholder phrase={
+        <span>
+          There are no EC2 Profiles available <br />
+          You can create some with the <i className={theme.addIcon}></i> above
+        </span> }
+      />);
+    }
+
     return (
       <div className={ style.rootContainer }>
         <Toolbar
@@ -118,18 +143,7 @@ const AWSPrefs = React.createClass({
             active={active}
             list={list}
           />
-          <div className={ style.content }>
-            <AWSForm
-              data={activeData}
-              onChange={ this.changeItem }
-            />
-            <ButtonBar
-              visible={!!activeData}
-              onAction={ this.formAction }
-              error={ this.state._error || error }
-              actions={getActions(buttonsDisabled)}
-            />
-          </div>
+          { content }
         </div>
       </div>);
   },

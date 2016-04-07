@@ -29,6 +29,7 @@ export default React.createClass({
     location: React.PropTypes.object,
     onAction: React.PropTypes.func,
     title: React.PropTypes.string,
+    placeholder: React.PropTypes.object,
   },
 
   contextTypes: {
@@ -111,6 +112,43 @@ export default React.createClass({
     updateQuery(this.props.location.query.filter);
     const filteredList = this.props.items.filter(itemFilter);
     const helper = this.props.accessHelper;
+    let content = null;
+
+    if (this.props.items.length) {
+      content = (
+        <table className={ style.table }>
+          <thead>
+              <tr>
+                  <th></th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Created</th>
+                  <th>Updated</th>
+                  <th></th>
+              </tr>
+          </thead>
+          <tbody>
+            { filteredList.map((item, index) =>
+              <tr key={ `${item._id}_${index}` } data-link={ helper.getViewLink(item) } data-index={ index }
+                className={this.state.selected.indexOf(index) !== -1 ? style.selected : ''}
+              >
+                <td onClick={ this.itemClicked } >
+                  <ImageIcon data={ helper.getIcon(item) } />
+                </td>
+                <td onClick={ this.itemClicked } >{ helper.getName(item) }</td>
+                <td onClick={ this.itemClicked } title={ helper.getDescription(item) }>{ helper.getDescription(item, true) }</td>
+                <td onClick={ this.itemClicked } title={helper.getCreationDate(item)}>{ helper.getCreationDate(item, true) }</td>
+                <td onClick={ this.itemClicked } title={helper.getUpdateDate(item)}>{ helper.getUpdateDate(item, true) }</td>
+                <td>
+                  <IconActionList actions={ helper.getActions(item) } onAction={ this.lineAction } />
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>);
+    } else if (this.props.placeholder) {
+      content = this.props.placeholder;
+    }
 
     return (
       <div className={ style.container }>
@@ -122,36 +160,7 @@ export default React.createClass({
             onAction={ this.toolbarAction }
             filter
           />
-          <table className={ style.table }>
-              <thead>
-                  <tr>
-                      <th></th>
-                      <th>Name</th>
-                      <th>Description</th>
-                      <th>Created</th>
-                      <th>Updated</th>
-                      <th></th>
-                  </tr>
-              </thead>
-              <tbody>
-                { filteredList.map((item, index) =>
-                  <tr key={ `${item._id}_${index}` } data-link={ helper.getViewLink(item) } data-index={ index }
-                    className={this.state.selected.indexOf(index) !== -1 ? style.selected : ''}
-                  >
-                    <td onClick={ this.itemClicked } >
-                      <ImageIcon data={ helper.getIcon(item) } />
-                    </td>
-                    <td onClick={ this.itemClicked } >{ helper.getName(item) }</td>
-                    <td onClick={ this.itemClicked } title={ helper.getDescription(item) }>{ helper.getDescription(item, true) }</td>
-                    <td onClick={ this.itemClicked } title={helper.getCreationDate(item)}>{ helper.getCreationDate(item, true) }</td>
-                    <td onClick={ this.itemClicked } title={helper.getUpdateDate(item)}>{ helper.getUpdateDate(item, true) }</td>
-                    <td>
-                      <IconActionList actions={ helper.getActions(item) } onAction={ this.lineAction } />
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-          </table>
+          { content }
       </div>);
   },
 });
