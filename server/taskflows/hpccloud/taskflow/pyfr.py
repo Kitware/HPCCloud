@@ -22,6 +22,8 @@ import os
 import subprocess
 import shutil
 from ConfigParser import SafeConfigParser
+from jsonpath_rw import parse
+from bson.objectid import ObjectId
 
 import cumulus.taskflow
 from cumulus.tasks.job import download_job_input_folders, submit_job
@@ -65,17 +67,25 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
     }
     """
     def start(self, *args, **kwargs):
-
-        # Load the cluster
-        model = ModelImporter.model('cluster', 'cumulus')
         user = getCurrentUser()
-        cluster = model.load(kwargs['cluster']['_id'],
-                             user=user, level=AccessType.ADMIN)
-        cluster = model.filter(cluster, user, passphrase=False)
-        kwargs['cluster'] = cluster
+        # Load the cluster
+        cluster_id = parse('cluster._id').find(kwargs)
+        if cluster_id:
+            cluster_id = cluster_id[0].value
+            model = ModelImporter.model('cluster', 'cumulus')
+            cluster = model.load(cluster_id, user=user, level=AccessType.ADMIN)
+            cluster = model.filter(cluster, user, passphrase=False)
+            kwargs['cluster'] = cluster
+
+        profile_id = parse('cluster.profileId').find(kwargs)
+        if profile_id:
+            profile_id = profile_id[0].value
+            model = ModelImporter.model('aws', 'cumulus')
+            profile = model.load(profile_id, user=user, level=AccessType.ADMIN)
+            kwargs['profile'] = profile
 
         super(PyFrTaskFlow, self).start(
-            setup_input.s(self,*args, **kwargs))
+            setup_cluster.s(self, next=setup_input.s(),  *args, **kwargs))
 
     def terminate(self):
         self.run_task(pyfr_terminate.s())
@@ -191,8 +201,6 @@ def update_config_file(task, client, *args, **kwargs):
 
 @cumulus.taskflow.task
 def setup_input(task, *args, **kwargs):
-    task.logger.info('Input parameters: %s' % kwargs)
-
     input_folder_id = kwargs['input']['folder']['id']
     mesh_file_id = kwargs['input']['meshFile']['id']
     kwargs['meshFileId'] = mesh_file_id

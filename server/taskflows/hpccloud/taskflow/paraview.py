@@ -49,17 +49,25 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
 
     """
     def start(self, *args, **kwargs):
-
-        # Load the cluster
-        model = ModelImporter.model('cluster', 'cumulus')
         user = getCurrentUser()
-        cluster = model.load(kwargs['cluster']['_id'],
-                             user=user, level=AccessType.ADMIN)
-        cluster = model.filter(cluster, user, passphrase=False)
-        kwargs['cluster'] = cluster
+        # Load the cluster
+        cluster_id = parse('cluster._id').find(kwargs)
+        if cluster_id:
+            model = ModelImporter.model('cluster', 'cumulus')
+            cluster = model.load(kwargs['cluster']['_id'],
+                                 user=user, level=AccessType.ADMIN)
+            cluster = model.filter(cluster, user, passphrase=False)
+            kwargs['cluster'] = cluster
+
+        profile_id = parse('cluster.profileId').find(kwargs)
+        if profile_id:
+            profile_id = profile_id[0].value
+            model = ModelImporter.model('aws', 'cumulus')
+            profile = model.load(profile_id, user=user, level=AccessType.ADMIN)
+            kwargs['profile'] = profile
 
         super(ParaViewTaskFlow, self).start(
-            create_paraview_job.s(self, *args, **kwargs))
+            setup_cluster.s(self, next=create_paraview_job.s(), *args, **kwargs))
 
     def terminate(self):
         self.run_task(paraview_terminate.s())
