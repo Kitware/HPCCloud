@@ -1,9 +1,10 @@
 import merge             from 'mout/src/object/merge';
 import React             from 'react';
 import TableListing      from '../../../panels/TableListing';
+import EmptyPlaceholder  from '../../../panels/EmptyPlaceholder';
 import { ProjectHelper } from '../../../utils/AccessHelper';
 
-import breadCrumbStyle from 'HPCCloudStyle/Theme.mcss';
+import theme from 'HPCCloudStyle/Theme.mcss';
 
 import { connect }  from 'react-redux';
 import { dispatch } from '../../../redux';
@@ -57,13 +58,23 @@ const ProjectAll = React.createClass({
         breadcrumb={{
           paths: ['/'],
           icons: [
-            breadCrumbStyle.breadCrumbRootIcon,
+            theme.breadCrumbRootIcon,
           ] }}
         location={ this.props.location }
         accessHelper={ ProjectHelper }
         items={ this.props.projects }
         onAction={ this.onAction }
         title="Projects"
+        placeholder={
+          <EmptyPlaceholder phrase={
+            <div>
+              <h3>Welcome to HPC Cloud</h3>
+              <span>You haven't created any projects yet<br />
+                Add one with the <i className={ theme.addIcon }></i> above.
+              </span>
+            </div>}
+          />
+        }
       />);
   },
 });

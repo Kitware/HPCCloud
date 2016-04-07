@@ -1,8 +1,9 @@
 import React                from 'react';
 import { SimulationHelper } from '../../../utils/AccessHelper';
 import TableListing         from '../../../panels/TableListing';
+import EmptyPlaceholder     from '../../../panels/EmptyPlaceholder';
 
-import breadCrumbStyle      from 'HPCCloudStyle/Theme.mcss';
+import theme      from 'HPCCloudStyle/Theme.mcss';
 
 import { connect }  from 'react-redux';
 import { dispatch } from '../../../redux';
@@ -59,14 +60,21 @@ const ProjectView = React.createClass({
         breadcrumb={{
           paths: ['/', `/View/Project/${this.props.params.id}`],
           icons: [
-            breadCrumbStyle.breadCrumbRootIcon,
-            breadCrumbStyle.breadCrumbProjectIcon,
+            theme.breadCrumbRootIcon,
+            theme.breadCrumbProjectIcon,
           ] }}
         location={ this.props.location }
         accessHelper={ SimulationHelper }
         items={ this.props.simulations }
         onAction={ this.onAction }
         title={ `${this.props.project.name} / Simulations` }
+        placeholder={
+          <EmptyPlaceholder phrase={
+            <span>There are no simulations for this project<br />
+              You can add some with the <i className={ theme.addIcon }></i> above.
+            </span>}
+          />
+        }
       />);
   },
 });

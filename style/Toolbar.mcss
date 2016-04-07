@@ -33,7 +33,6 @@
     align-items: center;
 }
 
-
 .actionButton {
     composes: isClickable from 'HPCCloudStyle/States.mcss';
     padding: 7px 17px;
