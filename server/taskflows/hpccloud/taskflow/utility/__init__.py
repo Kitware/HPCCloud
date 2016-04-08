@@ -41,16 +41,16 @@ def create_girder_client(girder_api_url, girder_token):
 
     return client
 
-def create_ec2_cluster(task, cluster, **kwargs):
-    machine_type = cluster['machineType']
+def create_ec2_cluster(task, cluster, profile, ami):
+    machine_type = cluster['machine']['id']
     nodeCount = cluster['clusterSize']-1
     launch_spec = 'ec2'
     launch_params = {
         'master_instance_type': machine_type,
-        'master_instance_ami': 'ami-03de3c63',
+        'master_instance_ami': ami,
         'node_instance_count': nodeCount,
         'node_instance_type': machine_type,
-        'node_instance_ami': 'ami-03de3c63'
+        'node_instance_ami': ami
     }
     provision_spec = 'gridengine/site'
     provision_params = {
@@ -94,7 +94,6 @@ def create_ec2_cluster(task, cluster, **kwargs):
     }
     client.patch('clusters/%s' % cluster['_id'], data=json.dumps(body))
 
-    profile = kwargs['profile']
     secret_key = profile['secretAccessKey']
     log_write_url = '%s/clusters/%s/log' % (task.taskflow.girder_api_url,
                                             cluster['_id'])
@@ -106,19 +105,28 @@ def create_ec2_cluster(task, cluster, **kwargs):
         launch_params, provision_params, girder_token, log_write_url,
         master_name='head')
 
+    # Get the update to date cluster
+    cluster = client.get('clusters/%s' % cluster['_id'])
+
+    return cluster
+
 @cumulus.taskflow.task
-def setup_cluster(task, *args, **kwargs):
+def setup_cluster(task, *args,**kwargs):
     cluster = kwargs['cluster']
+    kwargs['machine'] = cluster['machine']
+    ami = kwargs.get('ami')
+    profile = kwargs.get('profile')
 
     if '_id' in cluster:
         task.taskflow.logger.info('We are using an existing cluster: %s' % cluster['name'])
     else:
         task.taskflow.logger.info('We are creating an EC2 cluster.')
         task.logger.info('Cluster name %s' % cluster['name'])
-        create_ec2_cluster(task, **kwargs)
+        cluster = create_ec2_cluster(task, cluster, profile, ami)
         task.logger.info('Cluster started.')
 
     # Call any follow on task
     if 'next' in kwargs:
+        kwargs['cluster'] = cluster
         next = Signature.from_dict(kwargs['next'])
         next.delay(*args, **kwargs)

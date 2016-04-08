@@ -66,6 +66,8 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
         }
     }
     """
+    PYFR_AMI = 'ami-7def1b1d'
+
     def start(self, *args, **kwargs):
         user = getCurrentUser()
         # Load the cluster
@@ -84,8 +86,12 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
             profile = model.load(profile_id, user=user, level=AccessType.ADMIN)
             kwargs['profile'] = profile
 
+        kwargs['next'] = setup_input.s()
+        kwargs['ami'] = self.PYFR_AMI
+
         super(PyFrTaskFlow, self).start(
-            setup_cluster.s(self, next=setup_input.s(),  *args, **kwargs))
+            setup_cluster.s(
+                self, *args, **kwargs))
 
     def terminate(self):
         self.run_task(pyfr_terminate.s())
@@ -210,6 +216,14 @@ def setup_input(task, *args, **kwargs):
         number_of_procs = kwargs.get('numberOfNodes')
 
     if not number_of_procs:
+        size = parse('cluster.config.launch.params.node_instance_count').find(kwargs)
+        if size:
+            number_of_procs = size[0].value + 1
+        else:
+            raise Exception('Unable to extract number of nodes in cluster')
+
+
+    if not number_of_procs:
         raise Exception('Unable to determine number of mpi processes to run.')
 
     number_of_procs = int(number_of_procs)
@@ -277,6 +291,24 @@ def setup_input(task, *args, **kwargs):
                 os.remove(input_path)
             if os.path.exists(output_dir):
                 shutil.rmtree(output_dir)
+
+    # If we are running in the cloud determine backend to use
+    if kwargs['cluster']['type'] == 'ec2':
+        machine_spec = kwargs.get('machine')
+        # If we have GPUs use cuda
+        if int(machine_spec['gpu']) == 1:
+            backend = {
+                'type': 'cuda',
+                'device-id': 'round-robin'
+            }
+        # Use OpenMP
+        else:
+            backend = {
+                'type': 'openmp',
+                'cblas': '/usr/lib/openblas-base/libblas.so'
+            }
+
+        kwargs['backend'] = backend
 
     update_config_file(task, client, *args, **kwargs)
 
