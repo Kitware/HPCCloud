@@ -431,7 +431,10 @@ def create_export_job(task, job_name, files, job_dir, mesh_filename):
         'name': job_name,
         'commands': commands,
         'input': [],
-        'output': []
+        'output': [],
+        'params': {
+            'numberOfSlots': 1
+        }
     }
 
     client = _create_girder_client(
