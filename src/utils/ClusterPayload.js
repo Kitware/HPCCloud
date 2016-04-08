@@ -7,11 +7,11 @@ export function tradClusterPayload(id) {
   };
 }
 
-export function ec2ClusterPayload(name, machineType, clusterSize = 1, profileId) {
+export function ec2ClusterPayload(name, machine, clusterSize = 1, profileId) {
   if (!name) {
     throw Error('missing `name` in ec2 cluster payload');
-  } else if (!machineType) {
-    throw Error('missing `machineType` in ec2 cluster payload');
+  } else if (!machine) {
+    throw Error('missing `machine` in ec2 cluster payload');
   } else if (!profileId) {
     throw Error('missing `profileId` in ec2 cluster payload');
   }
@@ -26,7 +26,7 @@ export function ec2ClusterPayload(name, machineType, clusterSize = 1, profileId)
   return {
     serverType: 'ec2',
     name,
-    machineType,
+    machine,
     clusterSize: _clusterSize,
     profileId,
   };

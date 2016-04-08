@@ -51,6 +51,8 @@ export default React.createClass({
 
     if (key === 'profile') {
       value = this.state.profiles[value];
+    } else if (key === 'machine') {
+      value = machines[value];
     }
 
     if (this.props.onChange) {
@@ -67,7 +69,7 @@ export default React.createClass({
     var machineMapper = (machine, index) =>
       <option
         key={machine.id}
-        value={machine.id}
+        value={index}
       >
         { `${machine.name} - ${machine.cpu} core${machine.cpu > 1 ? 's' : ''} - ${machine.memory}GB ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` }
       </option>;
@@ -108,7 +110,7 @@ export default React.createClass({
               <select
                 onChange={this.dataChange} className={style.input}
                 data-key="machine"
-                defaultValue={machines[0].id}
+                defaultValue={machines[0]}
               >
                 {machines.map(machineMapper)}
               </select>
