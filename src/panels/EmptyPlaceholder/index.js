@@ -19,6 +19,9 @@ const placeholder = (props) => (
 );
 
 placeholder.displayName = 'EmptyPlaceholder';
-placeholder.propTypes = { phrase: React.PropTypes.string };
+placeholder.propTypes = { phrase: React.PropTypes.oneOfType([
+  React.PropTypes.string,
+  React.PropTypes.object,
+]) };
 
 export default placeholder;

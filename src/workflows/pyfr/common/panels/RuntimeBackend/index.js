@@ -19,7 +19,7 @@ export default React.createClass({
   },
 
   getInitialState() {
-    const state = Object.assign({ device: 'round-robin', profile: 'cuda', type: 'cuda' }, this.getStateFromProps(this.props));
+    const state = Object.assign({ device: 'round-robin', profile: 'cuda', backend: { type: 'cuda' } }, this.getStateFromProps(this.props));
     this.updateBackend(state.type, state.profile, state.device);
     return state;
   },
@@ -88,14 +88,15 @@ export default React.createClass({
     const backend = { type };
     if (type === 'cuda') {
       backend['device-id'] = device;
-    } else {
+    } else { // type === openmp
       const addOn = this.props.profiles[type].filter(item => item.name === profile);
       if (addOn.length) {
         Object.assign(backend, addOn[0]);
       }
     }
     if (this.props.onChange) {
-      if (!deepEquals(this.state.backend, backend)) {
+      // this is called in `componentWillReceiveProps`, before state is available so guard it.
+      if (this.state && this.state.backend && !deepEquals(this.state.backend, backend)) {
         this.setState({ backend });
         this.props.onChange(backend);
       }
