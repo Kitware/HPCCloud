@@ -48,6 +48,7 @@ const SimualtionView = React.createClass({
     onTerminateTaskflow: React.PropTypes.func,
     onDeleteTaskflow: React.PropTypes.func,
     onVisualizeTaskflow: React.PropTypes.func,
+    onMount: React.PropTypes.func,
 
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
@@ -97,7 +98,7 @@ const SimualtionView = React.createClass({
   },
 
   render() {
-    if (!this.props.taskflow || !this.props.taskflow.flow) {
+    if (!this.props.taskflow || !this.props.taskflow.flow || !get(this.props.taskflow.flow, 'meta.cluster._id')) {
       return null;
     }
 
@@ -108,10 +109,11 @@ const SimualtionView = React.createClass({
     if (taskflow.allComplete) {
       actions.push('visualize');
     }
-
     return (
       <div>
-        <JobMonitor taskflowId={ taskflowId } />
+        <JobMonitor taskflowId={ taskflowId }
+          clusterId={ taskflow.flow.meta.cluster._id }
+        />
         <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />
         <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />
         <section>
@@ -127,7 +129,6 @@ const SimualtionView = React.createClass({
 
 
 // Binding --------------------------------------------------------------------
-/* eslint-disable arrow-body-style */
 
 export default connect(
   (state, props) => {
@@ -147,16 +148,14 @@ export default connect(
       error: null,
     };
   },
-  () => {
-    return {
-      onVisualizeTaskflow: (sim, location) => {
-        dispatch(SimActions.saveSimulation(sim, null));
-        const metadata = sim.steps.Visualization.metadata;
-        dispatch(SimActions.updateSimulationStep(sim._id, 'Visualization', { metadata }, location));
-      },
-      onDeleteTaskflow: (id, simulationStep, location) => dispatch(Actions.deleteTaskflow(id, simulationStep, location)),
-      onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
-    };
-  }
+  () => ({
+    onVisualizeTaskflow: (sim, location) => {
+      dispatch(SimActions.saveSimulation(sim, null));
+      const metadata = sim.steps.Visualization.metadata;
+      dispatch(SimActions.updateSimulationStep(sim._id, 'Visualization', { metadata }, location));
+    },
+    onDeleteTaskflow: (id, simulationStep, location) => dispatch(Actions.deleteTaskflow(id, simulationStep, location)),
+    onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
+  })
 )(SimualtionView);
 

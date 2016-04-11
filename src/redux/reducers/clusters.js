@@ -14,6 +14,7 @@ const clusterTemplate = {
   name: 'new cluster',
   type: 'trad',
   classPrefix: style.statusCreatingIcon,
+  log: [],
   config: {
     host: 'localhost',
     ssh: {
@@ -165,6 +166,33 @@ export default function clustersReducer(state = initialState, action) {
         state.list.slice(index + 1));
 
       return Object.assign({}, state, { list });
+    }
+
+    case Actions.UPDATE_CLUSTER_LOG: {
+      const mapById = Object.assign({}, state.mapById);
+      const cluster = Object.assign({}, state.mapById[action.id]);
+      cluster.log = [].concat(cluster.log ? cluster.log : [], action.log);
+      mapById[action.id] = cluster;
+      return Object.assign({}, state, { mapById });
+    }
+
+    case Actions.SUB_CLUSTER_LOG: {
+      const mapById = Object.assign({}, state.mapById);
+      const cluster = Object.assign({}, mapById[action.id]);
+      cluster.logStream = action.eventSource;
+      mapById[action.id] = cluster;
+      return Object.assign({}, state, { mapById });
+    }
+
+    case Actions.UNSUB_CLUSTER_LOG: {
+      const mapById = Object.assign({}, state.mapById);
+      if (mapById[action.id].logStream) {
+        mapById[action.id].logStream.close();
+        delete mapById[action.id].logStream;
+        return Object.assign({}, state, { mapById });
+      }
+
+      return state;
     }
 
     default:

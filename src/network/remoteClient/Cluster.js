@@ -60,3 +60,7 @@ export function testCluster(id) {
 export function getCluster(id) {
   return girder.getCluster(id);
 }
+
+export function getClusterLog(id, offset = 0) {
+  return girder.getClusterLogs(id, offset);
+}

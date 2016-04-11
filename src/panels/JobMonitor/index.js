@@ -3,22 +3,41 @@ import ExecutionUnit        from './ExecutionUnit.js';
 import style                from 'HPCCloudStyle/JobMonitor.mcss';
 
 import { connect }  from 'react-redux';
+import { dispatch }     from '../../redux';
+import * as ClusterActions from '../../redux/actions/clusters';
 
 const JobMonitor = React.createClass({
   displayName: 'JobMonitor',
 
   propTypes: {
     taskflowId: React.PropTypes.string,
+    clusterId: React.PropTypes.string,
+    clusterName: React.PropTypes.string,
     tasks: React.PropTypes.array,
     jobs: React.PropTypes.array,
     taskStatusCount: React.PropTypes.object,
     taskflowLog: React.PropTypes.array,
+    clusterLog: React.PropTypes.array,
+
+    subscribeToClusterLogStream: React.PropTypes.func,
+    unsubscribeFromClusterLogStream: React.PropTypes.func,
   },
 
   getInitialState() {
     return {
       advanced: false,
     };
+  },
+
+  componentWillMount() {
+    // subscribe to the cluster log stream
+    const offset = this.props.clusterLog.length;
+    this.props.subscribeToClusterLogStream(this.props.clusterId, offset);
+  },
+
+  componentWillUnmount() {
+    // unscubscribe from cluster log stream
+    this.props.unsubscribeFromClusterLogStream(this.props.clusterId);
   },
 
   toggleAdvanced() {
@@ -78,6 +97,17 @@ const JobMonitor = React.createClass({
                   <ExecutionUnit key={this.props.taskflowId} unit={{ name: 'Log', log: this.props.taskflowLog }} />
                 }
               </div>
+              <div className={ style.toolbar }>
+                  <div className={ style.title }>
+                      Cluster log
+                  </div>
+                  <div className={ style.buttons }></div>
+              </div>
+              <div className={ style.taskflowContent }>
+                {
+                  <ExecutionUnit unit={{ name: 'Log', log: this.props.clusterLog }} />
+                }
+              </div>
           </div>
       </div>);
   },
@@ -90,11 +120,14 @@ const JobMonitor = React.createClass({
 export default connect(
   (state, props) => {
     const taskflowId = props.taskflowId;
+    const clusterId = props.clusterId;
     const taskflow = taskflowId ? state.taskflows.mapById[taskflowId] : null;
     const tasks = [];
     const jobs = [];
+    const cluster = clusterId ? state.preferences.clusters.mapById[clusterId] : null;
     const taskStatusCount = {};
     var taskflowLog = [];
+    var clusterLog = [];
 
     if (taskflow && taskflow.taskMapById && taskflow.jobMapById) {
       Object.keys(taskflow.taskMapById).forEach(id => {
@@ -111,16 +144,24 @@ export default connect(
       });
       taskflowLog = taskflow.log;
     }
-
     // Sort the tasks by created timestamp
     tasks.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
+
+    if (cluster.log && cluster.log.length) {
+      clusterLog = cluster.log.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
+    }
 
     return {
       tasks,
       jobs,
       taskStatusCount,
       taskflowLog,
+      clusterLog,
     };
-  }
+  },
+  () => ({
+    subscribeToClusterLogStream: (id, offset) => dispatch(ClusterActions.subscribeClusterLogStream(id, offset)),
+    unsubscribeFromClusterLogStream: (id) => dispatch(ClusterActions.unsubscribeClusterLogStream(id)),
+  })
 )(JobMonitor);
 

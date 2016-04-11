@@ -84,7 +84,8 @@ const VisualizationView = React.createClass({
     const { taskflow, taskflowId, error, simulation, buttonsDisabled } = this.props;
 
     // these can be undefined sometimes and we need them.
-    if (!taskflow || !taskflow.flow || !taskflow.jobMapById || !taskflow.actions || !taskflow.hasOwnProperty('allComplete')) {
+    if (!taskflow || !taskflow.flow || !get(this.props.taskflow.flow, 'meta.cluster._id') ||
+      !taskflow.jobMapById || !taskflow.actions || !taskflow.hasOwnProperty('allComplete')) {
       return null;
     }
 
@@ -104,7 +105,7 @@ const VisualizationView = React.createClass({
 
     return (
       <div>
-        <JobMonitor taskflowId={ taskflowId } />
+        <JobMonitor taskflowId={ taskflowId } clusterId={taskflow.flow.meta.cluster._id} />
         <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />
         <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />
         <section>
@@ -121,7 +122,6 @@ const VisualizationView = React.createClass({
 
 
 // Binding --------------------------------------------------------------------
-/* eslint-disable arrow-body-style */
 
 export default connect(
   (state, props) => {
@@ -142,11 +142,9 @@ export default connect(
       error: null,
     };
   },
-  () => {
-    return {
-      onVisualizeTaskflow: (sim, location) => dispatch(SimActions.saveSimulation(sim, null, location)),
-      onDeleteTaskflow: (id, simulationStep, location) => dispatch(Actions.deleteTaskflow(id, simulationStep, location)),
-      onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
-    };
-  }
+  () => ({
+    onVisualizeTaskflow: (sim, location) => dispatch(SimActions.saveSimulation(sim, null, location)),
+    onDeleteTaskflow: (id, simulationStep, location) => dispatch(Actions.deleteTaskflow(id, simulationStep, location)),
+    onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
+  })
 )(VisualizationView);
