@@ -3,6 +3,8 @@ import Workflows from '../../../workflows';
 import tools     from  '../../../tools';
 
 import { connect } from 'react-redux';
+import { dispatch } from '../../../redux';
+import * as Actions from '../../../redux/actions/taskflows';
 
 const SimulationView = React.createClass({
 
@@ -13,6 +15,7 @@ const SimulationView = React.createClass({
     params: React.PropTypes.object,
     simulation: React.PropTypes.object,
     project: React.PropTypes.object,
+    onMount: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -20,6 +23,18 @@ const SimulationView = React.createClass({
       project: null,
       simulation: null,
     };
+  },
+
+  componentDidMount() {
+    if (this.props.simulation) {
+      this.props.onMount(this.props.simulation);
+    }
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.props.simulation && nextProps.simulation && Object.keys(nextProps.simulation.steps).length) {
+      this.props.onMount(nextProps.simulation);
+    }
   },
 
   render() {
@@ -65,6 +80,11 @@ export default connect(
     return {
       project,
       simulation,
+    };
+  },
+  () => {
+    return {
+      onMount: (simulation) => dispatch(Actions.updateTaskflowFromSimulation(simulation)),
     };
   }
 )(SimulationView);

@@ -3,7 +3,7 @@ import * as netActions  from './network';
 import { dispatch }     from '../index.js';
 
 import * as router          from './router';
-import * as TaskflowActions from './taskflows';
+// import * as TaskflowActions from './taskflows';
 
 export const FETCH_PROJECT_LIST = 'FETCH_PROJECT_LIST';
 export const UPDATE_PROJECT_LIST = 'UPDATE_PROJECT_LIST';
@@ -36,9 +36,9 @@ export function fetchProjectSimulations(id) {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(updateProjectSimulations(id, simulations));
 
-          simulations.forEach(simulation => {
-            dispatch(TaskflowActions.updateTaskflowFromSimulation(simulation));
-          });
+          // simulations.forEach(simulation => {
+          //   dispatch(TaskflowActions.updateTaskflowFromSimulation(simulation));
+          // });
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));

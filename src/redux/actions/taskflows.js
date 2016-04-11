@@ -186,7 +186,7 @@ export function updateAllTaskflows() {
   return dispatch => {
     const state = store.getState();
     Object.keys(state.taskflows.mapById).forEach(id => {
-      if (state.taskflows.mapById[id].status !== 'complete') {
+      if (state.taskflows.mapById[id].status !== 'complete' && state.taskflows.mapById[id].status !== 'terminated') {
         dispatch(fetchTaskflow(id));
         dispatch(fetchTaskflowTasks(id));
       }
@@ -276,7 +276,7 @@ client.onEvent((resp) => {
         break;
       }
       case 'task': {
-        dispatch(fetchTaskflowTasks(taskflowId, id, status));
+        dispatch(updateTaskflowTaskStatus(taskflowId, id, status));
         break;
       }
       default:
