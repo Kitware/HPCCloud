@@ -148,13 +148,13 @@ const SimputPanel = React.createClass({
         const simulationStepIndex = this.props.simulation.disabled.indexOf('Simulation');
         if (simulationStepIndex !== -1) {
           this.props.simulation.disabled.splice(simulationStepIndex, 1);
-          client.saveDisabledSimulationSteps(this.props.simulation);
+          client.updateDisabledSimulationSteps(this.props.simulation);
         }
       } else {
-        console.log('no ini file');
+        console.log('no .ini file');
       }
     } catch (e) {
-      console.error('Error when generating INI file', e);
+      console.error('Error when generating .ini file', e);
     }
   },
 
