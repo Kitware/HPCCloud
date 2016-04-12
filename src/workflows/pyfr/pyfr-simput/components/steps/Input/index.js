@@ -75,9 +75,11 @@ export default React.createClass({
     // Need to fill up the jsonData
     if (!jsonData) {
       const boundaryNames = {};
-      this.props.project.metadata.boundaries.forEach(name => {
-        boundaryNames[name] = name;
-      });
+      if (this.props.project.metadata.boundaries) {
+        this.props.project.metadata.boundaries.forEach(name => {
+          boundaryNames[name] = name;
+        });
+      }
 
       jsonData = {
         data: {},
@@ -149,7 +151,7 @@ export default React.createClass({
         console.log('no ini file');
       }
     } catch (e) {
-      console.log('Error when generating INI file', e);
+      console.error('Error when generating INI file', e);
     }
   },
 
@@ -165,8 +167,9 @@ export default React.createClass({
     const data = this.state.viewData,
       keypath = newData.id.split('.'),
       attrName = keypath.shift();
-
+    console.log(attrName, keypath, newData);
     data[attrName][keypath.join('.')].value = newData.value;
+    console.log(data, data[attrName][keypath.join('.')].value);
     this.setState({ viewData: data });
   },
 
