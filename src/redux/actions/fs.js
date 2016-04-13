@@ -1,15 +1,16 @@
 import client           from '../../network';
 import * as netActions  from './network';
 
+export const UPDATE_FOLDER = 'UPDATE_FOLDER';
 export const CHILDREN_FOLDERS = 'CHILDREN_FOLDERS';
 export const CHILDREN_ITEMS = 'CHILDREN_ITEMS';
-export const UPDATE_FOLDER = 'UPDATE_FOLDER';
+export const TOGGLE_OPEN_FOLDER = 'TOGGLE_OPEN_FOLDER';
 
 export function updateFolder(folder) {
   return { type: UPDATE_FOLDER, folder, id: folder._id };
 }
 
-export function fetchFolder(id, fetchFolderMeta = true) {
+export function fetchFolder(id, fetchFolderMeta = true, openedFolders = []) {
   return dispatch => {
     const action = netActions.addNetworkCall(`fetch_folder_${id}`, 'Fetch folder');
 
@@ -38,7 +39,9 @@ export function fetchFolder(id, fetchFolderMeta = true) {
           dispatch({ type: CHILDREN_FOLDERS, children, id });
           children.forEach(folder => {
             dispatch(updateFolder(folder));
-            dispatch(fetchFolder(folder._id, false));
+            if (openedFolders.indexOf()) {
+              dispatch(fetchFolder(folder._id, false, openedFolders));
+            }
           });
         },
         error => {
@@ -64,3 +67,11 @@ export function fetchFolder(id, fetchFolderMeta = true) {
   };
 }
 
+export function toggleOpenFolder(folderId, opening, opened) {
+  return dispatch => {
+    if (opening) {
+      dispatch(fetchFolder(folderId));
+    }
+    return { type: TOGGLE_OPEN_FOLDER, folderId };
+  };
+}

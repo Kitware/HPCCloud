@@ -17,6 +17,7 @@ function buildFolders(fs, id, container = {}, depth = -1) {
 
   // Fill children
   if (folder) {
+    container[id].open = folder.open;
     // - folders first
     folder.folderChildren.forEach(folderId => {
       if (fs.folderMapById[folderId]) {
@@ -47,6 +48,7 @@ const FileListing = React.createClass({
     folderId: React.PropTypes.string.isRequired,
     title: React.PropTypes.string.isRequired,
     folders: React.PropTypes.object, // { [id]: { children: [..], depth: 0 } }
+    toggleOpenFolder: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -57,7 +59,7 @@ const FileListing = React.createClass({
 
   getInitialState() {
     return {
-      isFolderOpened: {}, // object of folders: {id: open(true|false) }
+      opened: [], // list of folderId's which are open
       open: false,
     };
   },
@@ -113,7 +115,7 @@ const FileListing = React.createClass({
     if (el._modelType === 'item') {
       return this.fileMapper(el, index);
     } else if (el._modelType === 'folder') {
-      if (this.state.isFolderOpened[el._id]) {
+      if (this.props.folders[el._id].open) {
         return this.openFolderMapper(el, index);
       }
       return this.folderMapper(el, index);
@@ -126,10 +128,16 @@ const FileListing = React.createClass({
   },
 
   openFolder(e) {
-    const isFolderOpened = this.state.isFolderOpened;
     const id = e.currentTarget.dataset.folderId;
-    isFolderOpened[id] = !isFolderOpened[id];
-    this.setState({ isFolderOpened });
+    const opened = this.state.opened;
+    if (!this.props.folders[id].open) {
+      opened.splice(opened.indexOf(id), 1);
+    } else {
+      opened.push(id);
+    }
+
+    this.setState({ opened });
+    this.props.toggleOpenFolder(id, !this.props.folders[id].open, opened);
   },
 
   render() {
@@ -168,5 +176,8 @@ export default connect(
     return {
       folders: buildFolders(state.fs, props.folderId),
     };
-  }
+  },
+  () => ({
+    toggleOpenFolder: (folderId, opening, opened) => dispatch(Actions.toggleOpenFolder(folderId, opening, opened)),
+  })
 )(FileListing);
