@@ -59,8 +59,7 @@ export default function taskflowsReducer(state = initialState, action) {
     }
 
     case Actions.CLEAR_UPDATE_LOG: {
-      const updateLogs = [];
-      return Object.assign({}, state, { updateLogs });
+      return Object.assign({}, state, { updateLogs: [] });
     }
 
     case Actions.UPDATE_TASKFLOW_JOB_LOG: {

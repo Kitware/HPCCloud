@@ -8,6 +8,11 @@ import { dispatch } from './redux';
 
 const simulationsStatus = {};
 
+function folderItemSize(state, folderId) {
+  return state.fs.folderMapById[folderId].itemChildren.length +
+    state.fs.folderMapById[folderId].folderChildren.length;
+}
+
 export function handleTaskflowChange(state, taskflow) {
   if (!taskflow) {
     return;
@@ -76,9 +81,14 @@ export function handleTaskflowChange(state, taskflow) {
 
     // Update simulation folders when all tasks/jobs are done
     if (allComplete && taskflow.simulation && state.simulations.mapById[taskflow.simulation]) {
-      const metadata = state.simulations.mapById[taskflow.simulation].metadata;
-      dispatch(FSActions.fetchFolder(metadata.inputFolder._id));
-      dispatch(FSActions.fetchFolder(metadata.outputFolder._id));
+      const inputFolder = state.simulations.mapById[taskflow.simulation].metadata.inputFolder._id;
+      const outputFolder = state.simulations.mapById[taskflow.simulation].metadata.outputFolder._id;
+      // inputFolder is already a little populated on allComplete
+      dispatch(FSActions.fetchFolder(inputFolder));
+      // outputFolder is not, only get it once.
+      if (folderItemSize(state, outputFolder) === 0) {
+        dispatch(FSActions.fetchFolder(outputFolder));
+      }
     }
   }
 }

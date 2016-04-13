@@ -22,18 +22,25 @@ export function configure(config = { girderAPI: '/api/v1' }) {
     </Provider>, container);
 }
 
+let logDebounce = null;
+
 store.subscribe(() => {
   const state = store.getState();
   if (state.taskflows.updateLogs.length > 0) {
-    const updateLogs = state.taskflows.updateLogs;
-    dispatch(TaskflowActions.clearUpdateLog());
-    updateLogs.forEach((taskflowId) => {
-      // fetch the log of the taskflow id
-      dispatch(TaskflowActions.updateTaskflowLog(taskflowId));
+    if (logDebounce) {
+      clearTimeout(logDebounce);
+    }
+    logDebounce = setTimeout(() => {
+      const updateLogs = state.taskflows.updateLogs;
+      dispatch(TaskflowActions.clearUpdateLog());
+      updateLogs.forEach((taskflowId) => {
+        // fetch the log of the taskflow id
+        dispatch(TaskflowActions.updateTaskflowLog(taskflowId));
 
-      // Handle any behavior from taskflow change
-      Behavior.handleTaskflowChange(state, state.taskflows.mapById[taskflowId]);
-    });
+        // Handle any behavior from taskflow change
+        Behavior.handleTaskflowChange(state, state.taskflows.mapById[taskflowId]);
+      });
+    }, 1500);
   }
 });
 

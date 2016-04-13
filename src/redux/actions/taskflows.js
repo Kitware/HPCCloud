@@ -166,8 +166,10 @@ export function fetchTaskflow(id) {
 
           if (taskflow.meta && taskflow.meta.jobs) {
             taskflow.meta.jobs.forEach(job => {
-              dispatch(updateTaskflowJobStatus(id, job._id));
-              dispatch(updateTaskflowJobLog(id, job._id));
+              if (job.status !== 'complete' && job.status !== 'terminated') {
+                dispatch(updateTaskflowJobStatus(id, job._id));
+                dispatch(updateTaskflowJobLog(id, job._id));
+              }
             });
           }
         },
@@ -179,19 +181,6 @@ export function fetchTaskflow(id) {
     dispatch(fetchTaskflowTasks(id));
 
     return action;
-  };
-}
-
-export function updateAllTaskflows() {
-  return dispatch => {
-    const state = store.getState();
-    Object.keys(state.taskflows.mapById).forEach(id => {
-      if (state.taskflows.mapById[id].status !== 'complete' && state.taskflows.mapById[id].status !== 'terminated') {
-        dispatch(fetchTaskflow(id));
-        dispatch(fetchTaskflowTasks(id));
-      }
-    });
-    return { type: 'NOOP' };
   };
 }
 
@@ -253,6 +242,54 @@ export function updateTaskflowMetadata(id, actions, allComplete, outputDirectory
 
 // ----------------------------------------------------------------------------
 
+// find a discrete job and only update that one
+function findJob(jobId) {
+  return dispatch => {
+    const state = store.getState();
+    Object.keys(state.taskflows.mapById).forEach(id => {
+      if (state.taskflows.mapById[id].status !== 'complete' && state.taskflows.mapById[id].status !== 'terminated') {
+        const action = netActions.addNetworkCall('taskflow_tasks', 'Check tasks');
+        client.getTaskflow(id)
+          .then((resp) => {
+            const taskflow = resp.data;
+            dispatch(netActions.successNetworkCall(action.id, resp));
+            dispatch(addTaskflow(taskflow));
+
+            if (taskflow.meta && taskflow.meta.jobs) {
+              taskflow.meta.jobs.forEach(job => {
+                // only update the status and the log if the jobId is the one we're looking for
+                if (job._id === jobId) {
+                  dispatch(updateTaskflowJobStatus(id, job._id));
+                  dispatch(updateTaskflowJobLog(id, job._id));
+                }
+              });
+            }
+          })
+          .catch((error) => {
+            dispatch(netActions.errorNetworkCall(action.id, error));
+            dispatch({ type: DELETE_TASKFLOW, id: action.id });
+          });
+      } // close if
+    });
+    return { type: 'NOOP' };
+  };
+}
+
+// fetch tasks for each taskflow, the task objects which come back have log and status.
+function findTask() {
+  return dispatch => {
+    const state = store.getState();
+    Object.keys(state.taskflows.mapById).forEach(id => {
+      if (state.taskflows.mapById[id].status !== 'complete' && state.taskflows.mapById[id].status !== 'terminated') {
+        dispatch(fetchTaskflowTasks(id));
+      }
+    });
+    return { type: 'NOOP' };
+  };
+}
+
+// ----------------------------------------------------------------------------
+
 function getTaskflowIdFromId(id, type) {
   if (type === 'task') {
     return store.getState().taskflows.taskflowMapByTaskId[id];
@@ -280,10 +317,25 @@ client.onEvent((resp) => {
         break;
       }
       default:
+        console.log('unrecognized event', resp.type, resp.data.status);
         break;
     }
   } else {
-    dispatch(updateAllTaskflows());
+    switch (type) {
+      case 'job': {
+        // find and update job
+        dispatch(findJob(id));
+        break;
+      }
+      case 'task': {
+        // find and update task
+        dispatch(findTask());
+        break;
+      }
+      default:
+        console.log('unrecognized event', resp.type, resp.data.status);
+        break;
+    }
   }
 });
 
