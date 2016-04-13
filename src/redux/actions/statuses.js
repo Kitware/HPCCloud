@@ -51,10 +51,6 @@ export function fetchServers() {
 //   }
 // });
 
-// No need to be authenticated
-setImmediate(() => {
-  dispatch(fetchServers());
-});
 
 // Auto trigger actions on authentication change...
 client.onAuthChange(authenticated => {

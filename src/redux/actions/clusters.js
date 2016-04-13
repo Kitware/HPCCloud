@@ -159,15 +159,11 @@ client.onEvent((e) => {
   }
 });
 
-// No need to be authenticated
-setImmediate(() => {
-  dispatch(fetchClusterPresets());
-});
-
 // Auto trigger actions on authentication change...
 client.onAuthChange(authenticated => {
   if (authenticated) {
     dispatch(fetchClusters());
+    dispatch(fetchClusterPresets());
   } else {
     dispatch(updateClusters([]));
   }
