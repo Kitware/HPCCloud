@@ -450,6 +450,10 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
     mesh_file_id = kwargs.pop('meshFileId')
 
     solution_files = list(_list_solution_files(client, output_folder_id))
+
+    if len(solution_files) == 0:
+        raise Exception('No solution files where produced, please check output files for errors.')
+
     # Generate and save the first vtu file that should be loaded for this
     # run. This can then be used to know which file to open as part of any viz
     # step.
