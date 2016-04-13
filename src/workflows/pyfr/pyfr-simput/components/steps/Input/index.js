@@ -10,10 +10,13 @@ import deepClone            from 'mout/src/lang/deepClone';
 import PropertyPanelBlock   from 'paraviewweb/src/React/Properties/PropertyPanel';
 
 import style                from 'HPCCloudStyle/PageWithMenu.mcss';
+import { connect } from 'react-redux';
+import { dispatch } from '../../../../../../redux';
+import * as Actions from '../../../../../../redux/actions/projects';
 
-export default React.createClass({
+const SimputPanel = React.createClass({
 
-  displayName: 'PyFRSimput',
+  displayName: 'PyFrSimput',
 
   propTypes: {
     convert: React.PropTypes.func,
@@ -21,6 +24,8 @@ export default React.createClass({
     project: React.PropTypes.object,
     simulation: React.PropTypes.object,
     step: React.PropTypes.string,
+    updateSimulation: React.PropTypes.func,
+    saveSimulation: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -57,15 +62,12 @@ export default React.createClass({
     if (!iniFile) {
       client.addEmptyFileForSimulation(this.props.simulation, 'pyfr.ini')
         .then(resp => {
-          const { _id } = resp.data; // itemId
-
+          const _id = resp.data._id; // itemId
           this.props.simulation.metadata.inputFolder.files.ini = _id;
-
           this.setState({ iniFile: _id });
-
           client.saveSimulation(this.props.simulation)
             .then(() => {
-              client.invalidateSimulation(this.props.simulation);
+              this.props.updateSimulation(this.props.simulation);
             });
         });
     } else if (!this.state.iniFile) {
@@ -84,9 +86,7 @@ export default React.createClass({
       jsonData = {
         data: {},
         type: 'pyfr',
-        external: {
-          'boundary-names': boundaryNames,
-        },
+        external: { 'boundary-names': boundaryNames },
         hideViews: ['backend'],
       };
 
@@ -96,7 +96,7 @@ export default React.createClass({
       }).then((resp) => {
         var newSim = deepClone(this.props.simulation);
         newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
-        client.invalidateSimulation(newSim);
+        this.props.saveSimulation(newSim);
       });
     } else {
       if (typeof jsonData === 'string') {
@@ -115,15 +115,19 @@ export default React.createClass({
   },
 
   saveModel() {
-    const { jsonData } = this.state;
+    const jsonData = this.state.jsonData;
 
     // Update step metadata
     client.updateSimulationStep(this.props.simulation._id, this.props.step, {
       metadata: { model: JSON.stringify(jsonData) },
-    }).then((resp) => {
+    })
+    .then((resp) => {
       var newSim = deepClone(this.props.simulation);
       newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
-      client.invalidateSimulation(newSim);
+      this.props.saveSimulation(newSim);
+    })
+    .catch((error) => {
+      console.error('problem saving model');
     });
 
     // Update ini file content
@@ -135,23 +139,22 @@ export default React.createClass({
         console.log('try to save content', content.length);
         const blob = new Blob([content], { type: 'text/plain' });
         client.updateFileContent(this.state.iniFile, content.length)
-          .then(
-            upload => {
-              client.uploadChunk(upload.data._id, 0, blob);
-            },
-            err => {
-              console.log('Error update ini content', err);
-            });
+          .then(upload => {
+            client.uploadChunk(upload.data._id, 0, blob);
+          })
+          .catch(err => {
+            console.log('Error update ini content', err);
+          });
         const simulationStepIndex = this.props.simulation.disabled.indexOf('Simulation');
         if (simulationStepIndex !== -1) {
           this.props.simulation.disabled.splice(simulationStepIndex, 1);
           client.updateDisabledSimulationSteps(this.props.simulation);
         }
       } else {
-        console.log('no ini file');
+        console.log('no .ini file');
       }
     } catch (e) {
-      console.error('Error when generating INI file', e);
+      console.error('Error when generating .ini file', e);
     }
   },
 
@@ -199,3 +202,11 @@ export default React.createClass({
       </div>);
   },
 });
+
+export default connect(
+  state => ({ }),
+  () => ({
+    saveSimulation: (simulation) => dispatch(Actions.saveSimulation(simulation)),
+    updateSimulation: (simulation) => dispatch(Actions.updateSimulation(simulation)),
+  })
+)(SimputPanel);
