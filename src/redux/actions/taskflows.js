@@ -6,6 +6,7 @@ import { store, dispatch } from '..';
 export const ADD_TASKFLOW = 'ADD_TASKFLOW';
 export const UPDATE_TASKFLOW_LOG = 'UPDATE_TASKFLOW_LOG';
 export const CLEAR_UPDATE_LOG = 'CLEAR_UPDATE_LOG';
+export const UPDATE_TASKFLOW_STATUS = 'UPDATE_TASKFLOW_STATUS';
 export const UPDATE_TASKFLOW_JOB_LOG = 'UPDATE_TASKFLOW_JOB_LOG';
 export const UPDATE_TASKFLOW_JOB_STATUS = 'UPDATE_TASKFLOW_JOB_STATUS';
 export const UPDATE_TASKFLOW_TASKS = 'UPDATE_TASKFLOW_TASKS';
@@ -26,6 +27,10 @@ export function attachSimulationToTaskflow(simulationId, taskflowId, stepName) {
 
 export function clearUpdateLog() {
   return { type: CLEAR_UPDATE_LOG };
+}
+
+export function updateTaskflowStatus(status) {
+  return { type: UPDATE_TASKFLOW_STATUS, status };
 }
 
 export function startTaskflow(id, payload, simulationStep, location) {
@@ -241,13 +246,16 @@ export function updateTaskflowMetadata(id, actions, allComplete, outputDirectory
 }
 
 // ----------------------------------------------------------------------------
+// SSE Handling for taskflow, job, & task statuses
+// ----------------------------------------------------------------------------
 
 // find a discrete job and only update that one
 function findJob(jobId) {
   return dispatch => {
     const state = store.getState();
     Object.keys(state.taskflows.mapById).forEach(id => {
-      if (state.taskflows.mapById[id].status !== 'complete' && state.taskflows.mapById[id].status !== 'terminated') {
+      if (state.taskflows.mapById[id].status !== 'complete' &&
+          state.taskflows.mapById[id].status !== 'terminated') {
         const action = netActions.addNetworkCall('taskflow_tasks', 'Check tasks');
         client.getTaskflow(id)
           .then((resp) => {
@@ -280,15 +288,14 @@ function findTask() {
   return dispatch => {
     const state = store.getState();
     Object.keys(state.taskflows.mapById).forEach(id => {
-      if (state.taskflows.mapById[id].status !== 'complete' && state.taskflows.mapById[id].status !== 'terminated') {
+      if (state.taskflows.mapById[id].status !== 'complete' &&
+          state.taskflows.mapById[id].status !== 'terminated') {
         dispatch(fetchTaskflowTasks(id));
       }
     });
     return { type: 'NOOP' };
   };
 }
-
-// ----------------------------------------------------------------------------
 
 function getTaskflowIdFromId(id, type) {
   if (type === 'task') {
@@ -316,8 +323,13 @@ client.onEvent((resp) => {
         dispatch(updateTaskflowTaskStatus(taskflowId, id, status));
         break;
       }
+      case 'taskflow': {
+        dispatch(updateTaskflowStatus(id, status));
+        break;
+      }
       default:
-        console.log('unrecognized event', resp.type, resp.data.status);
+        console.log(`unrecognized event for taskflow ${taskflowId}:` +
+          ` ${resp.type},${resp.data.status}`);
         break;
     }
   } else {
@@ -328,12 +340,13 @@ client.onEvent((resp) => {
         break;
       }
       case 'task': {
-        // find and update task
+        // update all tasks for each taskflow
         dispatch(findTask());
         break;
       }
       default:
-        console.log('unrecognized event', resp.type, resp.data.status);
+        console.log(`unrecognized event for unknown taskflow ${taskflowId}:` +
+          ` ${resp.type},${resp.data.status}`);
         break;
     }
   }

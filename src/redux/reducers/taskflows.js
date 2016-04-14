@@ -62,6 +62,17 @@ export default function taskflowsReducer(state = initialState, action) {
       return Object.assign({}, state, { updateLogs: [] });
     }
 
+    case Actions.UPDATE_TASKFLOW_STATUS: {
+      const status = action.status;
+      const mapById = Object.assign({}, state.mapById);
+      const taskflow = Object.assign({}, mapById[action.id]);
+      const flow = Object.assign({}, taskflow.flow);
+      flow.status = status;
+      taskflow.flow = flow;
+      mapById[action.id].taskflow = taskflow;
+      return Object.assign({}, state, { mapById });
+    }
+
     case Actions.UPDATE_TASKFLOW_JOB_LOG: {
       const { taskflowId, jobId, log } = action;
       const taskflow = state.mapById[taskflowId];
@@ -144,7 +155,7 @@ export default function taskflowsReducer(state = initialState, action) {
     }
 
     case Actions.DELETE_TASKFLOW: {
-      const { id } = action;
+      const id = action.id;
 
       const taskflowMapByTaskId = {};
       Object.keys(state.taskflowMapByTaskId).forEach((key) => {
