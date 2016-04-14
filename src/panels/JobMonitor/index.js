@@ -21,14 +21,6 @@ const JobMonitor = React.createClass({
     };
   },
 
-
-  // refreshTaskflowLog() {
-  //   TaskflowManager.getTaskflowLog(this.props.taskFlowId)
-  //     .then(resp => {
-  //       this.setState({ taskflowLog: resp.data.log });
-  //     });
-  // },
-
   toggleAdvanced() {
     const advanced = !this.state.advanced;
     this.setState({ advanced });
@@ -117,14 +109,11 @@ export default connect(
       Object.keys(taskflow.jobMapById).forEach(id => {
         jobs.push(taskflow.jobMapById[id]);
       });
-      // console.log(taskflow.log);
       taskflowLog = taskflow.log;
     }
 
     // Sort the tasks by created timestamp
     tasks.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
-
-    // FIXME need to fill taskflowLog
 
     return {
       tasks,

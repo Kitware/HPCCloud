@@ -35,10 +35,6 @@ export function fetchProjectSimulations(id) {
           const simulations = resp.data;
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(updateProjectSimulations(id, simulations));
-
-          // simulations.forEach(simulation => {
-          //   dispatch(TaskflowActions.updateTaskflowFromSimulation(simulation));
-          // });
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));

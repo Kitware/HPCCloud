@@ -11,11 +11,6 @@ const initialTaskflow = {
   taskMapById: {},
   log: [],
   actions: [],
-  // simulation: null,      // Keep them undefined initially
-  // primaryJob: null,      // Keep them undefined initially
-  // stepName: null,        // Keep them undefined initially
-  // allComplete: false,    // Keep them undefined initially
-  // outputDirectory: null, // Keep them undefined initially
 };
 
 export default function taskflowsReducer(state = initialState, action) {

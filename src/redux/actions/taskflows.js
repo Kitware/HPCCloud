@@ -316,7 +316,6 @@ client.onEvent((resp) => {
   if (type === 'taskflow') {
     dispatch(updateTaskflowStatus(id, status));
   } else if (taskflowId) {
-    console.log(taskflowId);
     switch (type) {
       case 'job': {
         dispatch(updateTaskflowJobStatus(taskflowId, id, status));
