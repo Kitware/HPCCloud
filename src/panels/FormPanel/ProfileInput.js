@@ -45,7 +45,7 @@ export default React.createClass({
   },
 
   addProfile() {
-    const { data } = this.state;
+    const data = this.state.data;
     data.push({ name: 'New profile' });
     this.updateProfiles(data);
   },
@@ -80,7 +80,7 @@ export default React.createClass({
   },
 
   render() {
-    const { item } = this.props;
+    const item = this.props.item;
 
     return (
       <div className={ style.container }>

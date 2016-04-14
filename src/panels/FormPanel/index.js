@@ -86,7 +86,7 @@ export default React.createClass({
 
   render() {
     const onChange = this.onChange;
-    const { data } = this.state;
+    const data = this.state.data;
     const { config, style } = this.props;
     return (
       <div>

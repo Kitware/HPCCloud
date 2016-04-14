@@ -97,7 +97,7 @@ const JobMonitor = React.createClass({
 
 export default connect(
   (state, props) => {
-    const { taskflowId } = props;
+    const taskflowId = props.taskFlowId;
     const taskflow = taskflowId ? state.taskflows.mapById[taskflowId] : null;
     const tasks = [];
     const jobs = [];

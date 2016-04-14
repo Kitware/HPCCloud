@@ -35,7 +35,7 @@ export default function projectsReducer(state = initialState, action) {
     }
 
     case Actions.UPDATE_PROJECT_SIMULATIONS: {
-      const { id } = action;
+      const id = action.id;
       const simulations = Object.assign({}, state.simulations);
       const sim = simulations[id] || Helper.initialState;
       simulations[id] = Helper.updateList(sim, action.simulations);
