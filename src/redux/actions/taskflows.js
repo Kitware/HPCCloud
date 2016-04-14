@@ -29,8 +29,8 @@ export function clearUpdateLog() {
   return { type: CLEAR_UPDATE_LOG };
 }
 
-export function updateTaskflowStatus(status) {
-  return { type: UPDATE_TASKFLOW_STATUS, status };
+export function updateTaskflowStatus(id, status) {
+  return { type: UPDATE_TASKFLOW_STATUS, id, status };
 }
 
 export function startTaskflow(id, payload, simulationStep, location) {
@@ -313,7 +313,10 @@ client.onEvent((resp) => {
   const status = resp.data.status;
   const taskflowId = getTaskflowIdFromId(id, type);
 
-  if (taskflowId) {
+  if (type === 'taskflow') {
+    dispatch(updateTaskflowStatus(id, status));
+  } else if (taskflowId) {
+    console.log(taskflowId);
     switch (type) {
       case 'job': {
         dispatch(updateTaskflowJobStatus(taskflowId, id, status));
@@ -323,13 +326,9 @@ client.onEvent((resp) => {
         dispatch(updateTaskflowTaskStatus(taskflowId, id, status));
         break;
       }
-      case 'taskflow': {
-        dispatch(updateTaskflowStatus(id, status));
-        break;
-      }
       default:
-        console.log(`unrecognized event for taskflow ${taskflowId}:` +
-          ` ${resp.type},${resp.data.status}`);
+        console.log(`unrecognized ServerEvent with type "${type}",` +
+          ` taskflowId "${taskflowId}", and status "${status}"`);
         break;
     }
   } else {
@@ -345,8 +344,8 @@ client.onEvent((resp) => {
         break;
       }
       default:
-        console.log(`unrecognized event for unknown taskflow ${taskflowId}:` +
-          ` ${resp.type},${resp.data.status}`);
+        console.log(`unrecognized ServerEvent with type "${type}",` +
+          ` id "${id}", and status "${status}"`);
         break;
     }
   }

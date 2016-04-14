@@ -29,8 +29,8 @@ const ProjectNew = React.createClass({
     };
   },
 
-  onAction(action, data, attachements) {
-    this[action](data, attachements);
+  onAction(action, data, attachments) {
+    this[action](data, attachments);
   },
 
   updateForm(e) {
@@ -40,7 +40,7 @@ const ProjectNew = React.createClass({
     this.setState({ [key]: value });
   },
 
-  newProject(data, attachements) {
+  newProject(data, attachments) {
     const { name, description } = data,
       type = this.state.type,
       orders = Workflows[type].steps._order,
@@ -48,11 +48,24 @@ const ProjectNew = React.createClass({
       metadata = data.metadata || {},
       project = { name, description, type, steps, metadata };
 
-    if (name && name.length) {
-      this.props.onSave(project, attachements);
-    } else {
+    if (!name || !name.length) {
       this.setState({ _error: 'The project needs to have a name' });
     }
+
+    // check for requiredAttachements.
+    if (Workflows[this.state.type].requiredAttachments &&
+        Workflows[this.state.type].requiredAttachments.project &&
+        Workflows[this.state.type].requiredAttachments.project.length) {
+      const reqAttachments = Workflows[this.state.type].requiredAttachments.project;
+      if (!attachments || !reqAttachments.every((el) => attachments.hasOwnProperty(el))) {
+        // ['this', 'that', 'other'] => '"this", "that" and "other"'
+        const reqAttachmentsStr = reqAttachments.map(el => `"${el}"`).join(', ').replace(/(, )(?!.* )/, ' and ');
+        this.setState({ _error: `The project requires file${reqAttachments.length === 1 ? '' : 's'} ${reqAttachmentsStr}` });
+        return;
+      }
+    }
+
+    this.props.onSave(project, attachments);
   },
 
   cancel() {
@@ -103,7 +116,7 @@ export default connect(
   },
   () => {
     return {
-      onSave: (project, attachements) => dispatch(Actions.saveProject(project, attachements)),
+      onSave: (project, attachments) => dispatch(Actions.saveProject(project, attachments)),
       onCancel: () => dispatch(Router.replace('/')),
     };
   }

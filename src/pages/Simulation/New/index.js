@@ -37,11 +37,11 @@ const SimulationNew = React.createClass({
     };
   },
 
-  onAction(action, data, attachements) {
-    this[action](data, attachements);
+  onAction(action, data, attachments) {
+    this[action](data, attachments);
   },
 
-  newSimulation(data, attachements) {
+  newSimulation(data, attachments) {
     const { name, description } = data,
       projectId = this.props.params.projectId,
       metadata = {},
@@ -51,11 +51,26 @@ const SimulationNew = React.createClass({
       active = stepsInfo._active || stepsInfo._order[0],
       simulation = { name, description, steps, metadata, projectId, active, disabled };
 
-    if (name && name.length) {
-      this.props.onSave(simulation, attachements);
-    } else {
+    // simulation name is always required.
+    if (!name || !name.length) {
       this.setState({ _error: 'The simulation needs to have a name' });
+      return;
     }
+
+    // check for requiredAttachements.
+    if (Workflows[this.props.project.type].requiredAttachments &&
+        Workflows[this.props.project.type].requiredAttachments.simulation &&
+        Workflows[this.props.project.type].requiredAttachments.simulation.length) {
+      const reqAttachments = Workflows[this.props.project.type].requiredAttachments.simulation;
+      if (!attachments || !reqAttachments.every((el) => attachments.hasOwnProperty(el))) {
+        // ['this', 'that', 'other'] => '"this", "that" and "other"'
+        const reqAttachmentsStr = reqAttachments.map(el => `"${el}"`).join(', ').replace(/(, )(?!.* )/, ' and ');
+        this.setState({ _error: `The simulation requires file${reqAttachments.length === 1 ? '' : 's'} ${reqAttachmentsStr}` });
+        return;
+      }
+    }
+
+    this.props.onSave(simulation, attachments);
   },
 
   cancel() {
@@ -103,7 +118,7 @@ export default connect(
   },
   () => {
     return {
-      onSave: (simulation, attachements) => dispatch(Actions.saveSimulation(simulation, attachements, `/View/Project/${simulation.projectId}`)),
+      onSave: (simulation, attachments) => dispatch(Actions.saveSimulation(simulation, attachments, `/View/Project/${simulation.projectId}`)),
       onCancel: (location) => dispatch(Router.replace(location)),
     };
   }

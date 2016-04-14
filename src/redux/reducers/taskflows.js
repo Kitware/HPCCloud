@@ -69,7 +69,7 @@ export default function taskflowsReducer(state = initialState, action) {
       const flow = Object.assign({}, taskflow.flow);
       flow.status = status;
       taskflow.flow = flow;
-      mapById[action.id].taskflow = taskflow;
+      mapById[action.id] = taskflow;
       return Object.assign({}, state, { mapById });
     }
 
