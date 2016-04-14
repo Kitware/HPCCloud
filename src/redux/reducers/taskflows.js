@@ -11,11 +11,6 @@ const initialTaskflow = {
   taskMapById: {},
   log: [],
   actions: [],
-  // simulation: null,      // Keep them undefined initially
-  // primaryJob: null,      // Keep them undefined initially
-  // stepName: null,        // Keep them undefined initially
-  // allComplete: false,    // Keep them undefined initially
-  // outputDirectory: null, // Keep them undefined initially
 };
 
 export default function taskflowsReducer(state = initialState, action) {
@@ -59,8 +54,18 @@ export default function taskflowsReducer(state = initialState, action) {
     }
 
     case Actions.CLEAR_UPDATE_LOG: {
-      const updateLogs = [];
-      return Object.assign({}, state, { updateLogs });
+      return Object.assign({}, state, { updateLogs: [] });
+    }
+
+    case Actions.UPDATE_TASKFLOW_STATUS: {
+      const status = action.status;
+      const mapById = Object.assign({}, state.mapById);
+      const taskflow = Object.assign({}, mapById[action.id]);
+      const flow = Object.assign({}, taskflow.flow);
+      flow.status = status;
+      taskflow.flow = flow;
+      mapById[action.id] = taskflow;
+      return Object.assign({}, state, { mapById });
     }
 
     case Actions.UPDATE_TASKFLOW_JOB_LOG: {
@@ -145,7 +150,7 @@ export default function taskflowsReducer(state = initialState, action) {
     }
 
     case Actions.DELETE_TASKFLOW: {
-      const { id } = action;
+      const id = action.id;
 
       const taskflowMapByTaskId = {};
       Object.keys(state.taskflowMapByTaskId).forEach((key) => {

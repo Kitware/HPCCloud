@@ -110,8 +110,7 @@ export default function clustersReducer(state = initialState, action) {
     }
 
     case Actions.UPDATE_CLUSTER_PRESETS: {
-      const { presets } = action;
-      return Object.assign({}, state, { presets });
+      return Object.assign({}, state, { presets: action.presets });
     }
 
     case Actions.SAVE_CLUSTER: {
@@ -158,7 +157,7 @@ export default function clustersReducer(state = initialState, action) {
     }
 
     case Actions.TESTING_CLUSTER: {
-      const { index } = action;
+      const index = action.index;
       const cluster = Object.assign({}, state.list[index], { classPrefix: style.statusTestingIcon });
       const list = [].concat(
         state.list.slice(0, index),

@@ -6,6 +6,7 @@ const initialState = {
 };
 
 const folderInitialState = {
+  open: false,
   folder: null,
   folderChildren: [],
   itemChildren: [],
@@ -40,6 +41,16 @@ export default function fsReducer(state = initialState, action) {
       const folderChildren = children.map(item => item._id);
       const folderMapById = Object.assign({}, state.folderMapById);
       folderMapById[id] = Object.assign({}, folderInitialState, state.folderMapById[id], { folderChildren });
+      return Object.assign({}, state, { folderMapById });
+    }
+
+    case Actions.TOGGLE_OPEN_FOLDER: {
+      const id = action.folderId;
+      const folderMapById = Object.assign({}, state.folderMapById);
+      const folderObject = Object.assign({}, state.folderMapById[id]);
+      folderObject.open = !folderObject.open;
+      folderMapById[id] = folderObject;
+
       return Object.assign({}, state, { folderMapById });
     }
 

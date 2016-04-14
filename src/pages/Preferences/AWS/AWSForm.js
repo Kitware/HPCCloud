@@ -72,12 +72,6 @@ export default React.createClass({
     }
   },
 
-  // accessKeyId: '',
-  // availabilityZone: 'a',
-  // name: 'new AWS profile',
-  // regionName: 'us-east-1',
-  // secretAccessKey: '',
-
   render() {
     if (!this.state.data) {
       return null;

@@ -25,9 +25,6 @@ const StatusPage = React.createClass({
   },
 
   networkMapper(el, index) {
-    // if (!el.label) {
-    //   return null;
-    // }
     return {
       name: <span title={JSON.stringify(el, null, '  ')}><i className={iconMap[el.state]}></i> {el.label ? el.label : '__'}</span>,
       value: (<span>{el.state}</span>),

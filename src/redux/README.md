@@ -94,7 +94,8 @@
   fs: {
     folderMapById: {
       [id]: {
-        folder: { full folder },
+        open: false,
+        folder: { full folder... },
         folderChildren: [ ids... ],
         itemChildren: [ ids... ], 
       }

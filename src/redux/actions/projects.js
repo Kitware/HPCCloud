@@ -35,10 +35,6 @@ export function fetchProjectSimulations(id) {
           const simulations = resp.data;
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(updateProjectSimulations(id, simulations));
-
-          // simulations.forEach(simulation => {
-          //   dispatch(TaskflowActions.updateTaskflowFromSimulation(simulation));
-          // });
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
@@ -96,11 +92,11 @@ export function updateSimulation(simulation) {
   return { type: UPDATE_SIMULATION, simulation };
 }
 
-export function saveProject(project, attachements) {
+export function saveProject(project, attachments) {
   return dispatch => {
     const action = netActions.addNetworkCall('save_project', `Save project ${project.name}`);
 
-    client.saveProject(project, attachements)
+    client.saveProject(project, attachments)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -116,11 +112,11 @@ export function saveProject(project, attachements) {
   };
 }
 
-export function saveSimulation(simulation, attachements, location) {
+export function saveSimulation(simulation, attachments, location) {
   return dispatch => {
     const action = netActions.addNetworkCall('save_simulation', `Save simulation ${simulation.name}`);
 
-    client.saveSimulation(simulation, attachements)
+    client.saveSimulation(simulation, attachments)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));

@@ -8,8 +8,6 @@ import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
 import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 import RuntimeBackend          from '../../../panels/RuntimeBackend';
 
-// import client                  from '../../../../../../network';
-// import deepClone               from 'mout/src/lang/deepClone';
 import merge                   from 'mout/src/object/merge';
 import formStyle               from 'HPCCloudStyle/ItemEditor.mcss';
 
