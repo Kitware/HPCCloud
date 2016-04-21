@@ -106,7 +106,7 @@ class Projects(Resource):
 
         cursor = self._model.find(limit=limit, offset=offset)
         return list(self._model.filterResultsByPermission(cursor=cursor,
-            user=user, level=AccessType.READ))
+                    user=user, level=AccessType.READ))
 
     @describeRoute(
         Description('Delete a project')
@@ -197,4 +197,5 @@ class Projects(Resource):
     def simulations(self, project, params):
         user = getCurrentUser()
         limit, offset, _ = self.getPagingParameters(params)
-        return self.model('project', 'hpccloud').simulations(user, project, limit, offset)
+        return self.model('project', 'hpccloud').simulations(user, project,
+                                                             limit, offset)

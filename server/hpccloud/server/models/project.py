@@ -222,7 +222,7 @@ class Project(AccessControlledModel):
             'projectId': project['_id']
         }
 
-        sims = self.model('simulation', 'hpccloud').find(query=query, limit=limit, offset=offset)
-
+        sims = self.model('simulation', 'hpccloud').find(
+            query=query, limit=limit, offset=offset)
         return list(self.filterResultsByPermission(
-            cursor=sims, user=user, level=AccessType.READ))
+                    cursor=sims, user=user, level=AccessType.READ))
