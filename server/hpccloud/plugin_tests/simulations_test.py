@@ -160,17 +160,31 @@ class SimulationTestCase(TestCase):
         return r.json
 
     def test_list_simulations(self):
-        self._create_simulation(
-            self._project1, self._another_user, 'sim1')
+        self._create_simulation(self._project1,
+            self._another_user, 'sim1')
         self._create_simulation(self._project1,
             self._another_user, 'sim2')
         self._create_simulation(self._project2,
             self._another_user, 'sim3')
 
+        # test limit and offset
+        r = self.request('/projects/%s/simulations' % str(self._project1['_id']), method='GET',
+                         params={'limit':1}, type='application/json', user=self._another_user)
+        self.assertStatusOk(r)
+        self.assertEqual(len(r.json), 1)
+
+        r = self.request('/projects/%s/simulations' % str(self._project1['_id']), method='GET',
+                         params={'offset':1}, type='application/json', user=self._another_user)
+        self.assertStatusOk(r)
+        self.assertEqual(len(r.json), 1)
+        self.assertEqual(r.json[0]['name'], 'sim2')
+
+        # plain get
         r = self.request('/projects/%s/simulations' % str(self._project1['_id']), method='GET',
                          type='application/json', user=self._another_user)
         self.assertStatusOk(r)
         self.assertEqual(len(r.json), 2)
+
 
     def test_get(self):
         sim1 = self._create_simulation(

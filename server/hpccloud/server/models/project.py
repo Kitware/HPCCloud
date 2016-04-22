@@ -139,7 +139,7 @@ class Project(AccessControlledModel):
 
         # Prevent the deletion of a project that contains simulations
         query = {
-            "projectId": project['_id']
+            'projectId': project['_id']
         }
 
         sim = self.model('simulation', 'hpccloud').findOne(query=query)
@@ -199,7 +199,7 @@ class Project(AccessControlledModel):
 
         # Now share any simulation associated with this project
         query = {
-            "projectId": project['_id']
+            'projectId': project['_id']
         }
         sims = self.model('simulation', 'hpccloud').find(query=query)
         for sim in sims:
@@ -210,7 +210,7 @@ class Project(AccessControlledModel):
 
         return self.save(project)
 
-    def simulations(self, user, project):
+    def simulations(self, user, project, limit, offset):
         """
         Get all the simulation associated with a given project.
 
@@ -219,10 +219,10 @@ class Project(AccessControlledModel):
         """
 
         query = {
-            "projectId": project['_id']
+            'projectId': project['_id']
         }
 
-        sims = self.model('simulation', 'hpccloud').find(query=query)
-
+        sims = self.model('simulation', 'hpccloud').find(
+            query=query, limit=limit, offset=offset)
         return list(self.filterResultsByPermission(
                     cursor=sims, user=user, level=AccessType.READ))

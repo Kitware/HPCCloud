@@ -94,14 +94,19 @@ class Projects(Resource):
 
     @describeRoute(
         Description('Get all projects this user has access to project')
+        .param('limit', 'Result set size limit.',
+               dataType='integer', required=False, paramType='query')
+        .param('offset', 'Offset into result set.',
+               dataType='integer', required=False, paramType='query')
     )
     @access.user
     def get_all(self, params):
         user = getCurrentUser()
-        cursor = self._model.find()
+        limit, offset, _ = self.getPagingParameters(params)
 
-        return list(self._model.filterResultsByPermission(
-            cursor=cursor, user=user, level=AccessType.READ))
+        cursor = self._model.find(limit=limit, offset=offset)
+        return list(self._model.filterResultsByPermission(cursor=cursor,
+                    user=user, level=AccessType.READ))
 
     @describeRoute(
         Description('Delete a project')
@@ -182,10 +187,15 @@ class Projects(Resource):
         Description('List all the simulations associated with a project.')
         .param('id', 'The project',
                dataType='string', required=True, paramType='path')
+        .param('limit', 'Result set size limit.',
+               dataType='integer', required=False, paramType='query')
+        .param('offset', 'Offset into result set.',
+               dataType='integer', required=False, paramType='query')
     )
     @access.user
     @loadmodel(model='project', plugin='hpccloud', level=AccessType.READ)
     def simulations(self, project, params):
         user = getCurrentUser()
-
-        return self.model('project', 'hpccloud').simulations(user, project)
+        limit, offset, _ = self.getPagingParameters(params)
+        return self.model('project', 'hpccloud').simulations(user, project,
+                                                             limit, offset)
