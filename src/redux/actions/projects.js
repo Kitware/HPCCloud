@@ -102,7 +102,11 @@ export function saveProject(project, attachments) {
           dispatch(netActions.successNetworkCall(action.id, resp));
           const respWithProj = Array.isArray(resp) ? resp[resp.length - 1] : resp;
           dispatch(updateProject(respWithProj.data));
-          dispatch(router.push(`/View/Project/${respWithProj.data._id}`));
+          if (attachments && attachments.length) {
+            setTimeout(() => { dispatch(router.push(`/View/Project/${respWithProj.data._id}`)); }, 1500);
+          } else {
+            dispatch(router.push(`/View/Project/${respWithProj.data._id}`));
+          }
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
@@ -122,7 +126,10 @@ export function saveSimulation(simulation, attachments, location) {
           dispatch(netActions.successNetworkCall(action.id, resp));
           const respWithSim = Array.isArray(resp) ? resp[resp.length - 1] : resp;
           dispatch(updateSimulation(respWithSim.data));
-          if (location) { // `/View/Project/${respWithSim.data.projectId}`
+          if (location && attachments && attachments.length) { // `/View/Project/${respWithSim.data.projectId}`
+            // in this 1.5s gap the progressBar will appear complete, and fade on the new page
+            setTimeout(() => { dispatch(router.push(location)); }, 1500);
+          } else if (location) {
             dispatch(router.push(location));
           }
         },

@@ -5,6 +5,8 @@ const initialState = {
   success: {},
   error: {},
   backlog: [],
+  progress: 0,
+  progressReset: false,
 };
 
 export default function networkReducer(state = initialState, action) {
@@ -60,6 +62,10 @@ export default function networkReducer(state = initialState, action) {
       }
 
       return Object.assign({}, state, { error });
+    }
+
+    case Actions.ON_PROGRESS: {
+      return Object.assign({}, state, { progress: action.progress, progressReset: action.progressReset });
     }
 
     default:

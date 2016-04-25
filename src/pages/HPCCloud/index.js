@@ -19,6 +19,7 @@ const TopBar = React.createClass({
     userName: React.PropTypes.string,
     isBusy: React.PropTypes.bool,
     progress: React.PropTypes.number,
+    progressReset: React.PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -30,6 +31,9 @@ const TopBar = React.createClass({
   },
 
   render() {
+    const width = `${this.props.progress}%`;
+    const opacity = (this.props.progress === 100 ? '0' : '1.0');
+    const display = this.props.progressReset ? 'none' : null;
     return (
       <div className={ layout.verticalFlexContainer }>
         <div className={ theme.topBar } style={{ position: 'relative' }}>
@@ -39,13 +43,7 @@ const TopBar = React.createClass({
                 </Link>
             </div>
 
-            <div className={ theme.progressBar }
-              style={{
-                width: `${this.props.progress}%`,
-                opacity: (this.props.progress === 100 ? '0' : '1.0'),
-              }}
-            >
-            </div>
+            <div className={ theme.progressBar } style={{ width, opacity, display }}></div>
 
             { this.props.userName ? (
                 <div className={ theme.capitalizeRightText }>
@@ -75,13 +73,13 @@ export default connect(
     const lastName = get(state, 'auth.user.lastName');
     const pendingRequests = get(state, 'network.pending') || {};
     const numberOfPendingRequest = Object.keys(pendingRequests).length;
-    const progress = numberOfPendingRequest
-      ? (100 * Object.keys(pendingRequests).map(item => item.progress).reduce((a, b) => a + b) / numberOfPendingRequest)
-      : 0;
+    const progress = get(state, 'network.progress');
+    const progressReset = get(state, 'network.progressReset');
     return {
       userName: firstName ? `${firstName} ${lastName}` : null,
       isBusy: !!numberOfPendingRequest,
-      progress,
+      progress: progress || 0, // can be undefined sometimes
+      progressReset,
     };
   }
 )(TopBar);

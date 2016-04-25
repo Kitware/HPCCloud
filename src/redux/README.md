@@ -13,6 +13,7 @@
     success: {},
     error: {},
     backlog: [ {contents of outdated pending, success, and errors} ],
+    progress: number
   },
   preferences: {
     clusters: {
