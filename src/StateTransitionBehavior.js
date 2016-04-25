@@ -9,8 +9,13 @@ import { dispatch } from './redux';
 const simulationsStatus = {};
 
 function folderItemSize(state, folderId) {
-  return state.fs.folderMapById[folderId].itemChildren.length +
-    state.fs.folderMapById[folderId].folderChildren.length;
+  const folder = state.fs.folderMapById[folderId];
+  if (folder) {
+    const itemChildrenLength = folder.itemChildren ? folder.itemChildren : 0;
+    const folderChildrenLength = folder.folderChildren ? folder.folderChildren : 0;
+    return itemChildrenLength + folderChildrenLength;
+  }
+  return 0;
 }
 
 export function handleTaskflowChange(state, taskflow) {

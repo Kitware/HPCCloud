@@ -81,10 +81,13 @@ const VisualizationView = React.createClass({
   },
 
   render() {
-    if (!this.props.taskflow || !this.props.taskflow.flow) {
+    const { taskflow, taskflowId, error, simulation, buttonsDisabled } = this.props;
+
+    // these can be undefined sometimes and we need them.
+    if (!taskflow || !taskflow.flow || !taskflow.jobMapById || !taskflow.actions || !taskflow.hasOwnProperty('allComplete')) {
       return null;
     }
-    const { taskflow, taskflowId, error, simulation, buttonsDisabled } = this.props;
+
     const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
     const actions = [];
 
