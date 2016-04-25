@@ -1,7 +1,7 @@
 {
   "name": "hpc-cloud",
   "description": "Virtual platform for running simulations and visualization",
-  "license": "BSD-3-Clause",
+  "license": "Apache-2.0",
   "version": "0.0.0-semantically-release",
   "main": "./lib/app.js",
   "repository": {
@@ -30,17 +30,15 @@
     "react-dom": "0.14.7",
 
     "redux": "3.3.1",
-    "redux-thunk": "2.0.1",
     "react-redux": "4.4.1",
     "react-router-redux": "4.0.0",
 
     "bootstrap": "3.3.6",
-    "history": "1.17.0",
-    "react-router": "2.0.0",
+    "react-router": "2.0.1",
 
-    "paraviewweb": "1.3.1",
+    "paraviewweb": "1.3.7",
     "simput": "1.2.0",
-    "pvw-visualizer": "1.0.10",
+    "pvw-visualizer": "1.0.11",
 
     "kw-web-suite": "1.1.0"
   },
