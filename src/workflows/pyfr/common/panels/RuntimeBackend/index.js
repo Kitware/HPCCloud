@@ -88,10 +88,12 @@ export default React.createClass({
     const backend = { type };
     if (type === 'cuda') {
       backend['device-id'] = device;
-    } else { // type === openmp
-      const addOn = this.props.profiles[type].filter(item => item.name === profile);
-      if (addOn.length) {
-        Object.assign(backend, addOn[0]);
+    } else { // type === 'openmp'
+      if (this.props.profiles[type]) {
+        const addOn = this.props.profiles[type].filter(item => item.name === profile);
+        if (addOn.length) {
+          Object.assign(backend, addOn[0]);
+        }
       }
     }
     if (this.props.onChange) {

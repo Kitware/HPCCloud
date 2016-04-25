@@ -96,7 +96,7 @@ export default connect(
     const taskStatusCount = {};
     var taskflowLog = [];
 
-    if (taskflow) {
+    if (taskflow && taskflow.taskMapById && taskflow.jobMapById) {
       Object.keys(taskflow.taskMapById).forEach(id => {
         tasks.push(taskflow.taskMapById[id]);
         const status = taskflow.taskMapById[id].status;
