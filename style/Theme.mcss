@@ -137,6 +137,13 @@
     composes: fa-cloud-download from 'font-awesome/css/font-awesome.css';
 }
 
+.loadingIcon {
+    composes: fa         from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw      from 'font-awesome/css/font-awesome.css';
+    composes: fa-spinner from 'font-awesome/css/font-awesome.css';
+    composes: fa-spin    from 'font-awesome/css/font-awesome.css';
+}
+
 .editIcon {
     composes: fa            from 'font-awesome/css/font-awesome.css';
     composes: fa-fw         from 'font-awesome/css/font-awesome.css';
