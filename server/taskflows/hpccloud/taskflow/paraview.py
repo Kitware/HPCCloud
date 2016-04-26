@@ -106,8 +106,8 @@ def paraview_terminate(task):
     if cluster:
         cluster = cluster[0].value
     else:
-        raise Exception('Unable to extract cluster from taskflow. '
-                        'Unable to terminate ParaView job.')
+        task.logger.warning('Unable to extract cluster from taskflow. '
+                         'Unable to terminate ParaView job.')
 
     client = _create_girder_client(
             task.taskflow.girder_api_url, task.taskflow.girder_token)
@@ -119,6 +119,10 @@ def paraview_terminate(task):
 def create_paraview_job(task, *args, **kwargs):
     task.logger.info('Validating args passed to flow.')
     validate_args(kwargs)
+
+    cluster = kwargs.pop('cluster')
+    # Save the cluster in the taskflow for termination
+    task.taskflow.set_metadata('cluster', cluster)
 
     client = _create_girder_client(
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
@@ -160,7 +164,6 @@ def create_paraview_job(task, *args, **kwargs):
         task.logger.error('Unable to local pvw-visualizer.py for upload.')
         return
 
-    cluster = kwargs.pop('cluster')
     target_dir = job_directory(cluster, job)
     target_path = os.path.join(target_dir, 'pvw-visualizer.py')
 
@@ -197,9 +200,6 @@ def upload_input(task, cluster, job, *args, **kwargs):
 def submit_paraview_job(task, cluster, job, *args, **kwargs):
     task.taskflow.logger.info('Submitting job to cluster.')
     girder_token = task.taskflow.girder_token
-
-    # Save the cluster in the taskflow for termination
-    task.taskflow.set_metadata('cluster', cluster)
 
     params = {}
 
