@@ -8,10 +8,28 @@ export default React.createClass({
 
   propTypes: {
     unit: React.PropTypes.object,
+    open: React.PropTypes.bool,
+    onToggle: React.PropTypes.func,
+    alwaysShowLogToggle: React.PropTypes.bool,
+  },
+
+  getDefaultProps() {
+    return { open: false, alwaysShowLogToggle: false };
+  },
+
+  getInitialState() {
+    return { open: this.props.open };
+  },
+
+  onToggle(open) {
+    if (this.props.onToggle) {
+      this.props.onToggle(open);
+    }
   },
 
   render() {
-    if (this.props.unit.log === undefined || this.props.unit.log.length === 0) {
+    if (!this.props.alwaysShowLogToggle &&
+      (this.props.unit.log === undefined || this.props.unit.log.length === 0)) {
       return (
         <section className={ style.listItem }>
           <strong className={ style.itemContent }>{this.props.unit.name.split('.').pop()}</strong>
@@ -25,7 +43,8 @@ export default React.createClass({
         <CollapsibleWidget
           title={this.props.unit.name.split('.').pop()}
           subtitle={this.props.unit.status}
-          open={false}
+          open={this.state.open}
+          onChange={this.onToggle}
         >
           <pre className={ style.log }>
           { // reduce log array to a string with formatted entries
