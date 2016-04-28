@@ -1,14 +1,10 @@
 import React                   from 'react';
-
 import defaultServerParameters from '../../../../../../panels/run/defaults';
-import RunEC2                  from '../../../../../../panels/run/RunEC2';
-import RunCluster              from '../../../../../../panels/run/RunCluster';
-import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
+import RunClusterFrom          from '../../../../../../panels/run';
 import ButtonBar               from '../../../../../../panels/ButtonBar';
 import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 
 import merge                   from 'mout/src/object/merge';
-import formStyle               from 'HPCCloudStyle/ItemEditor.mcss';
 
 import { connect }  from 'react-redux';
 import get          from 'mout/src/object/get';
@@ -102,33 +98,13 @@ const VisualizationStart = React.createClass({
 
   render() {
     var actions = [{ name: 'startVisualization', label: 'Start Visualization', icon: '' }],
-      serverForm;
-    switch (this.state.serverType) {
-      case 'EC2':
-        serverForm = <RunEC2 contents={this.state.EC2} onChange={this.dataChange} />;
-        break;
-      case 'Traditional':
-        serverForm = <RunCluster contents={this.state.Traditional} onChange={this.dataChange} />;
-        break;
-      case 'OpenStack':
-        serverForm = <RunOpenStack />;
-        break;
-      default:
-        serverForm = <span>no valid serverType: {this.state.serverType}</span>;
-    }
+      serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional, OpenStack: this.state.OpenStack };
+
     return (
         <div>
-            <section className={formStyle.group}>
-                <label className={formStyle.label}>Server Type</label>
-                <select className={formStyle.input} value={this.state.serverType} onChange={ this.updateServerType }>
-                    <option value="Traditional">Traditional</option>
-                    <option value="EC2">EC2</option>
-                    <option value="OpenStack">OpenStack</option>
-                </select>
-            </section>
-            <section>
-                {serverForm}
-            </section>
+            <RunClusterFrom serverType={this.state.serverType} serverTypeChange={this.updateServerType}
+              profiles={serverProfiles} dataChange={this.dataChange}
+            />
             <section>
                 <ButtonBar
                   visible={this.state[this.state.serverType].profile !== ''}
