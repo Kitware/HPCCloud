@@ -1,15 +1,11 @@
 import React                   from 'react';
-
 import ButtonBar               from '../../../../../../panels/ButtonBar';
 import defaultServerParameters from '../../../../../../panels/run/defaults';
-import RunCluster              from '../../../../../../panels/run/RunCluster';
-import RunEC2                  from '../../../../../../panels/run/RunEC2';
-import RunOpenStack            from '../../../../../../panels/run/RunOpenStack';
+import RunClusterFrom          from '../../../../../../panels/run';
 import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 import RuntimeBackend          from '../../../panels/RuntimeBackend';
 
 import merge                   from 'mout/src/object/merge';
-import formStyle               from 'HPCCloudStyle/ItemEditor.mcss';
 
 import { connect } from 'react-redux';
 import get          from 'mout/src/object/get';
@@ -112,6 +108,9 @@ const SimulationStart = React.createClass({
             this.state[this.state.serverType].profile
           ),
         });
+    } else {
+      console.log('unrecognized serverType: ', this.state.serverType);
+      return;
     }
 
     this.props.onRun(
@@ -143,8 +142,7 @@ const SimulationStart = React.createClass({
   },
 
   updateServerType(e) {
-    const serverType = e.target.value;
-    this.setState({ serverType });
+    this.setState({ serverType: e.target.value });
   },
 
   updateBackend(backend) {
@@ -153,48 +151,21 @@ const SimulationStart = React.createClass({
 
   render() {
     var actions = [{ name: 'runSimulation', label: 'Run Simulation', icon: '' }],
-      serverForm;
-
-    switch (this.state.serverType) {
-      case 'EC2':
-        serverForm = <RunEC2 contents={this.state.EC2} onChange={this.dataChange} />;
-        break;
-      case 'Traditional':
-        serverForm = <RunCluster contents={this.state.Traditional} onChange={this.dataChange} />;
-        break;
-      case 'OpenStack':
-        serverForm = <RunOpenStack />;
-        break;
-      default:
-        serverForm = <span>no valid serverType: {this.state.serverType}</span>;
-    }
-
-    let profiles = { cuda: false, openmp: [], opencl: [] };
+      serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional, OpenStack: this.state.OpenStack },
+      backendProfiles = { cuda: false, openmp: [], opencl: [] };
     if (this.state.serverType === 'Traditional') {
       const clusterId = this.state.Traditional.profile;
       if (this.props.tradClusters[clusterId] && this.props.tradClusters[clusterId].config && this.props.tradClusters[clusterId].config.pyfr) {
-        profiles = this.props.tradClusters[clusterId].config.pyfr;
+        backendProfiles = this.props.tradClusters[clusterId].config.pyfr;
       }
     }
 
     return (
       <div>
-          <section className={formStyle.group}>
-              <label className={formStyle.label}>Server Type</label>
-              <select
-                className={formStyle.input}
-                value={this.state.serverType}
-                onChange={ this.updateServerType }
-              >
-                <option value="Traditional">Traditional</option>
-                <option value="EC2">EC2</option>
-                <option value="OpenStack">OpenStack</option>
-              </select>
-          </section>
-          <section>
-              {serverForm}
-          </section>
-          <RuntimeBackend profiles={profiles} onChange={ this.updateBackend } visible={this.state.serverType === 'Traditional'} />
+          <RunClusterFrom serverType={this.state.serverType} serverTypeChange={this.updateServerType}
+            profiles={serverProfiles} dataChange={this.dataChange}
+          />
+          <RuntimeBackend profiles={backendProfiles} onChange={ this.updateBackend } visible={this.state.serverType === 'Traditional'} />
           <ButtonBar
             visible={this.state[this.state.serverType].profile !== ''}
             onAction={this.formAction}

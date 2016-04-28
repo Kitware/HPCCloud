@@ -1,5 +1,6 @@
 import 'normalize.css';
 import 'HPCCloudStyle/global.mcss';
+import { baseURL }  from './utils/Constants.js';
 
 import React        from 'react';
 import { render }   from 'react-dom';
@@ -15,7 +16,7 @@ import * as Behavior                from './StateTransitionBehavior';
 // Setup application and pages
 const container = document.querySelector('.react-container');
 
-export function configure(config = { girderAPI: '/api/v1' }) {
+export function configure(config = { girderAPI: baseURL }) {
   render(
     <Provider store={ store }>
       <Router history={ history } routes={ routes } />

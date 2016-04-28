@@ -5,6 +5,7 @@ import JobMonitor       from '../../../../../../panels/JobMonitor';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
 
+import get              from 'mout/src/object/get';
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
@@ -83,7 +84,7 @@ const visualizationView = React.createClass({
   },
 
   render() {
-    if (!this.props.taskflow || !this.props.taskflow.flow) {
+    if (!this.props.taskflow || !this.props.taskflow.flow || !get(this.props.taskflow.flow, 'meta.cluster._id')) {
       return null;
     }
 
@@ -102,16 +103,16 @@ const visualizationView = React.createClass({
 
     return (
       <div>
-          <JobMonitor taskflowId={ taskflowId } />
-          <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />
-          <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />
-          <section>
-              <ButtonBar
-                onAction={ this.onAction }
-                actions={ getActions(actions, false)}
-                error={error}
-              />
-          </section>
+        <JobMonitor taskflowId={ taskflowId } clusterId={taskflow.flow.meta.cluster._id} />
+        <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />
+        <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />
+        <section>
+            <ButtonBar
+              onAction={ this.onAction }
+              actions={ getActions(actions, false)}
+              error={error}
+            />
+        </section>
       </div>);
   },
 });

@@ -22,7 +22,10 @@
       ],
       active: 0,
       mapById: {
-        [_id]: { name, config, status },
+        [_id]: { name, config, status,
+          logStream: EventSource,
+          log: []
+        },
       }
       presets: {
         [name]: { prop: value, ... }
@@ -33,7 +36,7 @@
       list: [],
       active: 0,
       mapById: {
-        [_id]: { ... },
+        [_id]: { },
       }
     },
     statuses: {

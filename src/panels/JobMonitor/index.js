@@ -3,16 +3,31 @@ import ExecutionUnit        from './ExecutionUnit.js';
 import style                from 'HPCCloudStyle/JobMonitor.mcss';
 
 import { connect }  from 'react-redux';
+import { dispatch }     from '../../redux';
+import * as ClusterActions from '../../redux/actions/clusters';
+
+// EventSource readyStates
+const CONNECTING = 0;
+const OPEN = 1;
+const CLOSED = 2;
 
 const JobMonitor = React.createClass({
   displayName: 'JobMonitor',
 
   propTypes: {
     taskflowId: React.PropTypes.string,
+    clusterId: React.PropTypes.string,
+    clusterName: React.PropTypes.string,
     tasks: React.PropTypes.array,
     jobs: React.PropTypes.array,
     taskStatusCount: React.PropTypes.object,
     taskflowLog: React.PropTypes.array,
+    clusterLog: React.PropTypes.array,
+    clusterLogStreamState: React.PropTypes.number,
+
+    getClusterLog: React.PropTypes.func,
+    subscribeToClusterLogStream: React.PropTypes.func,
+    unsubscribeFromClusterLogStream: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -21,9 +36,29 @@ const JobMonitor = React.createClass({
     };
   },
 
+  componentWillUnmount() {
+    // if stream is connecting or open: unsubscribe
+    if (this.props.clusterLogStreamState === OPEN ||
+      this.props.clusterLogStreamState === CONNECTING) {
+      this.props.unsubscribeFromClusterLogStream(this.props.clusterId);
+    }
+  },
+
   toggleAdvanced() {
     const advanced = !this.state.advanced;
     this.setState({ advanced });
+  },
+
+  clusterLogOpen(open) {
+    if (open) {
+      console.log('stream state:', this.props.clusterLogStreamState);
+      if (this.props.clusterLogStreamState === CLOSED) {
+        const offset = this.props.clusterLog.length;
+        this.props.subscribeToClusterLogStream(this.props.clusterId, offset);
+      }
+    } else {
+      this.props.unsubscribeFromClusterLogStream(this.props.clusterId);
+    }
   },
 
   render() {
@@ -75,7 +110,20 @@ const JobMonitor = React.createClass({
               </div>
               <div className={ style.taskflowContent }>
                 {
-                  <ExecutionUnit key={this.props.taskflowId} unit={{ name: 'Log', log: this.props.taskflowLog }} />
+                  <ExecutionUnit unit={{ name: 'Log', log: this.props.taskflowLog }} />
+                }
+              </div>
+              <div className={ style.toolbar }>
+                  <div className={ style.title }>
+                      Cluster log
+                  </div>
+                  <div className={ style.buttons }></div>
+              </div>
+              <div className={ style.taskflowContent }>
+                {
+                  <ExecutionUnit unit={{ name: 'Log', log: this.props.clusterLog }}
+                    onToggle={this.clusterLogOpen} alwaysShowLogToggle
+                  />
                 }
               </div>
           </div>
@@ -90,11 +138,15 @@ const JobMonitor = React.createClass({
 export default connect(
   (state, props) => {
     const taskflowId = props.taskflowId;
+    const clusterId = props.clusterId;
     const taskflow = taskflowId ? state.taskflows.mapById[taskflowId] : null;
     const tasks = [];
     const jobs = [];
+    const cluster = clusterId ? state.preferences.clusters.mapById[clusterId] : null;
     const taskStatusCount = {};
     var taskflowLog = [];
+    var clusterLog = [];
+    var clusterLogStreamState = CLOSED;
 
     if (taskflow && taskflow.taskMapById && taskflow.jobMapById) {
       Object.keys(taskflow.taskMapById).forEach(id => {
@@ -111,16 +163,27 @@ export default connect(
       });
       taskflowLog = taskflow.log;
     }
-
     // Sort the tasks by created timestamp
     tasks.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
+
+    if (cluster.log && cluster.log.length) {
+      clusterLog = cluster.log.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
+      clusterLogStreamState = cluster.logStream ? cluster.logStream.readyState : CLOSED;
+    }
 
     return {
       tasks,
       jobs,
       taskStatusCount,
       taskflowLog,
+      clusterLog,
+      clusterLogStreamState,
     };
-  }
+  },
+  () => ({
+    getClusterLog: (id, offset) => dispatch(ClusterActions.getClusterLog(id, offset)),
+    subscribeToClusterLogStream: (id, offset) => dispatch(ClusterActions.subscribeClusterLogStream(id, offset)),
+    unsubscribeFromClusterLogStream: (id) => dispatch(ClusterActions.unsubscribeClusterLogStream(id)),
+  })
 )(JobMonitor);
 
