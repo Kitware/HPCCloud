@@ -46,6 +46,10 @@ const TopBar = React.createClass({
       // when progressReset, the bar's display is 'none',
       // it takes 2.5s for width & opacity to fade back to initial values to transition .
       this.timeout = setTimeout(() => { this.props.resetProgress(false);}, 2500);
+      // uploading is well done at this point but it is not clear to the user, so unset onbeforeunload here.
+      window.onbeforeunload = null;
+    } else if (this.props.progress > 0) {
+      window.onbeforeunload = () => 'There is file uploading in progress. Are you sure you want to leave the page?';
     }
   },
 
