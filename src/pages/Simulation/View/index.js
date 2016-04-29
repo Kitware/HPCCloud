@@ -1,6 +1,7 @@
 import React     from 'react';
 import Workflows from '../../../workflows';
 import tools     from  '../../../tools';
+import LoadingPanel from '../../../panels/LoadingPanel';
 
 import { connect } from 'react-redux';
 import { dispatch } from '../../../redux';
@@ -39,7 +40,7 @@ const SimulationView = React.createClass({
 
   render() {
     if (!this.props.simulation || !this.props.project) {
-      return null;
+      return <LoadingPanel />;
     }
 
     const { project, simulation } = this.props;

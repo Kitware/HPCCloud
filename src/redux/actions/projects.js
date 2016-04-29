@@ -96,7 +96,7 @@ export function saveProject(project, attachments) {
   return dispatch => {
     const action = netActions.addNetworkCall('save_project', `Save project ${project.name}`);
 
-    if (Object.keys(attachments).length) {
+    if (attachments && Object.keys(attachments).length) {
       dispatch(netActions.prepareUpload(attachments));
     }
 
@@ -106,7 +106,7 @@ export function saveProject(project, attachments) {
           dispatch(netActions.successNetworkCall(action.id, resp));
           const respWithProj = Array.isArray(resp) ? resp[resp.length - 1] : resp;
           dispatch(updateProject(respWithProj.data));
-          if (Object.keys(attachments).length) {
+          if (attachments && Object.keys(attachments).length) {
             setTimeout(() => { dispatch(router.push(`/View/Project/${respWithProj.data._id}`)); }, 1500);
           } else {
             dispatch(router.push(`/View/Project/${respWithProj.data._id}`));
@@ -124,7 +124,7 @@ export function saveSimulation(simulation, attachments, location) {
   return dispatch => {
     const action = netActions.addNetworkCall('save_simulation', `Save simulation ${simulation.name}`);
 
-    if (Object.keys(attachments).length) {
+    if (attachments && Object.keys(attachments).length) {
       dispatch(netActions.prepareUpload(attachments));
     }
 
@@ -134,7 +134,7 @@ export function saveSimulation(simulation, attachments, location) {
           dispatch(netActions.successNetworkCall(action.id, resp));
           const respWithSim = Array.isArray(resp) ? resp[resp.length - 1] : resp;
           dispatch(updateSimulation(respWithSim.data));
-          if (location && Object.keys(attachments).length) {
+          if (location && attachments && Object.keys(attachments).length) {
             // in this 1.5s gap the progressBar will appear complete, and fade on the new page
             setTimeout(() => { dispatch(router.push(location)); }, 1500);
           } else if (location) {

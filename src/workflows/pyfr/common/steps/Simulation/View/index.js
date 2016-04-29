@@ -4,6 +4,7 @@ import FileListing      from '../../../../../../panels/FileListing';
 import deepClone        from 'mout/src/lang/deepClone';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
+import LoadingPanel     from '../../../../../../panels/LoadingPanel';
 
 import get              from 'mout/src/object/get';
 import { connect }      from 'react-redux';
@@ -99,7 +100,7 @@ const SimualtionView = React.createClass({
 
   render() {
     if (!this.props.taskflow || !this.props.taskflow.flow || !get(this.props.taskflow.flow, 'meta.cluster._id')) {
-      return null;
+      return <LoadingPanel />;
     }
 
     const { taskflow, taskflowId, simulation, buttonsDisabled, error } = this.props;
