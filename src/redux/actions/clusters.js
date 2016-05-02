@@ -7,6 +7,7 @@ export const ADD_CLUSTER = 'ADD_CLUSTER';
 export const UPDATE_ACTIVE_CLUSTER = 'UPDATE_ACTIVE_CLUSTER';
 export const UPDATE_CLUSTERS = 'UPDATE_CLUSTERS';
 export const UPDATE_CLUSTER_PRESETS = 'UPDATE_CLUSTER_PRESETS';
+export const UPDATE_CLUSTER_STATUS = 'UPDATE_CLUSTER_STATUS';
 export const REMOVE_CLUSTER = 'REMOVE_CLUSTER';
 export const SAVE_CLUSTER = 'SAVE_CLUSTER';
 export const TEST_CLUSTER = 'TEST_CLUSTER';
@@ -45,6 +46,10 @@ export function pendingNetworkCall(pending = true) {
 
 export function updateClusterLog(id, log) {
   return { type: UPDATE_CLUSTER_LOG, id, log };
+}
+
+export function updateClusterStatus(id, status) {
+  return { type: UPDATE_CLUSTER_STATUS, id, status };
 }
 
 export function getClusterLog(id, offset) {
@@ -205,12 +210,6 @@ export function testCluster(index, cluster) {
     return { type: TESTING_CLUSTER, index };
   };
 }
-
-client.onEvent((e) => {
-  if (e.type === 'cluster.status') {
-    dispatch(fetchClusters());
-  }
-});
 
 // Auto trigger actions on authentication change...
 client.onAuthChange(authenticated => {

@@ -1,5 +1,6 @@
 import * as netActions  from './network';
 import * as projActions from './projects';
+import * as clusterActions from './clusters';
 import client           from '../../network';
 import { store, dispatch } from '..';
 
@@ -298,13 +299,20 @@ function findTask() {
 }
 
 function getTaskflowIdFromId(id, type) {
-  if (type === 'task') {
-    return store.getState().taskflows.taskflowMapByTaskId[id];
+  switch (type) {
+    case 'task': {
+      return store.getState().taskflows.taskflowMapByTaskId[id];
+    }
+    case 'job': {
+      return store.getState().taskflows.taskflowMapByJobId[id];
+    }
+    case 'cluster': {
+      return store.getState().preferences.clusters.mapById[id];
+    }
+    default: {
+      return null;
+    }
   }
-  if (type === 'job') {
-    return store.getState().taskflows.taskflowMapByJobId[id];
-  }
-  return null;
 }
 
 client.onEvent((resp) => {
@@ -323,6 +331,10 @@ client.onEvent((resp) => {
       }
       case 'task': {
         dispatch(updateTaskflowTaskStatus(taskflowId, id, status));
+        break;
+      }
+      case 'cluster': {
+        dispatch(clusterActions.updateClusterStatus(id, status));
         break;
       }
       default:
