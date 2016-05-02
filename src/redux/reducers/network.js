@@ -5,21 +5,23 @@ const initialState = {
   success: {},
   error: {},
   backlog: [],
+  progress: {},
+  progressReset: false,
 };
 
 export default function networkReducer(state = initialState, action) {
   switch (action.type) {
 
     case Actions.ADD_NETWORK_CALL: {
-      const { id, label, progress, ts } = action;
-      const pending = Object.assign({}, state.pending, { [id]: { id, label, progress, ts } });
+      const { id, label, ts } = action;
+      const pending = Object.assign({}, state.pending, { [id]: { id, label, ts } });
       const success = Object.assign({}, state.success);
       const error = Object.assign({}, state.error);
       const backlog = [].concat(state.backlog, success[id], error[id]).filter(el => !!el);
       delete success[id];
       delete error[id];
 
-      return Object.assign({}, { pending, success, error, backlog });
+      return Object.assign({}, state, { pending, success, error, backlog });
     }
 
     case Actions.SUCCESS_NETWORK_CALL: {
@@ -43,12 +45,6 @@ export default function networkReducer(state = initialState, action) {
       return Object.assign({}, state, { pending, error });
     }
 
-    case Actions.PROGRESS_NETWORK_CALL: {
-      const item = Object.assign({}, state.pending[action.id], { progress: action.progress });
-      const pending = Object.assign({}, state.pending, { [action.id]: item });
-      return Object.assign({}, state, { pending });
-    }
-
     case Actions.INVALIDATE_ERROR: {
       const id = action.id;
       const error = Object.assign({}, state.error);
@@ -60,6 +56,27 @@ export default function networkReducer(state = initialState, action) {
       }
 
       return Object.assign({}, state, { error });
+    }
+
+    case Actions.PREPARE_UPLOAD: {
+      const files = action.files;
+      const progress = {};
+      Object.keys(files).forEach((key, index) => {
+        progress[`${files[key].name}_${files[key].lastModified}`] = { current: 0, total: files[key].size };
+      });
+      return Object.assign({}, state, { progress });
+    }
+
+    case Actions.RESET_PROGRESS: {
+      return Object.assign({}, state, { progress: {}, progressReset: action.val });
+    }
+
+    case Actions.ON_PROGRESS: {
+      const progress = Object.assign({}, state.progress);
+      const progressItem = Object.assign({}, progress[action.progressPacket.id]);
+      progressItem.current = action.progressPacket.current;
+      progress[action.progressPacket.id] = progressItem;
+      return Object.assign({}, state, { progress });
     }
 
     default:

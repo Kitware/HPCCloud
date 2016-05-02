@@ -1,9 +1,9 @@
 import ButtonBar        from '../../../../../../panels/ButtonBar';
 import FileListing      from '../../../../../../panels/FileListing';
 import JobMonitor       from '../../../../../../panels/JobMonitor';
-
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
+import LoadingPanel     from '../../../../../../panels/LoadingPanel';
 
 import get              from 'mout/src/object/get';
 import { connect }      from 'react-redux';
@@ -85,7 +85,7 @@ const visualizationView = React.createClass({
 
   render() {
     if (!this.props.taskflow || !this.props.taskflow.flow || !get(this.props.taskflow.flow, 'meta.cluster._id')) {
-      return null;
+      return <LoadingPanel />;
     }
 
     const { taskflow, taskflowId, error, simulation } = this.props;

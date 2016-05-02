@@ -13,6 +13,8 @@
     success: {},
     error: {},
     backlog: [ {contents of outdated pending, success, and errors} ],
+    progress: { [fileId]: {current: number, total: number}, ... }
+    progressReset: bool
   },
   preferences: {
     clusters: {

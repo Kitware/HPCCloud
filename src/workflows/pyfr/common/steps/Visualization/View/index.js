@@ -3,6 +3,7 @@ import FileListing      from '../../../../../../panels/FileListing';
 import JobMonitor       from '../../../../../../panels/JobMonitor';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
+import LoadingPanel     from '../../../../../../panels/LoadingPanel';
 
 import get              from 'mout/src/object/get';
 import { connect }      from 'react-redux';
@@ -83,10 +84,10 @@ const VisualizationView = React.createClass({
   render() {
     const { taskflow, taskflowId, error, simulation, buttonsDisabled } = this.props;
 
-    // these can be undefined sometimes and we need them.
+    // these can be undefined sometimes, show a loading icon if any are missing.
     if (!taskflow || !taskflow.flow || !get(this.props.taskflow.flow, 'meta.cluster._id') ||
       !taskflow.jobMapById || !taskflow.actions || !taskflow.hasOwnProperty('allComplete')) {
-      return null;
+      return <LoadingPanel />;
     }
 
     const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);

@@ -71,9 +71,12 @@
     position: absolute;
     width: 0px;
     height: 2px;
-    transition: width 1s linear, opacity 1.5s linear;
     left: 0;
     top: 0;
+    transition-property: width, opacity;
+    transition-duration: 1s;
+    transition-timing-function: linear;
+    transition-delay: 0s, 1.5s;
 }
 
 /* Boxes */
@@ -132,6 +135,13 @@
     composes: fa                from 'font-awesome/css/font-awesome.css';
     composes: fa-fw             from 'font-awesome/css/font-awesome.css';
     composes: fa-cloud-download from 'font-awesome/css/font-awesome.css';
+}
+
+.loadingIcon {
+    composes: fa         from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw      from 'font-awesome/css/font-awesome.css';
+    composes: fa-spinner from 'font-awesome/css/font-awesome.css';
+    composes: fa-spin    from 'font-awesome/css/font-awesome.css';
 }
 
 .editIcon {
