@@ -343,7 +343,10 @@ def create_job(task, *args, **kwargs):
               'path': 'input'
             }
         ],
-        'output': []
+        'output': [],
+        'params': {
+            'numberOfSlots': kwargs['numberOfProcs']
+        }
     }
 
     client = _create_girder_client(
