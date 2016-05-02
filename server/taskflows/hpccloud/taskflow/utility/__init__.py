@@ -113,15 +113,15 @@ def create_ec2_cluster(task, cluster, profile, ami):
 @cumulus.taskflow.task
 def setup_cluster(task, *args,**kwargs):
     cluster = kwargs['cluster']
-    kwargs['machine'] = cluster['machine']
-    ami = kwargs.get('ami')
-    profile = kwargs.get('profile')
 
     if '_id' in cluster:
         task.taskflow.logger.info('We are using an existing cluster: %s' % cluster['name'])
     else:
         task.taskflow.logger.info('We are creating an EC2 cluster.')
         task.logger.info('Cluster name %s' % cluster['name'])
+        kwargs['machine'] = cluster.get('machine')
+        ami = kwargs.get('ami')
+        profile = kwargs.get('profile')
         cluster = create_ec2_cluster(task, cluster, profile, ami)
         task.logger.info('Cluster started.')
 

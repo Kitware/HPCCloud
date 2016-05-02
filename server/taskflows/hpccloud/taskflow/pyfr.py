@@ -378,7 +378,10 @@ def submit_pyfr_job(task, cluster,  job, *args, **kwargs):
     task.logger.info('Submitting job %s to cluster.' % job['_id'])
     girder_token = task.taskflow.girder_token
 
-    job['params'] = kwargs
+    job['params'].update(kwargs)
+
+    task.logger.info(job['params'])
+
     submit_job(cluster, job, log_write_url=None,
                           girder_token=girder_token, monitor=False)
 
