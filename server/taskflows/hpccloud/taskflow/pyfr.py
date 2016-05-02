@@ -183,7 +183,8 @@ def update_config_file(task, client, *args, **kwargs):
                 task.logger.info('%s removed.' % section)
 
         backend_section = 'backend-%s' % kwargs['backend']['type']
-        task.logger.info('Adding backend configuration for %s')
+        task.logger.info('Adding backend configuration for %s'
+                            % kwargs['backend']['type'] )
         # Filter out options with no value
         options = {k: v for k, v in kwargs['backend'].iteritems() if v}
         options.pop('type', None)
