@@ -315,6 +315,11 @@ function getTaskflowIdFromId(id, type) {
   }
 }
 
+function findCluster() {
+  dispatch(clusterActions.fetchClusters());
+  return { type: 'NOOP' };
+}
+
 client.onEvent((resp) => {
   const type = resp.type.split('.')[0];
   const id = resp.data._id;
@@ -352,6 +357,11 @@ client.onEvent((resp) => {
       case 'task': {
         // update all tasks for each taskflow
         dispatch(findTask());
+        break;
+      }
+      case 'cluster': {
+        // fetch clusters
+        dispatch(findCluster());
         break;
       }
       default:

@@ -38,6 +38,12 @@ export default React.createClass({
     onChange: React.PropTypes.func,
   },
 
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.data._id) {
+      this.refs.nameInput.focus();
+    }
+  },
+
   formChange(event) {
     const propName = event.target.dataset.key;
     const value = event.target.value;
@@ -81,6 +87,7 @@ export default React.createClass({
                 data-key="name"
                 onChange={this.formChange}
                 required
+                ref="nameField"
               />
           </section>
           <section className={style.group}>
