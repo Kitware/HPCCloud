@@ -65,7 +65,7 @@ def create_ec2_cluster(task, cluster, profile, ami):
                 'spec': launch_spec,
                 'params': launch_params
             },
-            'provison': {
+            'provision': {
                 'spec': provision_spec
             }
         },
