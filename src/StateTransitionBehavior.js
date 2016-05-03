@@ -77,6 +77,12 @@ export function handleTaskflowChange(state, taskflow) {
     }
   }
 
+  // for taskflows on ec2 the meta object is not as readily available
+  // this is due to fewer jobs coming through SSE which triggers a fetch for trad clusters.
+  if (!taskflow.flow.meta) {
+    dispatch(TaskflowActions.fetchTaskflow(taskflow.flow._id));
+  }
+
   // Update taslkfow meta
   if (allComplete !== taskflow.allComplete ||
     outputDirectory[0] !== taskflow.outputDirectory ||

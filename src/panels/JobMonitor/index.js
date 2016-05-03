@@ -166,7 +166,7 @@ export default connect(
     // Sort the tasks by created timestamp
     tasks.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
 
-    if (cluster.log && cluster.log.length) {
+    if (cluster && cluster.log && cluster.log.length) {
       clusterLog = cluster.log.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
       clusterLogStreamState = cluster.logStream ? cluster.logStream.readyState : CLOSED;
     }
