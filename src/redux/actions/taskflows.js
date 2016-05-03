@@ -1,5 +1,6 @@
 import * as netActions  from './network';
 import * as projActions from './projects';
+import * as clusterActions from './clusters';
 import client           from '../../network';
 import { store, dispatch } from '..';
 
@@ -298,13 +299,25 @@ function findTask() {
 }
 
 function getTaskflowIdFromId(id, type) {
-  if (type === 'task') {
-    return store.getState().taskflows.taskflowMapByTaskId[id];
+  switch (type) {
+    case 'task': {
+      return store.getState().taskflows.taskflowMapByTaskId[id];
+    }
+    case 'job': {
+      return store.getState().taskflows.taskflowMapByJobId[id];
+    }
+    case 'cluster': {
+      return store.getState().preferences.clusters.mapById[id];
+    }
+    default: {
+      return null;
+    }
   }
-  if (type === 'job') {
-    return store.getState().taskflows.taskflowMapByJobId[id];
-  }
-  return null;
+}
+
+function findCluster() {
+  dispatch(clusterActions.fetchClusters());
+  return { type: 'NOOP' };
 }
 
 client.onEvent((resp) => {
@@ -325,6 +338,10 @@ client.onEvent((resp) => {
         dispatch(updateTaskflowTaskStatus(taskflowId, id, status));
         break;
       }
+      case 'cluster': {
+        dispatch(clusterActions.updateClusterStatus(id, status));
+        break;
+      }
       default:
         console.log(`unrecognized ServerEvent with type "${type}",` +
           ` taskflowId "${taskflowId}", and status "${status}"`);
@@ -340,6 +357,11 @@ client.onEvent((resp) => {
       case 'task': {
         // update all tasks for each taskflow
         dispatch(findTask());
+        break;
+      }
+      case 'cluster': {
+        // fetch clusters
+        dispatch(findCluster());
         break;
       }
       default:

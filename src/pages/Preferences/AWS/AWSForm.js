@@ -43,6 +43,10 @@ export default React.createClass({
     const data = nextProps.data,
       oldData = this.props.data;
 
+    if (!nextProps.data._id) {
+      this.refs.nameInput.focus();
+    }
+
     if (!deepEquals(data, oldData)) {
       this.setState({ data });
     }
@@ -90,6 +94,7 @@ export default React.createClass({
               onChange={this.formChange}
               disabled={this.state.data._id}
               required
+              ref="nameInput"
             />
           </section>
           <section className={style.group}>

@@ -132,6 +132,14 @@ export default function clustersReducer(state = initialState, action) {
       return Object.assign({}, state, { list, active });
     }
 
+    case Actions.UPDATE_CLUSTER_STATUS: {
+      const mapById = Object.assign({}, state.mapById);
+      const cluster = Object.assign({}, state.mapById[action.id]);
+      cluster.status = action.status;
+      mapById[action.id] = cluster;
+      return Object.assign({}, state, { mapById });
+    }
+
     case Actions.CLUSTER_APPLY_PRESET: {
       const { index, name } = action;
       const cluster = applyPreset(Object.assign({}, state.list[index]), state.presets[name]);

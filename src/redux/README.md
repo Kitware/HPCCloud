@@ -24,7 +24,9 @@
       ],
       active: 0,
       mapById: {
-        [_id]: { name, config, status,
+        [_id]: { name, 
+          config, 
+          status,
           logStream: EventSource,
           log: []
         },
