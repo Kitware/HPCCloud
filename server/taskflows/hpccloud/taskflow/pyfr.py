@@ -380,8 +380,6 @@ def submit_pyfr_job(task, cluster,  job, *args, **kwargs):
 
     job['params'].update(kwargs)
 
-    task.logger.info(job['params'])
-
     submit_job(cluster, job, log_write_url=None,
                           girder_token=girder_token, monitor=False)
 
