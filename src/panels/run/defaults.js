@@ -1,9 +1,7 @@
-import machines from './machines';
-
 export default {
   EC2: {
     profile: '',
-    machine: machines[0],
+    machine: '',
     clusterSize: '',
     volumneSize: '',
   },
