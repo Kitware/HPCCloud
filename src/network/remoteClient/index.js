@@ -4,6 +4,7 @@ import {
   getAWSMaxInstances,
   listAWSProfiles,
   listAWSRunningInstances,
+  getEC2InstanceTypes,
 } from './AWS';
 
 import {
@@ -143,6 +144,7 @@ export default {
   getAWSMaxInstances,
   listAWSProfiles,
   listAWSRunningInstances,
+  getEC2InstanceTypes,
 
   /* BusyProgress */
   onBusy,

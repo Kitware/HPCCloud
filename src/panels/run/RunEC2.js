@@ -1,5 +1,4 @@
 import client   from '../../network';
-import machines from './machines';
 import React    from 'react';
 import { Link } from 'react-router';
 
@@ -19,6 +18,9 @@ export default React.createClass({
       busy: false,
       profiles: [],
       profile: {},
+      machines: {},
+      machineFamilies: [],
+      machinesInFamily: [],
     };
   },
 
@@ -28,16 +30,26 @@ export default React.createClass({
 
   updateState() {
     this.setState({ busy: true });
+    let newState;
     client.listAWSProfiles()
       .then((resp) => {
-        this.setState({
+        newState = {
           profiles: resp.data,
           profile: resp.data[0],
           busy: false,
-        });
+        };
+
         if (this.props.onChange) {
           this.props.onChange('profile', resp.data[0]._id, 'EC2');
         }
+
+        return client.getEC2InstanceTypes();
+      })
+      .then((resp) => {
+        newState.machines = resp.data;
+        newState.machineFamilies = Object.keys(newState.machines[newState.profile.regionName]);
+        newState.machinesInFamily = newState.machines[newState.profile.regionName]['General purpose'];
+        this.setState(newState);
       })
       .catch((err) => {
         console.log('Error: Sim/RunEC2', err);
@@ -51,8 +63,13 @@ export default React.createClass({
 
     if (key === 'profile') {
       value = this.state.profiles[value];
-    } else if (key === 'machine') {
-      value = machines[value];
+      this.setState({
+        machineFamilies: Object.keys(this.state.machines[value.regionName]),
+      });
+    } else if (key === 'machineFamily') {
+      this.setState({
+        machinesInFamily: this.state.machines[this.state.profile.regionName][value],
+      });
     }
 
     if (this.props.onChange) {
@@ -66,12 +83,21 @@ export default React.createClass({
         key={ `${el.name}_${index}` }
         value={index}
       >{el.name}</option>;
+    var machineFamilyMapper = (family, index) =>
+      <option
+        key={family}
+        value={family}
+      >
+        { family }
+      </option>;
     var machineMapper = (machine, index) =>
       <option
         key={machine.id}
         value={index}
       >
-        { `${machine.name} - ${machine.cpu} core${machine.cpu > 1 ? 's' : ''} - ${machine.memory}GB ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` }
+        { `${machine.id} - ${machine.cpu} core${machine.cpu > 1 ? 's' : ''} - ` +
+          `${machine.memory}GB ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` +
+          ` - $${Number(machine.price).toPrecision(3)} est. per hour per node` }
       </option>;
 
     if (this.state.profiles.length === 0) {
@@ -106,13 +132,22 @@ export default React.createClass({
               </select>
           </section>
           <section className={style.group}>
-              <label className={style.label}>Machine:</label>
+              <label className={style.label}>Machine family:</label>
+              <select
+                onChange={this.dataChange} className={style.input}
+                data-key="machineFamily"
+                defaultValue="General purpose"
+              >
+                {this.state.machineFamilies.map(machineFamilyMapper)}
+              </select>
+          </section>
+          <section className={style.group}>
+              <label className={style.label}>Machine type:</label>
               <select
                 onChange={this.dataChange} className={style.input}
                 data-key="machine"
-                defaultValue={machines[0]}
               >
-                {machines.map(machineMapper)}
+                {this.state.machinesInFamily.map(machineMapper)}
               </select>
           </section>
           <section className={style.group}>
