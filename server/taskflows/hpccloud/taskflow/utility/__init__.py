@@ -85,7 +85,7 @@ def create_ec2_cluster(task, cluster, profile, ami):
     task.logger.info(msg)
 
     # Now save cluster id in metadata
-    task.taskflow.set_metadata('clusters', [cluster['_id']])
+    task.taskflow.set_metadata('cluster', cluster)
 
     task.logger.info('Starting cluster.')
 
