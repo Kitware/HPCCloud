@@ -96,7 +96,7 @@ export default React.createClass({
         value={index}
       >
         { `${machine.id} - ${machine.cpu} core${machine.cpu > 1 ? 's' : ''} - ` +
-          `${machine.memory}GB ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` +
+          `${machine.memory} ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` +
           ` - $${Number(machine.price).toPrecision(3)} est. per hour per node` }
       </option>;
 
