@@ -309,14 +309,22 @@ function getTaskflowIdFromId(id, type) {
     case 'cluster': {
       return store.getState().preferences.clusters.mapById[id];
     }
+    case 'profile': {
+      return store.getState().preferences.clusters.mapById[id];
+    }
     default: {
       return null;
     }
   }
 }
 
-function findCluster() {
+function findTradClusters() {
   dispatch(clusterActions.fetchClusters());
+  return { type: 'NOOP' };
+}
+
+function findEC2Clusters() {
+  dispatch(clusterActions.fetchClusters('ec2'));
   return { type: 'NOOP' };
 }
 
@@ -342,6 +350,10 @@ client.onEvent((resp) => {
         dispatch(clusterActions.updateClusterStatus(id, status));
         break;
       }
+      case 'profile': {
+        dispatch(clusterActions.updateClusterStatus(id, status));
+        break;
+      }
       default:
         console.log(`unrecognized ServerEvent with type "${type}",` +
           ` taskflowId "${taskflowId}", and status "${status}"`);
@@ -361,7 +373,11 @@ client.onEvent((resp) => {
       }
       case 'cluster': {
         // fetch clusters
-        dispatch(findCluster());
+        dispatch(findTradClusters());
+        break;
+      }
+      case 'profile': {
+        dispatch(findEC2Clusters());
         break;
       }
       default:

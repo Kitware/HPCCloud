@@ -51,6 +51,13 @@ export function handleTaskflowChange(state, taskflow) {
     simulationStatus.push('complete');
   }
 
+  if (taskflow.flow.meta) {
+    const tfCluster = taskflow.flow.meta.cluster;
+    if (tfCluster.type === 'ec2' && tfCluster.status === 'running') {
+      actions.push('terminateInstance');
+    }
+  }
+
   if (taskflow.simulation && state.simulations.mapById[taskflow.simulation]) {
     const simulation = state.simulations.mapById[taskflow.simulation];
     const project = state.projects.mapById[simulation.projectId];

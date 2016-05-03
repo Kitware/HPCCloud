@@ -32,7 +32,7 @@ export function updateActiveCluster(index) {
   return { type: UPDATE_ACTIVE_CLUSTER, index };
 }
 
-export function updateClusters(clusters) {
+export function updateClusters(clusters, type) {
   return { type: UPDATE_CLUSTERS, clusters };
 }
 
@@ -119,11 +119,11 @@ export function fetchClusterPresets() {
   };
 }
 
-export function fetchClusters() {
+export function fetchClusters(type = 'trad') {
   return dispatch => {
     const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
     dispatch(pendingNetworkCall(true));
-    client.listClusterProfiles()
+    client.listClusterProfiles(type)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -209,6 +209,17 @@ export function testCluster(index, cluster) {
 
     return { type: TESTING_CLUSTER, index };
   };
+}
+
+export function terminateCluster(id) {
+  const action = netActions.addNetworkCall('terminate_cluster', 'terminate cluster');
+  client.terminateCluster(id)
+    .then((resp) => {
+      dispatch(netActions.successNetworkCall(action.id, resp));
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 // Auto trigger actions on authentication change...
