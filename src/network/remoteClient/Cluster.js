@@ -1,37 +1,8 @@
 import girder from './GirderClient';
+import { getJSON } from './Utils';
 
 export function getClusterPresets() {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-
-    function extractResponse(ctx) {
-      return {
-        ctx,
-        data: JSON.parse(xhr.responseText),
-        status: xhr.status,
-        statusText: xhr.statusText,
-        headers: {},
-        config: {},
-      };
-    }
-
-    xhr.addEventListener('load', event => {
-      resolve(extractResponse('load'));
-    });
-    xhr.addEventListener('error', event => {
-      console.log('Get Cluster preset as failed', event);
-      reject(extractResponse('error'));
-    });
-    xhr.addEventListener('abort', event => {
-      console.log('Get Cluster preset as been canceled', event);
-      reject(extractResponse('abort'));
-    });
-
-    xhr.open('GET', '/clusters-presets.json', true);
-    xhr.responseType = 'text';
-    xhr.setRequestHeader('Accept', 'application/json, text/plain, */*');
-    xhr.send();
-  });
+  return getJSON('/clusters-presets.json');
 }
 
 export function listClusterProfiles() {

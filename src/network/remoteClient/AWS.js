@@ -1,4 +1,5 @@
 import girder from './GirderClient';
+import { getJSON } from './Utils';
 
 export function listAWSProfiles() {
   return girder.listAWSProfiles();
@@ -22,4 +23,8 @@ export function getAWSMaxInstances(id) {
 
 export function deleteAWSProfile(id) {
   return girder.deleteAWSProfile(id);
+}
+
+export function getEC2InstanceTypes() {
+  return getJSON('/ec2_instance_types.json');
 }
