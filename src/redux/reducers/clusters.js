@@ -52,6 +52,7 @@ const STATUS_TO_ICON = {
   created: style.statusCreatedIcon,
   launching: style.statusLaunchingIcon,
   running: style.statusRunningIcon,
+  terminated: style.statusTerminatedIcon,
 };
 
 function updateIcon(clusters) {

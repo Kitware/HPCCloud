@@ -319,7 +319,7 @@ function getTaskflowIdFromId(id, type) {
 }
 
 function findTradClusters() {
-  dispatch(clusterActions.fetchClusters());
+  dispatch(clusterActions.fetchClusters('trad'));
   return { type: 'NOOP' };
 }
 

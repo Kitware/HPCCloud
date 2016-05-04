@@ -51,14 +51,6 @@ export function handleTaskflowChange(state, taskflow) {
     simulationStatus.push('complete');
   }
 
-  if (taskflow.flow.meta) {
-    const tfClusterId = taskflow.flow.meta.cluster._id,
-      tfCluster = state.preferences.clusters.mapById[tfClusterId];
-    if (tfCluster && tfCluster.type === 'ec2' && ['created', 'launching', 'running'].indexOf(tfCluster.status) !== -1) {
-      actions.push('terminateInstance');
-    }
-  }
-
   if (taskflow.simulation && state.simulations.mapById[taskflow.simulation]) {
     const simulation = state.simulations.mapById[taskflow.simulation];
     const project = state.projects.mapById[simulation.projectId];
@@ -89,6 +81,12 @@ export function handleTaskflowChange(state, taskflow) {
   // this is due to fewer jobs coming through SSE which triggers a fetch for trad clusters.
   if (!taskflow.flow.meta) {
     dispatch(TaskflowActions.fetchTaskflow(taskflow.flow._id));
+  } else {
+    const tfClusterId = taskflow.flow.meta.cluster._id,
+      tfCluster = state.preferences.clusters.mapById[tfClusterId];
+    if (tfCluster && tfCluster.type === 'ec2' && ['created', 'provisioning', 'launching', 'running'].indexOf(tfCluster.status) !== -1) {
+      actions.push('terminateInstance');
+    }
   }
 
   // Update taslkfow meta

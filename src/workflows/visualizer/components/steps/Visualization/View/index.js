@@ -85,7 +85,7 @@ const visualizationView = React.createClass({
   },
 
   render() {
-    if (!this.props.taskflow || !this.props.taskflow.flow || !get(this.props.taskflow.flow, 'meta.cluster._id')) {
+    if (!this.props.taskflow || !this.props.taskflow.flow) {
       return <LoadingPanel />;
     }
 
@@ -104,7 +104,9 @@ const visualizationView = React.createClass({
 
     return (
       <div>
-        <JobMonitor taskflowId={ taskflowId } clusterId={taskflow.flow.meta.cluster._id} />
+        <JobMonitor taskflowId={ taskflowId }
+          clusterId={taskflow.flow.meta ? taskflow.flow.meta.cluster._id : null}
+        />
         <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />
         <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />
         <section>

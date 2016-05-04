@@ -85,7 +85,7 @@ const VisualizationView = React.createClass({
     const { taskflow, taskflowId, error, simulation, buttonsDisabled } = this.props;
 
     // these can be undefined sometimes, show a loading icon if any are missing.
-    if (!taskflow || !taskflow.flow || !get(this.props.taskflow.flow, 'meta.cluster._id') ||
+    if (!taskflow || !taskflow.flow ||
       !taskflow.jobMapById || !taskflow.actions || !taskflow.hasOwnProperty('allComplete')) {
       return <LoadingPanel />;
     }
@@ -106,7 +106,9 @@ const VisualizationView = React.createClass({
 
     return (
       <div>
-        <JobMonitor taskflowId={ taskflowId } clusterId={taskflow.flow.meta.cluster._id} />
+        <JobMonitor taskflowId={ taskflowId }
+          clusterId={taskflow.flow.meta ? taskflow.flow.meta.cluster._id : null}
+        />
         <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />
         <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />
         <section>
