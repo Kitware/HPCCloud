@@ -50,6 +50,7 @@ const STATUS_TO_ICON = {
   error: style.statusErrorIcon,
   creating: style.statusCreatingIcon,
   created: style.statusCreatedIcon,
+  launching: style.statusLaunchingIcon,
   running: style.statusRunningIcon,
 };
 

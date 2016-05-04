@@ -59,7 +59,7 @@ const visualizationView = React.createClass({
   },
 
   terminateInstance() {
-    this.props.onTerminateTaskflow(this.props.taskflowId);
+    this.props.onTerminateInstance(this.props.taskflow.flow.meta.cluster._id);
   },
 
   terminateTaskflow() {
@@ -139,6 +139,6 @@ export default connect(
     onVisualizeTaskflow: (sim, location) => dispatch(SimActions.saveSimulation(sim, null, location)),
     onDeleteTaskflow: (id, simulationStep, location) => dispatch(Actions.deleteTaskflow(id, simulationStep, location)),
     onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
-    onTerminateInstance: (id) => dispatch(ClusterActions.terminateTaskflow(id)),
+    onTerminateInstance: (id) => dispatch(ClusterActions.terminateCluster(id)),
   })
 )(visualizationView);

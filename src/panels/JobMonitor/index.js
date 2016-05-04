@@ -51,7 +51,7 @@ const JobMonitor = React.createClass({
 
   clusterLogOpen(open) {
     if (open) {
-      console.log('stream state:', this.props.clusterLogStreamState);
+      // console.log('stream state:', this.props.clusterLogStreamState);
       if (this.props.clusterLogStreamState === CLOSED) {
         const offset = this.props.clusterLog.length;
         this.props.subscribeToClusterLogStream(this.props.clusterId, offset);

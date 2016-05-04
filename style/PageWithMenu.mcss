@@ -81,6 +81,13 @@
     margin-right: 5px;
 }
 
+.statusLaunchingIcon {
+    composes: fa            from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
+    composes: fa-rocket   from 'font-awesome/css/font-awesome.css';
+    margin-right: 5px;
+}
+
 .statusRunningIcon {
     composes: fa            from 'font-awesome/css/font-awesome.css';
     composes: fa-fw         from 'font-awesome/css/font-awesome.css';

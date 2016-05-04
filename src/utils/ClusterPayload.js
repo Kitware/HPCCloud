@@ -8,11 +8,11 @@ export function tradClusterPayload(id) {
 }
 
 export function ec2ClusterPayload(name, machine, clusterSize = 1, profileId) {
-  if (!name) {
+  if (typeof name === 'undefined') {
     throw Error('missing `name` in ec2 cluster payload');
-  } else if (!machine) {
+  } else if (typeof machine === 'undefined') {
     throw Error('missing `machine` in ec2 cluster payload');
-  } else if (!profileId) {
+  } else if (typeof profileId === 'undefined') {
     throw Error('missing `profileId` in ec2 cluster payload');
   }
 

@@ -74,7 +74,6 @@ export function subscribeClusterLogStream(id, offset = 0) {
     eventSource = new EventSource(`${baseURL}/clusters/${id}/log/stream`);
     eventSource.onmessage = (e) => {
       var parsedLog = JSON.parse(e.data);
-      console.log('update cluster log', parsedLog);
       dispatch(updateClusterLog(id, parsedLog));
     };
 
@@ -220,12 +219,14 @@ export function terminateCluster(id) {
     .catch((err) => {
       console.log(err);
     });
+  return { type: 'NOOP' };
 }
 
 // Auto trigger actions on authentication change...
 client.onAuthChange(authenticated => {
   if (authenticated) {
-    dispatch(fetchClusters());
+    dispatch(fetchClusters('trad'));
+    dispatch(fetchClusters('ec2'));
     dispatch(fetchClusterPresets());
   } else {
     dispatch(updateClusters([]));

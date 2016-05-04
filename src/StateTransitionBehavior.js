@@ -52,8 +52,9 @@ export function handleTaskflowChange(state, taskflow) {
   }
 
   if (taskflow.flow.meta) {
-    const tfCluster = taskflow.flow.meta.cluster;
-    if (tfCluster.type === 'ec2' && tfCluster.status === 'running') {
+    const tfClusterId = taskflow.flow.meta.cluster._id,
+      tfCluster = state.preferences.clusters.mapById[tfClusterId];
+    if (tfCluster && tfCluster.type === 'ec2' && ['created', 'launching', 'running'].indexOf(tfCluster.status) !== -1) {
       actions.push('terminateInstance');
     }
   }
