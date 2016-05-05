@@ -173,10 +173,9 @@ export default function taskflowsReducer(state = initialState, action) {
     }
 
     case Actions.UPDATE_TASKFLOW_METADATA: {
-      const { id, actions, allComplete, outputDirectory, primaryJob } = action;
+      const { id, metadata } = action;
       const mapById = Object.assign({}, state.mapById);
-      mapById[id] = Object.assign({}, mapById[id], { actions, allComplete, outputDirectory, primaryJob });
-      // console.log('update actions', id, actions);
+      mapById[id] = Object.assign({}, mapById[id], metadata);
       return Object.assign({}, state, { mapById });
     }
 

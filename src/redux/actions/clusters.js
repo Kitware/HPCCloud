@@ -1,6 +1,7 @@
 import * as netActions  from './network';
+import * as TaskflowActions from './taskflows';
 import client           from '../../network';
-import { dispatch }     from '..';
+import { store, dispatch }     from '..';
 import { baseURL }      from '../../utils/Constants.js';
 
 export const ADD_CLUSTER = 'ADD_CLUSTER';
@@ -20,8 +21,8 @@ export const UNSUB_CLUSTER_LOG = 'UNSUB_CLUSTER_LOG';
 
 /* eslint-disable no-shadow */
 
-export function addCluster() {
-  return { type: ADD_CLUSTER };
+export function addCluster(cluster) {
+  return { type: ADD_CLUSTER, cluster };
 }
 
 export function applyPreset(index, name) {
@@ -48,7 +49,34 @@ export function updateClusterLog(id, log) {
   return { type: UPDATE_CLUSTER_LOG, id, log };
 }
 
+function updateTaskflowActionsForClusterEvent(cluster, status) {
+  if (cluster.type !== 'ec2') {
+    return;
+  }
+  const tfMapById = Object.assign({}, store.getState().taskflows.mapById);
+  const keys = Object.keys(tfMapById);
+  for (let i = 0; i < keys.length; i++) {
+    const taskflow = tfMapById[keys[i]];
+    if (taskflow.meta && taskflow.meta.cluster._id === cluster._id) {
+      const actions = taskflow.actions || [];
+      // console.log(actions);
+      if (cluster.type === 'ec2' &&
+        ['created', 'launching', 'launched', 'provisioning', 'running'].indexOf(status) !== -1 &&
+        actions.indexOf('terminateInstance') !== -1) {
+        actions.push('terminateInstance');
+      }
+      dispatch(TaskflowActions.updateTaskflowMetadata(taskflow.flow._id, { actions }));
+      return;
+    } else if (!taskflow.meta) {
+      dispatch(TaskflowActions.fetchTaskflow(taskflow.flow._id));
+    }
+  }
+}
+
 export function updateClusterStatus(id, status) {
+  // for taskflows on ec2 the meta object is not as readily available
+  // this is due to fewer jobs coming through SSE which triggers a fetch for trad clusters.
+  updateTaskflowActionsForClusterEvent(store.getState().preferences.clusters.mapById[id], status);
   return { type: UPDATE_CLUSTER_STATUS, id, status };
 }
 
@@ -96,21 +124,19 @@ export function unsubscribeClusterLogStream(id) {
   return { type: UNSUB_CLUSTER_LOG, id };
 }
 
-export function fetchClusterPresets() {
+export function fetchCluster(id) {
   return dispatch => {
-    const action = netActions.addNetworkCall('fetch_cluster_presets', 'Retreive cluster presets');
-
+    const action = netActions.addNetworkCall('fetch_cluster', 'Retreive cluster');
     dispatch(pendingNetworkCall(true));
-
-    client.getClusterPresets()
+    client.getCluster(id)
       .then(
-        presets => {
-          dispatch(netActions.successNetworkCall(action.id, presets));
-          dispatch(updateClusterPresets(presets.data));
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(addCluster(resp.data));
           dispatch(pendingNetworkCall(false));
         },
-        error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
+        err => {
+          dispatch(netActions.errorNetworkCall(action.id, err));
           dispatch(pendingNetworkCall(false));
         });
 
@@ -131,6 +157,28 @@ export function fetchClusters(type = 'trad') {
         },
         err => {
           dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(pendingNetworkCall(false));
+        });
+
+    return action;
+  };
+}
+
+export function fetchClusterPresets() {
+  return dispatch => {
+    const action = netActions.addNetworkCall('fetch_cluster_presets', 'Retreive cluster presets');
+
+    dispatch(pendingNetworkCall(true));
+
+    client.getClusterPresets()
+      .then(
+        presets => {
+          dispatch(netActions.successNetworkCall(action.id, presets));
+          dispatch(updateClusterPresets(presets.data));
+          dispatch(pendingNetworkCall(false));
+        },
+        error => {
+          dispatch(netActions.errorNetworkCall(action.id, error));
           dispatch(pendingNetworkCall(false));
         });
 

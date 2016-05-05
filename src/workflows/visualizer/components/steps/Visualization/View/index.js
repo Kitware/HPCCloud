@@ -6,7 +6,6 @@ import React            from 'react';
 import LoadingPanel     from '../../../../../../panels/LoadingPanel';
 import { taskflowActions } from '../../../../../../utils/Constants';
 
-import get              from 'mout/src/object/get';
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';

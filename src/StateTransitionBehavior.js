@@ -84,7 +84,8 @@ export function handleTaskflowChange(state, taskflow) {
   } else {
     const tfClusterId = taskflow.flow.meta.cluster._id,
       tfCluster = state.preferences.clusters.mapById[tfClusterId];
-    if (tfCluster && tfCluster.type === 'ec2' && ['created', 'provisioning', 'launching', 'running'].indexOf(tfCluster.status) !== -1) {
+    if (tfCluster && tfCluster.type === 'ec2' &&
+      ['created', 'launching', 'launched', 'provisioning', 'running'].indexOf(tfCluster.status) !== -1) {
       actions.push('terminateInstance');
     }
   }
@@ -94,7 +95,8 @@ export function handleTaskflowChange(state, taskflow) {
     outputDirectory[0] !== taskflow.outputDirectory ||
     !equals(actions, taskflow.actions) ||
     primaryJob !== taskflow.primaryJob) {
-    dispatch(TaskflowActions.updateTaskflowMetadata(taskflow.flow._id, actions, allComplete, outputDirectory[0], primaryJob));
+    dispatch(TaskflowActions.updateTaskflowMetadata(taskflow.flow._id,
+      { actions, allComplete, outputDirectory: outputDirectory[0], primaryJob }));
 
     // Update simulation folders when all tasks/jobs are done
     if (allComplete && taskflow.simulation && state.simulations.mapById[taskflow.simulation]) {

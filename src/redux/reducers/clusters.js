@@ -1,5 +1,4 @@
 import * as Actions from '../actions/clusters';
-import deepClone    from 'mout/src/lang/deepClone';
 import set          from 'mout/src/object/set';
 import style        from 'HPCCloudStyle/PageWithMenu.mcss';
 
@@ -10,30 +9,30 @@ const initialState = {
   mapById: {},
 };
 
-const clusterTemplate = {
-  name: 'new cluster',
-  type: 'trad',
-  classPrefix: style.statusCreatingIcon,
-  log: [],
-  config: {
-    host: 'localhost',
-    ssh: {
-      user: 'Your_Login',
-    },
-    scheduler: {
-      type: 'sge',
-    },
-    parallelEnvironment: '',
-    numberOfSlots: 1,
-    jobOutputDir: '/tmp',
-    paraview: {
-      installDir: '/opt/paraview',
-    },
-    hydra: {
-      executablePath: '/some/path/fake',
-    },
-  },
-};
+// const clusterTemplate = {
+//   name: 'new cluster',
+//   type: 'trad',
+//   classPrefix: style.statusCreatingIcon,
+//   log: [],
+//   config: {
+//     host: 'localhost',
+//     ssh: {
+//       user: 'Your_Login',
+//     },
+//     scheduler: {
+//       type: 'sge',
+//     },
+//     parallelEnvironment: '',
+//     numberOfSlots: 1,
+//     jobOutputDir: '/tmp',
+//     paraview: {
+//       installDir: '/opt/paraview',
+//     },
+//     hydra: {
+//       executablePath: '/some/path/fake',
+//     },
+//   },
+// };
 
 function applyPreset(obj, preset = null) {
   if (preset) {
@@ -69,13 +68,11 @@ function updateIcon(clusters) {
 export default function clustersReducer(state = initialState, action) {
   switch (action.type) {
     case Actions.ADD_CLUSTER: {
-      return Object.assign(
-        {},
-        state,
-        {
-          list: [].concat(state.list, deepClone(clusterTemplate)),
-          active: state.list.length,
-        });
+      const newCluster = action.cluster;
+      const mapById = Object.assign({}, state.mapById);
+      console.log('adding cluster', newCluster);
+      mapById[newCluster._id] = newCluster;
+      return Object.assign({}, state, { mapById });
     }
 
     case Actions.REMOVE_CLUSTER: {

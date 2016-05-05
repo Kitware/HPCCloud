@@ -135,7 +135,8 @@ export default connect(
       taskflow: taskflowId ? state.taskflows.mapById[taskflowId] : null,
       buttonsDisabled: !!get(state, 'network.pending.terminate_taskflow') ||
                        !!get(state, 'network.pending.delete_taskflow'),
-      error: null,
+      error: get(state, 'network.error.terminate_taskflow.resp.data.message')
+        || get(state, 'network.error.delete_taskflow.resp.data.message'),
     };
   },
   () => ({
