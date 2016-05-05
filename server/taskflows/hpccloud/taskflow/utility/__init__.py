@@ -1,12 +1,15 @@
 import json
 from jsonpath_rw import parse
 from celery.canvas import Signature
+import requests
 
 import cumulus
 from cumulus.tasks.job import terminate_job
 from cumulus.constants import JobState
 
 from girder_client import GirderClient, HttpError
+
+CHECKIP_URL = 'http://checkip.amazonaws.com/'
 
 def terminate_jobs(task, client, cluster, jobs):
     for job in jobs:
@@ -45,12 +48,21 @@ def create_ec2_cluster(task, cluster, profile, ami):
     machine_type = cluster['machine']['id']
     nodeCount = cluster['clusterSize']-1
     launch_spec = 'ec2'
+
+    # Look up the external IP of the deployment to user for firewall rules
+    r = requests.get(CHECKIP_URL)
+    r.raise_for_status()
+    source_ip = '%s/32' % r.text.strip()
+
+    task.logger.info('Using source ip: %s' % source_ip)
+
     launch_params = {
         'master_instance_type': machine_type,
         'master_instance_ami': ami,
         'node_instance_count': nodeCount,
         'node_instance_type': machine_type,
-        'node_instance_ami': ami
+        'node_instance_ami': ami,
+        'source_ip': source_ip
     }
     provision_spec = 'gridengine/site'
     provision_params = {
