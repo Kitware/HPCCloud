@@ -40,7 +40,7 @@
     "simput": "1.2.0",
     "pvw-visualizer": "1.0.11",
 
-    "kw-web-suite": "1.1.0"
+    "kw-web-suite": "Kitware/kw-web-suite.git#reduced-hpcc-deps"
   },
   "scripts": {
     "install:pyfr"  : "cp ./node_modules/simput/dist/types/pyfr.js ./dist/simput-pyfr.js",
