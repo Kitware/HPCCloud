@@ -1,7 +1,7 @@
 import React                   from 'react';
-import ButtonBar               from '../../../../../../panels/ButtonBar';
 import defaultServerParameters from '../../../../../../panels/run/defaults';
 import RunClusterFrom          from '../../../../../../panels/run';
+import ButtonBar               from '../../../../../../panels/ButtonBar';
 import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 import RuntimeBackend          from '../../../panels/RuntimeBackend';
 
@@ -54,7 +54,6 @@ const SimulationStart = React.createClass({
     var clusterName,
       sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
       payload;
-
 
     if (this.state.serverType === 'Traditional') {
       clusterName = this.props.tradClusters[this.state[this.state.serverType].profile].name;
