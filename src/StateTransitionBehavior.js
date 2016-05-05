@@ -38,7 +38,7 @@ export function handleTaskflowChange(state, taskflow) {
   const simulationStatus = [];
 
   // Figure out possible actions and simulation state
-  if (jobs.every(job => job.status === 'terminated')) {
+  if (jobs.length && jobs.every(job => job.status === 'terminated')) {
     simulationStatus.push('terminated');
     actions.push('rerun');
   } else if (tasks.some(task => task.status === 'error') && (jobs.length === 0 || !jobs.some(job => job.status === 'running'))) {
@@ -85,7 +85,8 @@ export function handleTaskflowChange(state, taskflow) {
     const tfClusterId = taskflow.flow.meta.cluster._id,
       tfCluster = state.preferences.clusters.mapById[tfClusterId];
     if (tfCluster && tfCluster.type === 'ec2' &&
-      ['created', 'launching', 'launched', 'provisioning', 'running'].indexOf(tfCluster.status) !== -1) {
+      taskflow.flow.status !== 'running' &&
+      ['running', 'error'].indexOf(tfCluster.status) !== -1) {
       actions.push('terminateInstance');
     }
   }

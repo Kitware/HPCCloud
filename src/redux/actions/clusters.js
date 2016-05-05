@@ -57,17 +57,7 @@ function updateTaskflowActionsForClusterEvent(cluster, status) {
   const keys = Object.keys(tfMapById);
   for (let i = 0; i < keys.length; i++) {
     const taskflow = tfMapById[keys[i]];
-    if (taskflow.meta && taskflow.meta.cluster._id === cluster._id) {
-      const actions = taskflow.actions || [];
-      // console.log(actions);
-      if (cluster.type === 'ec2' &&
-        ['created', 'launching', 'launched', 'provisioning', 'running'].indexOf(status) !== -1 &&
-        actions.indexOf('terminateInstance') !== -1) {
-        actions.push('terminateInstance');
-      }
-      dispatch(TaskflowActions.updateTaskflowMetadata(taskflow.flow._id, { actions }));
-      return;
-    } else if (!taskflow.meta) {
+    if (!taskflow.meta) {
       dispatch(TaskflowActions.fetchTaskflow(taskflow.flow._id));
     }
   }
