@@ -53,6 +53,9 @@ export default React.createClass({
         newState.machines = resp.data;
         newState.machineFamilies = Object.keys(newState.machines[newState.profile.regionName]);
         newState.machinesInFamily = newState.machines[newState.profile.regionName]['General purpose'];
+        if (this.props.onChange) {
+          this.props.onChange('machine', newState.machinesInFamily[0], 'EC2');
+        }
         return client.listClusterProfiles('ec2');
       })
       .then((resp) => {

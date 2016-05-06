@@ -21,7 +21,16 @@ export default React.createClass({
     return { open: this.props.open };
   },
 
+  componentDidUpdate(prevProps, prevState) {
+    // the <pre> needs to be rendered open to have scrollHeight, then it scrolls
+    if ((!prevState.open && this.state.open) ||
+      this.state.open && prevProps.unit.log.length < this.props.unit.log.length) {
+      this.refs.log.scrollTop = this.refs.log.scrollHeight;
+    }
+  },
+
   onToggle(open) {
+    this.setState({ open });
     if (this.props.onToggle) {
       this.props.onToggle(open);
     }
@@ -46,7 +55,7 @@ export default React.createClass({
           open={this.state.open}
           onChange={this.onToggle}
         >
-          <pre className={ style.log }>
+          <pre className={ style.log } ref="log">
           { // reduce log array to a string with formatted entries
             this.props.unit.log.reduce((prevVal, entry, index) => {
               let content = prevVal;
