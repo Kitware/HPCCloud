@@ -81,7 +81,6 @@ const AWSPrefs = React.createClass({
 
   saveItem() {
     const { onUpdateItem, active, list } = this.props;
-    console.log(list[active]);
     const contents = list[active];
     if (contents._id) {
       this.setState({ _error: 'Profile cannot be modified once saved' });

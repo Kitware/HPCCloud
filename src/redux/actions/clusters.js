@@ -1,6 +1,7 @@
 import * as netActions  from './network';
+import * as TaskflowActions from './taskflows';
 import client           from '../../network';
-import { dispatch }     from '..';
+import { store, dispatch }     from '..';
 import { baseURL }      from '../../utils/Constants.js';
 
 export const ADD_CLUSTER = 'ADD_CLUSTER';
@@ -20,8 +21,8 @@ export const UNSUB_CLUSTER_LOG = 'UNSUB_CLUSTER_LOG';
 
 /* eslint-disable no-shadow */
 
-export function addCluster() {
-  return { type: ADD_CLUSTER };
+export function addCluster(cluster) {
+  return { type: ADD_CLUSTER, cluster };
 }
 
 export function applyPreset(index, name) {
@@ -32,7 +33,7 @@ export function updateActiveCluster(index) {
   return { type: UPDATE_ACTIVE_CLUSTER, index };
 }
 
-export function updateClusters(clusters) {
+export function updateClusters(clusters, type) {
   return { type: UPDATE_CLUSTERS, clusters };
 }
 
@@ -48,7 +49,24 @@ export function updateClusterLog(id, log) {
   return { type: UPDATE_CLUSTER_LOG, id, log };
 }
 
+function updateTaskflowActionsForClusterEvent(cluster, status) {
+  if (cluster.type !== 'ec2') {
+    return;
+  }
+  const tfMapById = Object.assign({}, store.getState().taskflows.mapById);
+  const keys = Object.keys(tfMapById);
+  for (let i = 0; i < keys.length; i++) {
+    const taskflow = tfMapById[keys[i]];
+    if (!taskflow.meta) {
+      dispatch(TaskflowActions.fetchTaskflow(taskflow.flow._id));
+    }
+  }
+}
+
 export function updateClusterStatus(id, status) {
+  // for taskflows on ec2 the meta object is not as readily available
+  // this is due to fewer jobs coming through SSE which triggers a fetch for trad clusters.
+  updateTaskflowActionsForClusterEvent(store.getState().preferences.clusters.mapById[id], status);
   return { type: UPDATE_CLUSTER_STATUS, id, status };
 }
 
@@ -74,7 +92,6 @@ export function subscribeClusterLogStream(id, offset = 0) {
     eventSource = new EventSource(`${baseURL}/clusters/${id}/log/stream`);
     eventSource.onmessage = (e) => {
       var parsedLog = JSON.parse(e.data);
-      console.log('update cluster log', parsedLog);
       dispatch(updateClusterLog(id, parsedLog));
     };
 
@@ -97,6 +114,46 @@ export function unsubscribeClusterLogStream(id) {
   return { type: UNSUB_CLUSTER_LOG, id };
 }
 
+export function fetchCluster(id) {
+  return dispatch => {
+    const action = netActions.addNetworkCall('fetch_cluster', 'Retreive cluster');
+    dispatch(pendingNetworkCall(true));
+    client.getCluster(id)
+      .then(
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(addCluster(resp.data));
+          dispatch(pendingNetworkCall(false));
+        },
+        err => {
+          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(pendingNetworkCall(false));
+        });
+
+    return action;
+  };
+}
+
+export function fetchClusters(type = 'trad') {
+  return dispatch => {
+    const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
+    dispatch(pendingNetworkCall(true));
+    client.listClusterProfiles(type)
+      .then(
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(updateClusters(resp.data));
+          dispatch(pendingNetworkCall(false));
+        },
+        err => {
+          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(pendingNetworkCall(false));
+        });
+
+    return action;
+  };
+}
+
 export function fetchClusterPresets() {
   return dispatch => {
     const action = netActions.addNetworkCall('fetch_cluster_presets', 'Retreive cluster presets');
@@ -112,26 +169,6 @@ export function fetchClusterPresets() {
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
-          dispatch(pendingNetworkCall(false));
-        });
-
-    return action;
-  };
-}
-
-export function fetchClusters() {
-  return dispatch => {
-    const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
-    dispatch(pendingNetworkCall(true));
-    client.listClusterProfiles()
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(updateClusters(resp.data));
-          dispatch(pendingNetworkCall(false));
-        },
-        err => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
           dispatch(pendingNetworkCall(false));
         });
 
@@ -211,10 +248,23 @@ export function testCluster(index, cluster) {
   };
 }
 
+export function terminateCluster(id) {
+  const action = netActions.addNetworkCall('terminate_cluster', 'terminate cluster');
+  client.terminateCluster(id)
+    .then((resp) => {
+      dispatch(netActions.successNetworkCall(action.id, resp));
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  return { type: 'NOOP' };
+}
+
 // Auto trigger actions on authentication change...
 client.onAuthChange(authenticated => {
   if (authenticated) {
-    dispatch(fetchClusters());
+    dispatch(fetchClusters('trad'));
+    dispatch(fetchClusters('ec2'));
     dispatch(fetchClusterPresets());
   } else {
     dispatch(updateClusters([]));

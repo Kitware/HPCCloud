@@ -38,7 +38,7 @@ export function handleTaskflowChange(state, taskflow) {
   const simulationStatus = [];
 
   // Figure out possible actions and simulation state
-  if (jobs.every(job => job.status === 'terminated')) {
+  if (jobs.length && jobs.every(job => job.status === 'terminated')) {
     simulationStatus.push('terminated');
     actions.push('rerun');
   } else if (tasks.some(task => task.status === 'error') && (jobs.length === 0 || !jobs.some(job => job.status === 'running'))) {
@@ -81,6 +81,14 @@ export function handleTaskflowChange(state, taskflow) {
   // this is due to fewer jobs coming through SSE which triggers a fetch for trad clusters.
   if (!taskflow.flow.meta) {
     dispatch(TaskflowActions.fetchTaskflow(taskflow.flow._id));
+  } else {
+    const tfClusterId = taskflow.flow.meta.cluster._id,
+      tfCluster = state.preferences.clusters.mapById[tfClusterId];
+    if (tfCluster && tfCluster.type === 'ec2' &&
+      taskflow.flow.status !== 'running' &&
+      ['running', 'error'].indexOf(tfCluster.status) !== -1) {
+      actions.push('terminateInstance');
+    }
   }
 
   // Update taslkfow meta
@@ -88,7 +96,8 @@ export function handleTaskflowChange(state, taskflow) {
     outputDirectory[0] !== taskflow.outputDirectory ||
     !equals(actions, taskflow.actions) ||
     primaryJob !== taskflow.primaryJob) {
-    dispatch(TaskflowActions.updateTaskflowMetadata(taskflow.flow._id, actions, allComplete, outputDirectory[0], primaryJob));
+    dispatch(TaskflowActions.updateTaskflowMetadata(taskflow.flow._id,
+      { actions, allComplete, outputDirectory: outputDirectory[0], primaryJob }));
 
     // Update simulation folders when all tasks/jobs are done
     if (allComplete && taskflow.simulation && state.simulations.mapById[taskflow.simulation]) {

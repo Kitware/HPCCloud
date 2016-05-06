@@ -49,6 +49,9 @@ export default React.createClass({
         newState.machines = resp.data;
         newState.machineFamilies = Object.keys(newState.machines[newState.profile.regionName]);
         newState.machinesInFamily = newState.machines[newState.profile.regionName]['General purpose'];
+        if (this.props.onChange) {
+          this.props.onChange('machine', newState.machinesInFamily[0], 'EC2');
+        }
         this.setState(newState);
       })
       .catch((err) => {
@@ -70,6 +73,8 @@ export default React.createClass({
       this.setState({
         machinesInFamily: this.state.machines[this.state.profile.regionName][value],
       });
+    } else if (key === 'machine') {
+      value = this.state.machinesInFamily[value];
     }
 
     if (this.props.onChange) {
@@ -79,22 +84,15 @@ export default React.createClass({
 
   render() {
     var optionMapper = (el, index) =>
-      <option
-        key={ `${el.name}_${index}` }
-        value={index}
-      >{el.name}</option>;
+      <option key={ `${el.name}_${index}` } value={index}>
+        {el.name}
+      </option>;
     var machineFamilyMapper = (family, index) =>
-      <option
-        key={family}
-        value={family}
-      >
+      <option key={family} value={family}>
         { family }
       </option>;
     var machineMapper = (machine, index) =>
-      <option
-        key={machine.id}
-        value={index}
-      >
+      <option key={machine.id} value={ index } >
         { `${machine.id} - ${machine.cpu} core${machine.cpu > 1 ? 's' : ''} - ` +
           `${machine.memory} ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` +
           ` - $${Number(machine.price).toPrecision(3)} est. per hour per node` }
@@ -109,6 +107,7 @@ export default React.createClass({
             </span>
         </div>;
     }
+
     return (
       <div className={style.container}>
           <section className={style.group}>

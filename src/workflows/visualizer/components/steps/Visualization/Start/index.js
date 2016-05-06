@@ -36,10 +36,10 @@ const VisualizationStart = React.createClass({
     };
   },
 
-  dataChange(key, value, server) {
-    var profile = this.state[server];
+  dataChange(key, value, which) {
+    var profile = this.state[which];
     profile[key] = value;
-    this.setState({ [server]: profile });
+    this.setState({ [which]: profile });
   },
 
   startVisualization() {
@@ -60,8 +60,11 @@ const VisualizationStart = React.createClass({
         this.state[this.state.serverType].name,
         this.state[this.state.serverType].machine,
         this.state[this.state.serverType].clusterSize,
-        this.state[this.state.serverType].profile._id
+        this.state[this.state.serverType].profile
       );
+    } else {
+      console.log('unrecognized serverType: ', this.state.serverType);
+      return;
     }
 
     const simStepUpdate = {
@@ -97,17 +100,15 @@ const VisualizationStart = React.createClass({
 
     return (
       <div>
-          <RunClusterFrom serverType={this.state.serverType} serverTypeChange={this.updateServerType}
-            profiles={serverProfiles} dataChange={this.dataChange}
-          />
-          <section>
-              <ButtonBar
-                visible={this.state[this.state.serverType].profile !== ''}
-                onAction={this.formAction}
-                actions={actions}
-                error={this.state.error}
-              />
-          </section>
+        <RunClusterFrom serverType={this.state.serverType} serverTypeChange={this.updateServerType}
+          profiles={serverProfiles} dataChange={this.dataChange}
+        />
+        <ButtonBar
+          visible={this.state[this.state.serverType].profile !== ''}
+          onAction={this.formAction}
+          actions={actions}
+          error={this.state.error}
+        />
       </div>);
   },
 });

@@ -36,6 +36,7 @@ import {
   listClusterProfiles,
   saveCluster,
   testCluster,
+  terminateCluster,
 } from './Cluster';
 
 import {
@@ -160,6 +161,7 @@ export default {
   listClusterProfiles,
   saveCluster,
   testCluster,
+  terminateCluster,
 
   /* File */
   deleteFile,
