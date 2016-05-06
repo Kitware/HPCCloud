@@ -54,11 +54,22 @@ export default React.createClass({
               if (msg !== null && typeof msg === 'object') {
                 msg = JSON.stringify(msg, null, 2);
               }
+
+              if (entry.status) {
+                msg += ` [${entry.status}]`;
+              }
+
               content += `[${formatTime(entry.created)}] ${entry.levelname}: ${msg}\n`;
 
               if (entry.exc_info) {
                 content += entry.exc_info[2].join('');
                 content += `${entry.exc_info[0]}: ${entry.exc_info[1]}`;
+              }
+
+
+              if (entry.data) {
+                const data = JSON.stringify(entry.data, null, 2);
+                content += `${data}\n`;
               }
 
               return content;
