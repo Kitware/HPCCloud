@@ -76,7 +76,7 @@ export default React.createClass({
               }
 
 
-              if (entry.data) {
+              if (entry.data && Object.keys(entry.data).length > 0) {
                 const data = JSON.stringify(entry.data, null, 2);
                 content += `${data}\n`;
               }
