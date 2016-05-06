@@ -48,6 +48,9 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
     }
 
     """
+
+    PARAVIEW_AMI = 'ami-80c537e0'
+
     def start(self, *args, **kwargs):
         user = getCurrentUser()
         # Load the cluster
@@ -66,8 +69,11 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
             profile = model.load(profile_id, user=user, level=AccessType.ADMIN)
             kwargs['profile'] = profile
 
+        kwargs['next'] = create_paraview_job.s()
+        kwargs['ami'] = self.PARAVIEW_AMI
+
         super(ParaViewTaskFlow, self).start(
-            setup_cluster.s(self, next=create_paraview_job.s(), *args, **kwargs))
+            setup_cluster.s(self, *args, **kwargs))
 
     def terminate(self):
         self.run_task(paraview_terminate.s())
@@ -123,12 +129,19 @@ def paraview_terminate(task):
     jobs = task.taskflow.get('meta', {}).get('jobs', [])
     terminate_jobs(task, client, cluster, jobs)
 
+def _update_cluster_config(cluster):
+    if cluster['type'] == 'ec2':
+        paraview_config = cluster['config'].setdefault('paraview', {})
+        paraview_config['installDir'] = '/opt/paraview'
+        paraview_config['websocketPort'] = 9000
+
 @cumulus.taskflow.task
 def create_paraview_job(task, *args, **kwargs):
+    _update_cluster_config(kwargs['cluster'])
     task.logger.info('Validating args passed to flow.')
     validate_args(kwargs)
-
     cluster = kwargs.pop('cluster')
+
     # Save the cluster in the taskflow for termination
     task.taskflow.set_metadata('cluster', cluster)
 
@@ -204,6 +217,18 @@ def upload_input(task, cluster, job, *args, **kwargs):
         upload_file(cluster, task.taskflow.girder_token, file, job_dir)
         task.logger.info('Upload complete.')
 
+def create_proxy_entry(task, cluster, job):
+    session_key = job['params']['sessionKey']
+    host = cluster['config']['host']
+    body = {
+        'host': host,
+        'port': cluster['config']['paraview']['websocketPort'],
+        'key': session_key
+    }
+    client = _create_girder_client(
+                task.taskflow.girder_api_url, task.taskflow.girder_token)
+    client.post('proxy', data=json.dumps(body))
+
 @cumulus.taskflow.task
 def submit_paraview_job(task, cluster, job, *args, **kwargs):
     task.taskflow.logger.info('Submitting job to cluster.')
@@ -232,6 +257,8 @@ def submit_paraview_job(task, cluster, job, *args, **kwargs):
         parallel_environment = parallel_environment[0].value
         params['parallelEnvironment'] = parallel_environment
 
+    params['numberOfSlots'] = 1
+
     job_output_dir = get_cluster_job_output_dir(cluster)
     if job_output_dir:
         params['jobOutputDir'] = job_output_dir
@@ -243,6 +270,10 @@ def submit_paraview_job(task, cluster, job, *args, **kwargs):
         params['paraviewInstallDir'] = paraview_install_dir
 
     job['params'] = params
+
+    # Create proxy entry
+    if cluster['type'] == 'ec2':
+        create_proxy_entry(task, cluster, job)
 
     # Before we submit the job upload any file we may have been given
     upload_input(task, cluster, job, *args, **kwargs)
