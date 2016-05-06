@@ -5,8 +5,8 @@ export function getClusterPresets() {
   return getJSON('/clusters-presets.json');
 }
 
-export function listClusterProfiles() {
-  return girder.listClusters({ type: 'trad' });
+export function listClusterProfiles(type) {
+  return girder.listClusters({ type });
 }
 
 export function createCluster(cluster) {
@@ -34,4 +34,8 @@ export function getCluster(id) {
 
 export function getClusterLog(id, offset = 0) {
   return girder.getClusterLogs(id, offset);
+}
+
+export function terminateCluster(id) {
+  return girder.terminateCluster(id);
 }

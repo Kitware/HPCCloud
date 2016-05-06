@@ -20,8 +20,12 @@ const JobMonitor = React.createClass({
     clusterName: React.PropTypes.string,
     tasks: React.PropTypes.array,
     jobs: React.PropTypes.array,
+
     taskStatusCount: React.PropTypes.object,
+    taskflowStatus: React.PropTypes.string,
     taskflowLog: React.PropTypes.array,
+
+    clusterStatus: React.PropTypes.string,
     clusterLog: React.PropTypes.array,
     clusterLogStreamState: React.PropTypes.number,
 
@@ -51,7 +55,7 @@ const JobMonitor = React.createClass({
 
   clusterLogOpen(open) {
     if (open) {
-      console.log('stream state:', this.props.clusterLogStreamState);
+      // console.log('stream state:', this.props.clusterLogStreamState);
       if (this.props.clusterLogStreamState === CLOSED) {
         const offset = this.props.clusterLog.length;
         this.props.subscribeToClusterLogStream(this.props.clusterId, offset);
@@ -110,31 +114,33 @@ const JobMonitor = React.createClass({
               </div>
               <div className={ style.taskflowContent }>
                 {
-                  <ExecutionUnit unit={{ name: 'Log', log: this.props.taskflowLog }} />
+                  <ExecutionUnit unit={{ name: 'Log', log: this.props.taskflowLog, status: this.props.taskflowStatus }} />
                 }
               </div>
-              <div className={ style.toolbar }>
-                  <div className={ style.title }>
-                      Cluster log
+              { this.props.clusterId ?
+                <div>
+                  <div className={ style.toolbar }>
+                    <div className={ style.title }>
+                        Cluster log
+                    </div>
+                    <div className={ style.buttons }></div>
                   </div>
-                  <div className={ style.buttons }></div>
-              </div>
-              <div className={ style.taskflowContent }>
-                {
-                  <ExecutionUnit unit={{ name: 'Log', log: this.props.clusterLog }}
-                    onToggle={this.clusterLogOpen} alwaysShowLogToggle
-                  />
-                }
-              </div>
+                  <div className={ style.taskflowContent }>
+                    {
+                      <ExecutionUnit unit={{ name: 'Log', log: this.props.clusterLog, status: this.props.clusterStatus }}
+                        onToggle={this.clusterLogOpen} alwaysShowLogToggle
+                      />
+                    }
+                  </div>
+                </div> : null
+              }
           </div>
       </div>);
   },
 });
 
-
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
-
 export default connect(
   (state, props) => {
     const taskflowId = props.taskflowId;
@@ -144,11 +150,15 @@ export default connect(
     const jobs = [];
     const cluster = clusterId ? state.preferences.clusters.mapById[clusterId] : null;
     const taskStatusCount = {};
+    var taskflowStatus = '';
     var taskflowLog = [];
+    var clusterStatus = '';
     var clusterLog = [];
     var clusterLogStreamState = CLOSED;
 
+    // get tasks and jobs
     if (taskflow && taskflow.taskMapById && taskflow.jobMapById) {
+      taskflowStatus = taskflow.flow.status;
       Object.keys(taskflow.taskMapById).forEach(id => {
         tasks.push(taskflow.taskMapById[id]);
         const status = taskflow.taskMapById[id].status;
@@ -163,19 +173,26 @@ export default connect(
       });
       taskflowLog = taskflow.log;
     }
+
     // Sort the tasks by created timestamp
     tasks.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
 
-    if (cluster && cluster.log && cluster.log.length) {
-      clusterLog = cluster.log.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
-      clusterLogStreamState = cluster.logStream ? cluster.logStream.readyState : CLOSED;
+    // get cluster status, logs, and stream state.
+    if (cluster) {
+      clusterStatus = cluster.status;
+      if (cluster.log && cluster.log.length) {
+        clusterLog = cluster.log.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
+        clusterLogStreamState = cluster.logStream ? cluster.logStream.readyState : CLOSED;
+      }
     }
 
     return {
       tasks,
       jobs,
       taskStatusCount,
+      taskflowStatus,
       taskflowLog,
+      clusterStatus,
       clusterLog,
       clusterLogStreamState,
     };
@@ -186,4 +203,3 @@ export default connect(
     unsubscribeFromClusterLogStream: (id) => dispatch(ClusterActions.unsubscribeClusterLogStream(id)),
   })
 )(JobMonitor);
-
