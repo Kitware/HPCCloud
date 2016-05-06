@@ -9,31 +9,6 @@ const initialState = {
   mapById: {},
 };
 
-// const clusterTemplate = {
-//   name: 'new cluster',
-//   type: 'trad',
-//   classPrefix: style.statusCreatingIcon,
-//   log: [],
-//   config: {
-//     host: 'localhost',
-//     ssh: {
-//       user: 'Your_Login',
-//     },
-//     scheduler: {
-//       type: 'sge',
-//     },
-//     parallelEnvironment: '',
-//     numberOfSlots: 1,
-//     jobOutputDir: '/tmp',
-//     paraview: {
-//       installDir: '/opt/paraview',
-//     },
-//     hydra: {
-//       executablePath: '/some/path/fake',
-//     },
-//   },
-// };
-
 function applyPreset(obj, preset = null) {
   if (preset) {
     Object.keys(preset).forEach(key => {
