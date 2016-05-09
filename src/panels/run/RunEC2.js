@@ -1,5 +1,4 @@
 import client   from '../../network';
-import machines from './machines';
 import React    from 'react';
 import { Link } from 'react-router';
 
@@ -17,27 +16,54 @@ export default React.createClass({
   getInitialState() {
     return {
       busy: false,
+
+      selectedCluster: '',
+
       profiles: [],
       profile: {},
+
+      machines: {},
+      machineFamilies: [],
+      machinesInFamily: [],
     };
   },
 
-  componentWillMount() {
+  componentDidMount() {
     this.updateState();
   },
 
   updateState() {
     this.setState({ busy: true });
+    let newState;
     client.listAWSProfiles()
       .then((resp) => {
-        this.setState({
+        newState = {
           profiles: resp.data,
           profile: resp.data[0],
           busy: false,
-        });
+        };
+
         if (this.props.onChange) {
           this.props.onChange('profile', resp.data[0]._id, 'EC2');
         }
+
+        return client.getEC2InstanceTypes();
+      })
+      .then((resp) => {
+        newState.machines = resp.data;
+        newState.machineFamilies = Object.keys(newState.machines[newState.profile.regionName]);
+        newState.machinesInFamily = newState.machines[newState.profile.regionName]['General purpose'];
+        if (this.props.onChange) {
+          this.props.onChange('machine', newState.machinesInFamily[0], 'EC2');
+        }
+        return client.listClusterProfiles('ec2');
+      })
+      .then((resp) => {
+        newState.clusters = resp.data;
+        if (this.props.onChange) {
+          this.props.onChange('cluster', null, 'EC2');
+        }
+        this.setState(newState);
       })
       .catch((err) => {
         console.log('Error: Sim/RunEC2', err);
@@ -48,9 +74,15 @@ export default React.createClass({
   dataChange(event) {
     var key = event.currentTarget.dataset.key,
       value = event.target.value;
-
     if (key === 'profile') {
       value = this.state.profiles[value];
+      this.setState({
+        machineFamilies: Object.keys(this.state.machines[value.regionName]),
+      });
+    } else if (key === 'machineFamily') {
+      this.setState({
+        machinesInFamily: this.state.machines[this.state.profile.regionName][value],
+      });
     }
 
     if (this.props.onChange) {
@@ -59,19 +91,6 @@ export default React.createClass({
   },
 
   render() {
-    var optionMapper = (el, index) =>
-      <option
-        key={ `${el.name}_${index}` }
-        value={index}
-      >{el.name}</option>;
-    var machineMapper = (machine, index) =>
-      <option
-        key={machine.id}
-        value={machine.id}
-      >
-        { `${machine.name} - ${machine.cpu} core${machine.cpu > 1 ? 's' : ''} - ${machine.memory}GB ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` }
-      </option>;
-
     if (this.state.profiles.length === 0) {
       return this.state.busy ? null :
         <div className={ [style.container, theme.warningBox].join(' ') } style={{ margin: '15px' }}>
@@ -81,54 +100,84 @@ export default React.createClass({
             </span>
         </div>;
     }
+
+    const optionMapper = (el, index) =>
+      <option key={ `${el.name}_${index}` } value={index}>
+        {el.name}
+      </option>;
+    const machineFamilyMapper = (family, index) =>
+      <option key={family} value={family}>
+        { family }
+      </option>;
+    const machineMapper = (machine, index) =>
+      <option key={machine.id} value={ index } >
+        { `${machine.id} - ${machine.cpu} core${machine.cpu > 1 ? 's' : ''} - ` +
+          `${machine.memory} ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` +
+          ` - $${Number(machine.price).toPrecision(3)} est. per hour per node` }
+      </option>;
     return (
       <div className={style.container}>
+        { this.state.clusters ?
           <section className={style.group}>
-              <label className={style.label}>Name:</label>
-              <input
-                className={style.input}
-                data-key="name"
-                value={this.props.contents.name}
-                onChange={this.dataChange} required
-              />
-          </section>
-          <section className={style.group}>
-              <label className={style.label}>Profile:</label>
-              <select
-                className={style.input}
-                onChange={this.dataChange}
-                data-key="profile"
-                value={this.props.contents.profle}
-              >
-                {this.state.profiles.map(optionMapper)}
-              </select>
-          </section>
-          <section className={style.group}>
-              <label className={style.label}>Machine:</label>
-              <select
-                onChange={this.dataChange} className={style.input}
-                data-key="machine"
-                defaultValue={machines[0].id}
-              >
-                {machines.map(machineMapper)}
-              </select>
-          </section>
-          <section className={style.group}>
-              <label className={style.label}>Cluster size:</label>
-              <input type="number" min="1" max="100" className={style.input}
-                data-key="clusterSize"
-                value={this.props.contents.clusterSize}
-                onChange={this.dataChange} required
-              />
-          </section>
-          <section className={style.group}>
-              <label className={style.label}>Volumne size:</label>
-              <input type="number" min="1" max="16384" className={style.input}
-                data-key="volumneSize"
-                value={this.props.contents.volumneSize}
-                onChange={this.dataChange} required
-              />
-          </section>
+            <label className={style.label}>Existing Instances</label>
+            <select className={style.input}
+              onChange={this.dataChange} data-key="cluster"
+            >
+              <option value={null}></option>
+              {this.state.clusters.map((el, index) => <option key={el._id} value={el._id}>{el.name}</option>)}
+            </select>
+          </section> : null
+        }
+        <section className={style.group}>
+          <label className={style.label}>Name:</label>
+          <input className={style.input} data-key="name"
+            value={this.props.contents.name} onChange={this.dataChange} required
+            disabled={this.props.contents.cluster}
+          />
+        </section>
+        <section className={style.group}>
+          <label className={style.label}>Profile:</label>
+          <select className={style.input} onChange={this.dataChange}
+            data-key="profile" value={this.props.contents.profle}
+            disabled={this.props.contents.cluster}
+          >
+            {this.state.profiles.map(optionMapper)}
+          </select>
+        </section>
+        <section className={style.group}>
+          <label className={style.label}>Machine family:</label>
+          <select onChange={this.dataChange} className={style.input}
+            data-key="machineFamily"defaultValue="General purpose"
+            disabled={this.props.contents.cluster}
+          >
+            {this.state.machineFamilies.map(machineFamilyMapper)}
+          </select>
+        </section>
+        <section className={style.group}>
+          <label className={style.label}>Machine type:</label>
+          <select onChange={this.dataChange} className={style.input}
+            data-key="machine"
+            disabled={this.props.contents.cluster}
+          >
+            {this.state.machinesInFamily.map(machineMapper)}
+          </select>
+        </section>
+        <section className={style.group}>
+          <label className={style.label}>Cluster size:</label>
+          <input type="number" min="1" max="100" className={style.input}
+            data-key="clusterSize" value={this.props.contents.clusterSize}
+            onChange={this.dataChange} required
+            disabled={this.props.contents.cluster}
+          />
+        </section>
+        <section className={style.group}>
+          <label className={style.label}>Volumne size:</label>
+          <input type="number" min="1" max="16384" className={style.input}
+            data-key="volumneSize" value={this.props.contents.volumneSize}
+            onChange={this.dataChange} required
+            disabled={this.props.contents.cluster}
+          />
+        </section>
       </div>);
   },
 });

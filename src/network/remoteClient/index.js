@@ -4,6 +4,7 @@ import {
   getAWSMaxInstances,
   listAWSProfiles,
   listAWSRunningInstances,
+  getEC2InstanceTypes,
 } from './AWS';
 
 import {
@@ -30,10 +31,12 @@ import {
   createCluster,
   deleteCluster,
   getCluster,
+  getClusterLog,
   getClusterPresets,
   listClusterProfiles,
   saveCluster,
   testCluster,
+  terminateCluster,
 } from './Cluster';
 
 import {
@@ -142,6 +145,7 @@ export default {
   getAWSMaxInstances,
   listAWSProfiles,
   listAWSRunningInstances,
+  getEC2InstanceTypes,
 
   /* BusyProgress */
   onBusy,
@@ -152,10 +156,12 @@ export default {
   createCluster,
   deleteCluster,
   getCluster,
+  getClusterLog,
   getClusterPresets,
   listClusterProfiles,
   saveCluster,
   testCluster,
+  terminateCluster,
 
   /* File */
   deleteFile,

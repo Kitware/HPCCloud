@@ -67,10 +67,16 @@
     composes: fa-exclamation-triangle   from 'font-awesome/css/font-awesome.css';
 }
 
+.statusTerminatedIcon {
+    composes: fa     from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw  from 'font-awesome/css/font-awesome.css';
+    composes: fa-ban from 'font-awesome/css/font-awesome.css';
+}
+
 .statusCreatingIcon {
-    composes: fa            from 'font-awesome/css/font-awesome.css';
-    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
-    composes: fa-medkit   from 'font-awesome/css/font-awesome.css';
+    composes: fa         from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw      from 'font-awesome/css/font-awesome.css';
+    composes: fa-medkit  from 'font-awesome/css/font-awesome.css';
     margin-right: 5px;
 }
 
@@ -78,6 +84,13 @@
     composes: fa            from 'font-awesome/css/font-awesome.css';
     composes: fa-fw         from 'font-awesome/css/font-awesome.css';
     composes: fa-pencil-square-o   from 'font-awesome/css/font-awesome.css';
+    margin-right: 5px;
+}
+
+.statusLaunchingIcon {
+    composes: fa            from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
+    composes: fa-rocket   from 'font-awesome/css/font-awesome.css';
     margin-right: 5px;
 }
 

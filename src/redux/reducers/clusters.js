@@ -14,6 +14,7 @@ const clusterTemplate = {
   name: 'new cluster',
   type: 'trad',
   classPrefix: style.statusCreatingIcon,
+  log: [],
   config: {
     host: 'localhost',
     ssh: {
@@ -49,8 +50,12 @@ const STATUS_TO_ICON = {
   error: style.statusErrorIcon,
   creating: style.statusCreatingIcon,
   created: style.statusCreatedIcon,
+  launching: style.statusLaunchingIcon,
   running: style.statusRunningIcon,
+  terminated: style.statusTerminatedIcon,
 };
+
+const tradFilter = (el) => el.type === 'trad';
 
 function updateIcon(clusters) {
   clusters.forEach(cluster => {
@@ -67,12 +72,19 @@ export default function clustersReducer(state = initialState, action) {
   switch (action.type) {
     case Actions.ADD_CLUSTER: {
       return Object.assign(
-        {},
-        state,
+        {}, state,
         {
           list: [].concat(state.list, deepClone(clusterTemplate)),
-          active: state.list.length,
+          active: state.list.filter(tradFilter).length,
         });
+    }
+
+    case Actions.ADD_EXISTING_CLUSTER: {
+      const newCluster = action.cluster;
+      const mapById = Object.assign({}, state.mapById);
+      console.log('adding cluster', newCluster);
+      mapById[newCluster._id] = newCluster;
+      return Object.assign({}, state, { mapById });
     }
 
     case Actions.REMOVE_CLUSTER: {
@@ -99,13 +111,17 @@ export default function clustersReducer(state = initialState, action) {
     case Actions.UPDATE_CLUSTERS: {
       const list = action.clusters;
       const active = (state.active < list.length) ? state.active : (list.length - 1);
-      updateIcon(list);
       const mapById = {};
+      updateIcon(list);
       list.forEach(cluster => {
         if (cluster._id) {
           mapById[cluster._id] = cluster;
         }
       });
+      // do not save ec2 clusters in the list, it's only used for trad clusters
+      if (list.length && list[0].type !== 'trad') {
+        return Object.assign({}, state, { mapById });
+      }
       return Object.assign({}, state, { list, active, mapById });
     }
 
@@ -129,6 +145,14 @@ export default function clustersReducer(state = initialState, action) {
       }
 
       return Object.assign({}, state, { list, active });
+    }
+
+    case Actions.UPDATE_CLUSTER_STATUS: {
+      const mapById = Object.assign({}, state.mapById);
+      const cluster = Object.assign({}, state.mapById[action.id]);
+      cluster.status = action.status;
+      mapById[action.id] = cluster;
+      return Object.assign({}, state, { mapById });
     }
 
     case Actions.CLUSTER_APPLY_PRESET: {
@@ -165,6 +189,33 @@ export default function clustersReducer(state = initialState, action) {
         state.list.slice(index + 1));
 
       return Object.assign({}, state, { list });
+    }
+
+    case Actions.UPDATE_CLUSTER_LOG: {
+      const mapById = Object.assign({}, state.mapById);
+      const cluster = Object.assign({}, state.mapById[action.id]);
+      cluster.log = [].concat(cluster.log ? cluster.log : [], action.log);
+      mapById[action.id] = cluster;
+      return Object.assign({}, state, { mapById });
+    }
+
+    case Actions.SUB_CLUSTER_LOG: {
+      const mapById = Object.assign({}, state.mapById);
+      const cluster = Object.assign({}, mapById[action.id]);
+      cluster.logStream = action.eventSource;
+      mapById[action.id] = cluster;
+      return Object.assign({}, state, { mapById });
+    }
+
+    case Actions.UNSUB_CLUSTER_LOG: {
+      const mapById = Object.assign({}, state.mapById);
+      if (mapById[action.id].logStream) {
+        mapById[action.id].logStream.close();
+        delete mapById[action.id].logStream;
+        return Object.assign({}, state, { mapById });
+      }
+
+      return state;
     }
 
     default:

@@ -3,22 +3,18 @@ import FileListing      from '../../../../../../panels/FileListing';
 import JobMonitor       from '../../../../../../panels/JobMonitor';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
+import LoadingPanel     from '../../../../../../panels/LoadingPanel';
+import { taskflowActions } from '../../../../../../utils/Constants';
 
 import get              from 'mout/src/object/get';
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
 import * as SimActions  from '../../../../../../redux/actions/projects';
-
-
-const ACTIONS = {
-  terminate: { name: 'terminateTaskflow', label: 'Terminate', icon: '' },
-  visualize: { name: 'visualizeTaskflow', label: 'Visualize', icon: '' },
-  rerun: { name: 'deleteTaskflow', label: 'Rerun', icon: '' },
-};
+import * as ClusterActions  from '../../../../../../redux/actions/clusters';
 
 function getActions(actionsList, disabled) {
-  return actionsList.map((action) => Object.assign({ disabled }, ACTIONS[action]));
+  return actionsList.map((action) => Object.assign({ disabled }, taskflowActions[action]));
 }
 
 const VisualizationView = React.createClass({
@@ -36,6 +32,7 @@ const VisualizationView = React.createClass({
     onTerminateTaskflow: React.PropTypes.func,
     onDeleteTaskflow: React.PropTypes.func,
     onVisualizeTaskflow: React.PropTypes.func,
+    onTerminateInstance: React.PropTypes.func,
 
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
@@ -52,6 +49,10 @@ const VisualizationView = React.createClass({
     };
 
     this.props.onVisualizeTaskflow(newSimState, location);
+  },
+
+  terminateInstance() {
+    this.props.onTerminateInstance(this.props.taskflow.flow.meta.cluster._id);
   },
 
   terminateTaskflow() {
@@ -81,10 +82,14 @@ const VisualizationView = React.createClass({
   },
 
   render() {
-    if (!this.props.taskflow || !this.props.taskflow.flow) {
-      return null;
-    }
     const { taskflow, taskflowId, error, simulation, buttonsDisabled } = this.props;
+
+    // these can be undefined sometimes, show a loading icon if any are missing.
+    if (!taskflow || !taskflow.flow ||
+      !taskflow.jobMapById || !taskflow.actions || !taskflow.hasOwnProperty('allComplete')) {
+      return <LoadingPanel />;
+    }
+
     const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
     const actions = [];
 
@@ -101,7 +106,9 @@ const VisualizationView = React.createClass({
 
     return (
       <div>
-        <JobMonitor taskflowId={ taskflowId } />
+        <JobMonitor taskflowId={ taskflowId }
+          clusterId={taskflow.flow.meta ? taskflow.flow.meta.cluster._id : null}
+        />
         <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />
         <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />
         <section>
@@ -118,7 +125,6 @@ const VisualizationView = React.createClass({
 
 
 // Binding --------------------------------------------------------------------
-/* eslint-disable arrow-body-style */
 
 export default connect(
   (state, props) => {
@@ -139,11 +145,10 @@ export default connect(
       error: null,
     };
   },
-  () => {
-    return {
-      onVisualizeTaskflow: (sim, location) => dispatch(SimActions.saveSimulation(sim, null, location)),
-      onDeleteTaskflow: (id, simulationStep, location) => dispatch(Actions.deleteTaskflow(id, simulationStep, location)),
-      onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
-    };
-  }
+  () => ({
+    onVisualizeTaskflow: (sim, location) => dispatch(SimActions.saveSimulation(sim, null, location)),
+    onDeleteTaskflow: (id, simulationStep, location) => dispatch(Actions.deleteTaskflow(id, simulationStep, location)),
+    onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
+    onTerminateInstance: (id) => dispatch(ClusterActions.terminateCluster(id)),
+  })
 )(VisualizationView);

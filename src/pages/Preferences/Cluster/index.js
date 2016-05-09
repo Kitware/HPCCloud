@@ -84,7 +84,7 @@ const ClusterPrefs = React.createClass({
 
   clusterHasSimulation(id) {
     for (let i = 0; i < this.props.taskflows.length; i++) {
-      if (this.props.taskflows[i].flow.meta.cluster._id === id) {
+      if (this.props.taskflows[i].flow && this.props.taskflows[i].flow.meta.cluster._id === id) {
         return this.props.taskflows[i].simulation;
       }
     }
@@ -195,7 +195,7 @@ export default connect(
     return {
       presetNames: Object.keys(localState.presets || {}),
       active: localState.active,
-      list: localState.list,
+      list: localState.list.filter((el) => el.type === 'trad'),
       buttonsDisabled: localState.pending,
       error: get(state, 'network.error.save_cluster.resp.data.message'),
       taskflows,

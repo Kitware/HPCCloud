@@ -13,6 +13,8 @@
     success: {},
     error: {},
     backlog: [ {contents of outdated pending, success, and errors} ],
+    progress: { [fileId]: {current: number, total: number}, ... }
+    progressReset: bool
   },
   preferences: {
     clusters: {
@@ -22,7 +24,12 @@
       ],
       active: 0,
       mapById: {
-        [_id]: { name, config, status },
+        [_id]: { name, 
+          config, 
+          status,
+          logStream: EventSource,
+          log: []
+        },
       }
       presets: {
         [name]: { prop: value, ... }
@@ -33,7 +40,7 @@
       list: [],
       active: 0,
       mapById: {
-        [_id]: { ... },
+        [_id]: { },
       }
     },
     statuses: {

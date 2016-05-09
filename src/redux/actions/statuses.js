@@ -51,7 +51,6 @@ export function fetchServers() {
 //   }
 // });
 
-
 // Auto trigger actions on authentication change...
 client.onAuthChange(authenticated => {
   if (authenticated) {

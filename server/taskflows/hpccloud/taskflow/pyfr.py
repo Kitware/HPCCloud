@@ -22,6 +22,8 @@ import os
 import subprocess
 import shutil
 from ConfigParser import SafeConfigParser
+from jsonpath_rw import parse
+from bson.objectid import ObjectId
 
 import cumulus.taskflow
 from cumulus.tasks.job import download_job_input_folders, submit_job
@@ -64,18 +66,32 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
         }
     }
     """
-    def start(self, *args, **kwargs):
+    PYFR_AMI = 'ami-7def1b1d'
 
-        # Load the cluster
-        model = ModelImporter.model('cluster', 'cumulus')
+    def start(self, *args, **kwargs):
         user = getCurrentUser()
-        cluster = model.load(kwargs['cluster']['_id'],
-                             user=user, level=AccessType.ADMIN)
-        cluster = model.filter(cluster, user, passphrase=False)
-        kwargs['cluster'] = cluster
+        # Load the cluster
+        cluster_id = parse('cluster._id').find(kwargs)
+        if cluster_id:
+            cluster_id = cluster_id[0].value
+            model = ModelImporter.model('cluster', 'cumulus')
+            cluster = model.load(cluster_id, user=user, level=AccessType.ADMIN)
+            cluster = model.filter(cluster, user, passphrase=False)
+            kwargs['cluster'] = cluster
+
+        profile_id = parse('cluster.profileId').find(kwargs)
+        if profile_id:
+            profile_id = profile_id[0].value
+            model = ModelImporter.model('aws', 'cumulus')
+            profile = model.load(profile_id, user=user, level=AccessType.ADMIN)
+            kwargs['profile'] = profile
+
+        kwargs['next'] = setup_input.s()
+        kwargs['ami'] = self.PYFR_AMI
 
         super(PyFrTaskFlow, self).start(
-            setup_input.s(self,*args, **kwargs))
+            setup_cluster.s(
+                self, *args, **kwargs))
 
     def terminate(self):
         self.run_task(pyfr_terminate.s())
@@ -167,7 +183,8 @@ def update_config_file(task, client, *args, **kwargs):
                 task.logger.info('%s removed.' % section)
 
         backend_section = 'backend-%s' % kwargs['backend']['type']
-        task.logger.info('Adding backend configuration for %s')
+        task.logger.info('Adding backend configuration for %s'
+                            % kwargs['backend']['type'] )
         # Filter out options with no value
         options = {k: v for k, v in kwargs['backend'].iteritems() if v}
         options.pop('type', None)
@@ -191,8 +208,6 @@ def update_config_file(task, client, *args, **kwargs):
 
 @cumulus.taskflow.task
 def setup_input(task, *args, **kwargs):
-    task.logger.info('Input parameters: %s' % kwargs)
-
     input_folder_id = kwargs['input']['folder']['id']
     mesh_file_id = kwargs['input']['meshFile']['id']
     kwargs['meshFileId'] = mesh_file_id
@@ -200,6 +215,14 @@ def setup_input(task, *args, **kwargs):
     number_of_procs = kwargs.get('numberOfSlots')
     if not number_of_procs:
         number_of_procs = kwargs.get('numberOfNodes')
+
+    if not number_of_procs:
+        size = parse('cluster.config.launch.params.node_instance_count').find(kwargs)
+        if size:
+            number_of_procs = size[0].value + 1
+        else:
+            raise Exception('Unable to extract number of nodes in cluster')
+
 
     if not number_of_procs:
         raise Exception('Unable to determine number of mpi processes to run.')
@@ -270,6 +293,24 @@ def setup_input(task, *args, **kwargs):
             if os.path.exists(output_dir):
                 shutil.rmtree(output_dir)
 
+    # If we are running in the cloud determine backend to use
+    if kwargs['cluster']['type'] == 'ec2':
+        # If we have GPUs use cuda
+        gpu = parse('cluster.config.launch.gpu').find(kwargs)
+        if gpu and int(gpu[0].value) > 1:
+            backend = {
+                'type': 'cuda',
+                'device-id': 'round-robin'
+            }
+        # Use OpenMP
+        else:
+            backend = {
+                'type': 'openmp',
+                'cblas': '/usr/lib/openblas-base/libblas.so'
+            }
+
+        kwargs['backend'] = backend
+
     update_config_file(task, client, *args, **kwargs)
 
     ini_file_id = kwargs['input']['iniFile']['id']
@@ -302,7 +343,10 @@ def create_job(task, *args, **kwargs):
               'path': 'input'
             }
         ],
-        'output': []
+        'output': [],
+        'params': {
+            'numberOfSlots': kwargs['numberOfProcs']
+        }
     }
 
     client = _create_girder_client(
@@ -334,7 +378,8 @@ def submit_pyfr_job(task, cluster,  job, *args, **kwargs):
     task.logger.info('Submitting job %s to cluster.' % job['_id'])
     girder_token = task.taskflow.girder_token
 
-    job['params'] = kwargs
+    job['params'].update(kwargs)
+
     submit_job(cluster, job, log_write_url=None,
                           girder_token=girder_token, monitor=False)
 
@@ -391,7 +436,10 @@ def create_export_job(task, job_name, files, job_dir, mesh_filename):
         'name': job_name,
         'commands': commands,
         'input': [],
-        'output': []
+        'output': [],
+        'params': {
+            'numberOfSlots': 1
+        }
     }
 
     client = _create_girder_client(

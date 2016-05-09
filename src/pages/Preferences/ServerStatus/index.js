@@ -40,8 +40,9 @@ const StatusPage = React.createClass({
         />
         <div className={ style.container }>
           <div className={ style.content }>
-            <OutputPanel items={ this.props.ec2.map(this.serverMapper) } title="EC2" />
-            <OutputPanel items={ this.props.clusters.map(this.serverMapper) } title="Clusters" />
+            <OutputPanel items={ this.props.ec2.map(this.serverMapper) } title="EC2 Profiles" />
+            <OutputPanel items={ this.props.clusters.filter((el) => el.type === 'ec2').map(this.serverMapper) } title="EC2 Clusters" />
+            <OutputPanel items={ this.props.clusters.filter((el) => el.type === 'trad').map(this.serverMapper) } title="Clusters" />
           </div>
         </div>
       </div>);

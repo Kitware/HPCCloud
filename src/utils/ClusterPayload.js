@@ -7,12 +7,12 @@ export function tradClusterPayload(id) {
   };
 }
 
-export function ec2ClusterPayload(name, machineType, clusterSize = 1, profileId) {
-  if (!name) {
+export function ec2ClusterPayload(name, machine, clusterSize = 1, profileId) {
+  if (typeof name === 'undefined') {
     throw Error('missing `name` in ec2 cluster payload');
-  } else if (!machineType) {
-    throw Error('missing `machineType` in ec2 cluster payload');
-  } else if (!profileId) {
+  } else if (typeof machine === 'undefined') {
+    throw Error('missing `machine` in ec2 cluster payload');
+  } else if (typeof profileId === 'undefined') {
     throw Error('missing `profileId` in ec2 cluster payload');
   }
 
@@ -26,7 +26,7 @@ export function ec2ClusterPayload(name, machineType, clusterSize = 1, profileId)
   return {
     serverType: 'ec2',
     name,
-    machineType,
+    machine,
     clusterSize: _clusterSize,
     profileId,
   };

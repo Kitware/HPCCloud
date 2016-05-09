@@ -220,19 +220,37 @@ class ProjectsTestCase(TestCase):
 
 
     def test_get_all(self):
+        # _yet_another_user because _user has admin privilege
+        self._create_project('project1', self._yet_another_user)
+        self._create_project('project2', self._yet_another_user)
+        self._create_project('project3', self._yet_another_user)
+        project4 = self._create_project('project4', self._another_user)
 
-        self._create_project('project1', self._user)
-        project2 = self._create_project('project2', self._another_user)
+        # test limit and offset for _user
+        r = self.request('/projects', method='GET', params={'limit':2},
+                         type='application/json', user=self._yet_another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(len(r.json), 2)
+        self.assertEqual(r.json[0]['name'], 'project1')
+        self.assertEqual(r.json[1]['name'], 'project2')
 
+        r = self.request('/projects', method='GET',
+                         params={'offset':2},
+                         type='application/json', user=self._yet_another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(len(r.json), 1)
+        self.assertEqual(r.json[0]['name'], 'project3')
+
+        # test that _another_user only gets the projects that belongs to them
         r = self.request('/projects', method='GET',
                          type='application/json', user=self._another_user)
         self.assertStatus(r, 200)
         self.assertEqual(len(r.json), 1)
         del r.json[0]['created']
         del r.json[0]['updated']
-        del project2['created']
-        del project2['updated']
-        self.assertEqual(r.json[0], project2)
+        del project4['created']
+        del project4['updated']
+        self.assertEqual(r.json[0], project4)
 
     def test_delete(self):
 

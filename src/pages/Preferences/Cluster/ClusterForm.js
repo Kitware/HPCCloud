@@ -38,6 +38,12 @@ export default React.createClass({
     onChange: React.PropTypes.func,
   },
 
+  componentWillReceiveProps(nextProps) {
+    if (this.refs.nameInput && nextProps.data && !nextProps.data._id) {
+      this.refs.nameInput.focus();
+    }
+  },
+
   formChange(event) {
     const propName = event.target.dataset.key;
     const value = event.target.value;
@@ -80,7 +86,8 @@ export default React.createClass({
                 value={this.props.data.name}
                 data-key="name"
                 onChange={this.formChange}
-                required
+                autoFocus required
+                ref="nameInput"
               />
           </section>
           <section className={style.group}>

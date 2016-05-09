@@ -38,13 +38,13 @@ export default React.createClass({
     };
   },
 
-  componentWillMount() {
+  componentDidMount() {
     this.updateState();
   },
 
   updateState() {
     this.setState({ busy: true });
-    client.listClusterProfiles()
+    client.listClusterProfiles('trad')
       .then((resp) => {
         this.setState({
           profiles: resp.data,

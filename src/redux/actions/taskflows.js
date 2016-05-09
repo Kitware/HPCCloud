@@ -1,5 +1,6 @@
 import * as netActions  from './network';
 import * as projActions from './projects';
+import * as clusterActions from './clusters';
 import client           from '../../network';
 import { store, dispatch } from '..';
 
@@ -169,13 +170,18 @@ export function fetchTaskflow(id) {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(addTaskflow(taskflow));
 
-          if (taskflow.meta && taskflow.meta.jobs) {
-            taskflow.meta.jobs.forEach(job => {
-              if (job.status !== 'complete' && job.status !== 'terminated') {
-                dispatch(updateTaskflowJobStatus(id, job._id));
-                dispatch(updateTaskflowJobLog(id, job._id));
-              }
-            });
+          if (taskflow.meta) {
+            if (taskflow.meta.jobs) {
+              taskflow.meta.jobs.forEach(job => {
+                if (job.status !== 'complete' && job.status !== 'terminated') {
+                  dispatch(updateTaskflowJobStatus(id, job._id));
+                  dispatch(updateTaskflowJobLog(id, job._id));
+                }
+              });
+            }
+            if (taskflow.meta.cluster) {
+              clusterActions.fetchClusters();
+            }
           }
         },
         error => {
@@ -241,8 +247,9 @@ export function terminateTaskflow(id) {
   };
 }
 
-export function updateTaskflowMetadata(id, actions, allComplete, outputDirectory, primaryJob) {
-  return { type: UPDATE_TASKFLOW_METADATA, id, actions, allComplete, outputDirectory, primaryJob };
+export function updateTaskflowMetadata(id, metadata) {
+  // metadata can have: { actions, allComplete, outputDirectory, primaryJob }
+  return { type: UPDATE_TASKFLOW_METADATA, id, metadata };
 }
 
 // ----------------------------------------------------------------------------
@@ -298,13 +305,23 @@ function findTask() {
 }
 
 function getTaskflowIdFromId(id, type) {
-  if (type === 'task') {
-    return store.getState().taskflows.taskflowMapByTaskId[id];
+  switch (type) {
+    case 'task': {
+      return store.getState().taskflows.taskflowMapByTaskId[id];
+    }
+    case 'job': {
+      return store.getState().taskflows.taskflowMapByJobId[id];
+    }
+    case 'cluster': {
+      return store.getState().preferences.clusters.mapById[id];
+    }
+    case 'profile': {
+      return store.getState().preferences.clusters.mapById[id];
+    }
+    default: {
+      return null;
+    }
   }
-  if (type === 'job') {
-    return store.getState().taskflows.taskflowMapByJobId[id];
-  }
-  return null;
 }
 
 client.onEvent((resp) => {
@@ -312,6 +329,8 @@ client.onEvent((resp) => {
   const id = resp.data._id;
   const status = resp.data.status;
   const taskflowId = getTaskflowIdFromId(id, type);
+
+  console.log(`${type} ${status}`);
 
   if (type === 'taskflow') {
     dispatch(updateTaskflowStatus(id, status));
@@ -323,6 +342,14 @@ client.onEvent((resp) => {
       }
       case 'task': {
         dispatch(updateTaskflowTaskStatus(taskflowId, id, status));
+        break;
+      }
+      case 'cluster': {
+        dispatch(clusterActions.updateClusterStatus(id, status));
+        break;
+      }
+      case 'profile': {
+        dispatch(clusterActions.updateClusterStatus(id, status));
         break;
       }
       default:
@@ -340,6 +367,15 @@ client.onEvent((resp) => {
       case 'task': {
         // update all tasks for each taskflow
         dispatch(findTask());
+        break;
+      }
+      case 'cluster': {
+        // fetch clusters
+        dispatch(clusterActions.fetchClusters(null));
+        break;
+      }
+      case 'profile': {
+        dispatch(clusterActions.fetchClusters('ec2'));
         break;
       }
       default:

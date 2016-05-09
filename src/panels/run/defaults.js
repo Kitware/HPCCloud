@@ -1,7 +1,7 @@
 export default {
   EC2: {
     profile: '',
-    machine: 'm3.medium',
+    machine: '',
     clusterSize: '',
     volumneSize: '',
   },
