@@ -296,7 +296,7 @@ def setup_input(task, *args, **kwargs):
     # If we are running in the cloud determine backend to use
     if kwargs['cluster']['type'] == 'ec2':
         # If we have GPUs use cuda
-        gpu = parse('cluster.config.launch.gpu').find(kwargs)
+        gpu = parse('cluster.config.launch.params.gpu').find(kwargs)
         if gpu and int(gpu[0].value) > 1:
             backend = {
                 'type': 'cuda',
