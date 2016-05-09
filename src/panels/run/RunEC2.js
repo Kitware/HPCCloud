@@ -60,6 +60,9 @@ export default React.createClass({
       })
       .then((resp) => {
         newState.clusters = resp.data;
+        if (this.props.onChange) {
+          this.props.onChange('cluster', null, 'EC2');
+        }
         this.setState(newState);
       })
       .catch((err) => {
