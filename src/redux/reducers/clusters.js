@@ -1,4 +1,5 @@
 import * as Actions from '../actions/clusters';
+import deepClone    from 'mout/src/lang/deepClone';
 import set          from 'mout/src/object/set';
 import style        from 'HPCCloudStyle/PageWithMenu.mcss';
 
@@ -7,6 +8,31 @@ const initialState = {
   active: 0,
   pending: false,
   mapById: {},
+};
+
+const clusterTemplate = {
+  name: 'new cluster',
+  type: 'trad',
+  classPrefix: style.statusCreatingIcon,
+  log: [],
+  config: {
+    host: 'localhost',
+    ssh: {
+      user: 'Your_Login',
+    },
+    scheduler: {
+      type: 'sge',
+    },
+    parallelEnvironment: '',
+    numberOfSlots: 1,
+    jobOutputDir: '/tmp',
+    paraview: {
+      installDir: '/opt/paraview',
+    },
+    hydra: {
+      executablePath: '/some/path/fake',
+    },
+  },
 };
 
 function applyPreset(obj, preset = null) {
@@ -29,6 +55,8 @@ const STATUS_TO_ICON = {
   terminated: style.statusTerminatedIcon,
 };
 
+const tradFilter = (el) => el.type === 'trad';
+
 function updateIcon(clusters) {
   clusters.forEach(cluster => {
     // Debug
@@ -43,6 +71,15 @@ function updateIcon(clusters) {
 export default function clustersReducer(state = initialState, action) {
   switch (action.type) {
     case Actions.ADD_CLUSTER: {
+      return Object.assign(
+        {}, state,
+        {
+          list: [].concat(state.list, deepClone(clusterTemplate)),
+          active: state.list.filter(tradFilter).length,
+        });
+    }
+
+    case Actions.ADD_EXISTING_CLUSTER: {
       const newCluster = action.cluster;
       const mapById = Object.assign({}, state.mapById);
       console.log('adding cluster', newCluster);
@@ -74,13 +111,17 @@ export default function clustersReducer(state = initialState, action) {
     case Actions.UPDATE_CLUSTERS: {
       const list = action.clusters;
       const active = (state.active < list.length) ? state.active : (list.length - 1);
-      updateIcon(list);
       const mapById = {};
+      updateIcon(list);
       list.forEach(cluster => {
         if (cluster._id) {
           mapById[cluster._id] = cluster;
         }
       });
+      // do not save ec2 clusters in the list, it's only used for trad clusters
+      if (list.length && list[0].type !== 'trad') {
+        return Object.assign({}, state, { mapById });
+      }
       return Object.assign({}, state, { list, active, mapById });
     }
 

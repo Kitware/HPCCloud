@@ -43,7 +43,7 @@ export default React.createClass({
     const data = nextProps.data,
       oldData = this.props.data;
 
-    if (!nextProps.data._id) {
+    if (this.refs.nameInput && nextProps.data && !nextProps.data._id) {
       this.refs.nameInput.focus();
     }
 
@@ -93,7 +93,7 @@ export default React.createClass({
               data-key="name"
               onChange={this.formChange}
               disabled={this.state.data._id}
-              required
+              autoFocus required
               ref="nameInput"
             />
           </section>

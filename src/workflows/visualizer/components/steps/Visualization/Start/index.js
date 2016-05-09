@@ -56,12 +56,16 @@ const VisualizationStart = React.createClass({
     if (this.state.serverType === 'Traditional') {
       payload.cluster = ClusterPayloads.tradClusterPayload(this.state[this.state.serverType].profile);
     } else if (this.state.serverType === 'EC2') {
-      payload.cluster = ClusterPayloads.ec2ClusterPayload(
-        this.state[this.state.serverType].name,
-        this.state[this.state.serverType].machine,
-        this.state[this.state.serverType].clusterSize,
-        this.state[this.state.serverType].profile
-      );
+      if (!this.state.EC2.cluster) {
+        payload.cluster = ClusterPayloads.ec2ClusterPayload(
+          this.state.EC2.name,
+          this.state.EC2.machine,
+          this.state.EC2.clusterSize,
+          this.state.EC2.profile
+        );
+      } else {
+        payload.cluster = { _id: this.state.EC2.cluster };
+      }
     } else {
       console.log('unrecognized serverType: ', this.state.serverType);
       return;

@@ -5,6 +5,7 @@ import { store, dispatch }     from '..';
 import { baseURL }      from '../../utils/Constants.js';
 
 export const ADD_CLUSTER = 'ADD_CLUSTER';
+export const ADD_EXISTING_CLUSTER = 'ADD_EXISTING_CLUSTER';
 export const UPDATE_ACTIVE_CLUSTER = 'UPDATE_ACTIVE_CLUSTER';
 export const UPDATE_CLUSTERS = 'UPDATE_CLUSTERS';
 export const UPDATE_CLUSTER_PRESETS = 'UPDATE_CLUSTER_PRESETS';
@@ -21,8 +22,12 @@ export const UNSUB_CLUSTER_LOG = 'UNSUB_CLUSTER_LOG';
 
 /* eslint-disable no-shadow */
 
-export function addCluster(cluster) {
-  return { type: ADD_CLUSTER, cluster };
+export function addCluster() {
+  return { type: ADD_CLUSTER };
+}
+
+export function addExistingCluster(cluster) {
+  return { type: ADD_EXISTING_CLUSTER, cluster };
 }
 
 export function applyPreset(index, name) {
@@ -122,7 +127,7 @@ export function fetchCluster(id) {
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(addCluster(resp.data));
+          dispatch(addExistingCluster(resp.data));
           dispatch(pendingNetworkCall(false));
         },
         err => {

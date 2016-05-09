@@ -195,7 +195,7 @@ export default connect(
     return {
       presetNames: Object.keys(localState.presets || {}),
       active: localState.active,
-      list: localState.list,
+      list: localState.list.filter((el) => el.type === 'trad'),
       buttonsDisabled: localState.pending,
       error: get(state, 'network.error.save_cluster.resp.data.message'),
       taskflows,

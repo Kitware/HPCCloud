@@ -50,7 +50,8 @@ def create_ec2_cluster(task, cluster, profile, ami):
         'master_instance_ami': ami,
         'node_instance_count': nodeCount,
         'node_instance_type': machine_type,
-        'node_instance_ami': ami
+        'node_instance_ami': ami,
+        'gpu': cluster['machine']['gpu']
     }
     provision_spec = 'gridengine/site'
     provision_params = {

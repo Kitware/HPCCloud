@@ -39,7 +39,7 @@ export default React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    if (!nextProps.data._id) {
+    if (this.refs.nameInput && nextProps.data && !nextProps.data._id) {
       this.refs.nameInput.focus();
     }
   },
@@ -86,8 +86,8 @@ export default React.createClass({
                 value={this.props.data.name}
                 data-key="name"
                 onChange={this.formChange}
-                required
-                ref="nameField"
+                autoFocus required
+                ref="nameInput"
               />
           </section>
           <section className={style.group}>

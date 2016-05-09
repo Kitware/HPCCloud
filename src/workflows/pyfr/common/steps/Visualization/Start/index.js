@@ -40,7 +40,6 @@ const VisualizationStart = React.createClass({
     };
   },
 
-
   dataChange(key, value, which) {
     var profile = this.state[which];
     profile[key] = value;
@@ -58,14 +57,18 @@ const VisualizationStart = React.createClass({
     };
 
     if (this.state.serverType === 'Traditional') {
-      payload.cluster = ClusterPayloads.tradClusterPayload(this.state[this.state.serverType].profile);
+      payload.cluster = ClusterPayloads.tradClusterPayload(this.state.Traditional.profile);
     } else if (this.state.serverType === 'EC2') {
-      payload.cluster = ClusterPayloads.ec2ClusterPayload(
-        this.state[this.state.serverType].name,
-        this.state[this.state.serverType].machine,
-        this.state[this.state.serverType].clusterSize,
-        this.state[this.state.serverType].profile._id
-      );
+      if (!this.state.EC2.cluster) {
+        payload.cluster = ClusterPayloads.ec2ClusterPayload(
+          this.state.EC2.name,
+          this.state.EC2.machine,
+          this.state.EC2.clusterSize,
+          this.state.EC2.profile
+        );
+      } else {
+        payload.cluster = { _id: this.state.EC2.cluster };
+      }
     }
 
     const simStepUpdate = {

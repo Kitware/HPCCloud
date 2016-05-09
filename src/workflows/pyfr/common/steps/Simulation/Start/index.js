@@ -1,7 +1,7 @@
 import React                   from 'react';
+import ButtonBar               from '../../../../../../panels/ButtonBar';
 import defaultServerParameters from '../../../../../../panels/run/defaults';
 import RunClusterFrom          from '../../../../../../panels/run';
-import ButtonBar               from '../../../../../../panels/ButtonBar';
 import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 import RuntimeBackend          from '../../../panels/RuntimeBackend';
 
@@ -26,8 +26,7 @@ const SimulationStart = React.createClass({
     view: React.PropTypes.string,
 
     error: React.PropTypes.string,
-    tradClusters: React.PropTypes.object,
-    ec2Clusters: React.PropTypes.object,
+    clusters: React.PropTypes.object,
     onRun: React.PropTypes.func,
   },
 
@@ -55,10 +54,11 @@ const SimulationStart = React.createClass({
       sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
       payload;
 
+
     if (this.state.serverType === 'Traditional') {
-      clusterName = this.props.tradClusters[this.state[this.state.serverType].profile].name;
+      clusterName = this.props.clusters[this.state[this.state.serverType].profile].name;
       payload = Object.assign({},
-        this.state[this.state.serverType].runtime || {},
+        this.state.Traditional.runtime || {},
         {
           backend: this.state.backend,
           input: {
@@ -77,11 +77,11 @@ const SimulationStart = React.createClass({
               id: this.props.simulation.metadata.outputFolder._id,
             },
           },
-          cluster: ClusterPayloads.tradClusterPayload(this.state[this.state.serverType].profile),
+          cluster: ClusterPayloads.tradClusterPayload(this.state.Traditional.profile),
         });
     } else if (this.state.serverType === 'EC2') {
       payload = Object.assign({},
-        this.state[this.state.serverType].runtime || {},
+        this.state.EC2.runtime || {},
         {
           backend: this.state.backend,
           input: {
@@ -100,13 +100,17 @@ const SimulationStart = React.createClass({
               id: this.props.simulation.metadata.outputFolder._id,
             },
           },
-          cluster: ClusterPayloads.ec2ClusterPayload(
-            this.state[this.state.serverType].name,
-            this.state[this.state.serverType].machine,
-            this.state[this.state.serverType].clusterSize,
-            this.state[this.state.serverType].profile
-          ),
         });
+      if (!this.state.EC2.cluster) {
+        payload.cluster = ClusterPayloads.ec2ClusterPayload(
+          this.state.EC2.name,
+          this.state.EC2.machine,
+          this.state.EC2.clusterSize,
+          this.state.EC2.profile
+        );
+      } else {
+        payload.cluster = { _id: this.state.EC2.cluster };
+      }
     } else {
       console.log('unrecognized serverType: ', this.state.serverType);
       return;
@@ -154,8 +158,8 @@ const SimulationStart = React.createClass({
       backendProfiles = { cuda: false, openmp: [], opencl: [] };
     if (this.state.serverType === 'Traditional') {
       const clusterId = this.state.Traditional.profile;
-      if (this.props.tradClusters[clusterId] && this.props.tradClusters[clusterId].config && this.props.tradClusters[clusterId].config.pyfr) {
-        backendProfiles = this.props.tradClusters[clusterId].config.pyfr;
+      if (this.props.clusters[clusterId] && this.props.clusters[clusterId].config && this.props.clusters[clusterId].config.pyfr) {
+        backendProfiles = this.props.clusters[clusterId].config.pyfr;
       }
     }
 
@@ -183,8 +187,7 @@ export default connect(
     return {
       error: get(state, 'network.error.create_taskflow.resp.data.message')
         || get(state, 'network.error.start_taskflow.resp.data.message'),
-      ec2Clusters: state.preferences.aws.mapById,
-      tradClusters: state.preferences.clusters.mapById,
+      clusters: state.preferences.clusters.mapById,
     };
   },
   () => {
