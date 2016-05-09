@@ -43,7 +43,9 @@ DISPLAY=:0
 export DISPLAY
 
 # First run pvpython
-${PV_PYTHON} ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} --data-dir {{dataDir}} {{ '--load-file %s' % fileName if fileName else '' }}
+${PV_PYTHON} ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} \
+{{ '--data-dir %s' % dataDir if dataDir else ''}} \
+{{ '--load-file %s' % fileName if fileName else '' }}
 
 # Remove proxy entry
 curl --silent --show-error -o /dev/null -X DELETE "{{ baseUrl }}/proxy/${KEY}"
