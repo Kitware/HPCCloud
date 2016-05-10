@@ -7,7 +7,7 @@ export const breadcrumb = {
     '/Preferences/Cluster',
     '/Preferences/AWS',
     '/Preferences/Status',
-    '/Preferences/Network',
+    //'/Preferences/Network',
   ],
   icons: [
     style.userIcon,

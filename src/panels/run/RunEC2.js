@@ -101,6 +101,7 @@ export default React.createClass({
         </div>;
     }
 
+    const runningClusters = this.state.clusters ? this.state.clusters.filter((el) => el.status === 'running') : [];
     const optionMapper = (el, index) =>
       <option key={ `${el.name}_${index}` } value={index}>
         {el.name}
@@ -117,14 +118,14 @@ export default React.createClass({
       </option>;
     return (
       <div className={style.container}>
-        { this.state.clusters ?
+        { runningClusters.length ?
           <section className={style.group}>
             <label className={style.label}>Existing Instances</label>
             <select className={style.input}
               onChange={this.dataChange} data-key="cluster"
             >
               <option value={null}></option>
-              {this.state.clusters.map((el, index) => <option key={el._id} value={el._id}>{el.name}</option>)}
+              { runningClusters.map((el, index) => <option key={el._id} value={el._id}>{el.name}</option>)}
             </select>
           </section> : null
         }
