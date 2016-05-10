@@ -27,6 +27,7 @@ export default React.createClass({
       breadcrumb: {
         paths: [],
         icons: [],
+        titles: [],
       },
     };
   },
@@ -55,6 +56,7 @@ export default React.createClass({
           className={ style.breadcrumb }
           paths={ this.props.breadcrumb.paths }
           icons={ this.props.breadcrumb.icons }
+          titles={ this.props.breadcrumb.titles }
           active={ this.props.breadcrumb.active }
         />
 

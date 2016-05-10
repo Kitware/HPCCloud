@@ -4,7 +4,7 @@ import Toolbar      from '../../../../panels/Toolbar';
 import client       from '../../../../network';
 
 import style            from 'HPCCloudStyle/PageWithMenu.mcss';
-import breadCrumbStyle  from 'HPCCloudStyle/Theme.mcss';
+import { primaryBreadCrumbs } from '../../../../utils/Constants';
 
 export default React.createClass({
 
@@ -50,14 +50,7 @@ export default React.createClass({
     return (
       <div className={ style.rootContainer }>
           <Toolbar
-            breadcrumb={{
-              paths: ['/', `/View/Project/${this.props.project._id}`, `/View/Simulation/${this.props.simulation._id}`],
-              icons: [
-                breadCrumbStyle.breadCrumbRootIcon,
-                breadCrumbStyle.breadCrumbProjectIcon,
-                breadCrumbStyle.breadCrumbSimulationIcon,
-              ],
-            }}
+            breadcrumb={primaryBreadCrumbs(this.props.project._id, this.props.simulation._id)}
             title={ `${this.props.project.name} / ${this.props.simulation.name}` }
           />
           <div className={ style.container }>

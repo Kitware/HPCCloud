@@ -14,7 +14,13 @@ export const breadcrumb = {
     style.clusterIcon,
     style.ec2Icon,
     style.statusIcon,
-    style.networkIcon,
+    // style.networkIcon,
+  ],
+  titles: [
+    'User preferences',
+    'Cluster',
+    'EC2',
+    'Server status',
   ],
   active: -1,
 };

@@ -2,7 +2,7 @@ import React                from 'react';
 import { SimulationHelper } from '../../../utils/AccessHelper';
 import TableListing         from '../../../panels/TableListing';
 import EmptyPlaceholder     from '../../../panels/EmptyPlaceholder';
-
+import { primaryBreadCrumbs } from '../../../utils/Constants';
 import theme      from 'HPCCloudStyle/Theme.mcss';
 
 import { connect }  from 'react-redux';
@@ -57,12 +57,7 @@ const ProjectView = React.createClass({
   render() {
     return (
       <TableListing
-        breadcrumb={{
-          paths: ['/', `/View/Project/${this.props.params.id}`],
-          icons: [
-            theme.breadCrumbRootIcon,
-            theme.breadCrumbProjectIcon,
-          ] }}
+        breadcrumb={primaryBreadCrumbs(this.props.params.id)}
         location={ this.props.location }
         accessHelper={ SimulationHelper }
         items={ this.props.simulations }

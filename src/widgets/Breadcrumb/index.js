@@ -22,6 +22,7 @@ export default React.createClass({
     className: React.PropTypes.string,
     icons: React.PropTypes.array,
     paths: React.PropTypes.array,
+    titles: React.PropTypes.array,
   },
 
   getDefaultProps() {
@@ -37,6 +38,7 @@ export default React.createClass({
         { this.props.paths.map((path, index) =>
           <LinkIcon key={`${path}_${index}`} to={path}
             icon={this.props.icons[index]}
+            title={this.props.titles ? this.props.titles[index] : null}
             className={ index === this.props.active ? style.activeBreadCrumb : style.breadCrumb}
           />
         )}
