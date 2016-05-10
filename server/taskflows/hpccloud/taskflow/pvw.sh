@@ -45,12 +45,6 @@ export LD_LIBRARY_PATH
 DISPLAY=:0
 export DISPLAY
 
-{% if cluster.type == 'ec2' -%}
-# Restart window manager, for some reason it doesn't start correctly on boot
-sudo service slim restart
-{% endif -%}
-
-
 # First run pvpython
 ${PV_PYTHON} --mesa-llvm ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} \
 {{ '--data-dir %s' % dataDir if dataDir else ''}} \
