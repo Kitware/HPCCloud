@@ -49,7 +49,7 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
 
     """
 
-    PARAVIEW_AMI = 'ami-80c537e0'
+    PARAVIEW_AMI = 'ami-0e38c56e'
 
     def start(self, *args, **kwargs):
         user = getCurrentUser()

@@ -66,7 +66,7 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
         }
     }
     """
-    PYFR_AMI = 'ami-80c537e0'
+    PYFR_AMI = 'ami-0e38c56e'
 
     def start(self, *args, **kwargs):
         user = getCurrentUser()
