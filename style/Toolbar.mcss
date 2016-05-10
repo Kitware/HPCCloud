@@ -17,11 +17,15 @@
     justify-content: flex-start;
 }
 
-.breadcrumb a {
+.toolbarTab {
+    composes: colorBlack from 'HPCCloudStyle/Theme.mcss';
+}
+
+.breadcrumb a, .toolbarTab a {
     padding: 1px 10px;
 }
 
-.breadcrumb a:first-child {
+.breadcrumb a:first-child, .toolbarTab a:first-child {
     padding-left: 12px;
 }
 

@@ -164,11 +164,9 @@ const ClusterPrefs = React.createClass({
 
     return (
       <div className={ style.rootContainer }>
-        <Toolbar
-          breadcrumb={ clusterBreadCrumb }
-          title="Clusters"
-          actions={[{ name: 'add', icon: style.addIcon }]}
-          onAction={this.addItem}
+        <Toolbar breadcrumb={ clusterBreadCrumb } title="Clusters"
+          actions={[{ name: 'add', icon: style.addIcon }]} onAction={this.addItem}
+          hasTabs
         />
         <div className={ style.container }>
           <ActiveList

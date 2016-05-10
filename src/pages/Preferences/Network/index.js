@@ -34,10 +34,7 @@ const StatusPage = React.createClass({
   render() {
     return (
       <div className={ style.rootContainer }>
-        <Toolbar
-          breadcrumb={ clusterBreadCrumb }
-          title="Network"
-        />
+        <Toolbar breadcrumb={ clusterBreadCrumb } title="Network" hasTabs />
         <div className={ style.container }>
           <div className={ style.content }>
             <OutputPanel items={this.props.log.map(this.networkMapper)} title="Network log" />

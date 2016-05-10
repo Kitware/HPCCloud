@@ -48,7 +48,7 @@ export default React.createClass({
   render() {
     return (
       <div className={ style.rootContainer }>
-        <Toolbar title="User" breadcrumb={userBreadCrumb} />
+        <Toolbar title="User" breadcrumb={userBreadCrumb} hasTabs />
         <div className={ style.container }>
             <ActiveList
               className={ style.menu }

@@ -3,6 +3,7 @@ import React             from 'react';
 import TableListing      from '../../../panels/TableListing';
 import EmptyPlaceholder  from '../../../panels/EmptyPlaceholder';
 import { ProjectHelper } from '../../../utils/AccessHelper';
+import { primaryBreadCrumbs } from '../../../utils/Constants';
 
 import theme from 'HPCCloudStyle/Theme.mcss';
 
@@ -55,11 +56,7 @@ const ProjectAll = React.createClass({
   render() {
     return (
       <TableListing
-        breadcrumb={{
-          paths: ['/'],
-          icons: [
-            theme.breadCrumbRootIcon,
-          ] }}
+        breadcrumb={primaryBreadCrumbs()}
         location={ this.props.location }
         accessHelper={ ProjectHelper }
         items={ this.props.projects }

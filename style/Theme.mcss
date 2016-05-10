@@ -218,10 +218,6 @@
     composes: fa-question   from 'font-awesome/css/font-awesome.css';
 }
 
-.breadCrumb {
-    composes: colorBlack;
-}
-
 .activeBreadCrumb {
     composes: colorBlue;
 }

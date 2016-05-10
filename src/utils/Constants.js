@@ -1,3 +1,5 @@
+import breadCrumbStyle  from 'HPCCloudStyle/Theme.mcss';
+
 export const baseURL = '/api/v1';
 
 // name: action in component that this action runs
@@ -9,3 +11,22 @@ export const taskflowActions = {
   rerun: { name: 'deleteTaskflow', label: 'Rerun', icon: '' },
   terminateInstance: { name: 'terminateInstance', label: 'Terminate EC2 Instance', icon: '' },
 };
+
+export function primaryBreadCrumbs(projectId = null, simulationId = null) {
+  var ret = {
+    paths: ['/'],
+    icons: [breadCrumbStyle.breadCrumbRootIcon],
+    titles: ['Home'],
+  };
+  if (projectId) {
+    ret.paths.push(`/View/Project/${projectId}`);
+    ret.icons.push(breadCrumbStyle.breadCrumbProjectIcon);
+    ret.titles.push('Project');
+    if (simulationId) {
+      ret.paths.push(`/View/Simulation/${simulationId}`);
+      ret.icons.push(breadCrumbStyle.breadCrumbSimulationIcon);
+      ret.titles.push('Simulation');
+    }
+  }
+  return ret;
+}
