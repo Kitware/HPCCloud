@@ -54,6 +54,14 @@ def create_ec2_cluster(task, cluster, profile, ami):
     r.raise_for_status()
     source_ip = '%s/32' % r.text.strip()
 
+    extra_rules = [{
+        'proto': 'tcp',
+        'from_port': 9000,
+        'to_port': 9000,
+        'cidr_ip': source_ip
+    }]
+
+
     task.logger.info('Using source ip: %s' % source_ip)
 
     launch_params = {
@@ -63,7 +71,8 @@ def create_ec2_cluster(task, cluster, profile, ami):
         'node_instance_type': machine_type,
         'node_instance_ami': ami,
         'gpu': cluster['machine']['gpu'],
-        'source_cidr_ip': source_ip
+        'source_cidr_ip': source_ip,
+        'extra_rules': extra_rules
     }
     provision_spec = 'gridengine/site'
     provision_params = {
