@@ -52,7 +52,7 @@ sudo service slim restart
 
 
 # First run pvpython
-${PV_PYTHON} --mesa-llvm ${VISUALIZER} ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} \
+${PV_PYTHON} --mesa-llvm ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} \
 {{ '--data-dir %s' % dataDir if dataDir else ''}} \
 {{ '--load-file %s' % fileName if fileName else '' }}
 
