@@ -129,11 +129,9 @@ const AWSPrefs = React.createClass({
 
     return (
       <div className={ style.rootContainer }>
-        <Toolbar
-          breadcrumb={ awsBreadCrumb }
-          title="AWS EC2"
-          actions={[{ name: 'add', icon: style.addIcon }]}
-          onAction={this.addItem}
+        <Toolbar breadcrumb={ awsBreadCrumb } title="AWS EC2"
+          actions={[{ name: 'add', icon: style.addIcon }]} onAction={this.addItem}
+          hasTabs
         />
         <div className={ style.container }>
           <ActiveList

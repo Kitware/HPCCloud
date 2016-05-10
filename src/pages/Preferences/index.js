@@ -22,6 +22,12 @@ export const breadcrumb = {
     'EC2',
     'Server status',
   ],
+  labels: [
+    'User',
+    'Cluster',
+    'EC2',
+    'Status',
+  ],
   active: -1,
 };
 

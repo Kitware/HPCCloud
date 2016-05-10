@@ -33,10 +33,8 @@ const StatusPage = React.createClass({
   render() {
     return (
       <div className={ style.rootContainer }>
-        <Toolbar
-          breadcrumb={ clusterBreadCrumb }
-          title="Status"
-          onAction={this.addItem}
+        <Toolbar breadcrumb={ clusterBreadCrumb } title="Status"
+          onAction={this.addItem} hasTabs
         />
         <div className={ style.container }>
           <div className={ style.content }>

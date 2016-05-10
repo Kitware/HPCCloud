@@ -9,6 +9,7 @@ export default React.createClass({
   propTypes: {
     actions: React.PropTypes.array,
     breadcrumb: React.PropTypes.object,
+    hasTabs: React.PropTypes.bool,
     filter: React.PropTypes.bool,
     location: React.PropTypes.object,
     onAction: React.PropTypes.func,
@@ -29,6 +30,7 @@ export default React.createClass({
         icons: [],
         titles: [],
       },
+      hasTabs: false,
     };
   },
 
@@ -53,11 +55,13 @@ export default React.createClass({
     return (
       <nav className={ style.container }>
         <Breadcrumb
-          className={ style.breadcrumb }
+          className={ this.props.hasTabs ? style.toolbarTab : style.breadcrumb }
           paths={ this.props.breadcrumb.paths }
           icons={ this.props.breadcrumb.icons }
           titles={ this.props.breadcrumb.titles }
+          labels={ this.props.breadcrumb.labels }
           active={ this.props.breadcrumb.active }
+          hasTabs={this.props.hasTabs}
         />
 
         <div className={ style.title }>
