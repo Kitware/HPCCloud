@@ -10,10 +10,15 @@ import style from 'HPCCloudStyle/JobMonitor.mcss';
 
 // import get          from 'mout/src/object/get';
 import { connect }  from 'react-redux';
-import { dispatch }     from '../../../redux';
-import { getClusterLog } from '../../../redux/actions/clusters';
+import { dispatch }   from '../../../redux';
+import * as ClusterActions from '../../../redux/actions/clusters';
 
 const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 3 });
+
+// EventSource readyStates
+// const CONNECTING = 0;
+// const OPEN = 1;
+const CLOSED = 2;
 
 const StatusPage = React.createClass({
   displayName: 'Preferences/Status',
@@ -22,7 +27,9 @@ const StatusPage = React.createClass({
     ec2: React.PropTypes.array,
     ec2Clusters: React.PropTypes.array,
     tradClusters: React.PropTypes.array,
-    fetchClusterLog: React.PropTypes.func,
+
+    subscribeClusterLog: React.PropTypes.func,
+    unsubscribeClusterLog: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -32,10 +39,22 @@ const StatusPage = React.createClass({
     };
   },
 
+  componentWillUnmount() {
+    const unscriber = (cluster) => {
+      if (cluster.logStream && cluster.logStream.readyState !== CLOSED) {
+        this.props.unsubscribeClusterLog(cluster._id);
+      }
+    };
+    this.props.ec2Clusters.forEach(unscriber);
+    this.props.tradClusters.forEach(unscriber);
+  },
+
   logToggle(id, offset) {
     return (open) => {
       if (open) {
-        this.props.fetchClusterLog(id, offset);
+        this.props.subscribeClusterLog(id, offset);
+      } else {
+        this.props.unsubscribeClusterLog(id);
       }
     };
   },
@@ -98,6 +117,7 @@ export default connect(
     };
   },
   () => ({
-    fetchClusterLog: (id, offset) => dispatch(getClusterLog(id, offset)),
+    subscribeClusterLog: (id, offset) => dispatch(ClusterActions.subscribeClusterLogStream(id, offset)),
+    unsubscribeClusterLog: (id) => dispatch(ClusterActions.unsubscribeClusterLogStream(id)),
   })
 )(StatusPage);
