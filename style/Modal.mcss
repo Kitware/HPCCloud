@@ -1,0 +1,39 @@
+.modalContainer {
+    position: absolute;
+    z-index: 100;
+    width: 75%;
+    height: 400px;
+    top: 4em;
+    box-shadow: 0px 7px 10px gray;
+    overflow: hidden;
+    background-color: white;
+    border: 1px solid #ccc;
+}
+
+.modal {
+    color: black;
+    padding: 1em 2em;
+    overflow: scroll;
+    height: calc(100% - 38px);
+}
+
+.header {
+    background-color: #eee;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 20px;
+}
+
+.title {
+    composes: title from 'HPCCloudStyle/JobMonitor.mcss';
+    margin: 0;
+}
+
+.closeIcon {
+    composes: fa       from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw    from 'font-awesome/css/font-awesome.css';
+    composes: fa-times from 'font-awesome/css/font-awesome.css';
+    cursor: pointer;
+}

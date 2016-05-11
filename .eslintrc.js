@@ -19,6 +19,7 @@ module.exports = {
     'react/jsx-curly-spacing': 0,
     'react/jsx-first-prop-new-line': 0,
     'react/jsx-indent': 0,
+    'react/jsx-closing-bracket-location': 0,
     'jsx-a11y/img-has-alt': 0,
   }
 };
