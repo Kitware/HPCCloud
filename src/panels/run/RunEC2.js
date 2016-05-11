@@ -78,7 +78,10 @@ export default React.createClass({
       value = this.state.profiles[value];
       this.setState({
         machineFamilies: Object.keys(this.state.machines[value.regionName]),
+        profile: value,
       });
+      // Only want to propagate the id
+      value = value._id;
     } else if (key === 'machineFamily') {
       this.setState({
         machinesInFamily: this.state.machines[this.state.profile.regionName][value],
