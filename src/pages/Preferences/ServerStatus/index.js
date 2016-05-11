@@ -1,13 +1,17 @@
 // import client           from '../../../network';
-import OutputPanel      from '../../../panels/OutputPanel';
-import Toolbar          from '../../../panels/Toolbar';
-import React            from 'react';
-import { breadcrumb }   from '..';
+import OutputPanel    from '../../../panels/OutputPanel';
+import ExecutionUnit  from '../../../panels/JobMonitor/ExecutionUnit';
+import Toolbar        from '../../../panels/Toolbar';
+import React          from 'react';
+import { breadcrumb } from '..';
 
-import style from 'HPCCloudStyle/PageWithMenu.mcss';
+import style from 'HPCCloudStyle/JobMonitor.mcss';
+
 
 // import get          from 'mout/src/object/get';
 import { connect }  from 'react-redux';
+import { dispatch }     from '../../../redux';
+import { getClusterLog } from '../../../redux/actions/clusters';
 
 const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 3 });
 
@@ -16,7 +20,9 @@ const StatusPage = React.createClass({
 
   propTypes: {
     ec2: React.PropTypes.array,
-    clusters: React.PropTypes.array,
+    ec2Clusters: React.PropTypes.array,
+    tradClusters: React.PropTypes.array,
+    fetchClusterLog: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -26,8 +32,24 @@ const StatusPage = React.createClass({
     };
   },
 
-  serverMapper(el, index) {
+  logToggle(id, offset) {
+    return (open) => {
+      if (open) {
+        this.props.fetchClusterLog(id, offset);
+      }
+    };
+  },
+
+  profileMapper(el, index) {
     return { name: el.name, value: el.status };
+  },
+
+  serverMapper(el, index) {
+    const offset = el.log ? el.log.length : 0;
+    return (<ExecutionUnit key={el._id} alwaysShowLogToggle
+      unit={{ name: el.name, log: (el.log || []), status: el.status }}
+      onToggle={this.logToggle(el._id, offset)}
+    />);
   },
 
   render() {
@@ -37,10 +59,22 @@ const StatusPage = React.createClass({
           onAction={this.addItem} hasTabs
         />
         <div className={ style.container }>
-          <div className={ style.content }>
-            <OutputPanel items={ this.props.ec2.map(this.serverMapper) } title="EC2 Profiles" />
-            <OutputPanel items={ this.props.clusters.filter((el) => el.type === 'ec2').map(this.serverMapper) } title="EC2 Clusters" />
-            <OutputPanel items={ this.props.clusters.filter((el) => el.type === 'trad').map(this.serverMapper) } title="Clusters" />
+          <OutputPanel items={ this.props.ec2.map(this.profileMapper) } title="EC2 Profiles" />
+
+          <div className={ style.toolbar }>
+            <div className={ style.title }> EC2 Clusters </div>
+            <div className={ style.buttons }></div>
+          </div>
+          <div className={ style.taskflowContent }>
+            { this.props.ec2Clusters.map(this.serverMapper) }
+          </div>
+
+          <div className={ style.toolbar }>
+            <div className={ style.title }> Traditional Clusters </div>
+            <div className={ style.buttons }></div>
+          </div>
+          <div className={ style.taskflowContent }>
+            { this.props.tradClusters.map(this.serverMapper) }
           </div>
         </div>
       </div>);
@@ -50,10 +84,20 @@ const StatusPage = React.createClass({
 // Binding
 export default connect(
   state => {
-    const localState = state.preferences.statuses;
+    const localState = state.preferences;
+    var ec2Clusters = [],
+      tradClusters = [];
+    Object.keys(localState.clusters.mapById).forEach((key, index) => {
+      const cluster = localState.clusters.mapById[key];
+      (cluster.type === 'ec2' ? ec2Clusters : tradClusters).push(cluster);
+    });
     return {
-      ec2: localState.ec2,
-      clusters: localState.clusters,
+      ec2: localState.statuses.ec2,
+      ec2Clusters,
+      tradClusters,
     };
-  }
+  },
+  () => ({
+    fetchClusterLog: (id, offset) => dispatch(getClusterLog(id, offset)),
+  })
 )(StatusPage);

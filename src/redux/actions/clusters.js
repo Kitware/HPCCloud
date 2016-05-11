@@ -76,6 +76,7 @@ export function updateClusterStatus(id, status) {
 }
 
 export function getClusterLog(id, offset) {
+  console.log(offset);
   return dispatch => {
     const action = netActions.addNetworkCall(`cluster_log_${id}`, 'Check cluster log');
     client.getClusterLog(id, offset)
