@@ -130,6 +130,13 @@ def create_ec2_cluster(task, cluster, profile, ami):
     # Get the update to date cluster
     cluster = client.get('clusters/%s' % cluster['_id'])
 
+    # Add the passphrase if there is one. We need to do this as the clusters endpoints will not
+    # expose it for security reasons.
+    passphrase = parse('ssh.passphrase').find(profile)
+    if passphrase:
+        passphrase = passphrase[0].value
+        cluster['config']['ssh']['passphrase'] = passphrase
+
     return cluster
 
 @cumulus.taskflow.task
