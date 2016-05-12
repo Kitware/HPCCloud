@@ -48,6 +48,15 @@
     overflow: auto;
 }
 
+.logEntry {
+    padding: 0;
+    margin: 0;
+}
+
+p.logEntry {
+    margin-left: 10px;
+}
+
 .itemContent {
     margin: 0 15px 0 19px;
 }
@@ -116,4 +125,24 @@
 .fileIcon {
     composes: fa      from 'font-awesome/css/font-awesome.css';
     composes: fa-file-o from 'font-awesome/css/font-awesome.css';
+}
+
+.foldIcon {
+    cursor: pointer;
+    font-size: 1.2em;
+    width: 10px;
+}
+
+.foldClosed {
+    composes: fa     from 'font-awesome/css/font-awesome.css';
+    composes: fw     from 'font-awesome/css/font-awesome.css';
+    composes: fa-caret-right  from 'font-awesome/css/font-awesome.css';
+    composes: foldIcon;
+}
+
+.foldOpen {
+    composes: fa     from 'font-awesome/css/font-awesome.css';
+    composes: fw     from 'font-awesome/css/font-awesome.css';
+    composes: fa-caret-down from 'font-awesome/css/font-awesome.css';
+    composes: foldIcon;
 }
