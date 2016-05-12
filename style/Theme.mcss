@@ -112,6 +112,10 @@
     text-transform: capitalize;
 }
 
+.fixedWidth {
+    font-family: monospace;
+}
+
 /* Icons */
 .hpcCloudIcon {
     line-height: 0;

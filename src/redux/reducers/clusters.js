@@ -111,7 +111,7 @@ export default function clustersReducer(state = initialState, action) {
     case Actions.UPDATE_CLUSTERS: {
       const list = action.clusters;
       const active = (state.active < list.length) ? state.active : (list.length - 1);
-      const mapById = {};
+      const mapById = Object.assign({}, state.mapById);
       updateIcon(list);
       list.forEach(cluster => {
         if (cluster._id) {

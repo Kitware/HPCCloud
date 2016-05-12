@@ -4,8 +4,8 @@ export function getUploadOffset(id) {
   return girder.getUploadOffset(id);
 }
 
-export function downloadFile(id) {
-  return girder.downloadFile(id);
+export function downloadFile(id, offset, endByte, contentDisposition) {
+  return girder.downloadFile(id, offset, endByte, contentDisposition);
 }
 
 export function uploadChunk(id, offset, chunk) {
