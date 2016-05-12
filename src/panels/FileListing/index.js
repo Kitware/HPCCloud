@@ -91,7 +91,8 @@ const FileListing = React.createClass({
         <a href={`api/v1/item/${file._id}/download`} target="_blank">
           <i className={style.downloadIcon}></i>
         </a>
-        { file.size <= 100000 ? (<i className={style.previewIcon}
+        {/* 500,000B (500KB) maximum preview-able size */}
+        { file.size <= 500000 ? (<i className={style.previewIcon}
           data-name={file.name} data-id={file._id}
           onClick={this.togglePreview}>
           </i>) : null }
