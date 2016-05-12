@@ -12,9 +12,10 @@
 
 .modal {
     color: black;
-    padding: 1em 2em;
+    padding: 1em 2em 0;
     overflow: scroll;
     height: calc(100% - 38px);
+    white-space: pre;
 }
 
 .header {

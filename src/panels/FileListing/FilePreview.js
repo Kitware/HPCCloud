@@ -2,6 +2,7 @@ import React from 'react';
 import LoadingPanel from '../LoadingPanel';
 import client from '../../network';
 import style from 'HPCCloudStyle/Modal.mcss';
+import theme from 'HPCCloudStyle/Theme.mcss';
 
 export default React.createClass({
   displayName: 'FilePreview',
@@ -32,7 +33,7 @@ export default React.createClass({
         <span className={style.title}>{this.props.title}</span>
         <i className={style.closeIcon} onClick={this.props.closer}></i>
       </div>
-      <div className={style.modal}>
+      <div className={`${style.modal} ${theme.fixedWidth}`}>
       { this.state.loading ? <LoadingPanel /> : this.state.contents}
       </div>
     </div>);
