@@ -1,7 +1,7 @@
 import girder from './GirderClient';
 
-export function downloadItem(id) {
-  return girder.downloadItem(id);
+export function downloadItem(id, offset, endByte, contentDisposition) {
+  return girder.downloadItem(id, offset, endByte, contentDisposition);
 }
 export function updateItemMetadata(id, metadata = {}) {
   return girder.updateItemMetadata(id, metadata);

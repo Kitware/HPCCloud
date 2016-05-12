@@ -1,7 +1,42 @@
 import React                from 'react';
 import CollapsibleWidget    from 'paraviewweb/src/React/Widgets/CollapsibleWidget';
+import LogFold              from './LogFold';
 import { formatTime }       from '../../utils/Format';
 import style                from 'HPCCloudStyle/JobMonitor.mcss';
+
+// takes log array -> jsx lines, or if there's more information LogFold
+function logMapper(entry, index) {
+  let content = '';
+  let foldContent = null;
+  let msg = entry.msg;
+  if (msg !== null && typeof msg === 'object') {
+    msg = JSON.stringify(msg, null, 2);
+  }
+
+  if (entry.status) {
+    msg += ` [${entry.status}]`;
+  }
+
+  content += `[${formatTime(entry.created)}] ${entry.levelname}: ${msg}`;
+
+  if (entry.exc_info) {
+    foldContent = entry.exc_info[2].join('');
+    foldContent += `${entry.exc_info[0]}: ${entry.exc_info[1]}`;
+  }
+
+  if (entry.data && Object.keys(entry.data).length > 0) {
+    foldContent = `${JSON.stringify(entry.data, null, 2)}`;
+  }
+
+  if (foldContent !== null) {
+    return (<LogFold key={`${entry.created}_${index}`}
+      header={content} content={foldContent} />);
+  }
+
+  return (<p key={`${entry.created}_${index}`} className={style.logEntry}>
+    {content}
+  </p>);
+}
 
 export default React.createClass({
   displayName: 'ExecutionUnit',
@@ -57,32 +92,7 @@ export default React.createClass({
         >
           <pre className={ style.log } ref="log">
           { // reduce log array to a string with formatted entries
-            this.props.unit.log.reduce((prevVal, entry, index) => {
-              let content = prevVal;
-              let msg = entry.msg;
-              if (msg !== null && typeof msg === 'object') {
-                msg = JSON.stringify(msg, null, 2);
-              }
-
-              if (entry.status) {
-                msg += ` [${entry.status}]`;
-              }
-
-              content += `[${formatTime(entry.created)}] ${entry.levelname}: ${msg}\n`;
-
-              if (entry.exc_info) {
-                content += entry.exc_info[2].join('');
-                content += `${entry.exc_info[0]}: ${entry.exc_info[1]}`;
-              }
-
-
-              if (entry.data && Object.keys(entry.data).length > 0) {
-                const data = JSON.stringify(entry.data, null, 2);
-                content += `${data}\n`;
-              }
-
-              return content;
-            }, '')
+            this.props.unit.log.map(logMapper)
           }
           </pre>
         </CollapsibleWidget>

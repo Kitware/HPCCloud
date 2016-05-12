@@ -1,5 +1,6 @@
 import { formatFileSize } from '../../utils/Format';
 import React from 'react';
+import FilePreview from './FilePreview';
 import style from 'HPCCloudStyle/JobMonitor.mcss';
 
 import { connect }  from 'react-redux';
@@ -61,7 +62,20 @@ const FileListing = React.createClass({
     return {
       opened: [], // list of folderId's which are open
       open: false,
+      previewOpen: false,
+      previewTitle: '',
+      previewId: '',
     };
+  },
+
+  togglePreview(e) {
+    const previewId = e.currentTarget.dataset.id;
+    const previewTitle = e.currentTarget.dataset.name;
+    this.setState({ previewOpen: open, previewTitle, previewId });
+  },
+
+  closePreview() {
+    this.setState({ previewOpen: false });
   },
 
   fileMapper(file, index) {
@@ -77,6 +91,11 @@ const FileListing = React.createClass({
         <a href={`api/v1/item/${file._id}/download`} target="_blank">
           <i className={style.downloadIcon}></i>
         </a>
+        {/* 500,000B (500KB) maximum preview-able size */}
+        { file.size <= 500000 ? (<i className={style.previewIcon}
+          data-name={file.name} data-id={file._id}
+          onClick={this.togglePreview}>
+          </i>) : null }
       </span>);
     }
     return (<section key={`${file._id}_${index}`} className={ style.listItem }>
@@ -155,6 +174,12 @@ const FileListing = React.createClass({
       <div className={ this.state.open ? style.taskflowContainer : style.hidden }>
         {this.props.folders[this.props.folderId].children.map(this.superMapper)}
       </div>
+      { this.state.previewOpen ?
+        (<FilePreview contents={this.state.previewContent}
+          closer={this.closePreview}
+          fileId={this.state.previewId}
+          title={this.state.previewTitle}
+        />) : null}
     </div>);
   },
 });
