@@ -95,9 +95,7 @@ export function updateAWSProfile(index, profile, pushToServer = false) {
 
 // Auto trigger actions on authentication change...
 client.onAuthChange(authenticated => {
-  if (authenticated) {
-    dispatch(fetchAWSProfiles());
-  } else {
+  if (!authenticated) {
     dispatch(updateAWSProfiles([]));
   }
 });

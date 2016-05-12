@@ -30,6 +30,7 @@ const StatusPage = React.createClass({
 
     subscribeClusterLog: React.PropTypes.func,
     unsubscribeClusterLog: React.PropTypes.func,
+    fetchClusters: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -37,6 +38,10 @@ const StatusPage = React.createClass({
       ec2: [],
       clusters: [],
     };
+  },
+
+  componentDidMount() {
+    this.props.fetchClusters();
   },
 
   componentWillUnmount() {
@@ -119,5 +124,6 @@ export default connect(
   () => ({
     subscribeClusterLog: (id, offset) => dispatch(ClusterActions.subscribeClusterLogStream(id, offset)),
     unsubscribeClusterLog: (id) => dispatch(ClusterActions.unsubscribeClusterLogStream(id)),
+    fetchClusters: () => dispatch(ClusterActions.fetchClusters()),
   })
 )(StatusPage);
