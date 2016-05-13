@@ -57,6 +57,7 @@ export default React.createClass({
       .then((resp) => {
         const config = {
           sessionURL: `ws://${location.hostname}:8888/proxy?sessionId=${resp.data.metadata.sessionId}&path=ws`,
+          retry: true,
         };
         network.connect(config);
       })
