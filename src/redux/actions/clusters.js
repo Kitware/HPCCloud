@@ -6,6 +6,7 @@ import { baseURL }      from '../../utils/Constants.js';
 
 export const ADD_CLUSTER = 'ADD_CLUSTER';
 export const ADD_EXISTING_CLUSTER = 'ADD_EXISTING_CLUSTER';
+export const REMOVE_CLUSTER_BY_ID = 'REMOVE_CLUSTER_BY_ID';
 export const UPDATE_ACTIVE_CLUSTER = 'UPDATE_ACTIVE_CLUSTER';
 export const UPDATE_CLUSTERS = 'UPDATE_CLUSTERS';
 export const UPDATE_CLUSTER_PRESETS = 'UPDATE_CLUSTER_PRESETS';
@@ -32,6 +33,10 @@ export function addExistingCluster(cluster) {
 
 export function applyPreset(index, name) {
   return { type: CLUSTER_APPLY_PRESET, index, name };
+}
+
+export function removeClusterById(id) {
+  return { type: REMOVE_CLUSTER_BY_ID, id };
 }
 
 export function updateActiveCluster(index) {
@@ -177,6 +182,7 @@ export function fetchClusterPresets() {
   };
 }
 
+// removes a cluster from the preferences page
 export function removeCluster(index, cluster) {
   return dispatch => {
     if (cluster._id) {
@@ -199,6 +205,28 @@ export function removeCluster(index, cluster) {
     }
 
     return { type: REMOVE_CLUSTER, index };
+  };
+}
+
+// deletes a cluster by id
+export function deleteCluster(id) {
+  return dispatch => {
+    const action = netActions.addNetworkCall('delete_cluster', 'Delete cluster');
+
+    dispatch(pendingNetworkCall(true));
+    client.deleteCluster(id)
+      .then(
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(pendingNetworkCall(false));
+          dispatch(removeClusterById(id));
+        },
+        err => {
+          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(pendingNetworkCall(false));
+        });
+
+    return action;
   };
 }
 

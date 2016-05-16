@@ -51,6 +51,7 @@ const SimulationStart = React.createClass({
   runSimulation() {
     const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
     var clusterName,
+      clusterId = this.state[this.state.serverType].profile,
       sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
       payload;
 
@@ -110,6 +111,7 @@ const SimulationStart = React.createClass({
         );
       } else {
         payload.cluster = { _id: this.state.EC2.cluster };
+        clusterId = this.state.EC2.cluster;
       }
     } else {
       console.log('unrecognized serverType: ', this.state.serverType);
@@ -127,6 +129,7 @@ const SimulationStart = React.createClass({
           view: 'run',
           metadata: {
             sessionId,
+            clusterId,
             cluster: clusterName,
           },
         },

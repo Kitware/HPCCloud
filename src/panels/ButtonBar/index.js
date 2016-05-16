@@ -3,6 +3,14 @@ import React    from 'react';
 import states   from 'HPCCloudStyle/States.mcss';
 import editor   from 'HPCCloudStyle/ItemEditor.mcss';
 
+// PROPS:
+// `children`: A child element to display to the left of the buttons
+// `actions`: a list of actions in the format {name, label, icon}
+//            name: id and action to pass to onAction,
+//            label: button label,
+//            icon: css class for icon
+// `onAction`: calls a delegate function which has the same prototype as the action's name
+// `visible`: if the bar is visible or not.
 export default React.createClass({
   displayName: 'ButtonBar',
 

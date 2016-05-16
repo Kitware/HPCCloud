@@ -100,6 +100,15 @@ export default function clustersReducer(state = initialState, action) {
       return newState;
     }
 
+    case Actions.REMOVE_CLUSTER_BY_ID: {
+      const id = action.id;
+      const list = state.list.filter((item) => item.id !== id);
+      const active = (state.active < list.length) ? state.active : (list.length - 1);
+      const mapById = Object.assign({}, state.mapById);
+      delete mapById[id];
+      return Object.assign({}, state, { mapById, list, active });
+    }
+
     case Actions.UPDATE_ACTIVE_CLUSTER: {
       return Object.assign(
         {},
