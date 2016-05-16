@@ -139,7 +139,7 @@ export function fetchCluster(id) {
   };
 }
 
-export function fetchClusters(type = 'trad') {
+export function fetchClusters(type) {
   return dispatch => {
     const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
     dispatch(pendingNetworkCall(true));
@@ -267,11 +267,7 @@ export function terminateCluster(id) {
 
 // Auto trigger actions on authentication change...
 client.onAuthChange(authenticated => {
-  if (authenticated) {
-    dispatch(fetchClusters('trad'));
-    dispatch(fetchClusters('ec2'));
-    dispatch(fetchClusterPresets());
-  } else {
+  if (!authenticated) {
     dispatch(updateClusters([]));
   }
 });
