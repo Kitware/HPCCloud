@@ -140,31 +140,27 @@ export function fetchCluster(id) {
 }
 
 export function fetchClusters(type) {
-  return dispatch => {
-    const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
-    dispatch(pendingNetworkCall(true));
-    client.listClusterProfiles(type)
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(updateClusters(resp.data));
-          dispatch(pendingNetworkCall(false));
-        },
-        err => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
-          dispatch(pendingNetworkCall(false));
-        });
+  const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
+  dispatch(pendingNetworkCall(true));
+  client.listClusterProfiles(type)
+    .then(
+      resp => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(updateClusters(resp.data));
+        dispatch(pendingNetworkCall(false));
+      },
+      err => {
+        dispatch(netActions.errorNetworkCall(action.id, err));
+        dispatch(pendingNetworkCall(false));
+      });
 
-    return action;
-  };
+  return action;
 }
 
 export function fetchClusterPresets() {
   return dispatch => {
     const action = netActions.addNetworkCall('fetch_cluster_presets', 'Retreive cluster presets');
-
     dispatch(pendingNetworkCall(true));
-
     client.getClusterPresets()
       .then(
         presets => {

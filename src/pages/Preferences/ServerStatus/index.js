@@ -12,6 +12,7 @@ import style from 'HPCCloudStyle/JobMonitor.mcss';
 import { connect }  from 'react-redux';
 import { dispatch }   from '../../../redux';
 import * as ClusterActions from '../../../redux/actions/clusters';
+import { fetchServers } from '../../../redux/actions/statuses';
 
 const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 3 });
 
@@ -31,6 +32,7 @@ const StatusPage = React.createClass({
     subscribeClusterLog: React.PropTypes.func,
     unsubscribeClusterLog: React.PropTypes.func,
     fetchClusters: React.PropTypes.func,
+    fetchServers: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -42,6 +44,7 @@ const StatusPage = React.createClass({
 
   componentDidMount() {
     this.props.fetchClusters();
+    this.props.fetchServers();
   },
 
   componentWillUnmount() {
@@ -125,5 +128,6 @@ export default connect(
     subscribeClusterLog: (id, offset) => dispatch(ClusterActions.subscribeClusterLogStream(id, offset)),
     unsubscribeClusterLog: (id) => dispatch(ClusterActions.unsubscribeClusterLogStream(id)),
     fetchClusters: () => dispatch(ClusterActions.fetchClusters()),
+    fetchServers: () => dispatch(fetchServers()),
   })
 )(StatusPage);

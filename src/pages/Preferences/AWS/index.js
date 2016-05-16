@@ -37,6 +37,7 @@ const AWSPrefs = React.createClass({
     onActiveChange: React.PropTypes.func,
     onAddItem: React.PropTypes.func,
     onRemoveItem: React.PropTypes.func,
+    onMount: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -50,6 +51,11 @@ const AWSPrefs = React.createClass({
 
   getInitialState() {
     return { _error: null };
+  },
+
+  componentDidMount() {
+    // this doesn't work without setImmediate ?!
+    setImmediate(this.props.onMount);
   },
 
   changeItem(item) {
@@ -166,6 +172,7 @@ export default connect(
       onActiveChange: (index) => dispatch(Actions.updateActiveProfile(index)),
       onAddItem: () => dispatch(Actions.addAWSProfile()),
       onRemoveItem: (index, profile) => dispatch(Actions.removeAWSProfile(index, profile)),
+      onMount: () => dispatch(Actions.fetchAWSProfiles()),
     };
   }
 )(AWSPrefs);

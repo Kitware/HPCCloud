@@ -1,12 +1,9 @@
 import * as netActions  from './network';
 import client           from '../../network';
-import { dispatch }     from '..';
 
 export const UPDATE_CLUSTERS_LIST = 'UPDATE_CLUSTERS_LIST';
 export const UPDATE_EC2_LIST = 'UPDATE_EC2_LIST';
 export const PENDING_CLUSTER_NETWORK = 'PENDING_CLUSTER_NETWORK';
-
-/* eslint-disable no-shadow */
 
 export function updateClusterList(list) {
   return { type: UPDATE_CLUSTERS_LIST, list };
@@ -44,16 +41,3 @@ export function fetchServers() {
     return action;
   };
 }
-
-// client.onEvent((e) => {
-//   if (e.type === 'cluster.status') {
-//     dispatch(fetchClusters());
-//   }
-// });
-
-// Auto trigger actions on authentication change...
-client.onAuthChange(authenticated => {
-  if (authenticated) {
-    dispatch(fetchServers());
-  }
-});

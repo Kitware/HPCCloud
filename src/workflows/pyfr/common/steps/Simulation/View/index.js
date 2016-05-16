@@ -38,6 +38,7 @@ const SimualtionView = React.createClass({
 
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
+    cluster: React.PropTypes.object,
     buttonsDisabled: React.PropTypes.bool,
     error: React.PropTypes.string,
   },
@@ -92,19 +93,21 @@ const SimualtionView = React.createClass({
       return <LoadingPanel />;
     }
 
-    const { taskflow, taskflowId, simulation, buttonsDisabled, error } = this.props;
+    const { taskflow, taskflowId, cluster, error, simulation, buttonsDisabled } = this.props;
     const actions = [].concat(taskflow.actions ? taskflow.actions : []);
+    const fileActionsDisabled = cluster ? cluster.status !== 'running' : true;
 
     if (taskflow.allComplete) {
       actions.push('visualize');
     }
+
     return (
       <div>
         <JobMonitor taskflowId={ taskflowId }
           clusterId={taskflow.flow.meta ? taskflow.flow.meta.cluster._id : null}
         />
-        <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />
-        <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />
+        <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} actionsDisabled={fileActionsDisabled} />
+        <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} actionsDisabled={fileActionsDisabled} />
         <section>
             <ButtonBar
               onAction={ this.onAction }
@@ -129,9 +132,20 @@ export default connect(
       const simulation = state.simulations.mapById[activeSimulation];
       taskflowId = simulation.steps.Simulation.metadata.taskflowId;
     }
+
+    let taskflow = null;
+    if (taskflowId) {
+      taskflow = state.taskflows.mapById[taskflowId];
+    }
+
+    let cluster = null;
+    if (get(taskflow, 'flow.meta.cluster._id')) {
+      const clusterId = taskflow.flow.meta.cluster._id;
+      cluster = state.preferences.clusters.mapById[clusterId];
+    }
+
     return {
-      taskflowId,
-      taskflow: taskflowId ? state.taskflows.mapById[taskflowId] : null,
+      taskflowId, cluster, taskflow,
       buttonsDisabled: !!get(state, 'network.pending.terminate_taskflow') ||
                        !!get(state, 'network.pending.delete_taskflow'),
       error: get(state, 'network.error.terminate_taskflow.resp.data.message')
