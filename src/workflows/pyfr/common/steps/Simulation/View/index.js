@@ -140,9 +140,7 @@ export default connect(
   },
   () => ({
     onVisualizeTaskflow: (sim, location) => {
-      dispatch(SimActions.saveSimulation(sim, null));
-      const metadata = sim.steps.Visualization.metadata;
-      dispatch(SimActions.updateSimulationStep(sim._id, 'Visualization', { metadata }, location));
+      dispatch(SimActions.saveSimulation(sim, null, location));
     },
     onDeleteTaskflow: (id, simulationStep, location) => dispatch(Actions.deleteTaskflow(id, simulationStep, location)),
     onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
