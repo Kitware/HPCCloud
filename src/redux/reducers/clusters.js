@@ -82,7 +82,6 @@ export default function clustersReducer(state = initialState, action) {
     case Actions.ADD_EXISTING_CLUSTER: {
       const newCluster = action.cluster;
       const mapById = Object.assign({}, state.mapById);
-      console.log('adding cluster', newCluster);
       mapById[newCluster._id] = newCluster;
       return Object.assign({}, state, { mapById });
     }
@@ -109,19 +108,16 @@ export default function clustersReducer(state = initialState, action) {
     }
 
     case Actions.UPDATE_CLUSTERS: {
-      const list = action.clusters;
+      // do not save ec2 clusters in the list, it's only used for trad clusters
+      const list = action.clusters.filter((cluster) => cluster.type === 'trad');
       const active = (state.active < list.length) ? state.active : (list.length - 1);
       const mapById = Object.assign({}, state.mapById);
       updateIcon(list);
-      list.forEach(cluster => {
+      action.clusters.forEach(cluster => {
         if (cluster._id) {
           mapById[cluster._id] = cluster;
         }
       });
-      // do not save ec2 clusters in the list, it's only used for trad clusters
-      if (list.length && list[0].type !== 'trad') {
-        return Object.assign({}, state, { mapById });
-      }
       return Object.assign({}, state, { list, active, mapById });
     }
 

@@ -95,7 +95,6 @@ const SimualtionView = React.createClass({
     const { taskflow, taskflowId, simulation, buttonsDisabled, error } = this.props;
     const actions = [].concat(taskflow.actions ? taskflow.actions : []);
 
-    // Extract meaningful information from props
     if (taskflow.allComplete) {
       actions.push('visualize');
     }

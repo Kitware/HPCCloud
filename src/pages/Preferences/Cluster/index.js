@@ -52,6 +52,8 @@ const ClusterPrefs = React.createClass({
     onAddItem: React.PropTypes.func,
     onRemoveItem: React.PropTypes.func,
     onTestCluster: React.PropTypes.func,
+    fetchPresets: React.PropTypes.func,
+    fetchClusters: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -66,6 +68,13 @@ const ClusterPrefs = React.createClass({
 
   getInitialState() {
     return { _error: null };
+  },
+
+  componentDidMount() {
+    if (!this.props.presetNames.length) {
+      this.props.fetchPresets();
+      this.props.fetchClusters();
+    }
   },
 
   changeItem(item) {
@@ -208,6 +217,8 @@ export default connect(
       onAddItem: () => dispatch(Actions.addCluster()),
       onRemoveItem: (index, cluster) => dispatch(Actions.removeCluster(index, cluster)),
       onTestCluster: (index, cluster) => dispatch(Actions.testCluster(index, cluster)),
+      fetchPresets: () => dispatch(Actions.fetchClusterPresets()),
+      fetchClusters: () => dispatch(Actions.fetchClusters('trad')),
     };
   }
 )(ClusterPrefs);
