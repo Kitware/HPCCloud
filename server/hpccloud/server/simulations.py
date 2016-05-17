@@ -92,7 +92,7 @@ class Simulations(Resource):
     @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def update(self, simulation, params):
         immutable = ['projectId', 'folderId', 'access', 'userId', '_id',
-                     'steps', 'updated', 'created']
+                     'updated', 'created']
         updates = getBodyJson()
 
         for p in updates:
@@ -106,11 +106,12 @@ class Simulations(Resource):
         disabled = updates.get('disabled')
         status = updates.get('status')
         metadata = updates.get('metadata')
+        steps = updates.get('steps')
 
         return self._model.update(user, simulation, name=name,
                                   metadata=metadata, description=description,
                                   active=active, disabled=disabled,
-                                  status=status)
+                                  status=status, steps=steps)
 
     addModel('CloneParams', {
         'id': 'CloneParams',
