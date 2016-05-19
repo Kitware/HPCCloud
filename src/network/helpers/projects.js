@@ -1,12 +1,4 @@
-import girder from './GirderClient';
-
-export function listProjects() {
-  return girder.listProjects();
-}
-
-export function getProject(id) {
-  return girder.getProject(id);
-}
+import girder from '../';
 
 function createItemForProject(project, name, file) {
   return girder.createItem(project.metadata.inputFolder._id, name)
@@ -84,9 +76,4 @@ export function saveProject(project_, attachments) {
       .catch((error) => new Promise((a, r) => { r(error); }));
   }
   return girder.updateProject(project);
-}
-
-export function deleteProject(id) {
-  // Caution this could fail if any simulation is nested !!!
-  return girder.deleteProject(id);
 }

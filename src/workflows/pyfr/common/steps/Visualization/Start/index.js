@@ -50,7 +50,6 @@ const VisualizationStart = React.createClass({
     const sessionKey = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
     const dataDir = this.props.simulation.steps.Visualization.metadata.dataDir;
     const fileName = this.props.simulation.steps.Visualization.metadata.fileName;
-    var clusterId = this.state[this.state.serverType].profile;
     const payload = {
       dataDir, // where the output for the sim will be
       fileName, // the file to load
@@ -69,18 +68,17 @@ const VisualizationStart = React.createClass({
         );
       } else {
         payload.cluster = { _id: this.state.EC2.cluster };
-        clusterId = this.state.EC2.cluster;
       }
     }
 
     const simStepUpdate = {
       id: this.props.simulation._id,
+      name: this.props.simulation.name,
       step: 'Visualization',
       data: {
         view: 'run',
         metadata: {
           dataDir,
-          clusterId,
           sessionId: sessionKey,
         },
       },

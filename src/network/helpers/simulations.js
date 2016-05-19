@@ -1,13 +1,5 @@
-import girder from './GirderClient';
-import { invalidateSimulation } from './Notification';
-
-export function deleteSimulation(id) {
-  return girder.deleteSimulation(id);
-}
-
-export function getSimulation(id) {
-  return girder.getSimulation(id);
-}
+import girder from '../';
+import { invalidateSimulation } from './notifications';
 
 function createItemForSimulation(simulation, name, file) {
   return girder.createItem(simulation.metadata.inputFolder._id, name)
@@ -104,10 +96,6 @@ export function saveSimulation(simulation_, attachments) {
   return girder.editSimulation(simulation);
 }
 
-export function getProjectSimulations(pId) {
-  return girder.listSimulations(pId);
-}
-
 export function updateDisabledSimulationSteps(simulation) {
   invalidateSimulation(simulation);
   return girder.editSimulation(simulation);
@@ -127,12 +115,4 @@ export function activateSimulationStep(simulation, active, disabled) {
   invalidateSimulation(simulation);
 
   return girder.editSimulation(simulation);
-}
-
-export function getSimulationStep(id, name) {
-  return girder.getSimulationStep(id, name);
-}
-
-export function updateSimulationStep(id, name, step) {
-  return girder.updateSimulationStep(id, name, step);
 }

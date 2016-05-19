@@ -13,11 +13,11 @@ function isEmptyWallTime(walltime) {
   }
 
   const undefinedKeys = ['hours', 'minutes', 'seconds'].filter(k =>
-    walltime[k] === ''
-    || walltime[k] === '0'
-    || walltime[k] === 0
-    || walltime[k] === null
-    || walltime[k] === undefined);
+    walltime[k] === '' ||
+    walltime[k] === '0' ||
+    walltime[k] === 0 ||
+    walltime[k] === null ||
+    walltime[k] === undefined);
 
   return undefinedKeys.length === 3;
 }
@@ -44,7 +44,7 @@ export default React.createClass({
 
   updateState() {
     this.setState({ busy: true });
-    client.listClusterProfiles('trad')
+    client.listClusters('trad')
       .then((resp) => {
         this.setState({
           profiles: resp.data,

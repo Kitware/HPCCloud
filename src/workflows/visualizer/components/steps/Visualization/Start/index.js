@@ -44,7 +44,6 @@ const VisualizationStart = React.createClass({
 
   startVisualization() {
     const sessionKey = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
-    var clusterId = this.state[this.state.serverType].profile;
     const payload = {
       sessionKey,
       input: {
@@ -66,7 +65,6 @@ const VisualizationStart = React.createClass({
         );
       } else {
         payload.cluster = { _id: this.state.EC2.cluster };
-        clusterId = this.state.EC2.cluster;
       }
     } else {
       console.log('unrecognized serverType: ', this.state.serverType);
@@ -75,12 +73,12 @@ const VisualizationStart = React.createClass({
 
     const simStepUpdate = {
       id: this.props.simulation._id,
+      name: this.props.simulation.name,
       step: 'Visualization',
       data: {
         view: 'run',
         metadata: {
           sessionId: sessionKey,
-          clusterId,
         },
       },
     };

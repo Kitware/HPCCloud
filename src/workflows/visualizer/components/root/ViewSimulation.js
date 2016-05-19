@@ -2,7 +2,7 @@ import ActiveList       from '../../../../panels/ActiveList';
 import VizModule        from './../../index.js';
 import React            from 'react';
 import Toolbar          from '../../../../panels/Toolbar';
-import client           from '../../../../network';
+import { activateSimulationStep } from '../../../../network/helpers/simulations';
 
 import style            from 'HPCCloudStyle/PageWithMenu.mcss';
 import { primaryBreadCrumbs } from '../../../../utils/Constants';
@@ -24,7 +24,7 @@ export default React.createClass({
 
   updateActiveStep(idx, item) {
     const stepName = VizModule.steps._order[idx];
-    client.activateSimulationStep(this.props.simulation, stepName)
+    activateSimulationStep(this.props.simulation, stepName)
       .then(resp => {
         if (stepName === 'Visualization') {
           const stepView = resp.data.steps[stepName].view ? resp.data.steps[stepName].view : 'default',

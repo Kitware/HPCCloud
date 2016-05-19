@@ -22,7 +22,7 @@ export function fetchServers() {
     const action = netActions.addNetworkCall('fetch_servers', 'Retreive servers');
 
     dispatch(pendingNetworkCall(true));
-    client.listClusterProfiles()
+    client.listClusters()
       .then(resp => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateClusterList(resp.data));

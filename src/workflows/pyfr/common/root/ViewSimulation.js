@@ -1,7 +1,7 @@
 import ActiveList   from '../../../../panels/ActiveList';
 import React        from 'react';
 import Toolbar      from '../../../../panels/Toolbar';
-import client       from '../../../../network';
+import { activateSimulationStep } from '../../../../network/helpers/simulations';
 
 import style            from 'HPCCloudStyle/PageWithMenu.mcss';
 import { primaryBreadCrumbs } from '../../../../utils/Constants';
@@ -24,7 +24,7 @@ export default React.createClass({
 
   updateActiveStep(idx, item) {
     const stepName = this.props.module.steps._order[idx];
-    client.activateSimulationStep(this.props.simulation, stepName)
+    activateSimulationStep(this.props.simulation, stepName)
       .then(resp => this.context.router.replace(['/View/Simulation', this.props.simulation._id, stepName].join('/')))
       .catch(err => {
         console.log('Update active error for', stepName);

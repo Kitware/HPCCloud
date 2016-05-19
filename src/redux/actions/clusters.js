@@ -1,8 +1,9 @@
-import * as netActions  from './network';
-import * as TaskflowActions from './taskflows';
-import client           from '../../network';
-import { store, dispatch }     from '..';
-import { baseURL }      from '../../utils/Constants.js';
+import * as netActions       from './network';
+import * as TaskflowActions  from './taskflows';
+import client                from '../../network';
+import * as ClusterHelper    from '../../network/helpers/clusters';
+import { store, dispatch }   from '..';
+import { baseURL }           from '../../utils/Constants.js';
 
 export const ADD_CLUSTER = 'ADD_CLUSTER';
 export const ADD_EXISTING_CLUSTER = 'ADD_EXISTING_CLUSTER';
@@ -80,6 +81,10 @@ export function updateClusterStatus(id, status) {
   return { type: UPDATE_CLUSTER_STATUS, id, status };
 }
 
+export function updateClusterConfig(id, params) {
+  // client.;
+}
+
 export function getClusterLog(id, offset) {
   return dispatch => {
     const action = netActions.addNetworkCall(`cluster_log_${id}`, 'Check cluster log');
@@ -147,7 +152,7 @@ export function fetchCluster(id) {
 export function fetchClusters(type) {
   const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
   dispatch(pendingNetworkCall(true));
-  client.listClusterProfiles(type)
+  client.listClusters(type)
     .then(
       resp => {
         dispatch(netActions.successNetworkCall(action.id, resp));
@@ -236,7 +241,7 @@ export function updateCluster(index, cluster, pushToServer = false) {
     if (pushToServer) {
       const action = netActions.addNetworkCall('save_cluster', 'Save cluster');
       dispatch(pendingNetworkCall(true));
-      client.saveCluster(cluster)
+      ClusterHelper.saveCluster(cluster)
         .then(
           resp => {
             dispatch(pendingNetworkCall(false));

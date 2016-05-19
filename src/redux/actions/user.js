@@ -50,7 +50,7 @@ export function login(username, password) {
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(authenticationPending(false));
-          dispatch(loggedIn(client.getUser()));
+          dispatch(loggedIn(client.getLoggedInUser()));
           dispatch(routingActions.replace('/'));
         },
         err => {
@@ -142,7 +142,7 @@ export function updateUser(user, pushOnServer = false) {
 // Auto trigger actions on authentication change...
 client.onAuthChange(authenticated => {
   if (authenticated) {
-    dispatch(loggedIn(client.getUser()));
+    dispatch(loggedIn(client.getLoggedInUser()));
   } else {
     dispatch({ type: LOGOUT });
   }

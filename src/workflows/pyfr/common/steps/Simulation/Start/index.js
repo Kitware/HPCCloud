@@ -50,14 +50,11 @@ const SimulationStart = React.createClass({
 
   runSimulation() {
     const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
-    var clusterName,
-      clusterId = this.state[this.state.serverType].profile,
+    var activeSimulation = { name: this.props.simulation.name, step: this.props.step },
       sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
       payload;
 
-
     if (this.state.serverType === 'Traditional') {
-      clusterName = this.props.clusters[this.state[this.state.serverType].profile].name;
       payload = Object.assign({},
         this.state.Traditional.runtime || {},
         {
@@ -111,26 +108,24 @@ const SimulationStart = React.createClass({
         );
       } else {
         payload.cluster = { _id: this.state.EC2.cluster };
-        clusterId = this.state.EC2.cluster;
       }
     } else {
       console.log('unrecognized serverType: ', this.state.serverType);
       return;
     }
-
+    payload.activeSimulation = activeSimulation;
     this.props.onRun(
       this.props.taskFlowName,
       this.props.primaryJob,
       payload,
       {
         id: this.props.simulation._id,
+        name: this.props.simulation.name,
         step: 'Simulation',
         data: {
           view: 'run',
           metadata: {
             sessionId,
-            clusterId,
-            cluster: clusterName,
           },
         },
       },
