@@ -13,9 +13,7 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
     createFolder(folder) {
       const allowed = ['parentType', 'parentId', 'name', 'description', 'public'],
         params = filterQuery(folder, ...allowed),
-        {
-          missingKeys, promise,
-        } = mustContain(folder, 'parentType', 'parentId', 'name');
+        { missingKeys, promise } = mustContain(folder, 'parentType', 'parentId', 'name');
 
       return missingKeys ? promise : busy(client._.post(`/folder${encodeQueryAsString(params)}`));
     },
@@ -35,9 +33,7 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
     editFolder(folder) {
       const allowed = ['parentType', 'parentId', 'name', 'description'],
         params = filterQuery(folder, ...allowed),
-        {
-          missingKeys, promise,
-        } = mustContain(folder, '_id');
+        { missingKeys, promise } = mustContain(folder, '_id');
 
       return missingKeys ? promise : busy(client._.put(`/folder/${folder._id}${encodeQueryAsString(params)}`));
     },
@@ -53,9 +49,7 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
     editFolderAccess(folder) {
       const allowed = ['access', 'public'],
         params = filterQuery(folder, ...allowed),
-        {
-          missingKeys, promise,
-        } = mustContain(folder, '_id');
+        { missingKeys, promise } = mustContain(folder, '_id');
 
       return missingKeys ? promise : busy(client._.put(`/folder/${folder._id}/access${encodeQueryAsString(params)}`));
     },

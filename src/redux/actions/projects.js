@@ -18,6 +18,9 @@ export const UPDATE_SIMULATION = 'UPDATE_SIMULATION';
 
 /* eslint-disable no-shadow */
 
+// ----------------------------------------------------------------------------
+// PROJECTS
+// ----------------------------------------------------------------------------
 export function updateProjectList(projects) {
   return { type: UPDATE_PROJECT_LIST, projects };
 }
@@ -85,13 +88,22 @@ export function deleteProject(project) {
   };
 }
 
+export function setActiveProject(id, location) {
+  return dispatch => {
+    const updateActive = { type: UPDATE_ACTIVE_PROJECT, id };
+
+    if (location) {
+      dispatch(updateActive);
+      return router.push(location);
+    }
+    return updateActive;
+  };
+}
+
 export function updateProject(project) {
   return { type: UPDATE_PROJECT, project };
 }
 
-export function updateSimulation(simulation) {
-  return { type: UPDATE_SIMULATION, simulation };
-}
 
 export function saveProject(project, attachments) {
   return dispatch => {
@@ -119,6 +131,14 @@ export function saveProject(project, attachments) {
 
     return action;
   };
+}
+
+// ----------------------------------------------------------------------------
+// SIMULATIONS
+// ----------------------------------------------------------------------------
+
+export function updateSimulation(simulation) {
+  return { type: UPDATE_SIMULATION, simulation };
 }
 
 export function saveSimulation(simulation, attachments, location) {
@@ -171,19 +191,6 @@ export function deleteSimulation(simulation, location) {
     return action;
   };
 }
-
-export function setActiveProject(id, location) {
-  return dispatch => {
-    const updateActive = { type: UPDATE_ACTIVE_PROJECT, id };
-
-    if (location) {
-      dispatch(updateActive);
-      return router.push(location);
-    }
-    return updateActive;
-  };
-}
-
 
 export function setActiveSimulation(id, location) {
   return dispatch => {

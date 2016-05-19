@@ -16,6 +16,7 @@ export default React.createClass({
     logToggle: React.PropTypes.func.isRequired,
     terminateCluster: React.PropTypes.func,
     deleteCluster: React.PropTypes.func,
+    noControls: React.PropTypes.bool,
   },
 
   barAction(action) {
@@ -55,7 +56,10 @@ export default React.createClass({
             unit={{ name: 'Log', log: (this.props.log || []), status: '' }}
             open
           />
-          <ButtonBar actions={actions} onAction={this.barAction} />
+          { !this.props.noControls ?
+            <ButtonBar actions={actions} onAction={this.barAction} />
+            : null
+          }
       </CollapsibleWidget>
     </div>);
   },

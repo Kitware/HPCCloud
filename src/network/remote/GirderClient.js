@@ -78,9 +78,7 @@ export function build(config = location, ...extensions) {
       promise.then(idle, idle);
       return promise;
     },
-    {
-      protocol, hostname, port, basepath = '/api/v1',
-    } = config,
+    { protocol, hostname, port, basepath = '/api/v1' } = config,
     baseURL = `${protocol}//${hostname}:${port}${basepath}`,
     connectToNotificationStream = () => {
       if (EventSource) {
@@ -94,7 +92,7 @@ export function build(config = location, ...extensions) {
           // Wait 10 seconds if the browser hasn't reconnected then
           // reinitialize.
           setTimeout(() => {
-            if (eventSource && eventSource.readyState === 2) {
+            if (eventSource && eventSource.readyState === EventSource.CLOSED) {
               connectToNotificationStream();
             } else {
               eventSource = null;

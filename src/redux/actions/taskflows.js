@@ -5,6 +5,7 @@ import client           from '../../network';
 import { store, dispatch } from '..';
 
 export const ADD_TASKFLOW = 'ADD_TASKFLOW';
+export const UPDATE_TASKFLOW = 'UPDATE_TASKFLOW';
 export const UPDATE_TASKFLOW_LOG = 'UPDATE_TASKFLOW_LOG';
 export const CLEAR_UPDATE_LOG = 'CLEAR_UPDATE_LOG';
 export const UPDATE_TASKFLOW_STATUS = 'UPDATE_TASKFLOW_STATUS';
@@ -12,11 +13,82 @@ export const UPDATE_TASKFLOW_JOB_LOG = 'UPDATE_TASKFLOW_JOB_LOG';
 export const UPDATE_TASKFLOW_JOB_STATUS = 'UPDATE_TASKFLOW_JOB_STATUS';
 export const UPDATE_TASKFLOW_TASKS = 'UPDATE_TASKFLOW_TASKS';
 export const UPDATE_TASKFLOW_TASK_STATUS = 'UPDATE_TASKFLOW_TASK_STATUS';
+export const UPDATE_TASKFLOW_METADATA = 'UPDATE_TASKFLOW_METADATA';
 export const BIND_SIMULATION_TO_TASKFLOW = 'BIND_SIMULATION_TO_TASKFLOW';
 export const DELETE_TASKFLOW = 'DELETE_TASKFLOW';
-export const UPDATE_TASKFLOW_METADATA = 'UPDATE_TASKFLOW_METADATA';
 
 /* eslint-disable no-shadow */
+
+// ----------------------------------------------------------------------------
+// LOGGING
+// ----------------------------------------------------------------------------
+
+export function clearUpdateLog() {
+  return { type: CLEAR_UPDATE_LOG };
+}
+
+export function updateTaskflowLog(taskflowId) {
+  return dispatch => {
+    const action = netActions.addNetworkCall(`taskflow_log_${taskflowId}`, 'Check taskflow log');
+    client.getTaskflowLog(taskflowId)
+      .then(resp => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch({ type: UPDATE_TASKFLOW_LOG, taskflowId, log: resp.data.log });
+      })
+      .catch(error => {
+        dispatch(netActions.errorNetworkCall(action.id, error));
+      });
+    return action;
+  };
+}
+
+export function updateTaskflowJobLog(taskflowId, jobId) {
+  return dispatch => {
+    const action = netActions.addNetworkCall(`taskflow_job_log_${jobId}`, 'Check job log');
+
+    client.getJobLog(jobId)
+      .then(
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch({ type: UPDATE_TASKFLOW_JOB_LOG, taskflowId, jobId, log: resp.data.log });
+        },
+        error => {
+          dispatch(netActions.errorNetworkCall(action.id, error));
+        });
+
+    return action;
+  };
+}
+
+// ----------------------------------------------------------------------------
+// STATUSES
+export function updateTaskflowJobStatus(taskflowId, jobId, status) {
+  return dispatch => {
+    if (status) {
+      return { type: UPDATE_TASKFLOW_JOB_STATUS, taskflowId, jobId, status };
+    }
+    const action = netActions.addNetworkCall(`taskflow_job_status_${jobId}`, 'Check job status');
+
+    client.getJobStatus(jobId)
+      .then(
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch({ type: UPDATE_TASKFLOW_JOB_STATUS, taskflowId, jobId, status: resp.data.status });
+        },
+        error => {
+          dispatch(netActions.errorNetworkCall(action.id, error));
+        });
+
+    return action;
+  };
+}
+
+export function updateTaskflowTaskStatus(taskflowId, taskId, status) {
+  return { type: UPDATE_TASKFLOW_TASK_STATUS, taskflowId, taskId, status };
+}
+
+// ----------------------------------------------------------------------------
+// CRUD operations
 
 export function addTaskflow(taskflow, primaryJob = null) {
   return { type: ADD_TASKFLOW, taskflow, primaryJob };
@@ -26,12 +98,13 @@ export function attachSimulationToTaskflow(simulationId, taskflowId, stepName) {
   return { type: BIND_SIMULATION_TO_TASKFLOW, taskflowId, simulationId, stepName };
 }
 
-export function clearUpdateLog() {
-  return { type: CLEAR_UPDATE_LOG };
-}
-
 export function updateTaskflowStatus(id, status) {
   return { type: UPDATE_TASKFLOW_STATUS, id, status };
+}
+
+export function updateTaskflowMetadata(id, metadata) {
+  // metadata can have: { actions, allComplete, outputDirectory, primaryJob }
+  return { type: UPDATE_TASKFLOW_METADATA, id, metadata };
 }
 
 export function startTaskflow(id, payload, simulationStep, location) {
@@ -82,60 +155,6 @@ export function createTaskflow(taskFlowName, primaryJob, payload, simulationStep
   };
 }
 
-export function updateTaskflowLog(taskflowId) {
-  return dispatch => {
-    const action = netActions.addNetworkCall(`taskflow_log_${taskflowId}`, 'Check taskflow log');
-    client.getTaskflowLog(taskflowId)
-      .then(resp => {
-        dispatch(netActions.successNetworkCall(action.id, resp));
-        dispatch({ type: UPDATE_TASKFLOW_LOG, taskflowId, log: resp.data.log });
-      })
-      .catch(error => {
-        dispatch(netActions.errorNetworkCall(action.id, error));
-      });
-    return action;
-  };
-}
-
-export function updateTaskflowJobLog(taskflowId, jobId) {
-  return dispatch => {
-    const action = netActions.addNetworkCall(`taskflow_job_log_${jobId}`, 'Check job log');
-
-    client.getJobLog(jobId)
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch({ type: UPDATE_TASKFLOW_JOB_LOG, taskflowId, jobId, log: resp.data.log });
-        },
-        error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
-        });
-
-    return action;
-  };
-}
-
-export function updateTaskflowJobStatus(taskflowId, jobId, status) {
-  return dispatch => {
-    if (status) {
-      return { type: UPDATE_TASKFLOW_JOB_STATUS, taskflowId, jobId, status };
-    }
-    const action = netActions.addNetworkCall(`taskflow_job_status_${jobId}`, 'Check job status');
-
-    client.getJobStatus(jobId)
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch({ type: UPDATE_TASKFLOW_JOB_STATUS, taskflowId, jobId, status: resp.data.status });
-        },
-        error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
-        });
-
-    return action;
-  };
-}
-
 export function fetchTaskflowTasks(taskflowId) {
   return dispatch => {
     const action = netActions.addNetworkCall('taskflow_tasks', 'Check tasks');
@@ -153,10 +172,6 @@ export function fetchTaskflowTasks(taskflowId) {
 
     return action;
   };
-}
-
-export function updateTaskflowTaskStatus(taskflowId, taskId, status) {
-  return { type: UPDATE_TASKFLOW_TASK_STATUS, taskflowId, taskId, status };
 }
 
 export function fetchTaskflow(id) {
@@ -245,11 +260,6 @@ export function terminateTaskflow(id) {
 
     return action;
   };
-}
-
-export function updateTaskflowMetadata(id, metadata) {
-  // metadata can have: { actions, allComplete, outputDirectory, primaryJob }
-  return { type: UPDATE_TASKFLOW_METADATA, id, metadata };
 }
 
 // ----------------------------------------------------------------------------

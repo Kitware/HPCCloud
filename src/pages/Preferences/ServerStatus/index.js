@@ -1,6 +1,5 @@
 // import client           from '../../../network';
 import OutputPanel    from '../../../panels/OutputPanel';
-import ExecutionUnit  from '../../../panels/JobMonitor/ExecutionUnit';
 import ClusterStatus  from './ClusterStatus';
 import Toolbar        from '../../../panels/Toolbar';
 import React          from 'react';
@@ -22,26 +21,7 @@ const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 3 });
 // const OPEN = 1;
 const CLOSED = 2;
 
-// iterate through each simulation and their steps to find a matching clusterId,
-// return { simulation.name, simulationSteps[j] }
-function findSimulationNameOnCluster(simulationMap, clusterId) {
-  const simulationKeys = Object.keys(simulationMap);
-  for (let i = 0; i < simulationKeys.length; i++) {
-    const simulation = simulationMap[simulationKeys[i]];
-    if (!simulation) {
-      continue;
-    }
-    const simulationSteps = Object.keys(simulation.steps);
-    for (let j = 0; j < simulationSteps.length; j++) {
-      const step = simulation.steps[simulationSteps[j]];
-      // console.log(`step cluster: ${step.metadata.clusterId}, looking for: ${clusterId}`);
-      if (step.metadata && step.metadata.clusterId === clusterId) {
-        return { name: simulation.name, step: simulationSteps[j] };
-      }
-    }
-  }
-  return { name: 'no simulation on this cluster.', step: '' };
-}
+const noSimulation = { name: 'no simulation on this cluster.', step: '' };
 
 const StatusPage = React.createClass({
   displayName: 'Preferences/Status',
@@ -98,9 +78,10 @@ const StatusPage = React.createClass({
 
   ec2Mapper(el, index) {
     const offset = el.log ? el.log.length : 0;
+    const activeSimulation = el.config.simulation ? el.config.simulation : noSimulation;
     return (<ClusterStatus key={el._id} title={el.name} status={el.status}
       clusterId={el._id} log={el.log || []}
-      simulation={findSimulationNameOnCluster(this.props.simulations, el._id)}
+      simulation={activeSimulation}
       logToggle={this.logToggle(el._id, offset)}
       terminateCluster={this.props.terminateCluster}
       deleteCluster={this.props.deleteCluster}
@@ -109,9 +90,14 @@ const StatusPage = React.createClass({
 
   tradClusterMapper(el, index) {
     const offset = el.log ? el.log.length : 0;
-    return (<ExecutionUnit key={el._id} alwaysShowLogToggle
-      unit={{ name: el.name, log: (el.log || []), status: el.status }}
-      onToggle={this.logToggle(el._id, offset)}
+    const activeSimulation = el.config.simulation ? el.config.simulation : noSimulation;
+    return (<ClusterStatus key={el._id} title={el.name} status={el.status}
+      clusterId={el._id} log={el.log || []}
+      simulation={activeSimulation}
+      logToggle={this.logToggle(el._id, offset)}
+      terminateCluster={this.props.terminateCluster}
+      deleteCluster={this.props.deleteCluster}
+      noControls
     />);
   },
 

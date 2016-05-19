@@ -40,11 +40,8 @@ export default function ({ client, filterQuery, mustContain, encodeQueryAsString
     //     Update the cluster
     updateCluster(cluster) {
       const editableCluster = deepClone(cluster),
-        expected = ['name', 'type', 'config', '_id'],
-        cfiltered = filterQuery(editableCluster, ...expected.slice(0, 3)),
-        {
-          missingKeys, promise,
-        } = mustContain(cluster, ...expected);
+        allowed = ['name', 'type', 'config', '_id'],
+        params = filterQuery(editableCluster, ...allowed.slice(0, 3));
 
       // Remove read only fields if any
       if (editableCluster.config.ssh && editableCluster.config.ssh.user) {
@@ -54,10 +51,9 @@ export default function ({ client, filterQuery, mustContain, encodeQueryAsString
         delete editableCluster.config.host;
       }
 
-      return missingKeys ? promise :
-        busy(client._.patch(`/clusters/${cluster._id}`, cfiltered, {
-          transformRequest, headers,
-        }));
+      return busy(client._.patch(`/clusters/${cluster._id}`, params, {
+        transformRequest, headers,
+      }));
     },
 
     // delete /clusters/{id}
@@ -89,6 +85,11 @@ export default function ({ client, filterQuery, mustContain, encodeQueryAsString
     // put /clusters/{id}/start
     //     Start a cluster (ec2 only)
     startCluster(id) {
+      return busy(client._.put(`/clusters/${id}/start`));
+    },
+
+    // alias for startClusters
+    testCluster(id) {
       return busy(client._.put(`/clusters/${id}/start`));
     },
 

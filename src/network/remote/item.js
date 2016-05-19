@@ -25,9 +25,7 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
     },
 
     createItem(folderId, name, description = '') {
-      const params = {
-        folderId, name, description,
-      };
+      const params = { folderId, name, description };
       return busy(client._.post(`/item${encodeQueryAsString(params)}`));
     },
 
@@ -59,9 +57,7 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
     editItem(item) {
       const expected = ['folderId', 'name', 'description'],
         params = filterQuery(item, ...expected),
-        {
-          missingKeys, promise,
-        } = mustContain(params, '_id');
+        { missingKeys, promise } = mustContain(params, '_id');
 
       return missingKeys ? promise : busy(client._.put(`/item/${item._id}${encodeQueryAsString(params)}`));
     },
@@ -70,9 +66,7 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
     copyItem(id, destinationItem) {
       const expected = ['folderId', 'name', 'description'],
         params = filterQuery(destinationItem, ...expected),
-        {
-          missingKeys, promise,
-        } = mustContain(params, 'folderId');
+        { missingKeys, promise } = mustContain(params, 'folderId');
 
       return missingKeys ? promise : busy(client._.post(`/item/${id}/copy${encodeQueryAsString(params)}`));
     },

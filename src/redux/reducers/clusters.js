@@ -116,6 +116,12 @@ export default function clustersReducer(state = initialState, action) {
         { active: action.index });
     }
 
+    case Actions.UPDATE_EXISTING_CLUSTER: {
+      const mapById = Object.assign({}, state.mapById);
+      mapById[action.cluster._id] = action.cluster;
+      return Object.assign({}, state, { mapById });
+    }
+
     case Actions.UPDATE_CLUSTERS: {
       // do not save ec2 clusters in the list, it's only used for trad clusters
       const list = action.clusters.filter((cluster) => cluster.type === 'trad');

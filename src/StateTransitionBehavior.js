@@ -1,5 +1,6 @@
 import * as ProjectActions  from './redux/actions/projects';
 import * as TaskflowActions from './redux/actions/taskflows';
+import * as ClusterActions from './redux/actions/clusters';
 import * as FSActions       from './redux/actions/fs';
 import Workflows            from './workflows';
 
@@ -18,23 +19,6 @@ function folderItemSize(state, folderId) {
   return 0;
 }
 
-// iterate through each simulation and their steps to find a matching taskflowId,
-// return {activeStep and simulation._id} else false;
-function findSimulationForTaskflow(simulationMap, taskflowId) {
-  const simulationKeys = Object.keys(simulationMap);
-  for (let i = 0; i < simulationKeys.length; i++) {
-    const simulation = simulationMap[simulationKeys[i]];
-    const simulationSteps = Object.keys(simulation.steps);
-    for (let j = 0; j < simulationSteps.length; j++) {
-      const step = simulation.steps[simulationSteps[j]];
-      console.log(simulationSteps[j], step, taskflowId);
-      if (step.metadata && step.metadata.taskflowId === taskflowId) {
-        return { step: simulationSteps[j], id: simulation._id };
-      }
-    }
-  }
-  return false;
-}
 export function handleTaskflowChange(state, taskflow) {
   if (!taskflow) {
     return;
@@ -55,10 +39,8 @@ export function handleTaskflowChange(state, taskflow) {
   const simulationStatus = [];
 
   // Figure out possible actions and simulation state
-  if (jobs.length && jobs.every(job => job.status === 'terminated')) {
-    simulationStatus.push('terminated');
-    actions.push('rerun');
-  } else if (tasks.some(task => task.status === 'error') && (jobs.length === 0 || !jobs.some(job => job.status === 'running'))) {
+  if ((jobs.length && jobs.every(job => job.status === 'terminated')) ||
+    (tasks.some(task => task.status === 'error') && (jobs.length === 0 || !jobs.some(job => job.status === 'running')))) {
     simulationStatus.push('terminated');
     actions.push('rerun');
   } else if (!allComplete && (jobs.length + tasks.length) > 0 && !jobs.some(job => job.status === 'terminating')) {
@@ -100,22 +82,17 @@ export function handleTaskflowChange(state, taskflow) {
     const tfClusterId = taskflow.flow.meta.cluster._id,
       tfCluster = state.preferences.clusters.mapById[tfClusterId];
 
-    // add clusterId to simulation meta if we find the taskflow in a simulation.
-    // tfSimulation = {id, step} or false
-    const tfSimulation = findSimulationForTaskflow(state.simulations.mapById, taskflow.flow._id);
-    if (tfSimulation && tfCluster && tfCluster.type === 'ec2') {
-      const simulation = state.simulations.mapById[tfSimulation.id];
-      const simCluster = simulation.steps[tfSimulation.step].metadata.clusterId;
-      console.log(`simulation: ${tfSimulation}, ${tfClusterId} !== ${simCluster}?`);
-      if (simCluster && simCluster !== tfClusterId) {
-        simulation.steps[tfSimulation.step].metadata.clusterId = tfClusterId;
-        const metadata = simulation.steps[tfSimulation.step].metadata;
-        dispatch(ProjectActions.updateSimulationStep(simulation._id, tfSimulation.step, { metadata }, null));
-        console.log(`new meta "${simulation.name}" ${tfSimulation.step} cId ${tfClusterId}`);
-      }
-    } else {
-      console.log('no sim found for cluster');
+    // add simulation info to cluster config.
+    if (tfCluster && taskflow.flow.meta.cluster && taskflow.simulation) {
+      const tfSimulation = state.simulations.mapById[taskflow.simulation];
+      const simulation = {
+        name: tfSimulation.name,
+        step: taskflow.stepName,
+      };
+      tfCluster.config.simulation = simulation;
+      dispatch(ClusterActions.updateCluster(tfCluster));
     }
+
     // add the terminate instance button if running or error
     if (tfCluster && tfCluster.type === 'ec2' &&
       taskflow.flow.status !== 'running' &&

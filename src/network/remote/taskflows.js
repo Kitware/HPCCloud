@@ -3,9 +3,7 @@ export default function ({ client, filterQuery, mustContain, busy }) {
 
     // POST /taskflows Create the taskflow
     createTaskflow(taskFlowClass) {
-      return busy(client._.post('/taskflows', {
-        taskFlowClass,
-      }));
+      return busy(client._.post('/taskflows', { taskFlowClass }));
     },
 
     // GET /taskflows/{id} Get a taskflow

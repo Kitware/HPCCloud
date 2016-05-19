@@ -12,9 +12,7 @@ export default function ({ client, filterQuery, mustContain, busy }) {
 
     createProject(project) {
       const expected = ['name', 'type', 'steps', 'metadata'],
-        {
-          missingKeys, promise,
-        } = mustContain(project, ...expected);
+        { missingKeys, promise } = mustContain(project, ...expected);
       return missingKeys ? promise : busy(client._.post('/projects', project));
     },
 
@@ -25,9 +23,7 @@ export default function ({ client, filterQuery, mustContain, busy }) {
     updateProject(project) {
       const expected = ['name', 'description', 'metadata', '_id'],
         pfiltered = filterQuery(project, ...expected.slice(0, 3)), // Remove '_id'
-        {
-          missingKeys, promise,
-        } = mustContain(project, ...expected);
+        { missingKeys, promise } = mustContain(project, ...expected);
 
       return missingKeys ?
         promise :

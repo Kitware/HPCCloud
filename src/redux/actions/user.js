@@ -9,17 +9,11 @@ export const LOGOUT = 'LOGOUT';
 
 /* eslint-disable no-shadow */
 export function authenticationPending(pending = true) {
-  return {
-    type: AUTH_PENDING,
-    pending,
-  };
+  return { type: AUTH_PENDING, pending };
 }
 
 export function loggedIn(user) {
-  return {
-    type: LOGGED_IN,
-    user,
-  };
+  return { type: LOGGED_IN, user };
 }
 
 export function register(firstName, lastName, login, email, password) {

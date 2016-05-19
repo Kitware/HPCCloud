@@ -24,11 +24,9 @@ export default function ({ client, filterQuery, mustContain, busy }) {
     },
 
     cloneSimulation(id, { name = 'Cloned simulation' }) {
-      return busy(client._.post(`/simulations/${id}/clone`), {
-        name,
-      }, {
-        headers, transformRequest,
-      });
+      return busy(client._.post(`/simulations/${id}/clone`),
+        { name },
+        { headers, transformRequest });
     },
 
     downloadSimulation(id) {

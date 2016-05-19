@@ -50,8 +50,7 @@ const SimulationStart = React.createClass({
 
   runSimulation() {
     const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
-    var activeSimulation = { name: this.props.simulation.name, step: this.props.step },
-      sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
+    var sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
       payload;
 
     if (this.state.serverType === 'Traditional') {
@@ -113,7 +112,6 @@ const SimulationStart = React.createClass({
       console.log('unrecognized serverType: ', this.state.serverType);
       return;
     }
-    payload.activeSimulation = activeSimulation;
     this.props.onRun(
       this.props.taskFlowName,
       this.props.primaryJob,
