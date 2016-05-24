@@ -6,7 +6,7 @@ import React            from 'react';
 import LoadingPanel     from '../../../../../../panels/LoadingPanel';
 import { taskflowActions } from '../../../../../../utils/Constants';
 
-import get              from 'mout/src/object/get';
+import get              from '../../../../../../utils/get';
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
@@ -36,6 +36,7 @@ const VisualizationView = React.createClass({
 
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
+    cluster: React.PropTypes.object,
     buttonsDisabled: React.PropTypes.bool,
     error: React.PropTypes.string,
   },
@@ -82,7 +83,7 @@ const VisualizationView = React.createClass({
   },
 
   render() {
-    const { taskflow, taskflowId, error, simulation, buttonsDisabled } = this.props;
+    const { taskflow, taskflowId, error, simulation, cluster, buttonsDisabled } = this.props;
 
     // these can be undefined sometimes, show a loading icon if any are missing.
     if (!taskflow || !taskflow.flow ||
@@ -92,6 +93,7 @@ const VisualizationView = React.createClass({
 
     const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
     const actions = [];
+    const fileActionsDisabled = cluster ? cluster.status !== 'running' : true;
 
     taskflow.actions.forEach(action => {
       actions.push(action);
@@ -109,8 +111,10 @@ const VisualizationView = React.createClass({
         <JobMonitor taskflowId={ taskflowId }
           clusterId={taskflow.flow.meta ? taskflow.flow.meta.cluster._id : null}
         />
-        <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />
-        <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />
+        <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id}
+          actionsDisbled={fileActionsDisabled} />
+        <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id}
+          actionsDisbled={fileActionsDisabled} />
         <section>
           <ButtonBar
             onAction={ this.buttonBarAction }
@@ -137,9 +141,19 @@ export default connect(
       taskflowId = simulation.steps.Visualization.metadata.taskflowId;
     }
 
+    let taskflow = null;
+    if (taskflowId) {
+      taskflow = state.taskflows.mapById[taskflowId];
+    }
+
+    let cluster = null;
+    if (get(taskflow, 'flow.meta.cluster._id')) {
+      const clusterId = taskflow.flow.meta.cluster._id;
+      cluster = state.preferences.clusters.mapById[clusterId];
+    }
+
     return {
-      taskflowId,
-      taskflow: taskflowId ? state.taskflows.mapById[taskflowId] : null,
+      taskflowId, taskflow, cluster,
       buttonsDisabled: !!get(state, 'network.pending.terminate_taskflow') ||
                        !!get(state, 'network.pending.delete_taskflow'),
       error: null,

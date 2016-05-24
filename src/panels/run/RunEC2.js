@@ -56,7 +56,7 @@ export default React.createClass({
         if (this.props.onChange) {
           this.props.onChange('machine', newState.machinesInFamily[0], 'EC2');
         }
-        return client.listClusterProfiles('ec2');
+        return client.listClusters('ec2');
       })
       .then((resp) => {
         newState.clusters = resp.data;

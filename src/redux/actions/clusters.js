@@ -1,11 +1,14 @@
-import * as netActions  from './network';
-import * as TaskflowActions from './taskflows';
-import client           from '../../network';
-import { store, dispatch }     from '..';
-import { baseURL }      from '../../utils/Constants.js';
+import * as netActions       from './network';
+import * as TaskflowActions  from './taskflows';
+import client                from '../../network';
+import * as ClusterHelper    from '../../network/helpers/clusters';
+import { store, dispatch }   from '..';
+import { baseURL }           from '../../utils/Constants.js';
 
 export const ADD_CLUSTER = 'ADD_CLUSTER';
 export const ADD_EXISTING_CLUSTER = 'ADD_EXISTING_CLUSTER';
+export const REMOVE_CLUSTER_BY_ID = 'REMOVE_CLUSTER_BY_ID';
+export const UPDATE_EXISTING_CLUSTER = 'UPDATE_EXISTING_CLUSTER';
 export const UPDATE_ACTIVE_CLUSTER = 'UPDATE_ACTIVE_CLUSTER';
 export const UPDATE_CLUSTERS = 'UPDATE_CLUSTERS';
 export const UPDATE_CLUSTER_PRESETS = 'UPDATE_CLUSTER_PRESETS';
@@ -26,6 +29,7 @@ export function addCluster() {
   return { type: ADD_CLUSTER };
 }
 
+// called if we get a cluster sse, we add it to the mapById
 export function addExistingCluster(cluster) {
   return { type: ADD_EXISTING_CLUSTER, cluster };
 }
@@ -34,8 +38,18 @@ export function applyPreset(index, name) {
   return { type: CLUSTER_APPLY_PRESET, index, name };
 }
 
+// removes cluster from mapById, does not affect selected index in preference pane
+// (see removeCluster(index, cluster) belows)
+export function removeClusterById(id) {
+  return { type: REMOVE_CLUSTER_BY_ID, id };
+}
+
 export function updateActiveCluster(index) {
   return { type: UPDATE_ACTIVE_CLUSTER, index };
+}
+
+export function updateExistingCluster(cluster) {
+  return { type: UPDATE_EXISTING_CLUSTER, cluster };
 }
 
 export function updateClusters(clusters, type) {
@@ -101,8 +115,7 @@ export function subscribeClusterLogStream(id, offset = 0) {
     };
 
     eventSource.onerror = (e) => {
-      // Wait 10 seconds if the browser hasn't reconnected then
-      // reinitialize.
+      // Wait 10 seconds if the browser hasn't reconnected then reinitialize.
       setTimeout(() => {
         if (eventSource && eventSource.readyState === 2) {
           subscribeClusterLogStream(id);
@@ -140,31 +153,27 @@ export function fetchCluster(id) {
 }
 
 export function fetchClusters(type) {
-  return dispatch => {
-    const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
-    dispatch(pendingNetworkCall(true));
-    client.listClusterProfiles(type)
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(updateClusters(resp.data));
-          dispatch(pendingNetworkCall(false));
-        },
-        err => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
-          dispatch(pendingNetworkCall(false));
-        });
+  const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
+  dispatch(pendingNetworkCall(true));
+  client.listClusters(type)
+    .then(
+      resp => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(updateClusters(resp.data));
+        dispatch(pendingNetworkCall(false));
+      },
+      err => {
+        dispatch(netActions.errorNetworkCall(action.id, err));
+        dispatch(pendingNetworkCall(false));
+      });
 
-    return action;
-  };
+  return action;
 }
 
 export function fetchClusterPresets() {
   return dispatch => {
     const action = netActions.addNetworkCall('fetch_cluster_presets', 'Retreive cluster presets');
-
     dispatch(pendingNetworkCall(true));
-
     client.getClusterPresets()
       .then(
         presets => {
@@ -181,6 +190,7 @@ export function fetchClusterPresets() {
   };
 }
 
+// removes a cluster from the preferences page
 export function removeCluster(index, cluster) {
   return dispatch => {
     if (cluster._id) {
@@ -206,24 +216,62 @@ export function removeCluster(index, cluster) {
   };
 }
 
-export function updateCluster(index, cluster, pushToServer = false) {
+// deletes a cluster by id, different from removeCluster(index, cluster) above
+export function deleteCluster(id) {
   return dispatch => {
-    const saveAction = { type: SAVE_CLUSTER, index, cluster };
-    if (pushToServer) {
-      const action = netActions.addNetworkCall('save_cluster', 'Save cluster');
-      dispatch(pendingNetworkCall(true));
-      client.saveCluster(cluster)
-        .then(
-          resp => {
-            dispatch(pendingNetworkCall(false));
-            dispatch(netActions.successNetworkCall(action.id, resp));
-          },
-          err => {
-            dispatch(netActions.errorNetworkCall(action.id, err));
-            dispatch(pendingNetworkCall(false));
-          });
-    }
-    return saveAction;
+    const action = netActions.addNetworkCall('delete_cluster', 'Delete cluster');
+
+    dispatch(pendingNetworkCall(true));
+    client.deleteCluster(id)
+      .then(
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(pendingNetworkCall(false));
+          dispatch(removeClusterById(id));
+        },
+        err => {
+          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(pendingNetworkCall(false));
+        });
+
+    return action;
+  };
+}
+
+export function saveCluster(index, cluster, pushToServer = false) {
+  const saveAction = { type: SAVE_CLUSTER, index, cluster };
+  if (pushToServer) {
+    const action = netActions.addNetworkCall('save_cluster', 'Save cluster');
+    dispatch(pendingNetworkCall(true));
+    ClusterHelper.saveCluster(cluster)
+      .then(
+        resp => {
+          dispatch(pendingNetworkCall(false));
+          dispatch(netActions.successNetworkCall(action.id, resp));
+        },
+        err => {
+          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(pendingNetworkCall(false));
+        });
+  }
+  return saveAction;
+}
+
+export function updateCluster(cluster) {
+  return dispatch => {
+    const action = netActions.addNetworkCall('save_cluster', 'Save cluster');
+    client.updateCluster(cluster)
+      .then((resp) => {
+        dispatch(updateExistingCluster(resp.data));
+        dispatch(pendingNetworkCall(false));
+        dispatch(netActions.successNetworkCall(action.id, resp));
+      })
+      .catch((err) => {
+        console.log(err);
+        dispatch(netActions.errorNetworkCall(action.id, err));
+        dispatch(pendingNetworkCall(false));
+      });
+    return action;
   };
 }
 

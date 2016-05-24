@@ -1,6 +1,6 @@
 // import client           from '../../../network';
 import OutputPanel    from '../../../panels/OutputPanel';
-import ExecutionUnit  from '../../../panels/JobMonitor/ExecutionUnit';
+import ClusterStatus  from './ClusterStatus';
 import Toolbar        from '../../../panels/Toolbar';
 import React          from 'react';
 import { breadcrumb } from '..';
@@ -12,6 +12,7 @@ import style from 'HPCCloudStyle/JobMonitor.mcss';
 import { connect }  from 'react-redux';
 import { dispatch }   from '../../../redux';
 import * as ClusterActions from '../../../redux/actions/clusters';
+import { fetchServers } from '../../../redux/actions/statuses';
 
 const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 3 });
 
@@ -20,17 +21,23 @@ const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 3 });
 // const OPEN = 1;
 const CLOSED = 2;
 
+const noSimulation = { name: 'no simulation on this cluster.', step: '' };
+
 const StatusPage = React.createClass({
   displayName: 'Preferences/Status',
 
   propTypes: {
+    simulations: React.PropTypes.object,
     ec2: React.PropTypes.array,
     ec2Clusters: React.PropTypes.array,
     tradClusters: React.PropTypes.array,
 
     subscribeClusterLog: React.PropTypes.func,
     unsubscribeClusterLog: React.PropTypes.func,
+    terminateCluster: React.PropTypes.func,
+    deleteCluster: React.PropTypes.func,
     fetchClusters: React.PropTypes.func,
+    fetchServers: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -42,6 +49,7 @@ const StatusPage = React.createClass({
 
   componentDidMount() {
     this.props.fetchClusters();
+    this.props.fetchServers();
   },
 
   componentWillUnmount() {
@@ -68,11 +76,28 @@ const StatusPage = React.createClass({
     return { name: el.name, value: el.status };
   },
 
-  serverMapper(el, index) {
+  ec2Mapper(el, index) {
     const offset = el.log ? el.log.length : 0;
-    return (<ExecutionUnit key={el._id} alwaysShowLogToggle
-      unit={{ name: el.name, log: (el.log || []), status: el.status }}
-      onToggle={this.logToggle(el._id, offset)}
+    const activeSimulation = el.config.simulation ? el.config.simulation : noSimulation;
+    return (<ClusterStatus key={el._id} title={el.name} status={el.status}
+      clusterId={el._id} log={el.log || []}
+      simulation={activeSimulation}
+      logToggle={this.logToggle(el._id, offset)}
+      terminateCluster={this.props.terminateCluster}
+      deleteCluster={this.props.deleteCluster}
+    />);
+  },
+
+  tradClusterMapper(el, index) {
+    const offset = el.log ? el.log.length : 0;
+    const activeSimulation = el.config.simulation ? el.config.simulation : noSimulation;
+    return (<ClusterStatus key={el._id} title={el.name} status={el.status}
+      clusterId={el._id} log={el.log || []}
+      simulation={activeSimulation}
+      logToggle={this.logToggle(el._id, offset)}
+      terminateCluster={this.props.terminateCluster}
+      deleteCluster={this.props.deleteCluster}
+      noControls
     />);
   },
 
@@ -90,7 +115,7 @@ const StatusPage = React.createClass({
             <div className={ style.buttons }></div>
           </div>
           <div className={ style.taskflowContent }>
-            { this.props.ec2Clusters.map(this.serverMapper) }
+            { this.props.ec2Clusters.map(this.ec2Mapper) }
           </div>
 
           <div className={ style.toolbar }>
@@ -98,7 +123,7 @@ const StatusPage = React.createClass({
             <div className={ style.buttons }></div>
           </div>
           <div className={ style.taskflowContent }>
-            { this.props.tradClusters.map(this.serverMapper) }
+            { this.props.tradClusters.map(this.tradClusterMapper) }
           </div>
         </div>
       </div>);
@@ -116,6 +141,7 @@ export default connect(
       (cluster.type === 'ec2' ? ec2Clusters : tradClusters).push(cluster);
     });
     return {
+      simulations: state.simulations.mapById,
       ec2: localState.statuses.ec2,
       ec2Clusters,
       tradClusters,
@@ -124,6 +150,9 @@ export default connect(
   () => ({
     subscribeClusterLog: (id, offset) => dispatch(ClusterActions.subscribeClusterLogStream(id, offset)),
     unsubscribeClusterLog: (id) => dispatch(ClusterActions.unsubscribeClusterLogStream(id)),
+    terminateCluster: (id) => dispatch(ClusterActions.terminateCluster(id)),
+    deleteCluster: (id) => dispatch(ClusterActions.deleteCluster(id)),
     fetchClusters: () => dispatch(ClusterActions.fetchClusters()),
+    fetchServers: () => dispatch(fetchServers()),
   })
 )(StatusPage);

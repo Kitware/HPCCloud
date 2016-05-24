@@ -6,6 +6,7 @@ import React            from 'react';
 import LoadingPanel     from '../../../../../../panels/LoadingPanel';
 import { taskflowActions } from '../../../../../../utils/Constants';
 
+import get              from '../../../../../../utils/get';
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
@@ -35,6 +36,7 @@ const visualizationView = React.createClass({
 
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
+    cluster: React.PropTypes.object,
     error: React.PropTypes.string,
   },
 
@@ -88,10 +90,11 @@ const visualizationView = React.createClass({
       return <LoadingPanel />;
     }
 
-    const { taskflow, taskflowId, error, simulation } = this.props;
+    const { taskflow, taskflowId, cluster, error, simulation } = this.props;
     const actions = [].concat(taskflow.actions);
     const tasks = taskflow.taskMapById ? Object.keys(taskflow.taskMapById).map(id => taskflow.taskMapById[id]) : [];
     const jobs = taskflow.jobMapById ? Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]) : [];
+    const fileActionsDisabled = cluster ? cluster.status !== 'running' : true;
 
     // Extract meaningful information from props
     if (jobs.length && jobs.some(job => job.name === this.props.primaryJob && job.status === 'running')) {
@@ -107,8 +110,8 @@ const visualizationView = React.createClass({
         <JobMonitor taskflowId={ taskflowId }
           clusterId={taskflow.flow.meta ? taskflow.flow.meta.cluster._id : null}
         />
-        <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} />
-        <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} />
+        <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} actionsDisabled={fileActionsDisabled} />
+        <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} actionsDisabled={fileActionsDisabled} />
         <section>
             <ButtonBar
               onAction={ this.onAction }
@@ -131,9 +134,19 @@ export default connect(
       taskflowId = simulation.steps.Visualization.metadata.taskflowId;
     }
 
+    let taskflow = null;
+    if (taskflowId) {
+      taskflow = state.taskflows.mapById[taskflowId];
+    }
+
+    let cluster = null;
+    if (get(taskflow, 'flow.meta.cluster._id')) {
+      const clusterId = taskflow.flow.meta.cluster._id;
+      cluster = state.preferences.clusters.mapById[clusterId];
+    }
+
     return {
-      taskflowId,
-      taskflow: taskflowId ? state.taskflows.mapById[taskflowId] : null,
+      taskflowId, cluster, taskflow,
       error: null,
     };
   },

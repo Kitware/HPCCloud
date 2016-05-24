@@ -17,7 +17,6 @@ const JobMonitor = React.createClass({
   propTypes: {
     taskflowId: React.PropTypes.string,
     clusterId: React.PropTypes.string,
-    clusterName: React.PropTypes.string,
     tasks: React.PropTypes.array,
     jobs: React.PropTypes.array,
 
@@ -25,6 +24,7 @@ const JobMonitor = React.createClass({
     taskflowStatus: React.PropTypes.string,
     taskflowLog: React.PropTypes.array,
 
+    clusterName: React.PropTypes.string,
     clusterStatus: React.PropTypes.string,
     clusterLog: React.PropTypes.array,
     clusterLogStreamState: React.PropTypes.number,
@@ -55,7 +55,6 @@ const JobMonitor = React.createClass({
 
   clusterLogOpen(open) {
     if (open) {
-      // console.log('stream state:', this.props.clusterLogStreamState);
       if (this.props.clusterLogStreamState === CLOSED) {
         const offset = this.props.clusterLog.length;
         this.props.subscribeToClusterLogStream(this.props.clusterId, offset);
@@ -127,7 +126,7 @@ const JobMonitor = React.createClass({
                   </div>
                   <div className={ style.taskflowContent }>
                     {
-                      <ExecutionUnit unit={{ name: 'Log', log: this.props.clusterLog, status: this.props.clusterStatus }}
+                      <ExecutionUnit unit={{ name: this.props.clusterName, log: this.props.clusterLog, status: this.props.clusterStatus }}
                         onToggle={this.clusterLogOpen} alwaysShowLogToggle
                       />
                     }
@@ -140,7 +139,6 @@ const JobMonitor = React.createClass({
 });
 
 // Binding --------------------------------------------------------------------
-/* eslint-disable arrow-body-style */
 export default connect(
   (state, props) => {
     const taskflowId = props.taskflowId;
@@ -152,6 +150,7 @@ export default connect(
     const taskStatusCount = {};
     var taskflowStatus = '';
     var taskflowLog = [];
+    var clusterName = '';
     var clusterStatus = '';
     var clusterLog = [];
     var clusterLogStreamState = CLOSED;
@@ -179,6 +178,7 @@ export default connect(
 
     // get cluster status, logs, and stream state.
     if (cluster) {
+      clusterName = cluster.name;
       clusterStatus = cluster.status;
       if (cluster.log && cluster.log.length) {
         clusterLog = cluster.log.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
@@ -192,6 +192,7 @@ export default connect(
       taskStatusCount,
       taskflowStatus,
       taskflowLog,
+      clusterName,
       clusterStatus,
       clusterLog,
       clusterLogStreamState,

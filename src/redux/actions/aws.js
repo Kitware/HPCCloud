@@ -28,23 +28,20 @@ export function updateAWSProfiles(profiles) {
 }
 
 export function fetchAWSProfiles() {
-  return dispatch => {
-    const action = netActions.addNetworkCall('fetch_aws_profiles', 'Retreive AWS profiles');
-    dispatch(pendingNetworkCall(true));
-    client.listAWSProfiles()
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(pendingNetworkCall(false));
-          dispatch(updateAWSProfiles(resp.data));
-        },
-        error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
-          dispatch(pendingNetworkCall(false));
-        });
+  const action = netActions.addNetworkCall('fetch_aws_profiles', 'Retreive AWS profiles');
+  dispatch(pendingNetworkCall(true));
+  client.listAWSProfiles()
+    .then((resp) => {
+      dispatch(netActions.successNetworkCall(action.id, resp));
+      dispatch(updateAWSProfiles(resp.data));
+      dispatch(pendingNetworkCall(false));
+    })
+    .catch((error) => {
+      dispatch(netActions.errorNetworkCall(action.id, error));
+      dispatch(pendingNetworkCall(false));
+    });
 
-    return action;
-  };
+  return action;
 }
 
 export function removeAWSProfile(index, profile) {

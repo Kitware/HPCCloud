@@ -73,6 +73,7 @@ const VisualizationStart = React.createClass({
 
     const simStepUpdate = {
       id: this.props.simulation._id,
+      name: this.props.simulation.name,
       step: 'Visualization',
       data: {
         view: 'run',

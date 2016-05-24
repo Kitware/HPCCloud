@@ -22,11 +22,15 @@ import SimulationEdit       from '../pages/Simulation/Edit';
 import SimulationNew        from '../pages/Simulation/New';
 import SimulationView       from '../pages/Simulation/View';
 
+function loggedIn() {
+  return !!client.getLoggedInUser();
+}
+
 function redirectToLogin(nextState, replace) {
-  if (client.loggedIn()) {
+  if (loggedIn()) {
     return;
   }
-  client.getLoggedInPromise()
+  client.isLoggedIn()
     .catch(() => {
       replace({
         pathname: '/Login',
@@ -38,11 +42,11 @@ function redirectToLogin(nextState, replace) {
 }
 
 function redirectToHome(nextState, replace) {
-  if (client.loggedIn()) {
+  if (loggedIn()) {
     replace('/');
     return;
   }
-  client.getLoggedInPromise().then(() => {
+  client.isLoggedIn().then(() => {
     replace('/');
   });
 }
@@ -73,11 +77,11 @@ export default {
       // Switch on authentication
       path: '/',
       getComponent: (location, cb) => {
-        if (client.loggedIn()) {
+        if (loggedIn()) {
           cb(null, AuthMainPage);
           return;
         }
-        client.getLoggedInPromise()
+        client.isLoggedIn()
           .then(
             () => {
               cb(null, AuthMainPage);
@@ -88,11 +92,11 @@ export default {
       },
       indexRoute: {
         getComponent: (location, cb) => {
-          if (client.loggedIn()) {
+          if (loggedIn()) {
             cb(null, ProjectAll);
             return;
           }
-          client.getLoggedInPromise()
+          client.isLoggedIn()
             .then(
               () => {
                 cb(null, ProjectAll);

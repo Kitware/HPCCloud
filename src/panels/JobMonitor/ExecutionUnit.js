@@ -1,8 +1,9 @@
-import React                from 'react';
-import CollapsibleWidget    from 'paraviewweb/src/React/Widgets/CollapsibleWidget';
-import LogFold              from './LogFold';
-import { formatTime }       from '../../utils/Format';
-import style                from 'HPCCloudStyle/JobMonitor.mcss';
+import React             from 'react';
+import CollapsibleWidget from 'paraviewweb/src/React/Widgets/CollapsibleWidget';
+import LogFold           from './LogFold';
+import { formatTime }    from '../../utils/Format';
+import style             from 'HPCCloudStyle/JobMonitor.mcss';
+import get               from '../../utils/get';
 
 // takes log array -> jsx lines, or if there's more information LogFold
 function logMapper(entry, index) {
@@ -44,12 +45,19 @@ export default React.createClass({
   propTypes: {
     unit: React.PropTypes.object,
     open: React.PropTypes.bool,
+    inline: React.PropTypes.bool,
+    logOnly: React.PropTypes.bool,
     onToggle: React.PropTypes.func,
     alwaysShowLogToggle: React.PropTypes.bool,
   },
 
   getDefaultProps() {
-    return { open: false, alwaysShowLogToggle: false };
+    return {
+      open: false,
+      logOnly: false,
+      alwaysShowLogToggle: false,
+      inline: false,
+    };
   },
 
   getInitialState() {
@@ -59,7 +67,7 @@ export default React.createClass({
   componentDidUpdate(prevProps, prevState) {
     // the <pre> needs to be rendered open to have scrollHeight, then it scrolls
     if ((!prevState.open && this.state.open) ||
-      this.state.open && prevProps.unit.log.length < this.props.unit.log.length) {
+      this.state.open && get(prevProps, 'unit.log').length < get(this.props, 'unit.log').length) {
       this.refs.log.scrollTop = this.refs.log.scrollHeight;
     }
   },
@@ -72,29 +80,37 @@ export default React.createClass({
   },
 
   render() {
+    const title = this.props.unit.name ? this.props.unit.name.split('.').pop() : 'Log';
+
     if (!this.props.alwaysShowLogToggle &&
       (this.props.unit.log === undefined || this.props.unit.log.length === 0)) {
       return (
         <section className={ style.listItem }>
-          <strong className={ style.itemContent }>{this.props.unit.name.split('.').pop()}</strong>
+          <strong className={ style.itemContent }>{ title }</strong>
           <div className={ style.itemContent }>{this.props.unit.status}</div>
         </section>
       );
     }
 
+    const log = (<pre className={ style.log } ref="log">
+      { // reduce log array to a string with formatted entries
+        this.props.unit.log.map(logMapper)
+      }
+      </pre>);
+
+    if (this.props.logOnly) {
+      return log;
+    }
+
     return (
-      <section className={ style.logListItem }>
+      <section className={ !this.props.inline ? style.logListItem : ''}>
         <CollapsibleWidget
-          title={this.props.unit.name.split('.').pop()}
+          title={ title }
           subtitle={this.props.unit.status}
           open={this.state.open}
           onChange={this.onToggle}
         >
-          <pre className={ style.log } ref="log">
-          { // reduce log array to a string with formatted entries
-            this.props.unit.log.map(logMapper)
-          }
-          </pre>
+          { log }
         </CollapsibleWidget>
       </section>);
   },

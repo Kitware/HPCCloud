@@ -49,6 +49,7 @@ const FileListing = React.createClass({
     folderId: React.PropTypes.string.isRequired,
     title: React.PropTypes.string.isRequired,
     folders: React.PropTypes.object, // { [id]: { children: [..], depth: 0 } }
+    actionsDisabled: React.PropTypes.bool, // if true you cannot download or preview files
     toggleOpenFolder: React.PropTypes.func,
   },
 
@@ -62,6 +63,7 @@ const FileListing = React.createClass({
     return {
       opened: [], // list of folderId's which are open
       open: false,
+      actionsDisabled: false,
       previewOpen: false,
       previewTitle: '',
       previewId: '',
@@ -85,6 +87,10 @@ const FileListing = React.createClass({
     // size === 0 ? file size : file size and download button
     if (file.size === 0) {
       value = (<span><em>{formatFileSize(file.size)}</em></span>);
+    } else if (this.props.actionsDisabled) {
+      value = (<span key={file._id}>
+        <em>{formatFileSize(file.size)} </em>
+        </span>);
     } else {
       value = (<span key={file._id}>
         <em>{formatFileSize(file.size)} </em>

@@ -211,7 +211,7 @@ export default connect(
   },
   () => {
     return {
-      onUpdateItem: (index, cluster, server) => dispatch(Actions.updateCluster(index, cluster, server)),
+      onUpdateItem: (index, cluster, server) => dispatch(Actions.saveCluster(index, cluster, server)),
       onActiveChange: (index) => dispatch(Actions.updateActiveCluster(index)),
       onApplyPreset: (index, presetName) => dispatch(Actions.applyPreset(index, presetName)),
       onAddItem: () => dispatch(Actions.addCluster()),

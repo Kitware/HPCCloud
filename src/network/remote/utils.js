@@ -31,3 +31,7 @@ export function getJSON(url) {
     xhr.send();
   });
 }
+
+export function transformRequest(data) {
+  return JSON.stringify(data);
+}

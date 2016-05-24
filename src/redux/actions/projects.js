@@ -1,9 +1,10 @@
 import client           from '../../network';
+import * as SimulationHelper from '../../network/helpers/simulations';
+import * as ProjectHelper    from '../../network/helpers/projects';
 import * as netActions  from './network';
 import { dispatch }     from '../index.js';
 
 import * as router          from './router';
-// import * as TaskflowActions from './taskflows';
 
 export const FETCH_PROJECT_LIST = 'FETCH_PROJECT_LIST';
 export const UPDATE_PROJECT_LIST = 'UPDATE_PROJECT_LIST';
@@ -17,6 +18,9 @@ export const UPDATE_SIMULATION = 'UPDATE_SIMULATION';
 
 /* eslint-disable no-shadow */
 
+// ----------------------------------------------------------------------------
+// PROJECTS
+// ----------------------------------------------------------------------------
 export function updateProjectList(projects) {
   return { type: UPDATE_PROJECT_LIST, projects };
 }
@@ -29,7 +33,7 @@ export function fetchProjectSimulations(id) {
   return dispatch => {
     const action = netActions.addNetworkCall(`fetch_project_simulations_${id}`, 'Retreive project simulations');
 
-    client.getProjectSimulations(id)
+    client.listSimulations(id)
       .then(
         resp => {
           const simulations = resp.data;
@@ -84,13 +88,22 @@ export function deleteProject(project) {
   };
 }
 
+export function setActiveProject(id, location) {
+  return dispatch => {
+    const updateActive = { type: UPDATE_ACTIVE_PROJECT, id };
+
+    if (location) {
+      dispatch(updateActive);
+      return router.push(location);
+    }
+    return updateActive;
+  };
+}
+
 export function updateProject(project) {
   return { type: UPDATE_PROJECT, project };
 }
 
-export function updateSimulation(simulation) {
-  return { type: UPDATE_SIMULATION, simulation };
-}
 
 export function saveProject(project, attachments) {
   return dispatch => {
@@ -100,7 +113,7 @@ export function saveProject(project, attachments) {
       dispatch(netActions.prepareUpload(attachments));
     }
 
-    client.saveProject(project, attachments)
+    ProjectHelper.saveProject(project, attachments)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -120,6 +133,14 @@ export function saveProject(project, attachments) {
   };
 }
 
+// ----------------------------------------------------------------------------
+// SIMULATIONS
+// ----------------------------------------------------------------------------
+
+export function updateSimulation(simulation) {
+  return { type: UPDATE_SIMULATION, simulation };
+}
+
 export function saveSimulation(simulation, attachments, location) {
   return dispatch => {
     const action = netActions.addNetworkCall('save_simulation', `Save simulation ${simulation.name}`);
@@ -128,7 +149,7 @@ export function saveSimulation(simulation, attachments, location) {
       dispatch(netActions.prepareUpload(attachments));
     }
 
-    client.saveSimulation(simulation, attachments)
+    SimulationHelper.saveSimulation(simulation, attachments)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -170,19 +191,6 @@ export function deleteSimulation(simulation, location) {
     return action;
   };
 }
-
-export function setActiveProject(id, location) {
-  return dispatch => {
-    const updateActive = { type: UPDATE_ACTIVE_PROJECT, id };
-
-    if (location) {
-      dispatch(updateActive);
-      return router.push(location);
-    }
-    return updateActive;
-  };
-}
-
 
 export function setActiveSimulation(id, location) {
   return dispatch => {

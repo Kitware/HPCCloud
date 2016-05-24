@@ -9,17 +9,11 @@ export const LOGOUT = 'LOGOUT';
 
 /* eslint-disable no-shadow */
 export function authenticationPending(pending = true) {
-  return {
-    type: AUTH_PENDING,
-    pending,
-  };
+  return { type: AUTH_PENDING, pending };
 }
 
 export function loggedIn(user) {
-  return {
-    type: LOGGED_IN,
-    user,
-  };
+  return { type: LOGGED_IN, user };
 }
 
 export function register(firstName, lastName, login, email, password) {
@@ -50,7 +44,7 @@ export function login(username, password) {
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(authenticationPending(false));
-          dispatch(loggedIn(client.getUser()));
+          dispatch(loggedIn(client.getLoggedInUser()));
           dispatch(routingActions.replace('/'));
         },
         err => {
@@ -142,7 +136,7 @@ export function updateUser(user, pushOnServer = false) {
 // Auto trigger actions on authentication change...
 client.onAuthChange(authenticated => {
   if (authenticated) {
-    dispatch(loggedIn(client.getUser()));
+    dispatch(loggedIn(client.getLoggedInUser()));
   } else {
     dispatch({ type: LOGOUT });
   }

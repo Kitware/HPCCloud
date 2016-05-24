@@ -1,5 +1,6 @@
 import * as ProjectActions  from './redux/actions/projects';
 import * as TaskflowActions from './redux/actions/taskflows';
+import * as ClusterActions from './redux/actions/clusters';
 import * as FSActions       from './redux/actions/fs';
 import Workflows            from './workflows';
 
@@ -38,10 +39,8 @@ export function handleTaskflowChange(state, taskflow) {
   const simulationStatus = [];
 
   // Figure out possible actions and simulation state
-  if (jobs.length && jobs.every(job => job.status === 'terminated')) {
-    simulationStatus.push('terminated');
-    actions.push('rerun');
-  } else if (tasks.some(task => task.status === 'error') && (jobs.length === 0 || !jobs.some(job => job.status === 'running'))) {
+  if ((jobs.length && jobs.every(job => job.status === 'terminated')) ||
+    (tasks.some(task => task.status === 'error') && (jobs.length === 0 || !jobs.some(job => job.status === 'running')))) {
     simulationStatus.push('terminated');
     actions.push('rerun');
   } else if (!allComplete && (jobs.length + tasks.length) > 0 && !jobs.some(job => job.status === 'terminating')) {
@@ -82,6 +81,19 @@ export function handleTaskflowChange(state, taskflow) {
   if (taskflow.flow.meta) {
     const tfClusterId = taskflow.flow.meta.cluster._id,
       tfCluster = state.preferences.clusters.mapById[tfClusterId];
+
+    // add simulation info to cluster config.
+    if (tfCluster && taskflow.flow.meta.cluster && taskflow.simulation) {
+      const tfSimulation = state.simulations.mapById[taskflow.simulation];
+      const simulation = {
+        name: tfSimulation.name,
+        step: taskflow.stepName,
+      };
+      tfCluster.config.simulation = simulation;
+      dispatch(ClusterActions.updateCluster(tfCluster));
+    }
+
+    // add the terminate instance button if running or error
     if (tfCluster && tfCluster.type === 'ec2' &&
       taskflow.flow.status !== 'running' &&
       ['running', 'error'].indexOf(tfCluster.status) !== -1) {
