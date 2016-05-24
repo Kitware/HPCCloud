@@ -1,4 +1,5 @@
 import * as Actions from '../actions/taskflows';
+import logSort from '../../utils/logSort';
 
 export const initialState = {
   mapById: {},
@@ -34,8 +35,13 @@ export default function taskflowsReducer(state = initialState, action) {
           flow: action.taskflow,
           jobMapById,
           primaryJob: action.primaryJob,
+<<<<<<< 6614cbc0609f782af64dadebd7bc3bfd86cdf9ee
         }
       );
+=======
+          log: action.taskflow.log,
+        });
+>>>>>>> streaming taskflow log
       const mapById = Object.assign(
         {},
         state.mapById,
@@ -43,13 +49,19 @@ export default function taskflowsReducer(state = initialState, action) {
       return Object.assign({}, state, { mapById });
     }
 
-    // case Actions.UPDATE_TASKFLOW: {
-    //   const mapById = Object.assign({}, state.mapById);
-    //   mapById[action.taskflow._id].flow = action.taskflow;
-    //   return Object.assign({}, state, { mapById });
-    // }
-
+    // appends a new log entry to the taskflow log
     case Actions.UPDATE_TASKFLOW_LOG: {
+      const mapById = Object.assign({}, state.mapById);
+      const taskflow = Object.assign({}, state.mapById[action.taskflowId]);
+      taskflow.log.push(action.logEntry);
+      taskflow.log = taskflow.log.sort(logSort);
+      mapById[action.taskflowId] = taskflow;
+
+      return Object.assign({}, state, { mapById });
+    }
+
+    // creates a log from GET/taskflow/{id}/log
+    case Actions.GET_TASKFLOW_LOG: {
       const newLog = action.log;
       const mapById = Object.assign({}, state.mapById);
       const taskflow = Object.assign({}, state.mapById[action.taskflowId]);

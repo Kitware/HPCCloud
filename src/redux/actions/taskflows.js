@@ -7,6 +7,7 @@ import { store, dispatch } from '..';
 export const ADD_TASKFLOW = 'ADD_TASKFLOW';
 export const UPDATE_TASKFLOW = 'UPDATE_TASKFLOW';
 export const UPDATE_TASKFLOW_LOG = 'UPDATE_TASKFLOW_LOG';
+export const GET_TASKFLOW_LOG = 'UPDATE_TASKFLOW_LOG';
 export const CLEAR_UPDATE_LOG = 'CLEAR_UPDATE_LOG';
 export const UPDATE_TASKFLOW_STATUS = 'UPDATE_TASKFLOW_STATUS';
 export const UPDATE_TASKFLOW_JOB_LOG = 'UPDATE_TASKFLOW_JOB_LOG';
@@ -27,7 +28,11 @@ export function clearUpdateLog() {
   return { type: CLEAR_UPDATE_LOG };
 }
 
-export function updateTaskflowLog(taskflowId) {
+export function updateTaskflowLog(taskflowId, logEntry) {
+  return { type: UPDATE_TASKFLOW_LOG, taskflowId, logEntry };
+}
+
+export function getTaskflowLog(taskflowId) {
   return dispatch => {
     const action = netActions.addNetworkCall(`taskflow_log_${taskflowId}`, 'Check taskflow log');
     client.getTaskflowLog(taskflowId)
@@ -343,14 +348,9 @@ function getTaskflowIdFromId(id, type) {
   }
 }
 
-client.onEvent((resp) => {
-  const type = resp.type.split('.')[0];
-  const id = resp.data._id;
-  const status = resp.data.status;
+function processStatusEvent(id, type, status) {
   const taskflowId = getTaskflowIdFromId(id, type);
-
   console.log(`${type} ${status}`);
-
   if (type === 'taskflow') {
     dispatch(updateTaskflowStatus(id, status));
   } else if (taskflowId) {
@@ -406,5 +406,23 @@ client.onEvent((resp) => {
           ` id "${id}", and status "${status}"`);
         break;
     }
+  }
+}
+
+function processLogEvent(id, type, log) {
+  console.log(`${type}`, log);
+  if (type === 'taskflow') {
+    dispatch(updateTaskflowLog(id, log));
+  }
+}
+
+client.onEvent((resp) => {
+  const type = resp.type.split('.')[0];
+  const id = resp.data._id;
+
+  if (resp.data.status) {
+    processStatusEvent(id, type, resp.data.status);
+  } else if (resp.data.log) {
+    processLogEvent(id, type, resp.data.log);
   }
 });
