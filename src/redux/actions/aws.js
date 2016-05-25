@@ -74,7 +74,7 @@ export function updateAWSProfile(index, profile, pushToServer = false) {
     if (pushToServer) {
       const action = netActions.addNetworkCall('save_aws_profile', 'Save cluster');
       dispatch(pendingNetworkCall(true));
-      client.saveAWSProfile(profile)
+      client.createAWSProfile(profile)
         .then(
           resp => {
             dispatch(pendingNetworkCall(false));
