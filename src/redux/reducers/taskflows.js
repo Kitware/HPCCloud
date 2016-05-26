@@ -1,5 +1,5 @@
 import * as Actions from '../actions/taskflows';
-import logSort from '../../utils/logSort';
+// import logSort from '../../utils/logSort';
 
 export const initialState = {
   mapById: {},
@@ -53,8 +53,10 @@ export default function taskflowsReducer(state = initialState, action) {
     case Actions.UPDATE_TASKFLOW_LOG: {
       const mapById = Object.assign({}, state.mapById);
       const taskflow = Object.assign({}, state.mapById[action.taskflowId]);
+      if (!taskflow.log) {
+        taskflow.log = [];
+      }
       taskflow.log.push(action.logEntry);
-      taskflow.log = taskflow.log.sort(logSort);
       mapById[action.taskflowId] = taskflow;
 
       return Object.assign({}, state, { mapById });
@@ -87,11 +89,43 @@ export default function taskflowsReducer(state = initialState, action) {
     }
 
     case Actions.UPDATE_TASKFLOW_JOB_LOG: {
+      const { taskflowId, jobId, logEntry } = action;
+      const taskflow = state.mapById[taskflowId];
+      const job = Object.assign({}, taskflow.jobMapById[jobId]);
+      if (!job.log) {
+        job.log = [];
+      }
+      job.log.push(logEntry);
+      const jobMapById = Object.assign({}, taskflow.jobMapById, { [jobId]: job });
+      const newTaskflow = Object.assign({}, taskflow, { jobMapById });
+      const mapById = Object.assign({}, state.mapById, { [taskflowId]: newTaskflow });
+
+      return Object.assign({}, state, { mapById });
+    }
+
+    // fetches and upates a full taskflow job log
+    case Actions.GET_TASKFLOW_JOB_LOG: {
       const { taskflowId, jobId, log } = action;
       const taskflow = state.mapById[taskflowId];
       const job = Object.assign({}, taskflow.jobMapById[jobId], { log });
       const jobMapById = Object.assign({}, taskflow.jobMapById, { [jobId]: job });
       const newTaskflow = Object.assign({}, taskflow, { jobMapById });
+      const mapById = Object.assign({}, state.mapById, { [taskflowId]: newTaskflow });
+
+      return Object.assign({}, state, { mapById });
+    }
+
+    // updates a job log with a single log entry
+    case Actions.UPDATE_TASKFLOW_TASK_LOG: {
+      const { taskflowId, taskId, logEntry } = action;
+      const taskflow = state.mapById[taskflowId];
+      const task = Object.assign({}, taskflow.taskMapById[taskId]);
+      if (!task.log) {
+        task.log = [];
+      }
+      task.log.push(logEntry);
+      const taskMapById = Object.assign({}, taskflow.taskMapById, { [taskId]: task });
+      const newTaskflow = Object.assign({}, taskflow, { taskMapById });
       const mapById = Object.assign({}, state.mapById, { [taskflowId]: newTaskflow });
 
       return Object.assign({}, state, { mapById });
@@ -133,7 +167,6 @@ export default function taskflowsReducer(state = initialState, action) {
         const updateLogs = [].concat(state.updateLogs, taskflowId);
         return Object.assign({}, state, { taskflowMapByTaskId, mapById, updateLogs });
       }
-
       return Object.assign({}, state, { taskflowMapByTaskId, mapById });
     }
 
