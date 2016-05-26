@@ -238,6 +238,7 @@ export function build(config = location, ...extensions) {
         .then((resp) => {
           if (!resp.data) {
             updateAuthenticationState(false);
+            userData = null;
             reject();
             return;
           }

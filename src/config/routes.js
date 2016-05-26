@@ -1,4 +1,6 @@
 import client               from '../network';
+import * as router          from '../redux/actions/router';
+import { dispatch }         from '../redux';
 
 import AuthMainPage         from '../pages/AuthContent';
 import Forgot               from '../pages/Forgot';
@@ -31,13 +33,13 @@ function redirectToLogin(nextState, replace) {
     return;
   }
   client.isLoggedIn()
-    .catch(() => {
-      replace({
-        pathname: '/Login',
-        state: {
-          nextPathname: nextState.location.pathname,
-        },
-      });
+    .catch((err) => {
+      // we need to dispatch here,
+      // but in redirectToHome below those replace()'s work fine.
+      dispatch(router.replace({
+        pathname: '/',
+        state: { nextPathname: nextState.location.pathname },
+      }));
     });
 }
 
@@ -50,7 +52,9 @@ function redirectToHome(nextState, replace) {
     .then(() => {
       replace('/');
     })
-    .catch(() => {});
+    .catch(() => {
+      replace('/');
+    });
 }
 
 export default {

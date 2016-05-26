@@ -16,24 +16,6 @@ export function loggedIn(user) {
   return { type: LOGGED_IN, user };
 }
 
-export function register(firstName, lastName, login, email, password) {
-  return dispatch => {
-    const action = netActions.addNetworkCall('user_register', 'Register user');
-
-    client.createUser({ firstName, lastName, login, email, password, admin: false })
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(routingActions.replace('/Login'));
-        },
-        error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
-        });
-
-    return action;
-  };
-}
-
 export function login(username, password) {
   return dispatch => {
     dispatch(authenticationPending(true));
@@ -50,6 +32,24 @@ export function login(username, password) {
         dispatch(netActions.errorNetworkCall(action.id, err));
         dispatch(authenticationPending(false));
       });
+
+    return action;
+  };
+}
+
+export function register(firstName, lastName, login, email, password) {
+  return dispatch => {
+    const action = netActions.addNetworkCall('user_register', 'Register user');
+
+    client.createUser({ firstName, lastName, login, email, password, admin: false })
+      .then(
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(routingActions.replace('/Login'));
+        },
+        error => {
+          dispatch(netActions.errorNetworkCall(action.id, error));
+        });
 
     return action;
   };
