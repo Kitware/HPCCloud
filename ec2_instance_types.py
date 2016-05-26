@@ -60,7 +60,7 @@ def generate_instance_types_json():
         instance['price'] =  parse(path).find(on_demand[p['sku']])[0].value
 
         gpu = 0
-        if gpu in attributes:
+        if 'gpu' in attributes:
             gpu = attributes['gpu']
         instance['gpu'] = gpu
 

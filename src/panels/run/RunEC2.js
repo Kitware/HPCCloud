@@ -86,6 +86,13 @@ export default React.createClass({
       this.setState({
         machinesInFamily: this.state.machines[this.state.profile.regionName][value],
       });
+
+      if (this.props.onChange) {
+        this.props.onChange('machine', this.state.machines[this.state.profile.regionName][value][0], 'EC2');
+      }
+    } else if (key === 'machine') {
+      // Convert from index into machine object
+      value = this.state.machinesInFamily[value];
     }
 
     if (this.props.onChange) {
@@ -151,7 +158,7 @@ export default React.createClass({
         <section className={style.group}>
           <label className={style.label}>Machine family:</label>
           <select onChange={this.dataChange} className={style.input}
-            data-key="machineFamily"defaultValue="General purpose"
+            data-key="machineFamily" defaultValue="General purpose"
             disabled={this.props.contents.cluster}
           >
             {this.state.machineFamilies.map(machineFamilyMapper)}
