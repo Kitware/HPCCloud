@@ -30,8 +30,6 @@ const Register = React.createClass({
     return {
       password: '',
       confirm: '',
-      requestCount: 0,
-      resetCount: 0,
     };
   },
 
@@ -55,20 +53,13 @@ const Register = React.createClass({
     }
   },
 
-  resetError() {
-    this.setState({ resetCount: this.state.requestCount });
-  },
-
   handleSubmit(event) {
     event.preventDefault();
-    if (this.state.resetCount === this.state.requestCount) {
-      const user = {};
-      ['login', 'firstName', 'lastName', 'email', 'password'].forEach(key => {
-        user[key] = this.refs[key].value;
-      });
-      this.setState({ requestCount: this.state.requestCount + 1 });
-      this.props.onRegister(user);
-    }
+    const user = {};
+    ['login', 'firstName', 'lastName', 'email', 'password'].forEach(key => {
+      user[key] = this.refs[key].value;
+    });
+    this.props.onRegister(user);
   },
 
   render() {
@@ -126,12 +117,11 @@ const Register = React.createClass({
           <div>
               <button
                 className={style.loginButton}
-                disabled={!!this.props.error && (this.state.resetCount !== this.state.requestCount)}
               >Register</button>
           </div>
-          {(!!this.props.error && this.state.requestCount !== this.state.resetCount) && (
+          {(!!this.props.error ? (
               <p className={style.warningBox}>{this.props.error}</p>
-          )}
+          ) : null)}
         </form>
       </center>);
   },

@@ -20,7 +20,7 @@ export function register(firstName, lastName, login, email, password) {
   return dispatch => {
     const action = netActions.addNetworkCall('user_register', 'Register user');
 
-    client.registerUser({ firstName, lastName, login, email, password })
+    client.createUser({ firstName, lastName, login, email, password, admin: false })
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -40,17 +40,16 @@ export function login(username, password) {
     const action = netActions.addNetworkCall('user_login', 'Authenticate');
 
     client.login(username, password)
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(authenticationPending(false));
-          dispatch(loggedIn(client.getLoggedInUser()));
-          dispatch(routingActions.replace('/'));
-        },
-        err => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
-          dispatch(authenticationPending(false));
-        });
+      .then((resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(authenticationPending(false));
+        dispatch(loggedIn(client.getLoggedInUser()));
+        dispatch(routingActions.replace('/'));
+      })
+      .catch((err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err));
+        dispatch(authenticationPending(false));
+      });
 
     return action;
   };

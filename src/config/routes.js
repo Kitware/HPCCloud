@@ -46,9 +46,11 @@ function redirectToHome(nextState, replace) {
     replace('/');
     return;
   }
-  client.isLoggedIn().then(() => {
-    replace('/');
-  });
+  client.isLoggedIn()
+    .then(() => {
+      replace('/');
+    })
+    .catch(() => {});
 }
 
 export default {
