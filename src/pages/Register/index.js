@@ -33,24 +33,29 @@ const Register = React.createClass({
     };
   },
 
+  componentWillReceiveProps(newProps) {
+    if (newProps.error) {
+      this.setState({ error: newProps.error });
+    }
+  },
+
   passwordChange(e) {
     var newState = { password: e.target.value };
     this.passwordCheck(e.target.value, this.state.confirm, newState);
-    this.setState(newState);
   },
 
   confirmChange(e) {
     var newState = { confirm: e.target.value };
     this.passwordCheck(this.state.password, e.target.value, newState);
-    this.setState(newState);
   },
 
-  passwordCheck(password, confirm, obj) {
+  passwordCheck(password, confirm, newState) {
     if (password !== confirm) {
-      obj.error = 'passwords do not match';
+      newState.error = 'Passwords do not match';
     } else {
-      obj.error = false;
+      newState.error = false;
     }
+    this.setState(newState);
   },
 
   handleSubmit(event) {
@@ -82,17 +87,17 @@ const Register = React.createClass({
           />
           <input
             className={style.loginInput}
-            ref="login"
-            type="text"
-            placeholder="login"
+            ref="email"
+            type="email"
+            placeholder="email"
             onChange={this.resetError}
             required
           />
           <input
             className={style.loginInput}
-            ref="email"
-            type="email"
-            placeholder="email"
+            ref="login"
+            type="text"
+            placeholder="login"
             onChange={this.resetError}
             required
           />
@@ -119,8 +124,8 @@ const Register = React.createClass({
                 className={style.loginButton}
               >Register</button>
           </div>
-          {(!!this.props.error ? (
-              <p className={style.warningBox}>{this.props.error}</p>
+          {(!!this.state.error ? (
+              <p className={style.warningBox}>{this.state.error}</p>
           ) : null)}
         </form>
       </center>);
