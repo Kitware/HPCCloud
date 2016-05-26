@@ -11,7 +11,7 @@ export default function ({ client, filterQuery, mustContain, busy }) {
     },
 
     editSimulation(simulation) {
-      const expected = ['name', 'description', 'active', 'disabled', 'metadata', '_id'],
+      const expected = ['name', 'description', 'active', 'disabled', 'metadata', 'steps', '_id'],
         sfiltered = filterQuery(simulation, ...expected.slice(0, 5)); // Remove '_id'
 
       return busy(client._.patch(`/simulations/${simulation._id}`, sfiltered, {

@@ -5,6 +5,7 @@ import SimputLabels         from 'simput/src/Labels';
 import ViewMenu             from 'simput/src/ViewMenu';
 import modelGenerator       from 'simput/src/modelGenerator';
 import client               from '../../../../../../network';
+import * as simulationsHelper from '../../../../../../network/helpers/simulations';
 import deepClone            from 'mout/src/lang/deepClone';
 
 import PropertyPanelBlock   from 'paraviewweb/src/React/Properties/PropertyPanel';
@@ -60,12 +61,12 @@ const SimputPanel = React.createClass({
 
     // Create ini file container if not already here
     if (!iniFile) {
-      client.addEmptyFileForSimulation(this.props.simulation, 'pyfr.ini')
+      simulationsHelper.addEmptyFileForSimulation(this.props.simulation, 'pyfr.ini')
         .then(resp => {
           const _id = resp.data._id; // itemId
           this.props.simulation.metadata.inputFolder.files.ini = _id;
           this.setState({ iniFile: _id });
-          client.saveSimulation(this.props.simulation)
+          simulationsHelper.saveSimulation(this.props.simulation)
             .then(() => {
               this.props.updateSimulation(this.props.simulation);
             });
@@ -148,7 +149,7 @@ const SimputPanel = React.createClass({
         const simulationStepIndex = this.props.simulation.disabled.indexOf('Simulation');
         if (simulationStepIndex !== -1) {
           this.props.simulation.disabled.splice(simulationStepIndex, 1);
-          client.updateDisabledSimulationSteps(this.props.simulation);
+          simulationsHelper.updateDisabledSimulationSteps(this.props.simulation);
         }
       } else {
         console.log('no .ini file');
