@@ -161,20 +161,24 @@ export function build(config = location, ...extensions) {
       const auth = {
         username, password,
       };
-      return busy(client._
-        .get('/user/authentication', {
-          auth,
-        })
-        .then(resp => {
-          token = resp.data.authToken.token;
-          userData = resp.data.user;
+      return new Promise((accept, reject) => {
+        busy(client._.get('/user/authentication', { auth })
+          .then(resp => {
+            token = resp.data.authToken.token;
+            userData = resp.data.user;
 
-          // Update userData for external modules
-          client.user = userData;
-          client.token = token;
+            // Update userData for external modules
+            client.user = userData;
+            client.token = token;
 
-          updateAuthenticationState(true);
-        }));
+            updateAuthenticationState(true);
+            accept();
+          })
+          .catch((err) => {
+            updateAuthenticationState(false);
+            reject();
+          }));
+      });
     },
 
     logout() {
@@ -231,20 +235,24 @@ export function build(config = location, ...extensions) {
     updateGirderInstance();
     if (token) {
       publicObject.me()
-        .then(
-          resp => {
-            userData = resp.data;
-
-            // Update userData for external modules
-            client.user = userData;
-            client.token = token;
-            updateAuthenticationState(true);
-            accept();
-          },
-          errResp => {
+        .then((resp) => {
+          if (!resp.data) {
             updateAuthenticationState(false);
+            userData = null;
             reject();
-          });
+            return;
+          }
+          // Update userData for external modules
+          userData = resp.data;
+          client.user = userData;
+          client.token = token;
+          updateAuthenticationState(true);
+          accept();
+        })
+        .catch((errResp) => {
+          updateAuthenticationState(false);
+          reject();
+        });
     } else {
       reject();
     }
