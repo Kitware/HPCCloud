@@ -15,12 +15,6 @@ import * as ClusterActions from '../../../redux/actions/clusters';
 import { fetchServers } from '../../../redux/actions/statuses';
 
 const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 3 });
-
-// EventSource readyStates
-// const CONNECTING = 0;
-// const OPEN = 1;
-const CLOSED = 2;
-
 const noSimulation = { name: 'no simulation on this cluster.', step: '' };
 
 const StatusPage = React.createClass({
@@ -32,8 +26,7 @@ const StatusPage = React.createClass({
     ec2Clusters: React.PropTypes.array,
     tradClusters: React.PropTypes.array,
 
-    subscribeClusterLog: React.PropTypes.func,
-    unsubscribeClusterLog: React.PropTypes.func,
+    getClusterLog: React.PropTypes.func,
     terminateCluster: React.PropTypes.func,
     deleteCluster: React.PropTypes.func,
     fetchClusters: React.PropTypes.func,
@@ -52,22 +45,10 @@ const StatusPage = React.createClass({
     this.props.fetchServers();
   },
 
-  componentWillUnmount() {
-    const unscriber = (cluster) => {
-      if (cluster.logStream && cluster.logStream.readyState !== CLOSED) {
-        this.props.unsubscribeClusterLog(cluster._id);
-      }
-    };
-    this.props.ec2Clusters.forEach(unscriber);
-    this.props.tradClusters.forEach(unscriber);
-  },
-
   logToggle(id, offset) {
     return (open) => {
       if (open) {
-        this.props.subscribeClusterLog(id, offset);
-      } else {
-        this.props.unsubscribeClusterLog(id);
+        this.props.getClusterLog(id, offset);
       }
     };
   },
@@ -148,8 +129,7 @@ export default connect(
     };
   },
   () => ({
-    subscribeClusterLog: (id, offset) => dispatch(ClusterActions.subscribeClusterLogStream(id, offset)),
-    unsubscribeClusterLog: (id) => dispatch(ClusterActions.unsubscribeClusterLogStream(id)),
+    getClusterLog: (id, offset) => dispatch(ClusterActions.getClusterLog(id, offset)),
     terminateCluster: (id) => dispatch(ClusterActions.terminateCluster(id)),
     deleteCluster: (id) => dispatch(ClusterActions.deleteCluster(id)),
     fetchClusters: () => dispatch(ClusterActions.fetchClusters()),

@@ -3,7 +3,6 @@ import * as TaskflowActions  from './taskflows';
 import client                from '../../network';
 import * as ClusterHelper    from '../../network/helpers/clusters';
 import { store, dispatch }   from '..';
-import { baseURL }           from '../../utils/Constants.js';
 
 export const ADD_CLUSTER = 'ADD_CLUSTER';
 export const ADD_EXISTING_CLUSTER = 'ADD_EXISTING_CLUSTER';
@@ -19,6 +18,7 @@ export const PENDING_CLUSTER_NETWORK = 'PENDING_CLUSTER_NETWORK';
 export const CLUSTER_APPLY_PRESET = 'CLUSTER_APPLY_PRESET';
 export const TESTING_CLUSTER = 'TESTING_CLUSTER';
 export const UPDATE_CLUSTER_LOG = 'UPDATE_CLUSTER_LOG';
+export const APPEND_TO_CLUSTER_LOG = 'APPEND_TO_CLUSTER_LOG';
 export const SUB_CLUSTER_LOG = 'SUB_CLUSTER_LOG';
 export const UNSUB_CLUSTER_LOG = 'UNSUB_CLUSTER_LOG';
 
@@ -67,6 +67,10 @@ export function updateClusterLog(id, log) {
   return { type: UPDATE_CLUSTER_LOG, id, log };
 }
 
+export function appendToClusterLog(id, logEntry) {
+  return { type: APPEND_TO_CLUSTER_LOG, id, logEntry };
+}
+
 function updateTaskflowActionsForClusterEvent(cluster, status) {
   if (cluster.type !== 'ec2') {
     return;
@@ -101,34 +105,6 @@ export function getClusterLog(id, offset) {
       });
     return action;
   };
-}
-
-export function subscribeClusterLogStream(id, offset = 0) {
-  var eventSource = null;
-  dispatch(getClusterLog(id, offset));
-  if (EventSource) {
-    eventSource = new EventSource(`${baseURL}/clusters/${id}/log/stream`);
-    eventSource.onmessage = (e) => {
-      var parsedLog = JSON.parse(e.data);
-      dispatch(updateClusterLog(id, parsedLog));
-    };
-
-    eventSource.onerror = (e) => {
-      // Wait 10 seconds if the browser hasn't reconnected then reinitialize.
-      setTimeout(() => {
-        if (eventSource && eventSource.readyState === 2) {
-          subscribeClusterLogStream(id);
-        } else {
-          eventSource = null;
-        }
-      }, 10000);
-    };
-  }
-  return { type: SUB_CLUSTER_LOG, id, eventSource };
-}
-
-export function unsubscribeClusterLogStream(id) {
-  return { type: UNSUB_CLUSTER_LOG, id };
 }
 
 export function fetchCluster(id) {

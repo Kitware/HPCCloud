@@ -18,6 +18,7 @@ export default function taskflowsReducer(state = initialState, action) {
   switch (action.type) {
     case Actions.ADD_TASKFLOW: {
       const jobMapById = {};
+      const log = action.taskflow.log || [];
       if (action.taskflow.meta && action.taskflow.meta.jobs) {
         action.taskflow.meta.jobs.forEach(job => {
           jobMapById[job._id] = job;
@@ -33,15 +34,10 @@ export default function taskflowsReducer(state = initialState, action) {
         state.mapById[action.taskflow._id],
         {
           flow: action.taskflow,
-          jobMapById,
           primaryJob: action.primaryJob,
-<<<<<<< 6614cbc0609f782af64dadebd7bc3bfd86cdf9ee
-        }
-      );
-=======
-          log: action.taskflow.log,
+          jobMapById,
+          log,
         });
->>>>>>> streaming taskflow log
       const mapById = Object.assign(
         {},
         state.mapById,
@@ -53,9 +49,6 @@ export default function taskflowsReducer(state = initialState, action) {
     case Actions.UPDATE_TASKFLOW_LOG: {
       const mapById = Object.assign({}, state.mapById);
       const taskflow = Object.assign({}, state.mapById[action.taskflowId]);
-      if (!taskflow.log) {
-        taskflow.log = [];
-      }
       taskflow.log.push(action.logEntry);
       mapById[action.taskflowId] = taskflow;
 
@@ -92,9 +85,6 @@ export default function taskflowsReducer(state = initialState, action) {
       const { taskflowId, jobId, logEntry } = action;
       const taskflow = state.mapById[taskflowId];
       const job = Object.assign({}, taskflow.jobMapById[jobId]);
-      if (!job.log) {
-        job.log = [];
-      }
       job.log.push(logEntry);
       const jobMapById = Object.assign({}, taskflow.jobMapById, { [jobId]: job });
       const newTaskflow = Object.assign({}, taskflow, { jobMapById });
@@ -120,9 +110,6 @@ export default function taskflowsReducer(state = initialState, action) {
       const { taskflowId, taskId, logEntry } = action;
       const taskflow = state.mapById[taskflowId];
       const task = Object.assign({}, taskflow.taskMapById[taskId]);
-      if (!task.log) {
-        task.log = [];
-      }
       task.log.push(logEntry);
       const taskMapById = Object.assign({}, taskflow.taskMapById, { [taskId]: task });
       const newTaskflow = Object.assign({}, taskflow, { taskMapById });

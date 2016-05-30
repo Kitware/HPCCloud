@@ -368,26 +368,22 @@ function processStatusEvent(id, type, status) {
     dispatch(updateTaskflowStatus(id, status));
   } else if (taskflowId) {
     switch (type) {
-      case 'job': {
+      case 'job':
         dispatch(updateTaskflowJobStatus(taskflowId, id, status));
         break;
-      }
-      case 'task': {
+      case 'task':
         dispatch(updateTaskflowTaskStatus(taskflowId, id, status));
         break;
-      }
-      case 'cluster': {
+      case 'cluster':
         if (status === 'created') {
           // we need to fetch some new cluster props when this happens
           dispatch(clusterActions.fetchCluster(id));
         }
         dispatch(clusterActions.updateClusterStatus(id, status));
         break;
-      }
-      case 'profile': {
+      case 'profile':
         dispatch(clusterActions.updateClusterStatus(id, status));
         break;
-      }
       default:
         console.log(`unrecognized ServerEvent with type "${type}",` +
           ` taskflowId "${taskflowId}", and status "${status}"`);
@@ -395,25 +391,21 @@ function processStatusEvent(id, type, status) {
     }
   } else {
     switch (type) {
-      case 'job': {
+      case 'job':
         // find and update job
         dispatch(findJob(id));
         break;
-      }
-      case 'task': {
+      case 'task':
         // update all tasks for each taskflow
         dispatch(findTask());
         break;
-      }
-      case 'cluster': {
+      case 'cluster':
         // update taskflow meta, fetch clusters
         updateTaskflowObject();
         break;
-      }
-      case 'profile': {
+      case 'profile':
         dispatch(clusterActions.fetchClusters('ec2'));
         break;
-      }
       default:
         console.log(`unrecognized ServerEvent with type "${type}",` +
           ` id "${id}", and status "${status}"`);
@@ -435,26 +427,26 @@ function processLogEvent(id, type, log) {
         dispatch(updateTaskflowTaskLog(taskflowId, id, log));
         break;
       case 'cluster':
+        dispatch(clusterActions.appendToClusterLog(id, log));
         break;
       default:
         console.log(`unrecognized ServerEvent with type "${type}",` +
-          ` id "${id}", and status "${status}"`);
+          ` id "${id}", and log: `, log);
     }
   } else {
     switch (type) {
       case 'job':
-        // console.log('unrecognized job log');
         dispatch(findJob(id, true));
         break;
       case 'task':
-        // console.log('unrecognized job task');
         dispatch(findTask());
         break;
       case 'cluster':
+        dispatch(clusterActions.fetchClusters(null));
         break;
       default:
         console.log(`unrecognized ServerEvent with type "${type}",` +
-          ` id "${id}", and status "${status}"`);
+          ` id "${id}", and log: `, log);
     }
   }
 }

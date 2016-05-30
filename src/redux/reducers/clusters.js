@@ -221,6 +221,17 @@ export default function clustersReducer(state = initialState, action) {
       return Object.assign({}, state, { list });
     }
 
+    case Actions.APPEND_TO_CLUSTER_LOG: {
+      const mapById = Object.assign({}, state.mapById);
+      const cluster = Object.assign({}, state.mapById[action.id]);
+      if (!cluster.log) {
+        cluster.log = [];
+      }
+      cluster.log.push(action.logEntry);
+      mapById[action.id] = cluster;
+      return Object.assign({}, state, { mapById });
+    }
+
     case Actions.UPDATE_CLUSTER_LOG: {
       const mapById = Object.assign({}, state.mapById);
       const cluster = Object.assign({}, state.mapById[action.id]);
