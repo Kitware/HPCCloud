@@ -7,7 +7,7 @@ function nodeEnv() {
   if (process.env.NODE_ENV) {
     return '\'' + process.env.NODE_ENV + '\'';
   }
-  return 'development';
+  return '\'development\'';
 }
 
 var definePlugin = new webpack.DefinePlugin({
