@@ -1,9 +1,18 @@
+/* eslint-disable */
 var webpack = require('webpack'),
     path = require('path'),
     loaders = require('./node_modules/paraviewweb/config/webpack.loaders.js');
 
+function nodeEnv() {
+  if (process.env.NODE_ENV) {
+    return '\'' + process.env.NODE_ENV + '\'';
+  }
+  return 'development';
+}
+
 var definePlugin = new webpack.DefinePlugin({
   __BROWSER_BUILD__: true,
+  'process.env.NODE_ENV': nodeEnv(),
 });
 
 module.exports = {

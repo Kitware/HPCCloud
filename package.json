@@ -47,12 +47,15 @@
     "postinstall"   : "npm run install:pyfr && fix-kw-web-suite || true",
     "check"         : "node bin/version-check.js",
 
-    "prebuild"      : "npm run check",
+    "env:dev"       : "export NODE_ENV='development'",
+    "env:prod"      : "export NODE_ENV='production'",
+
+    "prebuild"      : "npm run check && npm run env:dev",
     "build"         : "fix-autobahn && webpack --progress --colors",
     "build:debug"   : "fix-autobahn && webpack --display-modules",
-    "build:release" : "fix-autobahn && webpack -p --progress --colors",
+    "build:release" : "npm run env:prod && fix-autobahn && webpack -p --progress --colors",
 
-    "start": "fix-autobahn && webpack-dev-server --progress --open",
+    "start": "npm run env:dev && fix-autobahn && webpack-dev-server --progress --open",
 
     "commit"            : "git cz",
     "semantic-release"  : "semantic-release pre && npm publish && semantic-release post"
