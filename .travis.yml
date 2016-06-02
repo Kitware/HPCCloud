@@ -52,13 +52,13 @@ script:
     # Run client tests, only with python 2.7
     - if [ -n "${PY2}" ]; then npm install; fi
     - if [ -n "${PY2}" ]; then npm run build:release; fi
+    - if [ -n "${PY2}" ]; then npm run test:redux -g; fi
     # Now run server tests
     - mkdir _girder_build
     - pushd _girder_build
     - cmake -DBUILD_JAVASCRIPT_TESTS:BOOL=OFF -DPYTHON_COVERAGE:BOOL=OFF -DPYTHON_VERSION:STRING=${TRAVIS_PYTHON_VERSION} "${HOME}/build/girder"
     - ctest -R hpccloud -VV
     - ctest -R pvwproxy -VV
-    - npm run test:redux
 
 after_success:
     - npm run semantic-release

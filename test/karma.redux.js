@@ -20,7 +20,6 @@ const wpConfig = {
   plugins: [
     definePlugin
   ],
-  progress: true,
   module: {
     loaders: [
       {
