@@ -2,9 +2,8 @@ import client           from '../../network';
 import * as SimulationHelper from '../../network/helpers/simulations';
 import * as ProjectHelper    from '../../network/helpers/projects';
 import * as netActions  from './network';
-import { dispatch }     from '../index.js';
-
 import * as router          from './router';
+import { dispatch }     from '../index.js';
 
 export const FETCH_PROJECT_LIST = 'FETCH_PROJECT_LIST';
 export const UPDATE_PROJECT_LIST = 'UPDATE_PROJECT_LIST';
@@ -33,18 +32,16 @@ export function fetchProjectSimulations(id) {
   return dispatch => {
     const action = netActions.addNetworkCall(`fetch_project_simulations_${id}`, 'Retreive project simulations');
 
-    client.listSimulations(id)
-      .then(
-        resp => {
-          const simulations = resp.data;
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(updateProjectSimulations(id, simulations));
-        },
-        error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
-        });
-
-    return action;
+    return client.listSimulations(id)
+      .then((resp) => {
+        const simulations = resp.data;
+        // dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(updateProjectSimulations(id, simulations));
+      })
+      .catch((error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error));
+        throw new Error('sim fetch fails');
+      });
   };
 }
 
@@ -52,20 +49,20 @@ export function fetchProjectList() {
   return dispatch => {
     const action = netActions.addNetworkCall('fetch_project_list', 'Retreive projects');
 
-    client.listProjects()
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(updateProjectList(resp.data));
-          resp.data.forEach(project => {
-            dispatch(fetchProjectSimulations(project._id));
-          });
-        },
-        error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
+    return client.listProjects()
+      .then((resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(updateProjectList(resp.data));
+        resp.data.forEach(project => {
+          dispatch(fetchProjectSimulations(project._id));
         });
+      })
+      .catch((error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error));
+        throw new Error('proj fetch fails');
+      });
 
-    return action;
+    // return action;
   };
 }
 

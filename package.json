@@ -49,6 +49,7 @@
 
     "env:dev"       : "export NODE_ENV='development'",
     "env:prod"      : "export NODE_ENV='production'",
+    "env:test"      : "export NODE_ENV='test'",
 
     "prebuild"      : "npm run check && npm run env:dev",
     "build"         : "fix-autobahn && webpack --progress --colors",
@@ -56,6 +57,8 @@
     "build:release" : "npm run env:prod && fix-autobahn && webpack -p --progress --colors",
 
     "start": "npm run env:dev && fix-autobahn && webpack-dev-server --progress --open",
+
+    "test:redux": "npm run env:test && karma start test/karma.redux.js",
 
     "commit"            : "git cz",
     "semantic-release"  : "semantic-release pre && npm publish && semantic-release post"

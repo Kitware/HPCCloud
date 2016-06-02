@@ -43,6 +43,7 @@ module.exports = {
             SimputStyle: path.resolve('./node_modules/simput/style'),
             VisualizerStyle: path.resolve('./node_modules/pvw-visualizer/style'),
             HPCCloudStyle: path.resolve('./style'),
+            workflows: path.resolve('./src/workflows')
         },
     },
     postcss: [
