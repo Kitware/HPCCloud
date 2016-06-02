@@ -58,6 +58,7 @@ script:
     - cmake -DBUILD_JAVASCRIPT_TESTS:BOOL=OFF -DPYTHON_COVERAGE:BOOL=OFF -DPYTHON_VERSION:STRING=${TRAVIS_PYTHON_VERSION} "${HOME}/build/girder"
     - ctest -R hpccloud -VV
     - ctest -R pvwproxy -VV
+    - npm run test:redux
 
 after_success:
     - npm run semantic-release
