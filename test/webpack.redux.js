@@ -1,5 +1,6 @@
-var path = require('path'),
-  webpack = require('webpack');
+// webpack for redux tests
+var webpack = require('webpack'),
+  path = require('path');
 
 function nodeEnv() {
   if (process.env.NODE_ENV) {
@@ -17,13 +18,8 @@ module.exports = {
     'tests.webpack.js': './test/tests.webpack.js'
   },
   plugins: [
-      definePlugin,
+    definePlugin
   ],
-  output: {
-    path: './',
-    filename: 'WOW.js',
-  },
-  // node : { fs: 'empty' }, // prevents an error in nock
   module: {
     loaders: [
       {
@@ -64,8 +60,10 @@ module.exports = {
   },
   resolve: {
     alias: {
-      HPCCloudStyle: path.resolve('./style'),
+      // see that file for why we do this.
       workflows: path.resolve('./test/helpers/workflowNames'),
+      // Constants.js uses Theme.mcss
+      HPCCloudStyle: path.resolve('./style'),
     },
   },
 };

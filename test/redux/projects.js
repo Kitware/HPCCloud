@@ -10,8 +10,8 @@ import thunk from 'redux-thunk';
 import { registerMiddlewares } from 'redux-actions-assertions';
 import { registerAssertions } from 'redux-actions-assertions/expect';
 import fauxJax from 'faux-jax';
-
-/* eslint-disable no-undef */
+const req = 'request';
+/* global describe it afterEach afterAll beforeAll */
 
 registerMiddlewares([thunk]);
 registerAssertions();
@@ -67,6 +67,7 @@ describe('project actions', () => {
       request.respond(replyCode, { 'Content-Type': 'application/json' }, JSON.stringify(replyData));
     };
   }
+
   function complete(done) {
     return (err) => {
       if (err) {
@@ -75,15 +76,17 @@ describe('project actions', () => {
       done();
     };
   }
+
   describe('async actions', () => {
     beforeAll(() => {
       fauxJax.install();
+      // fauxJax.setMaxListeners(1);
     });
 
     afterEach(() => {
       // fauxJax inherits from EventEmitter, we do this afterEach because we
       // change the event listener function almost everytime
-      fauxJax.removeAllListeners('request');
+      fauxJax.removeAllListeners(req);
     });
 
     afterAll(() => {
@@ -91,18 +94,43 @@ describe('project actions', () => {
     });
 
     it('should get projects', (done) => {
-      fauxJax.on('request', fauxRes(200, projectsData));
+      fauxJax.on(req, fauxRes(200, projectsData));
       expect(Actions.fetchProjectList())
         .toDispatchActions({ type: Actions.UPDATE_PROJECT_LIST, projects: projectsData }, complete(done));
     });
 
     const id = projectsData[0]._id;
     it('should get a project\'s simulations', (done) => {
-      fauxJax.on('request', fauxRes(200, simulationData));
+      fauxJax.on(req, fauxRes(200, simulationData));
       expect(Actions.fetchProjectSimulations(id))
         .toDispatchActions({ type: Actions.UPDATE_PROJECT_SIMULATIONS, id, simulations: simulationData }, complete(done));
+    });
 
-      // expect(projectsReducer(''))
+    it('should delete a project', (done) => {
+      fauxJax.on(req, fauxRes(200, projectsData[0]));
+      expect(Actions.deleteProject(projectsData[0]))
+        .toDispatchActions({ type: 'REMOVE_PROJECT', project: projectsData[0] }, complete(done));
+    });
+
+    it('should save a project', (done) => {
+      fauxJax.on(req, fauxRes(200, projectsData[0]));
+      expect(Actions.saveProject(projectsData[0]))
+        .toDispatchActions({ type: Actions.UPDATE_PROJECT, project: projectsData[0] }, complete(done));
+    });
+
+    it('should update simulation step', (done) => {
+      const expectedSim = Object.assign({}, simulationData[0]);
+      expectedSim.steps.Introduction.status = 'complete';
+      fauxJax.on(req, fauxRes(202, expectedSim));
+      expect(Actions.updateSimulationStep(expectedSim._id, 'Introduction', { status: 'complete' }))
+        .toDispatchActions({ type: Actions.UPDATE_SIMULATION, simulation: expectedSim }, complete(done));
+    });
+
+    it('should delete simulation', (done) => {
+      const deletedSim = Object.assign({}, simulationData[0]);
+      fauxJax.on(req, fauxRes(200, null));
+      expect(Actions.deleteSimulation(deletedSim))
+        .toDispatchActions({ type: Actions.REMOVE_SIMULATION, simulation: deletedSim }, complete(done));
     });
   });
 });

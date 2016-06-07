@@ -35,7 +35,7 @@ export function fetchProjectSimulations(id) {
     return client.listSimulations(id)
       .then((resp) => {
         const simulations = resp.data;
-        // dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateProjectSimulations(id, simulations));
       })
       .catch((error) => {
@@ -70,7 +70,7 @@ export function deleteProject(project) {
   return dispatch => {
     const action = netActions.addNetworkCall(`delete_project_${project._id}`, `Delete project ${project.name}`);
 
-    client.deleteProject(project._id)
+    return client.deleteProject(project._id)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -79,9 +79,8 @@ export function deleteProject(project) {
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
+          throw new Error('project delete fails');
         });
-
-    return action;
   };
 }
 
@@ -101,7 +100,6 @@ export function updateProject(project) {
   return { type: UPDATE_PROJECT, project };
 }
 
-
 export function saveProject(project, attachments) {
   return dispatch => {
     const action = netActions.addNetworkCall('save_project', `Save project ${project.name}`);
@@ -110,7 +108,7 @@ export function saveProject(project, attachments) {
       dispatch(netActions.prepareUpload(attachments));
     }
 
-    ProjectHelper.saveProject(project, attachments)
+    return ProjectHelper.saveProject(project, attachments)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -125,8 +123,6 @@ export function saveProject(project, attachments) {
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
         });
-
-    return action;
   };
 }
 
@@ -172,7 +168,7 @@ export function deleteSimulation(simulation, location) {
   return dispatch => {
     const action = netActions.addNetworkCall(`delete_simulation_${simulation._id}`, `Delete simulation ${simulation.name}`);
 
-    client.deleteSimulation(simulation._id)
+    return client.deleteSimulation(simulation._id)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -183,9 +179,10 @@ export function deleteSimulation(simulation, location) {
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
+          // throw new Error('project delete fails');
         });
 
-    return action;
+    // return action;
   };
 }
 
@@ -205,20 +202,17 @@ export function updateSimulationStep(id, stepName, data, location) {
   return dispatch => {
     const action = netActions.addNetworkCall(`update_simulation_step_${id}`, 'Update simulation step');
 
-    client.updateSimulationStep(id, stepName, data)
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(updateSimulation(resp.data));
-          if (location) {
-            dispatch(router.replace(location));
-          }
-        },
-        error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
-        });
-
-    return action;
+    return client.updateSimulationStep(id, stepName, data)
+      .then((resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(updateSimulation(resp.data));
+        if (location) {
+          dispatch(router.replace(location));
+        }
+      })
+      .catch((error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error));
+      });
   };
 }
 
