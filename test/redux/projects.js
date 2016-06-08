@@ -1,14 +1,15 @@
 import * as Actions from '../../src/redux/actions/projects';
-import projectsReducer from '../../src/redux/reducers/projects';
-import { initialState } from '../../src/redux/reducers/projects';
+import projectsReducer, { initialState } from '../../src/redux/reducers/projects';
 import client from '../../src/network';
 import * as ProjectHelper from '../../src/network/helpers/projects';
+import * as SimulationHelper from '../../src/network/helpers/simulations';
 
 import projectsData from '../sampleData/projectsData';
 import simulationData from '../sampleData/simulationsForProj1';
 
 import expect from 'expect';
 import thunk from 'redux-thunk';
+import complete from '../helpers/complete';
 import { registerMiddlewares } from 'redux-actions-assertions';
 import { registerAssertions } from 'redux-actions-assertions/expect';
 /* global describe it afterEach */
@@ -16,7 +17,10 @@ import { registerAssertions } from 'redux-actions-assertions/expect';
 registerMiddlewares([thunk]);
 registerAssertions();
 
-// const client = Object.assign({}, srcClient);
+function setSpy(target, method, data) {
+  expect.spyOn(target, method)
+    .andReturn(Promise.resolve({ data }));
+}
 
 describe('project actions', () => {
   // ----------------------------------------------------------------------------
@@ -64,21 +68,6 @@ describe('project actions', () => {
   // ----------------------------------------------------------------------------
   // AYSYNCHRONUS ACTIONS
   // ----------------------------------------------------------------------------
-
-  function complete(done) {
-    return (err) => {
-      if (err) {
-        done.fail(err);
-      }
-      done();
-    };
-  }
-
-  function setSpy(target, method, data) {
-    expect.spyOn(target, method)
-      .andReturn(Promise.resolve({ data }));
-  }
-
   describe('async actions', () => {
     afterEach(() => {
       expect.restoreSpies();
@@ -99,16 +88,61 @@ describe('project actions', () => {
       expect(client.listSimulations).toHaveBeenCalled();
     });
 
+    it('should save a project', (done) => {
+      setSpy(ProjectHelper, 'saveProject', projectsData[0]);
+      expect(Actions.saveProject(projectsData[0]))
+        .toDispatchActions({ type: Actions.UPDATE_PROJECT, project: projectsData[0] }, complete(done));
+    });
+
     it('should delete a project', (done) => {
       setSpy(client, 'deleteProject', projectsData[0]);
       expect(Actions.deleteProject(projectsData[0]))
         .toDispatchActions({ type: 'REMOVE_PROJECT', project: projectsData[0] }, complete(done));
     });
+  });
+});
 
-    it('should save a project', (done) => {
-      setSpy(ProjectHelper, 'saveProject', projectsData[0]);
-      expect(Actions.saveProject(projectsData[0]))
-        .toDispatchActions({ type: Actions.UPDATE_PROJECT, project: projectsData[0] }, complete(done));
+// ----------------------------------------------------------------------------
+// SIMULATIONS
+// ----------------------------------------------------------------------------
+
+describe('simulation actions', () => {
+  describe('simple actions', () => {
+    it('should update Simulation', () => {
+      const projId = projectsData[0]._id;
+      const expectedAction = { type: Actions.UPDATE_SIMULATION, simulation: simulationData[0] };
+      expect(Actions.updateSimulation(simulationData[0]))
+        .toDispatchActions(expectedAction);
+
+      expect(projectsReducer(initialState, expectedAction).simulations[projId].list)
+        .toContain(simulationData[0]._id);
+    });
+
+    // setActiveSimulation
+    it('should set active Simulation', () => {
+      const simId = simulationData[0]._id;
+      const expectedAction = { type: Actions.UPDATE_ACTIVE_SIMULATION, id: simId };
+      expect(Actions.setActiveSimulation(simId))
+        .toDispatchActions(expectedAction);
+
+      // if the new active simulation isn't in the list
+      const newState = Object.assign({}, initialState);
+      newState.pendingActiveSimulation = simId;
+      expect(projectsReducer(initialState, expectedAction))
+        .toEqual(newState);
+    });
+  });
+
+  describe('async actions', () => {
+    afterEach(() => {
+      expect.restoreSpies();
+    });
+
+    it('should save simulation', (done) => {
+      const expectedSim = Object.assign({}, simulationData[0]);
+      setSpy(SimulationHelper, 'saveSimulation', expectedSim);
+      expect(Actions.saveSimulation(expectedSim))
+        .toDispatchActions({ type: Actions.UPDATE_SIMULATION, simulation: expectedSim }, complete(done));
     });
 
     it('should update simulation step', (done) => {

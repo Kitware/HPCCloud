@@ -142,7 +142,7 @@ export function saveSimulation(simulation, attachments, location) {
       dispatch(netActions.prepareUpload(attachments));
     }
 
-    SimulationHelper.saveSimulation(simulation, attachments)
+    return SimulationHelper.saveSimulation(simulation, attachments)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -159,8 +159,6 @@ export function saveSimulation(simulation, attachments, location) {
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
         });
-
-    return action;
   };
 }
 
@@ -204,7 +202,7 @@ export function updateSimulationStep(id, stepName, data, location) {
 
     return client.updateSimulationStep(id, stepName, data)
       .then((resp) => {
-        dispatch(netActions.successNetworkCall(action.id, resp));
+        // dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateSimulation(resp.data));
         if (location) {
           dispatch(router.replace(location));
