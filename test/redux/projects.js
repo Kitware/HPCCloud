@@ -1,6 +1,8 @@
 import * as Actions from '../../src/redux/actions/projects';
 import projectsReducer from '../../src/redux/reducers/projects';
 import { initialState } from '../../src/redux/reducers/projects';
+import client from '../../src/network';
+import * as ProjectHelper from '../../src/network/helpers/projects';
 
 import projectsData from '../sampleData/projectsData';
 import simulationData from '../sampleData/simulationsForProj1';
@@ -9,12 +11,12 @@ import expect from 'expect';
 import thunk from 'redux-thunk';
 import { registerMiddlewares } from 'redux-actions-assertions';
 import { registerAssertions } from 'redux-actions-assertions/expect';
-import fauxJax from 'faux-jax';
-const req = 'request';
-/* global describe it afterEach afterAll beforeAll */
+/* global describe it afterEach */
 
 registerMiddlewares([thunk]);
 registerAssertions();
+
+// const client = Object.assign({}, srcClient);
 
 describe('project actions', () => {
   // ----------------------------------------------------------------------------
@@ -62,11 +64,6 @@ describe('project actions', () => {
   // ----------------------------------------------------------------------------
   // AYSYNCHRONUS ACTIONS
   // ----------------------------------------------------------------------------
-  function fauxRes(replyCode, replyData) {
-    return (request) => {
-      request.respond(replyCode, { 'Content-Type': 'application/json' }, JSON.stringify(replyData));
-    };
-  }
 
   function complete(done) {
     return (err) => {
@@ -77,43 +74,39 @@ describe('project actions', () => {
     };
   }
 
+  function setSpy(target, method, data) {
+    expect.spyOn(target, method)
+      .andReturn(Promise.resolve({ data }));
+  }
+
   describe('async actions', () => {
-    beforeAll(() => {
-      fauxJax.install();
-      // fauxJax.setMaxListeners(1);
-    });
-
     afterEach(() => {
-      // fauxJax inherits from EventEmitter, we do this afterEach because we
-      // change the event listener function almost everytime
-      fauxJax.removeAllListeners(req);
-    });
-
-    afterAll(() => {
-      fauxJax.restore();
+      expect.restoreSpies();
     });
 
     it('should get projects', (done) => {
-      fauxJax.on(req, fauxRes(200, projectsData));
+      setSpy(client, 'listProjects', projectsData);
       expect(Actions.fetchProjectList())
         .toDispatchActions({ type: Actions.UPDATE_PROJECT_LIST, projects: projectsData }, complete(done));
+      expect(client.listProjects).toHaveBeenCalled();
     });
 
     const id = projectsData[0]._id;
     it('should get a project\'s simulations', (done) => {
-      fauxJax.on(req, fauxRes(200, simulationData));
+      setSpy(client, 'listSimulations', simulationData);
       expect(Actions.fetchProjectSimulations(id))
         .toDispatchActions({ type: Actions.UPDATE_PROJECT_SIMULATIONS, id, simulations: simulationData }, complete(done));
+      expect(client.listSimulations).toHaveBeenCalled();
     });
 
     it('should delete a project', (done) => {
-      fauxJax.on(req, fauxRes(200, projectsData[0]));
+      setSpy(client, 'deleteProject', projectsData[0]);
       expect(Actions.deleteProject(projectsData[0]))
         .toDispatchActions({ type: 'REMOVE_PROJECT', project: projectsData[0] }, complete(done));
     });
 
     it('should save a project', (done) => {
-      fauxJax.on(req, fauxRes(200, projectsData[0]));
+      setSpy(ProjectHelper, 'saveProject', projectsData[0]);
       expect(Actions.saveProject(projectsData[0]))
         .toDispatchActions({ type: Actions.UPDATE_PROJECT, project: projectsData[0] }, complete(done));
     });
@@ -121,14 +114,14 @@ describe('project actions', () => {
     it('should update simulation step', (done) => {
       const expectedSim = Object.assign({}, simulationData[0]);
       expectedSim.steps.Introduction.status = 'complete';
-      fauxJax.on(req, fauxRes(202, expectedSim));
+      setSpy(client, 'updateSimulationStep', expectedSim);
       expect(Actions.updateSimulationStep(expectedSim._id, 'Introduction', { status: 'complete' }))
         .toDispatchActions({ type: Actions.UPDATE_SIMULATION, simulation: expectedSim }, complete(done));
     });
 
     it('should delete simulation', (done) => {
       const deletedSim = Object.assign({}, simulationData[0]);
-      fauxJax.on(req, fauxRes(200, null));
+      setSpy(client, 'deleteSimulation', null);
       expect(Actions.deleteSimulation(deletedSim))
         .toDispatchActions({ type: Actions.REMOVE_SIMULATION, simulation: deletedSim }, complete(done));
     });

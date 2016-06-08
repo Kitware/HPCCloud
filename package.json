@@ -42,7 +42,6 @@
     "karma-webpack": "1.7.0",
     "karma-phantomjs-launcher": "1.0.0",
     "phantomjs-prebuilt": "2.1.7",
-    "faux-jax": "5.0.1",
     "jasmine": "2.4.1",
     "redux-actions-assertions": "1.0.8",
     "redux-thunk": "2.1.0",
