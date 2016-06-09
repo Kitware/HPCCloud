@@ -24,7 +24,7 @@ module.exports = function(config) {
     webpack: wpConfig,
     files: [
       '../node_modules/babel-polyfill/dist/polyfill.js',
-      'tests.webpack.js',
+      'tests.webpack.js'
     ],
   });
 };

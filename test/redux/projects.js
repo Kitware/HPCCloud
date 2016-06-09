@@ -28,11 +28,11 @@ describe('project actions', () => {
   // ----------------------------------------------------------------------------
   describe('basic actions', () => {
     const newState = Object.assign({}, initialState);
-    it('should update a project list', () => {
+    it('should update a project list', (done) => {
       const expectedAction = { type: Actions.UPDATE_PROJECT_LIST, projects: projectsData };
 
       expect(Actions.updateProjectList(projectsData))
-        .toDispatchActions(expectedAction);
+        .toDispatchActions(expectedAction, complete(done));
 
       newState.list = projectsData.map((el) => el._id);
       projectsData.forEach((el) => {
@@ -42,26 +42,26 @@ describe('project actions', () => {
         .toEqual(newState);
     });
 
-    it('should update project simulations', () => {
+    it('should update project simulations', (done) => {
       const id = projectsData[0]._id;
       const expectedAction = { type: Actions.UPDATE_PROJECT_SIMULATIONS, id, simulations: simulationData };
       expect(Actions.updateProjectSimulations(id, simulationData))
-        .toDispatchActions(expectedAction);
+        .toDispatchActions(expectedAction, complete(done));
 
       expect(Object.keys(projectsReducer(initialState, expectedAction).simulations[id]).length)
         .toEqual(simulationData.length);
     });
 
-    it('should update project data', () => {
+    it('should update project data', (done) => {
       const project = projectsData[0];
       expect(Actions.updateProject(project))
-        .toDispatchActions({ type: Actions.UPDATE_PROJECT, project });
+        .toDispatchActions({ type: Actions.UPDATE_PROJECT, project }, complete(done));
     });
 
-    it('should update simulation data', () => {
+    it('should update simulation data', (done) => {
       const simulation = simulationData[0];
       expect(Actions.updateSimulation(simulation))
-        .toDispatchActions({ type: Actions.UPDATE_SIMULATION, simulation });
+        .toDispatchActions({ type: Actions.UPDATE_SIMULATION, simulation }, complete(done));
     });
   });
 
@@ -76,8 +76,7 @@ describe('project actions', () => {
     it('should get projects', (done) => {
       setSpy(client, 'listProjects', projectsData);
       expect(Actions.fetchProjectList())
-        .toDispatchActions({ type: Actions.UPDATE_PROJECT_LIST, projects: projectsData }, complete(done));
-      expect(client.listProjects).toHaveBeenCalled();
+        .toDispatchActions({ type: Actions.UPDATE_PROJECT_LIST }, complete(done));
     });
 
     const id = projectsData[0]._id;
@@ -108,28 +107,14 @@ describe('project actions', () => {
 
 describe('simulation actions', () => {
   describe('simple actions', () => {
-    it('should update Simulation', () => {
+    it('should update Simulation', (done) => {
       const projId = projectsData[0]._id;
       const expectedAction = { type: Actions.UPDATE_SIMULATION, simulation: simulationData[0] };
       expect(Actions.updateSimulation(simulationData[0]))
-        .toDispatchActions(expectedAction);
+        .toDispatchActions(expectedAction, complete(done));
 
       expect(projectsReducer(initialState, expectedAction).simulations[projId].list)
         .toContain(simulationData[0]._id);
-    });
-
-    // setActiveSimulation
-    it('should set active Simulation', () => {
-      const simId = simulationData[0]._id;
-      const expectedAction = { type: Actions.UPDATE_ACTIVE_SIMULATION, id: simId };
-      expect(Actions.setActiveSimulation(simId))
-        .toDispatchActions(expectedAction);
-
-      // if the new active simulation isn't in the list
-      const newState = Object.assign({}, initialState);
-      newState.pendingActiveSimulation = simId;
-      expect(projectsReducer(initialState, expectedAction))
-        .toEqual(newState);
     });
   });
 
