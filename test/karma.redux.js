@@ -14,9 +14,9 @@ module.exports = function(config) {
     reporters: ['spec'],
     plugins: [
       'karma-jasmine',
+      'karma-phantomjs-launcher',
       'karma-spec-reporter',
       'karma-webpack',
-      'karma-phantomjs-launcher'
     ],
     preprocessors: {
       'tests.webpack.js': ['webpack'],

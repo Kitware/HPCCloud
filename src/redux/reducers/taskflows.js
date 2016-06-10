@@ -1,13 +1,13 @@
 import * as Actions from '../actions/taskflows';
 
-const initialState = {
+export const initialState = {
   mapById: {},
   taskflowMapByTaskId: {},
   taskflowMapByJobId: {},
   updateLogs: [],
 };
 
-const initialTaskflow = {
+export const taskflowTemplate = {
   taskMapById: {},
   log: [],
   actions: [],
@@ -28,14 +28,14 @@ export default function taskflowsReducer(state = initialState, action) {
       }
       const taskflow = Object.assign(
         {},
-        initialTaskflow,
+        taskflowTemplate,
         state.mapById[action.taskflow._id],
         {
           flow: action.taskflow,
           jobMapById,
           primaryJob: action.primaryJob,
-
-        });
+        }
+      );
       const mapById = Object.assign(
         {},
         state.mapById,
