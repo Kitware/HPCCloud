@@ -15,7 +15,6 @@ export const UPDATE_CLUSTER_PRESETS = 'UPDATE_CLUSTER_PRESETS';
 export const UPDATE_CLUSTER_STATUS = 'UPDATE_CLUSTER_STATUS';
 export const REMOVE_CLUSTER = 'REMOVE_CLUSTER';
 export const SAVE_CLUSTER = 'SAVE_CLUSTER';
-export const TEST_CLUSTER = 'TEST_CLUSTER';
 export const PENDING_CLUSTER_NETWORK = 'PENDING_CLUSTER_NETWORK';
 export const CLUSTER_APPLY_PRESET = 'CLUSTER_APPLY_PRESET';
 export const TESTING_CLUSTER = 'TESTING_CLUSTER';
@@ -38,7 +37,7 @@ export function applyPreset(index, name) {
   return { type: CLUSTER_APPLY_PRESET, index, name };
 }
 
-// removes cluster from mapById, does not affect selected index in preference pane
+// removes cluster from mapById
 // (see removeCluster(index, cluster) belows)
 export function removeClusterById(id) {
   return { type: REMOVE_CLUSTER_BY_ID, id };

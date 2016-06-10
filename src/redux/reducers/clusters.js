@@ -3,14 +3,14 @@ import deepClone    from 'mout/src/lang/deepClone';
 import set          from 'mout/src/object/set';
 import style        from 'HPCCloudStyle/PageWithMenu.mcss';
 
-const initialState = {
+export const initialState = {
   list: [],
   active: 0,
   pending: false,
   mapById: {},
 };
 
-const clusterTemplate = {
+export const clusterTemplate = {
   name: 'new cluster',
   type: 'trad',
   classPrefix: style.statusCreatingIcon,
@@ -102,7 +102,7 @@ export default function clustersReducer(state = initialState, action) {
 
     case Actions.REMOVE_CLUSTER_BY_ID: {
       const id = action.id;
-      const list = state.list.filter((item) => item.id !== id);
+      const list = state.list.filter((item) => item._id !== id);
       const active = (state.active < list.length) ? state.active : (list.length - 1);
       const mapById = Object.assign({}, state.mapById);
       delete mapById[id];
@@ -181,10 +181,6 @@ export default function clustersReducer(state = initialState, action) {
       }
 
       return Object.assign({}, state, { list, active });
-    }
-
-    case Actions.TEST_CLUSTER: {
-      return state;
     }
 
     case Actions.PENDING_CLUSTER_NETWORK: {
