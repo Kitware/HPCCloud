@@ -67,7 +67,7 @@ export function fetchFolder(id, fetchFolderMeta = true, openedFolders = []) {
   };
 }
 
-export function toggleOpenFolder(folderId, opening, opened) {
+export function toggleOpenFolder(folderId, opening) {
   return dispatch => {
     if (opening) {
       dispatch(fetchFolder(folderId));

@@ -47,7 +47,6 @@ if (process.env.NODE_ENV === 'test') {
   url = window.location;
 }
 
-const girderClient = ClientBuilder.build(
-  url, endpoints);
+const girderClient = ClientBuilder.build(url, endpoints);
 
 export default girderClient;
