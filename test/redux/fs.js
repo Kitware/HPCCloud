@@ -39,8 +39,10 @@ describe('fs', () => {
     });
 
     // just reducer
-    it('should open a folder', () => {
+    it('should open a folder', (done) => {
       const action = { type: Actions.TOGGLE_OPEN_FOLDER, folderId: folder._id };
+      expect(Actions.toggleOpenFolder(folder._id, false))
+        .toDispatchActions([], complete(done));
 
       // opens
       const newState = deepClone(fsState);
@@ -59,22 +61,22 @@ describe('fs', () => {
       expect.restoreSpies();
     });
 
-    // this stalls phantomJS?
-    // it('should fetch folders and child items', (done) => {
-    //   const childFolders = [ { _id: 'c3d4' }, { _id: 'e5f6' } ];
-    //   const items = [ { _id:'item1' }, { _id: 'item2' }, { _id: 'item3' } ];
-    //   const expectedActions = [
-    //     { type: Actions.CHILDREN_FOLDERS, children: childFolders, id: folder._id },
-    //     { type: Actions.CHILDREN_ITEMS, children: items, id: folder._id },
-    //     { type: Actions.UPDATE_FOLDER, folder, id: folder._id }
-    //   ];
+    // // this stalls phantomJS?
+    it('should fetch folders and child items', (done) => {
+      const childFolders = [ { _id: 'c3d4' }, { _id: 'e5f6' } ];
+      const items = [ { _id:'item1' }, { _id: 'item2' }, { _id: 'item3' } ];
+      const expectedActions = [
+        { type: Actions.CHILDREN_FOLDERS, children: childFolders, id: folder._id },
+        { type: Actions.CHILDREN_ITEMS, children: items, id: folder._id },
+        { type: Actions.UPDATE_FOLDER, folder: childFolders[0], id: childFolders[0]._id },
+        { type: Actions.UPDATE_FOLDER, folder: childFolders[1], id: childFolders[1]._id },
+      ];
 
-    //   setSpy(client, 'listFolders', childFolders);
-    //   setSpy(client, 'listItems', items);
-    //   // setSpy(client, 'getFolder', null);
+      setSpy(client, 'listFolders', childFolders);
+      setSpy(client, 'listItems', items);
 
-    //   expect(Actions.fetchFolder(folder._id, false))
-    //     .toDispatchActions(expectedActions, complete(done));
-    // });
+      expect(Actions.fetchFolder(folder._id, false))
+        .toDispatchActions(expectedActions, complete(done));
+    });
   });
 });

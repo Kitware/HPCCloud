@@ -39,9 +39,6 @@ export function fetchFolder(id, fetchFolderMeta = true, openedFolders = []) {
           dispatch({ type: CHILDREN_FOLDERS, children, id });
           children.forEach(folder => {
             dispatch(updateFolder(folder));
-            if (openedFolders.indexOf()) {
-              dispatch(fetchFolder(folder._id, false, openedFolders));
-            }
           });
         },
         error => {
