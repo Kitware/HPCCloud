@@ -1,14 +1,14 @@
 import * as Actions from '../actions/aws';
 import deepClone    from 'mout/src/lang/deepClone';
 
-const initialState = {
+export const initialState = {
   list: [],
   active: 0,
   pending: false,
   mapById: {},
 };
 
-const template = {
+export const awsTemplate = {
   accessKeyId: '',
   availabilityZone: 'us-east-1a',
   name: 'new AWS profile',
@@ -23,7 +23,7 @@ export default function awsReducer(state = initialState, action) {
         {},
         state,
         {
-          list: [].concat(state.list, deepClone(template)),
+          list: [].concat(state.list, deepClone(awsTemplate)),
           active: state.list.length,
         });
     }
@@ -43,10 +43,8 @@ export default function awsReducer(state = initialState, action) {
     }
 
     case Actions.UPDATE_ACTIVE_AWS_PROFILE: {
-      return Object.assign(
-        {},
-        state,
-        { active: action.index });
+      const active = Math.min(Math.max(action.index, 0), state.list.length - 1);
+      return Object.assign({}, state, { active });
     }
 
     case Actions.UPDATE_AWS_PROFILES: {
