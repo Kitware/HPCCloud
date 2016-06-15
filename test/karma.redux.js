@@ -29,8 +29,17 @@ module.exports = function(config) {
     },
     webpack: wpConfig,
     coverageReporter: {
-      type: 'html',
-      dir: 'coverage/',
+      reporters: [
+        {
+          type: 'html',
+          dir: 'coverage/',
+          subdir: 'html'
+        }, {
+          type: 'lcovonly',
+          dir: 'coverage',
+          subdir: 'lcov'
+        },
+      ]
     }
   });
 };

@@ -49,6 +49,8 @@
     "redux-actions-assertions": "1.1.0",
     "redux-thunk": "2.1.0",
     "expect": "1.20.1",
+    "codecov.io": "0.1.6",
+
     "babel-polyfill": "6.9.1",
     "paraviewweb": "1.6.0",
     "simput": "1.2.0",
@@ -69,6 +71,7 @@
     "start": "fix-autobahn && webpack-dev-server --progress --open",
 
     "test:redux": "NODE_ENV='test' karma start test/karma.redux.js",
+    "codecov": "cat test/coverage/lcov/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js",
 
     "commit"            : "git cz",
     "semantic-release"  : "semantic-release pre && npm publish && semantic-release post"
