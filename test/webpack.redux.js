@@ -55,8 +55,15 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel?presets[]=es2015,presets[]=react',
-      }
-    ]
+      },
+    ],
+    postLoaders: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'istanbul-instrumenter',
+      },
+    ],
   },
   resolve: {
     alias: {

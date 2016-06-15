@@ -11,20 +11,26 @@ module.exports = function(config) {
     singleRun: true,
     frameworks: ['jasmine'],
     browsers: ['PhantomJS'],
-    reporters: ['spec'],
+    reporters: ['spec', 'coverage'],
     plugins: [
       'karma-jasmine',
       'karma-phantomjs-launcher',
       'karma-spec-reporter',
       'karma-webpack',
+      'karma-coverage',
+      'karma-sourcemap-loader',
     ],
-    preprocessors: {
-      'tests.webpack.js': ['webpack'],
-    },
-    webpack: wpConfig,
     files: [
       '../node_modules/babel-polyfill/dist/polyfill.js',
       'tests.webpack.js'
     ],
+    preprocessors: {
+      'tests.webpack.js': ['webpack', 'sourcemap'],
+    },
+    webpack: wpConfig,
+    coverageReporter: {
+      type: 'html',
+      dir: 'coverage/',
+    }
   });
 };
