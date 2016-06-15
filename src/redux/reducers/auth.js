@@ -1,6 +1,6 @@
 import * as Actions from '../actions/user';
 
-const initialState = {
+export const initialState = {
   pending: false,
   user: null,
 };
