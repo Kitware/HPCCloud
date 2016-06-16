@@ -57,7 +57,6 @@ describe('cluster actions', () => {
       // skipping reducer test
     });
 
-    // FIXME, needs sample data
     it('should remove cluster given an id', (done) => {
       const expectedAction = { type: Actions.REMOVE_CLUSTER_BY_ID, id: cluster._id };
       expect(Actions.removeClusterById(cluster._id))
@@ -120,6 +119,14 @@ describe('cluster actions', () => {
       expect(clustersReducer(initialState, expectedAction))
         .toEqual(expectedState);
     });
+
+    it('should remove a cluster', (done) => {
+      const expectedActions = [{ type: Actions.REMOVE_CLUSTER, index: 0 }];
+
+      expect(Actions.removeCluster(0))
+        .toDispatchActions(expectedActions, complete(done));
+    });
+
 
     it('should update cluster presets', (done) => {
       const presets = [{ name: 'myCluster' }, { name: 'myOtherCluster' }];
@@ -193,6 +200,14 @@ describe('cluster actions', () => {
       setSpy(client, 'deleteCluster', null);
       expect(Actions.deleteCluster(cluster._id))
         .toDispatchActions(expectedAction, complete(done));
+    });
+
+    it('should delete a cluster with an id', (done) => {
+      const expectedActions = [{ type: Actions.UPDATE_CLUSTERS, clusters: [] }];
+      setSpy(client, 'deleteCluster', null);
+      setSpy(client, 'listClusters', []);
+      expect(Actions.removeCluster(0, cluster))
+        .toDispatchActions(expectedActions, complete(done));
     });
 
     it('should save a cluster', (done) => {

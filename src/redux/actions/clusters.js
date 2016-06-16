@@ -193,27 +193,27 @@ export function fetchClusterPresets() {
 
 // removes a cluster from the preferences page and deletes it if has _id
 export function removeCluster(index, cluster) {
-  return dispatch => {
-    if (cluster._id) {
-      const action = netActions.addNetworkCall('remove_cluster', 'Remove cluster');
-
-      dispatch(pendingNetworkCall(true));
-      client.deleteCluster(cluster._id)
-        .then(
-          resp => {
-            dispatch(netActions.successNetworkCall(action.id, resp));
-            dispatch(pendingNetworkCall(false));
-            dispatch(fetchClusters());
-          },
-          err => {
-            dispatch(netActions.errorNetworkCall(action.id, err));
-            dispatch(pendingNetworkCall(false));
-          });
-
-      return action;
-    }
-
+  if (!cluster || !cluster._id) {
     return { type: REMOVE_CLUSTER, index };
+  }
+
+  return dispatch => {
+    const action = netActions.addNetworkCall('remove_cluster', 'Remove cluster');
+
+    dispatch(pendingNetworkCall(true));
+    client.deleteCluster(cluster._id)
+      .then(
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(pendingNetworkCall(false));
+          dispatch(fetchClusters());
+        },
+        err => {
+          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(pendingNetworkCall(false));
+        });
+
+    return action;
   };
 }
 
