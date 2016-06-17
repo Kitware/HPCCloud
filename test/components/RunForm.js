@@ -44,7 +44,6 @@ describe('RunForm', () => {
         onChange={blankFunc} serverTypeChange={blankFunc}
       />);
       expect(TestUtils.scryRenderedComponentsWithType(el, RunEC2).length).toEqual(1);
-      expect(client.listAWSProfiles).toHaveBeenCalled();
     });
 
     it('should have a cluster list if there are clusters', () => {

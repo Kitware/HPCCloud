@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 module.exports = {
-  basePath: '.',
+  basePath: '..',
   client: {
     captureConsole: true
   },
