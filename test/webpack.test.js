@@ -14,12 +14,10 @@ var definePlugin = new webpack.DefinePlugin({
 });
 
 module.exports = {
-  entry: {
-    'tests.webpack.js': './test/tests.webpack.js',
-  },
   plugins: [
     definePlugin,
   ],
+  noInfo: true,
   module: {
     loaders: [
       {

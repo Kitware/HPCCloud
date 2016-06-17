@@ -52,7 +52,7 @@ script:
     # Run client tests, only with python 2.7
     - if [ -n "${PY2}" ]; then npm install; fi
     - if [ -n "${PY2}" ]; then npm run build:release; fi
-    - if [ -n "${PY2}" ]; then npm run test:redux; fi
+    - if [ -n "${PY2}" ]; then npm run test; fi
     - if [ -n "${PY2}" ]; then npm run codecov; fi
     # Now run server tests
     - mkdir _girder_build

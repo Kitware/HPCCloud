@@ -120,13 +120,18 @@ describe('cluster actions', () => {
         .toEqual(expectedState);
     });
 
+    it('should save a cluster locally', (done) => {
+      const expectedAction = { type: Actions.SAVE_CLUSTER, index: 0, cluster };
+      expect(Actions.saveCluster(0, cluster, false))
+        .toDispatchActions(expectedAction, complete(done));
+    });
+
     it('should remove a cluster', (done) => {
       const expectedActions = [{ type: Actions.REMOVE_CLUSTER, index: 0 }];
 
       expect(Actions.removeCluster(0))
         .toDispatchActions(expectedActions, complete(done));
     });
-
 
     it('should update cluster presets', (done) => {
       const presets = [{ name: 'myCluster' }, { name: 'myOtherCluster' }];
@@ -210,10 +215,10 @@ describe('cluster actions', () => {
         .toDispatchActions(expectedActions, complete(done));
     });
 
-    it('should save a cluster', (done) => {
+    it('should save a cluster remotely', (done) => {
       const expectedAction = { type: Actions.SAVE_CLUSTER, index: 0, cluster };
-      setSpy(ClusterHelpers, 'saveCluster', true);
-      expect(Actions.saveCluster(0, cluster, false))
+      setSpy(ClusterHelpers, 'saveCluster', null);
+      expect(Actions.saveCluster(0, cluster, true))
         .toDispatchActions(expectedAction, complete(done));
     });
 

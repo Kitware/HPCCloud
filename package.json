@@ -70,7 +70,9 @@
 
     "start": "fix-autobahn && webpack-dev-server --progress --open",
 
+    "test": "npm run test:redux && npm run test:component",
     "test:redux": "NODE_ENV='test' karma start test/karma.redux.js",
+    "test:component": "NODE_ENV='test' karma start test/karma.component.js",
     "codecov": "cat test/coverage/lcov/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js",
 
     "commit"            : "git cz",
