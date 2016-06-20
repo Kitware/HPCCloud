@@ -22,7 +22,10 @@ function setSpy(target, method, data) {
 Object.freeze(initialState);
 
 describe('cluster actions', () => {
-  const cluster = { _id: 'a1', name: 'myCluster',
+  const cluster = { _id: 'a1',
+    type: 'trad',
+    name: 'myCluster',
+    status: 'unknown',
     log: [{ entry: 'created...' }, { entry: 'running...' }],
   };
   describe('simple actions', () => {
@@ -45,6 +48,7 @@ describe('cluster actions', () => {
 
       const newState = deepClone(initialState);
       newState.mapById[cluster._id] = cluster;
+      newState.list = [cluster];
       expect(clustersReducer(initialState, expectedAction))
         .toEqual(newState);
     });
@@ -159,11 +163,19 @@ describe('cluster actions', () => {
 
     // we only test the reducer here
     it('should update a cluster\'s status', () => {
-      const thisState = Object.assign({}, initialState);
-      thisState.mapById = { a1: { status: 'created' } };
-      const action = { type: Actions.UPDATE_CLUSTER_STATUS, id: 'a1', status: 'terminated' };
-      expect(clustersReducer(thisState, action).mapById.a1.status)
-        .toEqual('terminated');
+      const newStatus = 'terminated';
+      const myCluster = deepClone(cluster);
+      const givenState = deepClone(initialState);
+      givenState.mapById[myCluster._id] = myCluster;
+      givenState.list.push(myCluster);
+
+      const expectedState = deepClone(givenState);
+      expectedState.mapById[myCluster._id].status = newStatus;
+      expectedState.list[0].status = newStatus;
+
+      const action = { type: Actions.UPDATE_CLUSTER_STATUS, id: cluster._id, status: newStatus };
+      expect(clustersReducer(givenState, action))
+        .toEqual(expectedState);
     });
   });
 

@@ -93,7 +93,7 @@ const ClusterPrefs = React.createClass({
 
   clusterHasSimulation(id) {
     for (let i = 0; i < this.props.taskflows.length; i++) {
-      if (this.props.taskflows[i].flow && this.props.taskflows[i].flow.meta.cluster._id === id) {
+      if (this.props.taskflows[i].flow && get(this.props.taskflows[i].flow, 'meta.cluster._id') === id) {
         return this.props.taskflows[i].simulation;
       }
     }

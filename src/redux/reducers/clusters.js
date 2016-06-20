@@ -81,9 +81,20 @@ export default function clustersReducer(state = initialState, action) {
 
     case Actions.ADD_EXISTING_CLUSTER: {
       const newCluster = action.cluster;
+      const list = [].concat(state.list);
       const mapById = Object.assign({}, state.mapById);
       mapById[newCluster._id] = newCluster;
-      return Object.assign({}, state, { mapById });
+      if (newCluster.type === 'trad' && list.some((el) => el._id === newCluster._id)) {
+        for (let i = 0; i < list.length; i++) {
+          if (list[i]._id === newCluster._id) {
+            list[i].status = newCluster.status;
+            break;
+          }
+        }
+      } else if (newCluster.type === 'trad') {
+        list.push(newCluster);
+      }
+      return Object.assign({}, state, { list, mapById });
     }
 
     case Actions.REMOVE_CLUSTER: {
@@ -159,11 +170,20 @@ export default function clustersReducer(state = initialState, action) {
     }
 
     case Actions.UPDATE_CLUSTER_STATUS: {
+      const list = [].concat(state.list);
       const mapById = Object.assign({}, state.mapById);
       const cluster = Object.assign({}, state.mapById[action.id]);
       cluster.status = action.status;
       mapById[action.id] = cluster;
-      return Object.assign({}, state, { mapById });
+      if (cluster.type === 'trad') {
+        for (let i = 0; i < list.length; i++) {
+          if (list[i]._id === action.id) {
+            list[i].status = action.status;
+            break;
+          }
+        }
+      }
+      return Object.assign({}, state, { list, mapById });
     }
 
     case Actions.CLUSTER_APPLY_PRESET: {

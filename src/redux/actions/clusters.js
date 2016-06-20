@@ -284,17 +284,17 @@ export function testCluster(index, cluster) {
     const action = netActions.addNetworkCall('test_cluster', 'Test cluster');
     dispatch(pendingNetworkCall(true));
     dispatch({ type: TESTING_CLUSTER, index });
-    return client.testCluster(cluster._id)
+    client.testCluster(cluster._id)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(pendingNetworkCall(false));
-          dispatch(fetchClusters());
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
           dispatch(pendingNetworkCall(false));
         });
+    return action;
   };
 }
 

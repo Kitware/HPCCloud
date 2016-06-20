@@ -351,6 +351,10 @@ client.onEvent((resp) => {
         break;
       }
       case 'cluster': {
+        if (status === 'created') {
+          // we need to fetch some new cluster props when this happens
+          dispatch(clusterActions.fetchCluster(id));
+        }
         dispatch(clusterActions.updateClusterStatus(id, status));
         break;
       }
