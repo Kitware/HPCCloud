@@ -2,6 +2,7 @@ import * as Actions from '../../src/redux/actions/clusters';
 import clustersReducer, { clusterTemplate, initialState } from '../../src/redux/reducers/clusters';
 import client from '../../src/network';
 import * as ClusterHelpers from '../../src/network/helpers/clusters';
+import style        from 'HPCCloudStyle/PageWithMenu.mcss';
 
 import expect from 'expect';
 import thunk from 'redux-thunk';
@@ -26,6 +27,7 @@ describe('cluster actions', () => {
     type: 'trad',
     name: 'myCluster',
     status: 'unknown',
+    classPrefix: '',
     log: [{ entry: 'created...' }, { entry: 'running...' }],
   };
   describe('simple actions', () => {
@@ -171,7 +173,9 @@ describe('cluster actions', () => {
 
       const expectedState = deepClone(givenState);
       expectedState.mapById[myCluster._id].status = newStatus;
+      expectedState.mapById[myCluster._id].classPrefix = style.statusTerminatedIcon;
       expectedState.list[0].status = newStatus;
+      expectedState.list[0].classPrefix = style.statusTerminatedIcon;
 
       const action = { type: Actions.UPDATE_CLUSTER_STATUS, id: cluster._id, status: newStatus };
       expect(clustersReducer(givenState, action))

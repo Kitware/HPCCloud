@@ -84,10 +84,12 @@ export default function clustersReducer(state = initialState, action) {
       const list = [].concat(state.list);
       const mapById = Object.assign({}, state.mapById);
       mapById[newCluster._id] = newCluster;
+
       if (newCluster.type === 'trad' && list.some((el) => el._id === newCluster._id)) {
         for (let i = 0; i < list.length; i++) {
           if (list[i]._id === newCluster._id) {
-            list[i].status = newCluster.status;
+            list[i] = newCluster;
+            updateIcon(list);
             break;
           }
         }
@@ -178,7 +180,8 @@ export default function clustersReducer(state = initialState, action) {
       if (cluster.type === 'trad') {
         for (let i = 0; i < list.length; i++) {
           if (list[i]._id === action.id) {
-            list[i].status = action.status;
+            list[i] = cluster;
+            updateIcon(list);
             break;
           }
         }
