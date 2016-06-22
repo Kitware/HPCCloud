@@ -363,7 +363,9 @@ function getTaskflowIdFromId(id, type) {
 
 function processStatusEvent(id, type, status) {
   const taskflowId = getTaskflowIdFromId(id, type);
-  console.log(`${type} status ${status}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`${type} status ${status}`);
+  }
   if (type === 'taskflow') {
     dispatch(updateTaskflowStatus(id, status));
   } else if (taskflowId) {
@@ -415,7 +417,9 @@ function processStatusEvent(id, type, status) {
 
 function processLogEvent(id, type, log) {
   const taskflowId = getTaskflowIdFromId(id, type);
-  console.log(`${type} log ${id}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`${type} log ${id}`);
+  }
   if (type === 'taskflow') {
     dispatch(updateTaskflowLog(id, log));
   } else if (taskflowId) {
