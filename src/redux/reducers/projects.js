@@ -1,14 +1,8 @@
 import * as Actions from '../actions/projects';
-// import deepClone    from 'mout/src/lang/deepClone';
-import Workflows    from '../../workflows';
+import { workflowNames } from 'workflows'; // alias
 import Helper       from './ListActiveMapByIdHelper';
 
-const workflowNames = Object.keys(Workflows).map(value => {
-  const label = Workflows[value].name;
-  return { value, label };
-});
-
-const initialState = {
+export const initialState = {
   list: [],
   active: null,
   mapById: {},

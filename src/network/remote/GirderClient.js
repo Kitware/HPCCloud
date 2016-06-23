@@ -286,6 +286,10 @@ export function build(config = location, ...extensions) {
   processExtension(extensions);
 
   // Return the newly composed object
+  // if env === test, return an unfrozen version so we can spy on it
+  if (process.env.NODE_ENV === 'test') {
+    return publicObject;
+  }
   return Object.freeze(publicObject);
 }
 

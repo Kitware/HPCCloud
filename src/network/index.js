@@ -36,7 +36,17 @@ const endpoints = [
   user,
 ];
 
-const girderClient = ClientBuilder.build(
-  window.location, endpoints);
+var url;
+if (process.env.NODE_ENV === 'test') {
+  url = {
+    protocol: 'http:',
+    hostname: 'test',
+    port: 80,
+  };
+} else {
+  url = window.location;
+}
+
+const girderClient = ClientBuilder.build(url, endpoints);
 
 export default girderClient;

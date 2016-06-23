@@ -3,14 +3,14 @@ import deepClone    from 'mout/src/lang/deepClone';
 import set          from 'mout/src/object/set';
 import style        from 'HPCCloudStyle/PageWithMenu.mcss';
 
-const initialState = {
+export const initialState = {
   list: [],
   active: 0,
   pending: false,
   mapById: {},
 };
 
-const clusterTemplate = {
+export const clusterTemplate = {
   name: 'new cluster',
   type: 'trad',
   classPrefix: style.statusCreatingIcon,
@@ -81,9 +81,22 @@ export default function clustersReducer(state = initialState, action) {
 
     case Actions.ADD_EXISTING_CLUSTER: {
       const newCluster = action.cluster;
+      const list = [].concat(state.list);
       const mapById = Object.assign({}, state.mapById);
       mapById[newCluster._id] = newCluster;
-      return Object.assign({}, state, { mapById });
+
+      if (newCluster.type === 'trad' && list.some((el) => el._id === newCluster._id)) {
+        for (let i = 0; i < list.length; i++) {
+          if (list[i]._id === newCluster._id) {
+            list[i] = newCluster;
+            updateIcon(list);
+            break;
+          }
+        }
+      } else if (newCluster.type === 'trad') {
+        list.push(newCluster);
+      }
+      return Object.assign({}, state, { list, mapById });
     }
 
     case Actions.REMOVE_CLUSTER: {
@@ -102,7 +115,7 @@ export default function clustersReducer(state = initialState, action) {
 
     case Actions.REMOVE_CLUSTER_BY_ID: {
       const id = action.id;
-      const list = state.list.filter((item) => item.id !== id);
+      const list = state.list.filter((item) => item._id !== id);
       const active = (state.active < list.length) ? state.active : (list.length - 1);
       const mapById = Object.assign({}, state.mapById);
       delete mapById[id];
@@ -159,11 +172,21 @@ export default function clustersReducer(state = initialState, action) {
     }
 
     case Actions.UPDATE_CLUSTER_STATUS: {
+      const list = [].concat(state.list);
       const mapById = Object.assign({}, state.mapById);
       const cluster = Object.assign({}, state.mapById[action.id]);
       cluster.status = action.status;
       mapById[action.id] = cluster;
-      return Object.assign({}, state, { mapById });
+      if (cluster.type === 'trad') {
+        for (let i = 0; i < list.length; i++) {
+          if (list[i]._id === action.id) {
+            list[i] = cluster;
+            updateIcon(list);
+            break;
+          }
+        }
+      }
+      return Object.assign({}, state, { list, mapById });
     }
 
     case Actions.CLUSTER_APPLY_PRESET: {
@@ -181,10 +204,6 @@ export default function clustersReducer(state = initialState, action) {
       }
 
       return Object.assign({}, state, { list, active });
-    }
-
-    case Actions.TEST_CLUSTER: {
-      return state;
     }
 
     case Actions.PENDING_CLUSTER_NETWORK: {

@@ -162,7 +162,7 @@ const FileListing = React.createClass({
     }
 
     this.setState({ opened });
-    this.props.toggleOpenFolder(id, !this.props.folders[id].open, opened);
+    this.props.toggleOpenFolder(id, !this.props.folders[id].open);
   },
 
   render() {
@@ -209,6 +209,6 @@ export default connect(
     };
   },
   () => ({
-    toggleOpenFolder: (folderId, opening, opened) => dispatch(Actions.toggleOpenFolder(folderId, opening, opened)),
+    toggleOpenFolder: (folderId, opening) => dispatch(Actions.toggleOpenFolder(folderId, opening)),
   })
 )(FileListing);

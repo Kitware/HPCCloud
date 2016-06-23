@@ -1,11 +1,11 @@
 import * as Actions from '../actions/fs';
 
-const initialState = {
+export const initialState = {
   folderMapById: {},
   itemMapById: {},
 };
 
-const folderInitialState = {
+export const folderInitialState = {
   open: false,
   folder: null,
   folderChildren: [],

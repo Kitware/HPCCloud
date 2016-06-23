@@ -1,6 +1,6 @@
 import * as Actions from '../actions/statuses';
 
-const initialState = {
+export const initialState = {
   ec2: [],
   clusters: [],
 };

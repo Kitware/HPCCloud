@@ -2,9 +2,8 @@ import client           from '../../network';
 import * as SimulationHelper from '../../network/helpers/simulations';
 import * as ProjectHelper    from '../../network/helpers/projects';
 import * as netActions  from './network';
-import { dispatch }     from '../index.js';
-
 import * as router          from './router';
+import { dispatch }     from '../index.js';
 
 export const FETCH_PROJECT_LIST = 'FETCH_PROJECT_LIST';
 export const UPDATE_PROJECT_LIST = 'UPDATE_PROJECT_LIST';
@@ -34,15 +33,14 @@ export function fetchProjectSimulations(id) {
     const action = netActions.addNetworkCall(`fetch_project_simulations_${id}`, 'Retreive project simulations');
 
     client.listSimulations(id)
-      .then(
-        resp => {
-          const simulations = resp.data;
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(updateProjectSimulations(id, simulations));
-        },
-        error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
-        });
+      .then((resp) => {
+        const simulations = resp.data;
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(updateProjectSimulations(id, simulations));
+      })
+      .catch((error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error));
+      });
 
     return action;
   };
@@ -53,17 +51,16 @@ export function fetchProjectList() {
     const action = netActions.addNetworkCall('fetch_project_list', 'Retreive projects');
 
     client.listProjects()
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(updateProjectList(resp.data));
-          resp.data.forEach(project => {
-            dispatch(fetchProjectSimulations(project._id));
-          });
-        },
-        error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
+      .then((resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(updateProjectList(resp.data));
+        resp.data.forEach(project => {
+          dispatch(fetchProjectSimulations(project._id));
         });
+      })
+      .catch((error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error));
+      });
 
     return action;
   };
@@ -103,7 +100,6 @@ export function setActiveProject(id, location) {
 export function updateProject(project) {
   return { type: UPDATE_PROJECT, project };
 }
-
 
 export function saveProject(project, attachments) {
   return dispatch => {
@@ -166,7 +162,6 @@ export function saveSimulation(simulation, attachments, location) {
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
         });
-
     return action;
   };
 }
@@ -186,6 +181,7 @@ export function deleteSimulation(simulation, location) {
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
+          // throw new Error('project delete fails');
         });
 
     return action;
@@ -209,17 +205,16 @@ export function updateSimulationStep(id, stepName, data, location) {
     const action = netActions.addNetworkCall(`update_simulation_step_${id}`, 'Update simulation step');
 
     client.updateSimulationStep(id, stepName, data)
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(updateSimulation(resp.data));
-          if (location) {
-            dispatch(router.replace(location));
-          }
-        },
-        error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
-        });
+      .then((resp) => {
+        // dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(updateSimulation(resp.data));
+        if (location) {
+          dispatch(router.replace(location));
+        }
+      })
+      .catch((error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error));
+      });
 
     return action;
   };

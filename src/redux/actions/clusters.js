@@ -15,7 +15,6 @@ export const UPDATE_CLUSTER_PRESETS = 'UPDATE_CLUSTER_PRESETS';
 export const UPDATE_CLUSTER_STATUS = 'UPDATE_CLUSTER_STATUS';
 export const REMOVE_CLUSTER = 'REMOVE_CLUSTER';
 export const SAVE_CLUSTER = 'SAVE_CLUSTER';
-export const TEST_CLUSTER = 'TEST_CLUSTER';
 export const PENDING_CLUSTER_NETWORK = 'PENDING_CLUSTER_NETWORK';
 export const CLUSTER_APPLY_PRESET = 'CLUSTER_APPLY_PRESET';
 export const TESTING_CLUSTER = 'TESTING_CLUSTER';
@@ -38,7 +37,7 @@ export function applyPreset(index, name) {
   return { type: CLUSTER_APPLY_PRESET, index, name };
 }
 
-// removes cluster from mapById, does not affect selected index in preference pane
+// removes cluster from mapById
 // (see removeCluster(index, cluster) belows)
 export function removeClusterById(id) {
   return { type: REMOVE_CLUSTER_BY_ID, id };
@@ -153,21 +152,23 @@ export function fetchCluster(id) {
 }
 
 export function fetchClusters(type) {
-  const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
-  dispatch(pendingNetworkCall(true));
-  client.listClusters(type)
-    .then(
-      resp => {
-        dispatch(netActions.successNetworkCall(action.id, resp));
-        dispatch(updateClusters(resp.data));
-        dispatch(pendingNetworkCall(false));
-      },
-      err => {
-        dispatch(netActions.errorNetworkCall(action.id, err));
-        dispatch(pendingNetworkCall(false));
-      });
+  return dispatch => {
+    const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
+    dispatch(pendingNetworkCall(true));
+    client.listClusters(type)
+      .then(
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(updateClusters(resp.data));
+          dispatch(pendingNetworkCall(false));
+        },
+        err => {
+          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(pendingNetworkCall(false));
+        });
 
-  return action;
+    return action;
+  };
 }
 
 export function fetchClusterPresets() {
@@ -190,29 +191,29 @@ export function fetchClusterPresets() {
   };
 }
 
-// removes a cluster from the preferences page
+// removes a cluster from the preferences page and deletes it if has _id
 export function removeCluster(index, cluster) {
-  return dispatch => {
-    if (cluster._id) {
-      const action = netActions.addNetworkCall('remove_cluster', 'Remove cluster');
-
-      dispatch(pendingNetworkCall(true));
-      client.deleteCluster(cluster._id)
-        .then(
-          resp => {
-            dispatch(netActions.successNetworkCall(action.id, resp));
-            dispatch(pendingNetworkCall(false));
-            dispatch(fetchClusters());
-          },
-          err => {
-            dispatch(netActions.errorNetworkCall(action.id, err));
-            dispatch(pendingNetworkCall(false));
-          });
-
-      return action;
-    }
-
+  if (!cluster || !cluster._id) {
     return { type: REMOVE_CLUSTER, index };
+  }
+
+  return dispatch => {
+    const action = netActions.addNetworkCall('remove_cluster', 'Remove cluster');
+
+    dispatch(pendingNetworkCall(true));
+    client.deleteCluster(cluster._id)
+      .then(
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(pendingNetworkCall(false));
+          dispatch(fetchClusters());
+        },
+        err => {
+          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(pendingNetworkCall(false));
+        });
+
+    return action;
   };
 }
 
@@ -276,28 +277,24 @@ export function updateCluster(cluster) {
 }
 
 export function testCluster(index, cluster) {
+  if (!cluster._id) {
+    return { type: 'NOOP', message: 'Cluster is not available on server yet' };
+  }
   return dispatch => {
-    if (!cluster._id) {
-      return { type: 'NO_OP', message: 'Cluster is not available on server yet' };
-    }
-
     const action = netActions.addNetworkCall('test_cluster', 'Test cluster');
     dispatch(pendingNetworkCall(true));
-    dispatch(action);
-
+    dispatch({ type: TESTING_CLUSTER, index });
     client.testCluster(cluster._id)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(pendingNetworkCall(false));
-          dispatch(fetchClusters());
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
           dispatch(pendingNetworkCall(false));
         });
-
-    return { type: TESTING_CLUSTER, index };
+    return action;
   };
 }
 

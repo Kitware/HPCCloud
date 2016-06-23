@@ -1,4 +1,7 @@
-## HPCCloud ##
+# HPC Cloud #
+
+[![codecov.io](https://codecov.io/github/Kitware/HPCCloud/coverage.svg?branch=master)](https://codecov.io/github/Kitware/HPCCloud?branch=master)
+[![Build Status](https://travis-ci.org/Kitware/HPCCloud.svg?branch=master)](https://travis-ci.org/Kitware/HPCCloud)
 
 ### Goal ###
 
@@ -7,26 +10,7 @@ environment and resources on which you can run those simulations.
 
 ## Installation
 
-```
-$ npm install
-```
-
-After installing the package you will get one executable **HPCCloud** with
-the following set of options.
-
-```
-$ HPCCloud
-
-  Usage: HPCCloud [options]
-
-  Options:
-
-    -h, --help                output usage information
-    -V, --version             output the version number
-
->>> FIXME <<<
-
-```
+Observe the instructions for [HPCCloud deploy](https://github.com/Kitware/HPCCloud-deploy);
 
 ## Development
 
@@ -37,8 +21,9 @@ $ npm install
 $ npm start
 ```
 
-## Trouble shooting
+## Troubleshooting
 
+(With the vm running from HPCCloud-Deploy)
 ```sh
 $ vagrant ssh
 $ sudo -iu hpccloud

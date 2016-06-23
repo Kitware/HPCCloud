@@ -63,10 +63,10 @@ export function updateTaskflowJobLog(taskflowId, jobId) {
 // ----------------------------------------------------------------------------
 // STATUSES
 export function updateTaskflowJobStatus(taskflowId, jobId, status) {
+  if (status) {
+    return { type: UPDATE_TASKFLOW_JOB_STATUS, taskflowId, jobId, status };
+  }
   return dispatch => {
-    if (status) {
-      return { type: UPDATE_TASKFLOW_JOB_STATUS, taskflowId, jobId, status };
-    }
     const action = netActions.addNetworkCall(`taskflow_job_status_${jobId}`, 'Check job status');
 
     client.getJobStatus(jobId)
@@ -117,13 +117,9 @@ export function startTaskflow(id, payload, simulationStep, location) {
           dispatch(netActions.successNetworkCall(action.id, resp));
 
           if (simulationStep) {
-            const data = Object.assign(
-              {},
-              simulationStep.data,
-              { metadata: Object.assign(
-                {},
-                simulationStep.data.metadata,
-                { taskflowId: id }) });
+            const data = Object.assign({}, simulationStep.data,
+              { metadata: Object.assign({}, simulationStep.data.metadata, { taskflowId: id }),
+            });
             dispatch(projActions.updateSimulationStep(simulationStep.id, simulationStep.step, data, location));
           }
         },
@@ -195,7 +191,7 @@ export function fetchTaskflow(id) {
               });
             }
             if (taskflow.meta.cluster) {
-              clusterActions.fetchClusters();
+              dispatch(clusterActions.fetchClusters());
             }
           }
         },
@@ -355,6 +351,10 @@ client.onEvent((resp) => {
         break;
       }
       case 'cluster': {
+        if (status === 'created') {
+          // we need to fetch some new cluster props when this happens
+          dispatch(clusterActions.fetchCluster(id));
+        }
         dispatch(clusterActions.updateClusterStatus(id, status));
         break;
       }
@@ -395,4 +395,3 @@ client.onEvent((resp) => {
     }
   }
 });
-
