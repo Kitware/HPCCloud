@@ -310,6 +310,16 @@ function findTask() {
   };
 }
 
+function updateTaskflowMeta() {
+  const state = store.getState();
+  const taskflows = Object.keys(state.taskflows.mapById).map((key) => state.taskflows.mapById[key]);
+  for (let i = 0; i < taskflows.length; i++) {
+    if (!taskflows[i].flow.meta) {
+      dispatch(fetchTaskflow(taskflows[i].flow._id));
+    }
+  }
+}
+
 function getTaskflowIdFromId(id, type) {
   switch (type) {
     case 'task': {
@@ -381,6 +391,7 @@ client.onEvent((resp) => {
       }
       case 'cluster': {
         // fetch clusters
+        updateTaskflowMeta();
         dispatch(clusterActions.fetchClusters(null));
         break;
       }
