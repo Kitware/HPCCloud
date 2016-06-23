@@ -66,7 +66,6 @@ const VisualizationView = React.createClass({
       step: 'Visualization',
       data: {
         view: 'default',
-        metadata: {},
       },
     };
     const location = {

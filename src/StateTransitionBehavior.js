@@ -85,12 +85,14 @@ export function handleTaskflowChange(state, taskflow) {
     // add simulation info to cluster config.
     if (tfCluster && taskflow.flow.meta.cluster && taskflow.simulation) {
       const tfSimulation = state.simulations.mapById[taskflow.simulation];
-      const simulation = {
-        name: tfSimulation.name,
-        step: taskflow.stepName,
-      };
-      tfCluster.config.simulation = simulation;
-      dispatch(ClusterActions.updateCluster(tfCluster));
+      if (tfSimulation) {
+        const simulation = {
+          name: tfSimulation.name,
+          step: taskflow.stepName,
+        };
+        tfCluster.config.simulation = simulation;
+        dispatch(ClusterActions.updateCluster(tfCluster));
+      }
     }
 
     // add the terminate instance button if running or error
