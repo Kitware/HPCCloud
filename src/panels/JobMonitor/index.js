@@ -36,7 +36,7 @@ const JobMonitor = React.createClass({
 
   getInitialState() {
     return {
-      advanced: false,
+      advanced: process.env.NODE_ENV === 'development',
     };
   },
 

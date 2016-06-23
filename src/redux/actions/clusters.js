@@ -75,7 +75,7 @@ function updateTaskflowActionsForClusterEvent(cluster, status) {
   const keys = Object.keys(tfMapById);
   for (let i = 0; i < keys.length; i++) {
     const taskflow = tfMapById[keys[i]];
-    if (!taskflow.meta) {
+    if (!taskflow.flow.meta) {
       dispatch(TaskflowActions.fetchTaskflow(taskflow.flow._id));
     }
   }
