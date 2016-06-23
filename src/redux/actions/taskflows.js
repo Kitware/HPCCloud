@@ -290,7 +290,7 @@ function findJob(jobId) {
             dispatch(netActions.errorNetworkCall(action.id, error));
             dispatch({ type: DELETE_TASKFLOW, id: action.id });
           });
-      } // close if
+      } // close if status is (!terminated && !complete)
     });
     return { type: 'NOOP' };
   };
@@ -310,7 +310,9 @@ function findTask() {
   };
 }
 
-function updateTaskflowMeta() {
+// updates taskflow.flow if the flow object has no meta.
+// this is called when we get a cluster event for an unknown cluster
+function updateTaskflowObject() {
   const state = store.getState();
   const taskflows = Object.keys(state.taskflows.mapById).map((key) => state.taskflows.mapById[key]);
   for (let i = 0; i < taskflows.length; i++) {
@@ -318,6 +320,7 @@ function updateTaskflowMeta() {
       dispatch(fetchTaskflow(taskflows[i].flow._id));
     }
   }
+  dispatch(clusterActions.fetchClusters(null));
 }
 
 function getTaskflowIdFromId(id, type) {
@@ -390,9 +393,8 @@ client.onEvent((resp) => {
         break;
       }
       case 'cluster': {
-        // fetch clusters
-        updateTaskflowMeta();
-        dispatch(clusterActions.fetchClusters(null));
+        // update taskflow meta, fetch clusters
+        updateTaskflowObject();
         break;
       }
       case 'profile': {
