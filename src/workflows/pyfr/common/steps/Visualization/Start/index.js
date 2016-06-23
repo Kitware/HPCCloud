@@ -79,6 +79,7 @@ const VisualizationStart = React.createClass({
         view: 'run',
         metadata: {
           dataDir,
+          fileName,
           sessionId: sessionKey,
         },
       },
