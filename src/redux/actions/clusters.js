@@ -51,7 +51,7 @@ export function updateExistingCluster(cluster) {
   return { type: UPDATE_EXISTING_CLUSTER, cluster };
 }
 
-export function updateClusters(clusters, type) {
+export function updateClusters(clusters) {
   return { type: UPDATE_CLUSTERS, clusters };
 }
 
