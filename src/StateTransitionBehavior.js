@@ -2,7 +2,7 @@ import * as ProjectActions  from './redux/actions/projects';
 import * as TaskflowActions from './redux/actions/taskflows';
 import * as ClusterActions from './redux/actions/clusters';
 import * as FSActions       from './redux/actions/fs';
-import Workflows            from './workflows';
+import Workflows            from 'workflows';
 
 import equals from 'mout/src/array/equals';
 import { dispatch } from './redux';
@@ -23,10 +23,9 @@ export function handleTaskflowChange(state, taskflow) {
   if (!taskflow) {
     return;
   }
-
   let primaryJob = taskflow.primaryJob;
-  let jobs,
-    tasks;
+  let jobs = [],
+    tasks = [];
   const outputDirectory = [];
   const actions = [];
   try {
@@ -54,7 +53,6 @@ export function handleTaskflowChange(state, taskflow) {
     const simulation = state.simulations.mapById[taskflow.simulation];
     const project = state.projects.mapById[simulation.projectId];
     simulationStatus.push(simulation.metadata.status);
-
     // Update local store to figure out primaryJob of taskflow if not yet available
     if (!primaryJob && taskflow.stepName && project) {
       primaryJob = Workflows[project.type].primaryJobs[taskflow.stepName];
