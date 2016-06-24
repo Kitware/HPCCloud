@@ -78,4 +78,37 @@ describe('StateTransitionBehavior', () => {
       expect(ProjectActions.saveSimulation).toHaveBeenCalledWith(Object.assign({}, simulation, { metadata }));
     });
   });
+
+  describe('should update the cluster', () => {
+    const taskflow = deepClone(fullState.taskflows.mapById[taskflowId]);
+    const simulation = deepClone(fullState.simulations.mapById['574c8aa00640fd3f1a3b379f']);
+
+    beforeAll(() => {
+      setSpy(ClusterActions, 'updateCluster', { type: 'NO-OP' });
+    });
+
+    afterAll(() => {
+      expect.restoreSpies();
+    });
+
+    it('should not update the cluster if there\'s no cluster in state', () => {
+      handleTaskflowChange(fullState, taskflow);
+      expect(ClusterActions.updateCluster).toNotHaveBeenCalled();
+    });
+
+    it('should update the cluster if there is a tf cluster in state', () => {
+      const cluster = taskflow.flow.meta.cluster;
+      fullState.preferences.clusters.mapById['574c9d920640fd6e133b4b60'] = deepClone(cluster);
+      cluster.config.simulation = {
+        name: simulation.name,
+        step: 'Simulation',
+      };
+      handleTaskflowChange(fullState, taskflow);
+      expect(ClusterActions.updateCluster).toHaveBeenCalledWith(cluster);
+    });
+  });
+
+  describe('should update actions', () => {
+
+  });
 });
