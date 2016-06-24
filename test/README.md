@@ -11,6 +11,14 @@ We test two things:
 - Components - `npm run test:components`
 - Everything - `npm run test`
 
+When developing, to avoid rerunning the test from the command line after each change append the argument 
+
+```
+-- --no-single-run
+``` 
+
+to the test command.
+
 ## Writing new tests
 
 We're using: 
@@ -24,7 +32,7 @@ We're using:
 - [React Test Utils](https://facebook.github.io/react/docs/test-utils.html) - For tests involving React components
 
 ### Redux
-Check if there is already a file for the actions or reducers you're testing in `/test/redux`, add a new file if there isn't one already. Action testing can be split up by "simple actions" and "async actions". Simple actions just return an object with `type` and optionally some data payload. Async actions call some backend component. 
+Check if there is already a file for the actions or reducers you're testing in `/test/redux`, add a new file if there isn't one already. Action testing can be split up by "simple actions" and "async actions". Simple actions just return an object with `type` and optionally some data payload. Async actions call some backend component. The Redux assertion library we're using relies on Promises and so while you can put more than one `expect()` statement inside a test (which for Jasmine are `it('', ()=>{})` blocks) they may not necessarily be called in order. If you need to write multiple assertions place them into separate it() blocks which are guarenteed to run in order.
 
 #### Template
 
@@ -81,7 +89,7 @@ describe('some action test', () => {
 ```
 
 ### Components
-Writing tests for React components can be a bit finicky. For components with reliance on state or props they may not fully render. Luckily you can manipulate the React components just like you would with plain javascript objects.
+Writing tests for React components can be a bit finicky. For components with reliance on state or props they may not fully render. Luckily you can manipulate the React components just like you would with plain javascript objects. For components that call a redux action or the client directly it's recommended that you mock those methods with expect spies.
 
 #### Template
 

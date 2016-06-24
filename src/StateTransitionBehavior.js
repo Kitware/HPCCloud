@@ -12,8 +12,8 @@ const simulationsStatus = {};
 function folderItemSize(state, folderId) {
   const folder = state.fs.folderMapById[folderId];
   if (folder) {
-    const itemChildrenLength = folder.itemChildren ? folder.itemChildren : 0;
-    const folderChildrenLength = folder.folderChildren ? folder.folderChildren : 0;
+    const itemChildrenLength = folder.itemChildren ? folder.itemChildren.length : 0;
+    const folderChildrenLength = folder.folderChildren ? folder.folderChildren.length : 0;
     return itemChildrenLength + folderChildrenLength;
   }
   return 0;
