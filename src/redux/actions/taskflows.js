@@ -4,6 +4,7 @@ import * as clusterActions from './clusters';
 import client           from '../../network';
 import { store, dispatch } from '..';
 
+export const PENDING_TASKFLOW_NETWORK = 'PENDING_TASKFLOW_NETWORK';
 export const CLEAR_UPDATE_LOG = 'CLEAR_UPDATE_LOG';
 export const UPDATE_TASKFLOW = 'UPDATE_TASKFLOW';
 export const GET_TASKFLOW_LOG = 'UPDATE_TASKFLOW_LOG';
@@ -23,6 +24,10 @@ export const BIND_SIMULATION_TO_TASKFLOW = 'BIND_SIMULATION_TO_TASKFLOW';
 export const DELETE_TASKFLOW = 'DELETE_TASKFLOW';
 
 /* eslint-disable no-shadow */
+
+export function pendingNetworkCall(pending = true) {
+  return { type: PENDING_TASKFLOW_NETWORK, pending };
+}
 
 // ----------------------------------------------------------------------------
 // LOGGING
@@ -169,18 +174,23 @@ export function createTaskflow(taskFlowName, primaryJob, payload, simulationStep
 }
 
 export function fetchTaskflowTasks(taskflowId) {
+  if (store.getState().taskflows.pending) {
+    return { type: 'NOOP' };
+  }
   return dispatch => {
     const action = netActions.addNetworkCall('taskflow_tasks', 'Check tasks');
-
+    dispatch(pendingNetworkCall(true));
     client.getTaskflowTasks(taskflowId)
       .then(
         resp => {
           const tasks = resp.data;
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch({ type: UPDATE_TASKFLOW_TASKS, taskflowId, tasks });
+          dispatch(pendingNetworkCall(false));
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
+          dispatch(pendingNetworkCall(false));
         });
 
     return action;
