@@ -64,10 +64,18 @@ export default React.createClass({
     return { open: this.props.open };
   },
 
+  componentWillUpdate(nextProps, nextState) {
+    // we want to update other stuff, but if the unit log is empty, ignore it.
+    if (!get(nextProps, 'unit.log.length')) {
+      nextProps.unit.log = this.props.unit.log;
+    }
+    return true;
+  },
+
   componentDidUpdate(prevProps, prevState) {
     // the <pre> needs to be rendered open to have scrollHeight, then it scrolls
     if ((!prevState.open && this.state.open) ||
-      this.state.open && get(prevProps, 'unit.log').length < get(this.props, 'unit.log').length) {
+      this.state.open && get(prevProps, 'unit.log.length') < get(this.props, 'unit.log.length')) {
       this.refs.log.scrollTop = this.refs.log.scrollHeight;
     }
   },
