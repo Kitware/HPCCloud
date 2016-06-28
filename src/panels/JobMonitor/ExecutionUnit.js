@@ -10,12 +10,19 @@ function logMapper(entry, index) {
   let content = '';
   let foldContent = null;
   let msg = entry.msg;
+  let color = '';
   if (msg !== null && typeof msg === 'object') {
     msg = JSON.stringify(msg, null, 2);
   }
 
   if (entry.status) {
     msg += ` [${entry.status}]`;
+  }
+
+  if (entry.levelname === 'WARN') {
+    color = style.logWarn;
+  } else if (entry.levelname === 'ERROR') {
+    color = style.logError;
   }
 
   content += `[${formatTime(entry.created)}] ${entry.levelname}: ${msg}`;
@@ -31,10 +38,10 @@ function logMapper(entry, index) {
 
   if (foldContent !== null) {
     return (<LogFold key={`${entry.created}_${index}`}
-      header={content} content={foldContent} />);
+      header={content} content={foldContent} color={color} />);
   }
 
-  return (<p key={`${entry.created}_${index}`} className={style.logEntry}>
+  return (<p key={`${entry.created}_${index}`} className={`${style.logEntry} ${color}`}>
     {content}
   </p>);
 }
