@@ -148,8 +148,27 @@ describe('cluster actions', () => {
       // skipping reducer test
     });
 
-    it('should update a cluster\'s log', (done) => {
-      const log = [{ entry: 'job submitted ...' }];
+    it('should update a cluster\'s log by appending to it', (done) => {
+      const logEntry = { entry: 'job submitted ...' };
+      const expectedAction = { type: Actions.APPEND_TO_CLUSTER_LOG, id: cluster._id, logEntry };
+      expect(Actions.appendToClusterLog(cluster._id, logEntry))
+        .toDispatchActions(expectedAction, complete(done));
+
+      const givenState = deepClone(initialState);
+      givenState.mapById[cluster._id] = cluster;
+      const expectedState = deepClone(initialState);
+      expectedState.mapById[cluster._id] = deepClone(cluster);
+      expectedState.mapById[cluster._id].log.push(logEntry);
+      expect(clustersReducer(givenState, expectedAction))
+        .toEqual(expectedState);
+    });
+
+    // only reducer
+    it('should update a cluster\'s log with a new log', (done) => {
+      const log = [{ entry: 'job submitted ...' },
+        { entry: 'job running ...' },
+        { entry: 'job finished ...' },
+      ];
       const expectedAction = { type: Actions.UPDATE_CLUSTER_LOG, id: cluster._id, log };
       expect(Actions.updateClusterLog(cluster._id, log))
         .toDispatchActions(expectedAction, complete(done));
@@ -158,12 +177,12 @@ describe('cluster actions', () => {
       givenState.mapById[cluster._id] = cluster;
       const expectedState = deepClone(initialState);
       expectedState.mapById[cluster._id] = deepClone(cluster);
-      expectedState.mapById[cluster._id].log.push(log[0]);
+      expectedState.mapById[cluster._id].log = log;
       expect(clustersReducer(givenState, expectedAction))
         .toEqual(expectedState);
     });
 
-    // we only test the reducer here
+    // only reducer
     it('should update a cluster\'s status', () => {
       const newStatus = 'terminated';
       const myCluster = deepClone(cluster);

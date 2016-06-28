@@ -19,8 +19,6 @@ export const CLUSTER_APPLY_PRESET = 'CLUSTER_APPLY_PRESET';
 export const TESTING_CLUSTER = 'TESTING_CLUSTER';
 export const UPDATE_CLUSTER_LOG = 'UPDATE_CLUSTER_LOG';
 export const APPEND_TO_CLUSTER_LOG = 'APPEND_TO_CLUSTER_LOG';
-export const SUB_CLUSTER_LOG = 'SUB_CLUSTER_LOG';
-export const UNSUB_CLUSTER_LOG = 'UNSUB_CLUSTER_LOG';
 
 /* eslint-disable no-shadow */
 
