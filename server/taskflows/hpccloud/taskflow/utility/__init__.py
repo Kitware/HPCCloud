@@ -117,6 +117,8 @@ def create_ec2_cluster(task, cluster, profile, ami):
     client.patch('clusters/%s' % cluster['_id'], data=json.dumps(body))
 
     secret_key = profile['secretAccessKey']
+    profile = profile.copy()
+    del profile['secretAccessKey']
     log_write_url = '%s/clusters/%s/log' % (task.taskflow.girder_api_url,
                                             cluster['_id'])
     provision_params['cluster_state'] = 'running'
