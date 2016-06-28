@@ -83,7 +83,7 @@ export function handleTaskflowChange(state, taskflow) {
     // add simulation info to cluster config.
     if (tfCluster && taskflow.flow.meta.cluster && taskflow.simulation) {
       const tfSimulation = state.simulations.mapById[taskflow.simulation];
-      if (tfSimulation) {
+      if (tfSimulation && tfCluster.config) {
         const simulation = {
           name: tfSimulation.name,
           step: taskflow.stepName,

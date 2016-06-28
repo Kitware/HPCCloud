@@ -163,7 +163,6 @@ describe('cluster actions', () => {
         .toEqual(expectedState);
     });
 
-    // only reducer
     it('should update a cluster\'s log with a new log', (done) => {
       const log = [{ entry: 'job submitted ...' },
         { entry: 'job running ...' },

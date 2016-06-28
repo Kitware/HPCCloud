@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  "pending": false,
+  "pending": [],
   "mapById": {
     "574c9d900640fd6e133b4b57": {
       "taskMapById": {

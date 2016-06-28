@@ -2,7 +2,7 @@ import * as Actions from '../actions/taskflows';
 // import logSort from '../../utils/logSort';
 
 export const initialState = {
-  pending: false,
+  pending: [],
   mapById: {},
   taskflowMapByTaskId: {},
   taskflowMapByJobId: {},
@@ -47,7 +47,14 @@ export default function taskflowsReducer(state = initialState, action) {
     }
 
     case Actions.PENDING_TASKFLOW_NETWORK: {
-      return Object.assign({}, state, { pending: action.pending });
+      const { isPending, taskflowId } = action;
+      const pending = [].concat(state.pending);
+      if (isPending) {
+        pending.push(taskflowId);
+      } else {
+        pending.splice(pending.indexOf(taskflowId), 1);
+      }
+      return Object.assign({}, state, { pending });
     }
 
     // appends a new log entry to the taskflow log

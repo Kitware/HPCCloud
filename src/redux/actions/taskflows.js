@@ -25,8 +25,8 @@ export const DELETE_TASKFLOW = 'DELETE_TASKFLOW';
 
 /* eslint-disable no-shadow */
 
-export function pendingNetworkCall(pending = true) {
-  return { type: PENDING_TASKFLOW_NETWORK, pending };
+export function pendingNetworkCall(taskflowId, isPending = true) {
+  return { type: PENDING_TASKFLOW_NETWORK, taskflowId, isPending };
 }
 
 // ----------------------------------------------------------------------------
@@ -174,23 +174,23 @@ export function createTaskflow(taskFlowName, primaryJob, payload, simulationStep
 }
 
 export function fetchTaskflowTasks(taskflowId) {
-  if (store.getState().taskflows.pending) {
+  if (store.getState().taskflows.pending.indexOf(taskflowId) !== -1) {
     return { type: 'NOOP' };
   }
   return dispatch => {
     const action = netActions.addNetworkCall('taskflow_tasks', 'Check tasks');
-    dispatch(pendingNetworkCall(true));
+    dispatch(pendingNetworkCall(taskflowId, true));
     client.getTaskflowTasks(taskflowId)
       .then(
         resp => {
           const tasks = resp.data;
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch({ type: UPDATE_TASKFLOW_TASKS, taskflowId, tasks });
-          dispatch(pendingNetworkCall(false));
+          dispatch(pendingNetworkCall(taskflowId, false));
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
-          dispatch(pendingNetworkCall(false));
+          dispatch(pendingNetworkCall(taskflowId, false));
         });
 
     return action;
@@ -327,10 +327,10 @@ function findJob(jobId, updateLog = false) {
 // fetch tasks for each taskflow, the task objects which come back have log and status.
 function findTask() {
   return dispatch => {
-    const state = store.getState();
-    Object.keys(state.taskflows.mapById).forEach(id => {
-      if (state.taskflows.mapById[id].status !== 'complete' &&
-          state.taskflows.mapById[id].status !== 'terminated') {
+    const taskflows = store.getState().taskflows;
+    Object.keys(taskflows.mapById).forEach(id => {
+      if (taskflows.mapById[id].status !== 'complete' &&
+          taskflows.mapById[id].status !== 'terminated') {
         dispatch(fetchTaskflowTasks(id));
       }
     });
