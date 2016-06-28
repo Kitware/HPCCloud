@@ -126,8 +126,7 @@ def create_ec2_cluster(task, cluster, profile, ami):
     girder_token = task.taskflow.girder_token
     cumulus.ansible.tasks.cluster.start_cluster(
         launch_spec, provision_spec, cluster, profile, secret_key,
-        launch_params, provision_params, girder_token, log_write_url,
-        master_name='head')
+        launch_params, provision_params, girder_token, log_write_url)
 
     # Get the update to date cluster
     cluster = client.get('clusters/%s' % cluster['_id'])
