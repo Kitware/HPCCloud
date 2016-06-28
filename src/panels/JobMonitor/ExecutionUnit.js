@@ -61,7 +61,7 @@ export default React.createClass({
   },
 
   getInitialState() {
-    return { open: this.props.open };
+    return { open: this.props.open, shouldScroll: false };
   },
 
   componentWillUpdate(nextProps, nextState) {
@@ -69,13 +69,11 @@ export default React.createClass({
     if (!get(nextProps, 'unit.log.length')) {
       nextProps.unit.log = this.props.unit.log;
     }
-    return true;
   },
 
   componentDidUpdate(prevProps, prevState) {
     // the <pre> needs to be rendered open to have scrollHeight, then it scrolls
-    if ((!prevState.open && this.state.open) ||
-      this.state.open && get(prevProps, 'unit.log.length') < get(this.props, 'unit.log.length')) {
+    if (this.state.open) {
       this.refs.log.scrollTop = this.refs.log.scrollHeight;
     }
   },
