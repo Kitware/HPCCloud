@@ -43,25 +43,26 @@ export default React.createClass({
   displayName: 'ExecutionUnit',
 
   propTypes: {
-    unit: React.PropTypes.object,
-    open: React.PropTypes.bool,
-    inline: React.PropTypes.bool,
-    logOnly: React.PropTypes.bool,
+    unit: React.PropTypes.object.isRequired,
+    // optionals
     onToggle: React.PropTypes.func,
     alwaysShowLogToggle: React.PropTypes.bool,
+    inline: React.PropTypes.bool,
+    logOnly: React.PropTypes.bool,
+    open: React.PropTypes.bool,
   },
 
   getDefaultProps() {
     return {
-      open: false,
-      logOnly: false,
       alwaysShowLogToggle: false,
       inline: false,
+      logOnly: false,
+      open: false,
     };
   },
 
   getInitialState() {
-    return { open: this.props.open, shouldScroll: false };
+    return { open: this.props.open };
   },
 
   componentWillUpdate(nextProps, nextState) {
@@ -73,7 +74,7 @@ export default React.createClass({
 
   componentDidUpdate(prevProps, prevState) {
     // the <pre> needs to be rendered open to have scrollHeight, then it scrolls
-    if (this.state.open) {
+    if (this.state.open && this.refs.log) {
       this.refs.log.scrollTop = this.refs.log.scrollHeight;
     }
   },
