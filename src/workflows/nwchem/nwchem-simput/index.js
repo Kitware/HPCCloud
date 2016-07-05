@@ -13,7 +13,7 @@ export default {
   name: 'NWChem',
   logo: require('./logo.png'),
   requiredAttachments: {
-    project: ['molecules'],
+    project: ['geometry'],
     simulation: [],
   },
   components: {

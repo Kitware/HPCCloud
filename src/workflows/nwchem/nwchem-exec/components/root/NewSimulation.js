@@ -12,7 +12,7 @@ export default React.createClass({
   render() {
     return (
       <div>
-        <FileUploadEntry name="molecules" label="Geometry file" accept=".pdb,.xyz" owner={ this.props.owner } />
+        <FileUploadEntry name="geometry" label="Geometry file" accept=".pdb,.xyz" owner={ this.props.owner } />
         <FileUploadEntry name="nw" label="nw file" accept=".nw" owner={ this.props.owner } />
       </div>);
   },
