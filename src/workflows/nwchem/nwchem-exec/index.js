@@ -12,7 +12,7 @@ export default {
   logo: require('./logo.png'),
   requiredAttachments: {
     project: [],
-    simulation: ['molucules', 'nw'],
+    simulation: ['geometry', 'nw'],
   },
   components: {
     NewSimulation: rootNewSimulation,

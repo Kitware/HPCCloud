@@ -39,6 +39,6 @@ export default React.createClass({
   },
 
   render() {
-    return <FileUploadEntry name="molecules" label="Geometry file" postProcess={ extractPhysicalNames } accept=".pdb,.xyz" owner={ this.props.owner } />;
+    return <FileUploadEntry name="geometry" label="Geometry file" postProcess={ extractPhysicalNames } accept=".pdb,.xyz" owner={ this.props.owner } />;
   },
 });

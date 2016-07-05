@@ -39,15 +39,15 @@ const SimputPanel = React.createClass({
 
   getInitialState() {
     return {
-      // ini file container
-      iniFile: null,
+      // nw file container
+      nwFile: null,
 
       // Simput root data
       jsonData: { data: {} },
 
       // Language support
       labels: new SimputLabels(Simput.types.nwchem, 'en'),
-      help: Simput.types.nwchem.lang.en.help,
+      help: Simput.types.nwchem.lang.en.help || {},
 
       // UI content management
       data: [],
@@ -56,38 +56,31 @@ const SimputPanel = React.createClass({
   },
 
   componentWillMount() {
-    var iniFile = this.props.simulation.metadata.inputFolder.files.ini;
+    var nwFile = this.props.simulation.metadata.inputFolder.files.nw;
     var jsonData = this.props.simulation.steps[this.props.step].metadata.model;
 
     // Create ini file container if not already here
-    if (!iniFile) {
+    if (!nwFile) {
       simulationsHelper.addEmptyFileForSimulation(this.props.simulation, 'job.nw')
         .then(resp => {
           const _id = resp.data._id; // itemId
-          this.props.simulation.metadata.inputFolder.files.ini = _id;
+          this.props.simulation.metadata.inputFolder.files.nw = _id;
           this.setState({ nwFile: _id });
           simulationsHelper.saveSimulation(this.props.simulation)
             .then(() => {
               this.props.updateSimulation(this.props.simulation);
             });
         });
-    } else if (!this.state.iniFile) {
-      this.setState({ iniFile });
+    } else if (!this.state.nwFile) {
+      this.setState({ nwFile });
     }
 
     // Need to fill up the jsonData
     if (!jsonData) {
-      const boundaryNames = {};
-      if (this.props.project.metadata.boundaries) {
-        this.props.project.metadata.boundaries.forEach(name => {
-          boundaryNames[name] = name;
-        });
-      }
-
       jsonData = {
         data: {},
         type: 'nwchem',
-        external: { molecules: boundaryNames },
+        external: { input: this.props.simulation.metadata.inputFolder.geometry },
         hideViews: [],
       };
 
@@ -133,18 +126,18 @@ const SimputPanel = React.createClass({
 
     // Update ini file content
     try {
-      if (this.state.iniFile) {
+      if (this.state.nwFile) {
         const convertedData = this.props.convert(jsonData);
         console.log(convertedData);
         const content = convertedData.results['job.nw'];
         console.log('try to save content', content.length);
         const blob = new Blob([content], { type: 'text/plain' });
-        client.updateFileContent(this.state.iniFile, content.length)
+        client.updateFileContent(this.state.nwFile, content.length)
           .then(upload => {
             client.uploadChunk(upload.data._id, 0, blob);
           })
           .catch(err => {
-            console.log('Error update ini content', err);
+            console.log('Error update nw content', err);
           });
         const simulationStepIndex = this.props.simulation.disabled.indexOf('Simulation');
         if (simulationStepIndex !== -1) {
