@@ -66,7 +66,10 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
         }
     }
     """
-    PYFR_AMI = 'ami-0e38c56e'
+    PYFR_IMAGE = {
+        'name': 'PyFR_ParaView-5.0.1',
+        'owner': '695977956746'
+    }
 
     def start(self, *args, **kwargs):
         user = getCurrentUser()
@@ -86,8 +89,8 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
             profile = model.load(profile_id, user=user, level=AccessType.ADMIN)
             kwargs['profile'] = profile
 
+        kwargs['image_spec'] = self.PYFR_IMAGE
         kwargs['next'] = setup_input.s()
-        kwargs['ami'] = self.PYFR_AMI
 
         super(PyFrTaskFlow, self).start(
             setup_cluster.s(

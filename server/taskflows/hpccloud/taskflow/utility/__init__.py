@@ -6,6 +6,7 @@ import requests
 import cumulus
 from cumulus.tasks.job import terminate_job
 from cumulus.constants import JobState
+from cumulus.ansible.tasks.providers import CloudProvider
 
 from girder_client import GirderClient, HttpError
 
@@ -133,6 +134,19 @@ def create_ec2_cluster(task, cluster, profile, ami):
 
     return cluster
 
+def _get_image(logger, profile, image_spec):
+    # Fetch the image from the CloudProvider
+    provider = CloudProvider(profile)
+    images = provider.get_machine_images(name=image_spec['name'],
+                                         owner=image_spec['owner'])
+
+    if len(images) == 0:
+        raise Exception('Unable to locate machine image: %s' % image_spec['name'])
+    elif len(images) > 1:
+        logger.warn('Found more than one machine image for: %s' % image_spec['name'])
+
+    return images[0]['image_id']
+
 @cumulus.taskflow.task
 def setup_cluster(task, *args,**kwargs):
     cluster = kwargs['cluster']
@@ -143,8 +157,8 @@ def setup_cluster(task, *args,**kwargs):
         task.taskflow.logger.info('We are creating an EC2 cluster.')
         task.logger.info('Cluster name %s' % cluster['name'])
         kwargs['machine'] = cluster.get('machine')
-        ami = kwargs.get('ami')
         profile = kwargs.get('profile')
+        ami = _get_image(task.logger, profile, kwargs['image_spec'])
         cluster = create_ec2_cluster(task, cluster, profile, ami)
         task.logger.info('Cluster started.')
 
