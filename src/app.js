@@ -35,9 +35,6 @@ store.subscribe(() => {
       const updateLogs = state.taskflows.updateLogs;
       dispatch(TaskflowActions.clearUpdateLog());
       updateLogs.forEach((taskflowId) => {
-        // fetch the log of the taskflow id
-        dispatch(TaskflowActions.updateTaskflowLog(taskflowId));
-
         // Handle any behavior from taskflow change
         Behavior.handleTaskflowChange(state, state.taskflows.mapById[taskflowId]);
       });

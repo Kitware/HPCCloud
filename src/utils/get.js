@@ -1,14 +1,17 @@
 /* eslint-disable */
 export default function get(obj, prop) {
   var parts = prop.split('.'),
-    last = parts.pop();
+    last = parts.pop(),
+    falseyReturn = parts[parts.length - 1] === 'length' ? 0 : false;
 
-  if (!obj) return;
+  if (!obj) {
+    return falseyReturn;
+  }
 
   while (prop = parts.shift()) {
     obj = obj[prop];
     if (obj == null) {
-      return false;
+      return falseyReturn;
     }
   }
 

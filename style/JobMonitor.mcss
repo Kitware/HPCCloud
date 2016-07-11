@@ -53,6 +53,14 @@
     margin: 0;
 }
 
+.logWarn {
+    color: darkorange;
+}
+
+.logError {
+    color: red;
+}
+
 p.logEntry {
     margin-left: 10px;
 }
@@ -138,6 +146,7 @@ p.logEntry {
     composes: fw     from 'font-awesome/css/font-awesome.css';
     composes: fa-caret-right  from 'font-awesome/css/font-awesome.css';
     composes: foldIcon;
+    color: black;
 }
 
 .foldOpen {
@@ -145,4 +154,5 @@ p.logEntry {
     composes: fw     from 'font-awesome/css/font-awesome.css';
     composes: fa-caret-down from 'font-awesome/css/font-awesome.css';
     composes: foldIcon;
+    color: black;
 }

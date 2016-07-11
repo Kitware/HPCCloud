@@ -8,6 +8,11 @@ export default React.createClass({
   propTypes: {
     header: React.PropTypes.string.isRequired,
     content: React.PropTypes.string.isRequired,
+    color: React.PropTypes.string,
+  },
+
+  getDefaultProps() {
+    return { color: '' };
   },
 
   getInitialState() {
@@ -19,7 +24,7 @@ export default React.createClass({
   },
 
   render() {
-    return (<div className={style.logEntry}>
+    return (<div className={`${style.logEntry} ${this.props.color}`}>
         {this.state.open ?
           <i className={style.foldOpen} onClick={this.toggleOpen}></i> :
           <i className={style.foldClosed} onClick={this.toggleOpen}></i>

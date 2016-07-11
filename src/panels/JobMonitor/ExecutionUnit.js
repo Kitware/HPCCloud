@@ -10,12 +10,19 @@ function logMapper(entry, index) {
   let content = '';
   let foldContent = null;
   let msg = entry.msg;
+  let color = '';
   if (msg !== null && typeof msg === 'object') {
     msg = JSON.stringify(msg, null, 2);
   }
 
   if (entry.status) {
     msg += ` [${entry.status}]`;
+  }
+
+  if (entry.levelname === 'WARN') {
+    color = style.logWarn;
+  } else if (entry.levelname === 'ERROR') {
+    color = style.logError;
   }
 
   content += `[${formatTime(entry.created)}] ${entry.levelname}: ${msg}`;
@@ -31,10 +38,10 @@ function logMapper(entry, index) {
 
   if (foldContent !== null) {
     return (<LogFold key={`${entry.created}_${index}`}
-      header={content} content={foldContent} />);
+      header={content} content={foldContent} color={color} />);
   }
 
-  return (<p key={`${entry.created}_${index}`} className={style.logEntry}>
+  return (<p key={`${entry.created}_${index}`} className={`${style.logEntry} ${color}`}>
     {content}
   </p>);
 }
@@ -43,20 +50,21 @@ export default React.createClass({
   displayName: 'ExecutionUnit',
 
   propTypes: {
-    unit: React.PropTypes.object,
-    open: React.PropTypes.bool,
-    inline: React.PropTypes.bool,
-    logOnly: React.PropTypes.bool,
+    unit: React.PropTypes.object.isRequired,
+    // optionals
     onToggle: React.PropTypes.func,
     alwaysShowLogToggle: React.PropTypes.bool,
+    inline: React.PropTypes.bool,
+    logOnly: React.PropTypes.bool,
+    open: React.PropTypes.bool,
   },
 
   getDefaultProps() {
     return {
-      open: false,
-      logOnly: false,
       alwaysShowLogToggle: false,
       inline: false,
+      logOnly: false,
+      open: false,
     };
   },
 
@@ -64,10 +72,16 @@ export default React.createClass({
     return { open: this.props.open };
   },
 
+  componentWillUpdate(nextProps, nextState) {
+    // we want to update other stuff, but if the unit log is empty, ignore it.
+    if (!get(nextProps, 'unit.log.length')) {
+      nextProps.unit.log = this.props.unit.log;
+    }
+  },
+
   componentDidUpdate(prevProps, prevState) {
     // the <pre> needs to be rendered open to have scrollHeight, then it scrolls
-    if ((!prevState.open && this.state.open) ||
-      this.state.open && get(prevProps, 'unit.log').length < get(this.props, 'unit.log').length) {
+    if (this.state.open && this.refs.log) {
       this.refs.log.scrollTop = this.refs.log.scrollHeight;
     }
   },

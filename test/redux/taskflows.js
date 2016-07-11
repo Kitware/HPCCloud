@@ -65,7 +65,7 @@ describe('taskflow actions', () => {
       const expectedTaskflow = deepClone(taskflowState);
       // we don't have these properties from a taskflow that's just been added
       expectedTaskflow.mapById[taskflowId].taskMapById = {};
-      expectedTaskflow.mapById[taskflowId].log = [];
+      expectedTaskflow.mapById[taskflowId].log = newState.mapById[taskflowId].log;
       expectedTaskflow.taskflowMapByTaskId = {};
       expectedTaskflow.taskflowMapByJobId = {};
       delete expectedTaskflow.mapById[taskflowId].allComplete;
@@ -118,6 +118,20 @@ describe('taskflow actions', () => {
       expect(taskflowsReducer(taskflowState, expectedAction))
         .toEqual(newState);
     });
+
+    it('should update taskflow job log', (done) => {
+      const logEntry = { entry: 'created...' };
+      const expectedAction = { type: Actions.UPDATE_TASKFLOW_JOB_LOG, taskflowId, jobId: 'a1', logEntry };
+      expect(Actions.updateTaskflowJobLog(taskflowId, 'a1', logEntry))
+        .toDispatchActions(expectedAction, complete(done));
+    });
+
+    it('should update taskflow log', (done) => {
+      const logEntry = { entry: 'created...' };
+      const expectedAction = { type: Actions.UPDATE_TASKFLOW_LOG, taskflowId, logEntry };
+      expect(Actions.updateTaskflowLog(taskflowId, logEntry))
+        .toDispatchActions(expectedAction, complete(done));
+    });
   });
 
 // ----------------------------------------------------------------------------
@@ -127,23 +141,6 @@ describe('taskflow actions', () => {
   describe('async actions', () => {
     afterEach(() => {
       expect.restoreSpies();
-    });
-
-    it('should update taskflow log', (done) => {
-      const log = [{ entry: 'created...' }, { entry: 'running...' }];
-      const expectedAction = { type: Actions.UPDATE_TASKFLOW_LOG, taskflowId, log };
-      setSpy(client, 'getTaskflowLog', { log });
-      expect(Actions.updateTaskflowLog(taskflowId))
-        .toDispatchActions(expectedAction, complete(done));
-    });
-
-    it('should update taskflow job log', (done) => {
-      const log = [{ entry: 'created...' }, { entry: 'running...' }];
-      const expectedAction = { type: Actions.UPDATE_TASKFLOW_JOB_LOG, taskflowId,
-        jobId: 'a1', log };
-      setSpy(client, 'getJobLog', { log });
-      expect(Actions.updateTaskflowJobLog(taskflowId, 'a1'))
-        .toDispatchActions(expectedAction, complete(done));
     });
 
     it('should update taskflow job status', (done) => {
@@ -201,8 +198,7 @@ describe('taskflow actions', () => {
       const expectedActions = [
         { type: Actions.ADD_TASKFLOW, taskflow: flow },
         { type: Actions.UPDATE_TASKFLOW_JOB_STATUS, taskflowId, jobId: 'job1', status: 'running' },
-        { type: Actions.UPDATE_TASKFLOW_JOB_LOG, taskflowId, jobId: 'job1', log },
-        { type: 'UPDATE_CLUSTERS', clusters },
+        { type: Actions.GET_TASKFLOW_JOB_LOG, taskflowId, jobId: 'job1', log },
       ];
       setSpy(client, 'getTaskflow', flow);
       setSpy(client, 'getJobLog', { log });
