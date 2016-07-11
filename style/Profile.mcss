@@ -61,7 +61,7 @@
   max-width: 300px;
   width: 10%;
   border-right: solid 1px #ccc;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .subContent {
