@@ -3,7 +3,6 @@ import * as TaskflowActions  from './taskflows';
 import client                from '../../network';
 import * as ClusterHelper    from '../../network/helpers/clusters';
 import { store, dispatch }   from '..';
-import { baseURL }           from '../../utils/Constants.js';
 
 export const ADD_CLUSTER = 'ADD_CLUSTER';
 export const ADD_EXISTING_CLUSTER = 'ADD_EXISTING_CLUSTER';
@@ -19,8 +18,7 @@ export const PENDING_CLUSTER_NETWORK = 'PENDING_CLUSTER_NETWORK';
 export const CLUSTER_APPLY_PRESET = 'CLUSTER_APPLY_PRESET';
 export const TESTING_CLUSTER = 'TESTING_CLUSTER';
 export const UPDATE_CLUSTER_LOG = 'UPDATE_CLUSTER_LOG';
-export const SUB_CLUSTER_LOG = 'SUB_CLUSTER_LOG';
-export const UNSUB_CLUSTER_LOG = 'UNSUB_CLUSTER_LOG';
+export const APPEND_TO_CLUSTER_LOG = 'APPEND_TO_CLUSTER_LOG';
 
 /* eslint-disable no-shadow */
 
@@ -51,7 +49,7 @@ export function updateExistingCluster(cluster) {
   return { type: UPDATE_EXISTING_CLUSTER, cluster };
 }
 
-export function updateClusters(clusters, type) {
+export function updateClusters(clusters) {
   return { type: UPDATE_CLUSTERS, clusters };
 }
 
@@ -65,6 +63,10 @@ export function pendingNetworkCall(pending = true) {
 
 export function updateClusterLog(id, log) {
   return { type: UPDATE_CLUSTER_LOG, id, log };
+}
+
+export function appendToClusterLog(id, logEntry) {
+  return { type: APPEND_TO_CLUSTER_LOG, id, logEntry };
 }
 
 function updateTaskflowActionsForClusterEvent(cluster, status) {
@@ -103,48 +105,17 @@ export function getClusterLog(id, offset) {
   };
 }
 
-export function subscribeClusterLogStream(id, offset = 0) {
-  var eventSource = null;
-  dispatch(getClusterLog(id, offset));
-  if (EventSource) {
-    eventSource = new EventSource(`${baseURL}/clusters/${id}/log/stream`);
-    eventSource.onmessage = (e) => {
-      var parsedLog = JSON.parse(e.data);
-      dispatch(updateClusterLog(id, parsedLog));
-    };
-
-    eventSource.onerror = (e) => {
-      // Wait 10 seconds if the browser hasn't reconnected then reinitialize.
-      setTimeout(() => {
-        if (eventSource && eventSource.readyState === 2) {
-          subscribeClusterLogStream(id);
-        } else {
-          eventSource = null;
-        }
-      }, 10000);
-    };
-  }
-  return { type: SUB_CLUSTER_LOG, id, eventSource };
-}
-
-export function unsubscribeClusterLogStream(id) {
-  return { type: UNSUB_CLUSTER_LOG, id };
-}
-
 export function fetchCluster(id) {
   return dispatch => {
     const action = netActions.addNetworkCall('fetch_cluster', 'Retreive cluster');
-    dispatch(pendingNetworkCall(true));
     client.getCluster(id)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(addExistingCluster(resp.data));
-          dispatch(pendingNetworkCall(false));
         },
         err => {
           dispatch(netActions.errorNetworkCall(action.id, err));
-          dispatch(pendingNetworkCall(false));
         });
 
     return action;
@@ -152,6 +123,10 @@ export function fetchCluster(id) {
 }
 
 export function fetchClusters(type) {
+  // this can be called excessively from a log or status event, this acts as our debounce
+  if (store.getState().preferences.clusters.pending) {
+    return { type: 'NOOP' };
+  }
   return dispatch => {
     const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
     dispatch(pendingNetworkCall(true));
@@ -174,17 +149,14 @@ export function fetchClusters(type) {
 export function fetchClusterPresets() {
   return dispatch => {
     const action = netActions.addNetworkCall('fetch_cluster_presets', 'Retreive cluster presets');
-    dispatch(pendingNetworkCall(true));
     client.getClusterPresets()
       .then(
         presets => {
           dispatch(netActions.successNetworkCall(action.id, presets));
           dispatch(updateClusterPresets(presets.data));
-          dispatch(pendingNetworkCall(false));
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
-          dispatch(pendingNetworkCall(false));
         });
 
     return action;
@@ -200,17 +172,14 @@ export function removeCluster(index, cluster) {
   return dispatch => {
     const action = netActions.addNetworkCall('remove_cluster', 'Remove cluster');
 
-    dispatch(pendingNetworkCall(true));
     client.deleteCluster(cluster._id)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(pendingNetworkCall(false));
           dispatch(fetchClusters());
         },
         err => {
           dispatch(netActions.errorNetworkCall(action.id, err));
-          dispatch(pendingNetworkCall(false));
         });
 
     return action;
@@ -222,17 +191,14 @@ export function deleteCluster(id) {
   return dispatch => {
     const action = netActions.addNetworkCall('delete_cluster', 'Delete cluster');
 
-    dispatch(pendingNetworkCall(true));
     client.deleteCluster(id)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(pendingNetworkCall(false));
           dispatch(removeClusterById(id));
         },
         err => {
           dispatch(netActions.errorNetworkCall(action.id, err));
-          dispatch(pendingNetworkCall(false));
         });
 
     return action;
@@ -243,16 +209,13 @@ export function saveCluster(index, cluster, pushToServer = false) {
   const saveAction = { type: SAVE_CLUSTER, index, cluster };
   if (pushToServer) {
     const action = netActions.addNetworkCall('save_cluster', 'Save cluster');
-    dispatch(pendingNetworkCall(true));
     ClusterHelper.saveCluster(cluster)
       .then(
         resp => {
-          dispatch(pendingNetworkCall(false));
           dispatch(netActions.successNetworkCall(action.id, resp));
         },
         err => {
           dispatch(netActions.errorNetworkCall(action.id, err));
-          dispatch(pendingNetworkCall(false));
         });
   }
   return saveAction;
@@ -264,13 +227,11 @@ export function updateCluster(cluster) {
     client.updateCluster(cluster)
       .then((resp) => {
         dispatch(updateExistingCluster(resp.data));
-        dispatch(pendingNetworkCall(false));
         dispatch(netActions.successNetworkCall(action.id, resp));
       })
       .catch((err) => {
         console.log(err);
         dispatch(netActions.errorNetworkCall(action.id, err));
-        dispatch(pendingNetworkCall(false));
       });
     return action;
   };
@@ -282,17 +243,14 @@ export function testCluster(index, cluster) {
   }
   return dispatch => {
     const action = netActions.addNetworkCall('test_cluster', 'Test cluster');
-    dispatch(pendingNetworkCall(true));
     dispatch({ type: TESTING_CLUSTER, index });
     client.testCluster(cluster._id)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(pendingNetworkCall(false));
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
-          dispatch(pendingNetworkCall(false));
         });
     return action;
   };

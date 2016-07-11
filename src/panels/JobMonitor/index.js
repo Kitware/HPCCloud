@@ -6,11 +6,6 @@ import { connect }  from 'react-redux';
 import { dispatch }     from '../../redux';
 import * as ClusterActions from '../../redux/actions/clusters';
 
-// EventSource readyStates
-const CONNECTING = 0;
-const OPEN = 1;
-const CLOSED = 2;
-
 const JobMonitor = React.createClass({
   displayName: 'JobMonitor',
 
@@ -27,25 +22,14 @@ const JobMonitor = React.createClass({
     clusterName: React.PropTypes.string,
     clusterStatus: React.PropTypes.string,
     clusterLog: React.PropTypes.array,
-    clusterLogStreamState: React.PropTypes.number,
 
     getClusterLog: React.PropTypes.func,
-    subscribeToClusterLogStream: React.PropTypes.func,
-    unsubscribeFromClusterLogStream: React.PropTypes.func,
   },
 
   getInitialState() {
     return {
       advanced: process.env.NODE_ENV === 'development',
     };
-  },
-
-  componentWillUnmount() {
-    // if stream is connecting or open: unsubscribe
-    if (this.props.clusterLogStreamState === OPEN ||
-      this.props.clusterLogStreamState === CONNECTING) {
-      this.props.unsubscribeFromClusterLogStream(this.props.clusterId);
-    }
   },
 
   toggleAdvanced() {
@@ -55,12 +39,8 @@ const JobMonitor = React.createClass({
 
   clusterLogOpen(open) {
     if (open) {
-      if (this.props.clusterLogStreamState === CLOSED) {
-        const offset = this.props.clusterLog.length;
-        this.props.subscribeToClusterLogStream(this.props.clusterId, offset);
-      }
-    } else {
-      this.props.unsubscribeFromClusterLogStream(this.props.clusterId);
+      const offset = this.props.clusterLog.length;
+      this.props.getClusterLog(this.props.clusterId, offset);
     }
   },
 
@@ -153,7 +133,6 @@ export default connect(
     var clusterName = '';
     var clusterStatus = '';
     var clusterLog = [];
-    var clusterLogStreamState = CLOSED;
 
     // get tasks and jobs
     if (taskflow && taskflow.taskMapById && taskflow.jobMapById) {
@@ -182,7 +161,6 @@ export default connect(
       clusterStatus = cluster.status;
       if (cluster.log && cluster.log.length) {
         clusterLog = cluster.log.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
-        clusterLogStreamState = cluster.logStream ? cluster.logStream.readyState : CLOSED;
       }
     }
 
@@ -195,12 +173,9 @@ export default connect(
       clusterName,
       clusterStatus,
       clusterLog,
-      clusterLogStreamState,
     };
   },
   () => ({
     getClusterLog: (id, offset) => dispatch(ClusterActions.getClusterLog(id, offset)),
-    subscribeToClusterLogStream: (id, offset) => dispatch(ClusterActions.subscribeClusterLogStream(id, offset)),
-    unsubscribeFromClusterLogStream: (id) => dispatch(ClusterActions.unsubscribeClusterLogStream(id)),
   })
 )(JobMonitor);

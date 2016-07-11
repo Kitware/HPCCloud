@@ -1,6 +1,8 @@
 import * as Actions from '../actions/taskflows';
+// import logSort from '../../utils/logSort';
 
 export const initialState = {
+  pending: [],
   mapById: {},
   taskflowMapByTaskId: {},
   taskflowMapByJobId: {},
@@ -17,6 +19,7 @@ export default function taskflowsReducer(state = initialState, action) {
   switch (action.type) {
     case Actions.ADD_TASKFLOW: {
       const jobMapById = {};
+      const log = action.taskflow.log || [];
       if (action.taskflow.meta && action.taskflow.meta.jobs) {
         action.taskflow.meta.jobs.forEach(job => {
           jobMapById[job._id] = job;
@@ -32,10 +35,10 @@ export default function taskflowsReducer(state = initialState, action) {
         state.mapById[action.taskflow._id],
         {
           flow: action.taskflow,
-          jobMapById,
           primaryJob: action.primaryJob,
-        }
-      );
+          jobMapById,
+          log,
+        });
       const mapById = Object.assign(
         {},
         state.mapById,
@@ -43,13 +46,32 @@ export default function taskflowsReducer(state = initialState, action) {
       return Object.assign({}, state, { mapById });
     }
 
-    // case Actions.UPDATE_TASKFLOW: {
-    //   const mapById = Object.assign({}, state.mapById);
-    //   mapById[action.taskflow._id].flow = action.taskflow;
-    //   return Object.assign({}, state, { mapById });
-    // }
+    case Actions.PENDING_TASKFLOW_NETWORK: {
+      const { isPending, taskflowId } = action;
+      const pending = [].concat(state.pending);
+      if (isPending) {
+        pending.push(taskflowId);
+      } else {
+        pending.splice(pending.indexOf(taskflowId), 1);
+      }
+      return Object.assign({}, state, { pending });
+    }
 
+    // appends a new log entry to the taskflow log
     case Actions.UPDATE_TASKFLOW_LOG: {
+      const mapById = Object.assign({}, state.mapById);
+      const taskflow = Object.assign({}, state.mapById[action.taskflowId]);
+      if (!taskflow.log) {
+        taskflow.log = [];
+      }
+      taskflow.log.push(action.logEntry);
+      mapById[action.taskflowId] = taskflow;
+
+      return Object.assign({}, state, { mapById });
+    }
+
+    // creates a log from GET/taskflow/{id}/log
+    case Actions.GET_TASKFLOW_LOG: {
       const newLog = action.log;
       const mapById = Object.assign({}, state.mapById);
       const taskflow = Object.assign({}, state.mapById[action.taskflowId]);
@@ -75,11 +97,37 @@ export default function taskflowsReducer(state = initialState, action) {
     }
 
     case Actions.UPDATE_TASKFLOW_JOB_LOG: {
+      const { taskflowId, jobId, logEntry } = action;
+      const taskflow = state.mapById[taskflowId];
+      const job = Object.assign({}, taskflow.jobMapById[jobId]);
+      job.log.push(logEntry);
+      const jobMapById = Object.assign({}, taskflow.jobMapById, { [jobId]: job });
+      const newTaskflow = Object.assign({}, taskflow, { jobMapById });
+      const mapById = Object.assign({}, state.mapById, { [taskflowId]: newTaskflow });
+
+      return Object.assign({}, state, { mapById });
+    }
+
+    // fetches and upates a full taskflow job log
+    case Actions.GET_TASKFLOW_JOB_LOG: {
       const { taskflowId, jobId, log } = action;
       const taskflow = state.mapById[taskflowId];
       const job = Object.assign({}, taskflow.jobMapById[jobId], { log });
       const jobMapById = Object.assign({}, taskflow.jobMapById, { [jobId]: job });
       const newTaskflow = Object.assign({}, taskflow, { jobMapById });
+      const mapById = Object.assign({}, state.mapById, { [taskflowId]: newTaskflow });
+
+      return Object.assign({}, state, { mapById });
+    }
+
+    // updates a job log with a single log entry
+    case Actions.UPDATE_TASKFLOW_TASK_LOG: {
+      const { taskflowId, taskId, logEntry } = action;
+      const taskflow = state.mapById[taskflowId];
+      const task = Object.assign({}, taskflow.taskMapById[taskId]);
+      task.log.push(logEntry);
+      const taskMapById = Object.assign({}, taskflow.taskMapById, { [taskId]: task });
+      const newTaskflow = Object.assign({}, taskflow, { taskMapById });
       const mapById = Object.assign({}, state.mapById, { [taskflowId]: newTaskflow });
 
       return Object.assign({}, state, { mapById });
@@ -121,7 +169,6 @@ export default function taskflowsReducer(state = initialState, action) {
         const updateLogs = [].concat(state.updateLogs, taskflowId);
         return Object.assign({}, state, { taskflowMapByTaskId, mapById, updateLogs });
       }
-
       return Object.assign({}, state, { taskflowMapByTaskId, mapById });
     }
 

@@ -49,6 +49,7 @@
     }
   },
   taskflows: {
+    pending: false,
     mapById: {
       [id]: {
         flow: { taskflow... },
