@@ -44,7 +44,15 @@ export function handleTaskflowChange(state, taskflow) {
     actions.push('rerun');
   } else if (!allComplete && (jobs.length + tasks.length) > 0 && !jobs.some(job => job.status === 'terminating')) {
     simulationStatus.push('running');
-    actions.push('terminate');
+
+    // Only allow termination if the cluster is not launching/provisioning ( we can't currently terminate a cluster in launching or provisioning )
+    if (taskflow.flow.meta) {
+      const tfClusterId = taskflow.flow.meta.cluster._id,
+        tfCluster = state.preferences.clusters.mapById[tfClusterId];
+      if (['launching', 'provisioning'].indexOf(tfCluster.status) === -1) {
+        actions.push('terminate');
+      }
+    }
   } else if (allComplete) {
     simulationStatus.push('complete');
   }
