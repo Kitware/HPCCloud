@@ -114,7 +114,7 @@ describe('StateTransitionBehavior', () => {
       taskflow.jobMapById = { someId: { _id: 'someId', status: 'complete' } };
       taskflow.taskMapById[taskId].status = 'complete';
 
-      const cluster = deepClone(taskflow.flow.meta.cluster);
+      const cluster = taskflow.flow.meta.cluster;
       cluster.status = 'running';
       cluster.type = 'ec2';
       fullState.preferences.clusters.mapById[clusterId] = cluster;
@@ -144,7 +144,7 @@ describe('StateTransitionBehavior', () => {
 
     it('should update the cluster if there is a tf cluster in state', () => {
       const cluster = taskflow.flow.meta.cluster;
-      fullState.preferences.clusters.mapById[clusterId] = deepClone(cluster);
+      fullState.preferences.clusters.mapById[clusterId] = cluster;
       cluster.config.simulation = {
         name: simulation.name,
         step: 'Simulation',
