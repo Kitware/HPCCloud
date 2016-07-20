@@ -95,6 +95,35 @@ describe('StateTransitionBehavior', () => {
       expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(taskflowId, newMeta);
     });
 
+    it('should set cluster status to launching, terminate not in actions', () => {
+      taskflow.actions = ['terminate'];
+      taskflow.taskMapById[taskId].status = 'running';
+      taskflow.allComplete = false;
+      metadata.status = 'running';
+      const cluster = taskflow.flow.meta.cluster;
+      cluster.status = 'launching'
+      fullState.preferences.clusters.mapById[clusterId] = cluster
+      handleTaskflowChange(fullState, taskflow);
+      expect(ProjectActions.saveSimulation).toHaveBeenCalledWith(Object.assign({}, simulation, { metadata }));
+      newMeta.actions = [];
+      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(taskflowId, newMeta);
+    });
+
+    it('should set cluster status to provisioning, terminate not in actions', () => {
+      taskflow.actions = ['terminate'];
+      taskflow.taskMapById[taskId].status = 'running';
+      taskflow.allComplete = false;
+      metadata.status = 'running';
+      const cluster = taskflow.flow.meta.cluster;
+      cluster.status = 'provisioning'
+      fullState.preferences.clusters.mapById[clusterId] = cluster
+      handleTaskflowChange(fullState, taskflow);
+      expect(ProjectActions.saveSimulation).toHaveBeenCalledWith(Object.assign({}, simulation, { metadata }));
+      newMeta.actions = [];
+      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(taskflowId, newMeta);
+    });
+
+
     it('should set status to complete, allComplete is true, actions is empty', () => {
       // if every job and task is complete, status is complete
       taskflow.jobMapById = { someId: { _id: 'someId', status: 'complete' } };
