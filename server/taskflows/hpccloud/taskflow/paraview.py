@@ -49,7 +49,10 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
 
     """
 
-    PARAVIEW_AMI = 'ami-0e38c56e'
+    PARAVIEW_IMAGE = {
+        'name': 'PyFR_ParaView-5.0.1',
+        'owner': '695977956746'
+    }
 
     def start(self, *args, **kwargs):
         user = getCurrentUser()
@@ -70,7 +73,7 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
             kwargs['profile'] = profile
 
         kwargs['next'] = create_paraview_job.s()
-        kwargs['ami'] = self.PARAVIEW_AMI
+        kwargs['image_spec'] = self.PARAVIEW_IMAGE
 
         super(ParaViewTaskFlow, self).start(
             setup_cluster.s(self, *args, **kwargs))
