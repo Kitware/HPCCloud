@@ -28,6 +28,7 @@ export default React.createClass({
   propTypes: {
     contents: React.PropTypes.object,
     onChange: React.PropTypes.func,
+    clusterFilter: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -46,9 +47,15 @@ export default React.createClass({
     this.setState({ busy: true });
     client.listClusters('trad')
       .then((resp) => {
+        let clusters = resp.data;
+
+        if (this.props.clusterFilter) {
+          clusters = clusters.filter(this.props.clusterFilter);
+        }
+
         this.setState({
-          profiles: resp.data,
-          profile: resp.data[0],
+          profiles: clusters,
+          profile: clusters[0] ? clusters.length > 0 : null,
           busy: false,
         });
         if (this.props.onChange) {
@@ -92,7 +99,7 @@ export default React.createClass({
     if (this.state.profiles.length === 0) {
       return this.state.busy ? null :
         <div className={ [style.container, theme.warningBox].join(' ') }>
-            <span>There are no Traditional Clusters defined. Add some on&nbsp;
+            <span>There are no Traditional Clusters defined with the required configuration. Add some on&nbsp;
             <Link to="/Preferences/Cluster">the Cluster preference page</Link>.
             </span>
         </div>;
