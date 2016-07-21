@@ -150,9 +150,9 @@ const SimulationStart = React.createClass({
 
   clusterFilter(cluster) {
     return 'config' in cluster && 'pyfr' in cluster.config &&
-      ('cuda' in cluster.config.pyfr && cluster.config.pyfr.cuda) ||
+      (('cuda' in cluster.config.pyfr && cluster.config.pyfr.cuda) ||
       ('opencl' in cluster.config.pyfr && cluster.config.pyfr.opencl.length > 0) ||
-      ('openmp' in cluster.config.pyfr && cluster.config.pyfr.openmp.length > 0);
+      ('openmp' in cluster.config.pyfr && cluster.config.pyfr.openmp.length > 0));
   },
 
   render() {
