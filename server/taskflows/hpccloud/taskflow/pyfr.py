@@ -300,11 +300,16 @@ def setup_input(task, *args, **kwargs):
     if kwargs['cluster']['type'] == 'ec2':
         # If we have GPUs use cuda
         gpu = parse('cluster.config.launch.params.gpu').find(kwargs)
+        pyfr_config = {}
         if gpu and int(gpu[0].value) > 1:
             backend = {
                 'type': 'cuda',
                 'device-id': 'round-robin'
             }
+
+            # Update cluster configuation
+            pyfr_config['cuda'] = True
+
         # Use OpenMP
         else:
             backend = {
@@ -312,7 +317,21 @@ def setup_input(task, *args, **kwargs):
                 'cblas': '/usr/lib/openblas-base/libblas.so'
             }
 
+            # Update cluster configuation
+            pyfr_config['openmp'] = [{
+                'name' : 'ec2profile',
+                'cblas' : "/usr/lib/libblas/libblas.so",
+            }]
+
         kwargs['backend'] = backend
+
+        # Patch cluster in Girder
+        client.patch('clusters/%s' % kwargs['cluster']['_id'],
+                     data=json.dumps({
+                        'config': {
+                            'pyfr': pyfr_config
+                        }
+                    }))
 
     update_config_file(task, client, *args, **kwargs)
 
