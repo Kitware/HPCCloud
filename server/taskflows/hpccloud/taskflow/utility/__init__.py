@@ -149,6 +149,24 @@ def _get_image(logger, profile, image_spec):
 
     return images[0]['image_id']
 
+def has_gpus(cluster):
+    """
+    :param cluster: The cluster passed by the client. Either an created cluster
+                    contain a _id or one contain a machine field specify the machine
+                    type.
+    :type cluster: dict
+    :returns: True is cluster nodes have GPUs, false otherwise.
+    """
+
+    # First check machine spec
+    gpu = parse('machine.gpu').find(cluster)
+
+    if not gpu:
+        # Check launch parameters
+        gpu = parse('config.launch.params.gpu').find(cluster)
+
+    return gpu and int(gpu[0].value) > 0
+
 @cumulus.taskflow.task
 def setup_cluster(task, *args,**kwargs):
     cluster = kwargs['cluster']
