@@ -137,13 +137,15 @@ def create_ec2_cluster(task, cluster, profile, ami):
 def _get_image(logger, profile, image_spec):
     # Fetch the image from the CloudProvider
     provider = CloudProvider(profile)
-    images = provider.get_machine_images(name=image_spec['name'],
-                                         owner=image_spec['owner'])
+    images = provider.get_machine_images(owner=image_spec['owner'],
+                                         tags=image_spec['tags'])
 
     if len(images) == 0:
-        raise Exception('Unable to locate machine image: %s' % image_spec['name'])
+        raise Exception('Unable to locate machine image for the ' +
+                        'following spec: %s' % image_spec)
     elif len(images) > 1:
-        logger.warn('Found more than one machine image for: %s' % image_spec['name'])
+        logger.warn('Found more than one machine image for the ' +
+                    'following spec: %s' % image_spec)
 
     return images[0]['image_id']
 
