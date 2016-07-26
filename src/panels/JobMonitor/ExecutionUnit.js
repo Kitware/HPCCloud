@@ -19,7 +19,7 @@ function logMapper(entry, index) {
     msg += ` [${entry.status}]`;
   }
 
-  if (entry.levelname === 'WARN') {
+  if (entry.levelname === 'WARNING') {
     color = style.logWarn;
   } else if (entry.levelname === 'ERROR') {
     color = style.logError;
