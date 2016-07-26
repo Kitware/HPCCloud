@@ -137,15 +137,35 @@ def create_ec2_cluster(task, cluster, profile, ami):
 def _get_image(logger, profile, image_spec):
     # Fetch the image from the CloudProvider
     provider = CloudProvider(profile)
-    images = provider.get_machine_images(name=image_spec['name'],
-                                         owner=image_spec['owner'])
+    images = provider.get_machine_images(owner=image_spec['owner'],
+                                         tags=image_spec['tags'])
 
     if len(images) == 0:
-        raise Exception('Unable to locate machine image: %s' % image_spec['name'])
+        raise Exception('Unable to locate machine image for the ' +
+                        'following spec: %s' % image_spec)
     elif len(images) > 1:
-        logger.warn('Found more than one machine image for: %s' % image_spec['name'])
+        logger.warn('Found more than one machine image for the ' +
+                    'following spec: %s' % image_spec)
 
     return images[0]['image_id']
+
+def has_gpus(cluster):
+    """
+    :param cluster: The cluster passed by the client. Either an created cluster
+                    contain a _id or one contain a machine field specify the machine
+                    type.
+    :type cluster: dict
+    :returns: True is cluster nodes have GPUs, false otherwise.
+    """
+
+    # First check machine spec
+    gpu = parse('machine.gpu').find(cluster)
+
+    if not gpu:
+        # Check launch parameters
+        gpu = parse('config.launch.params.gpu').find(cluster)
+
+    return gpu and int(gpu[0].value) > 0
 
 @cumulus.taskflow.task
 def setup_cluster(task, *args,**kwargs):

@@ -49,7 +49,12 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
 
     """
 
-    PARAVIEW_AMI = 'ami-0e38c56e'
+    PARAVIEW_IMAGE = {
+        'owner': '695977956746',
+        'tags': {
+            'paraview': '5.0.1'
+        }
+    }
 
     def start(self, *args, **kwargs):
         user = getCurrentUser()
@@ -69,8 +74,18 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
             profile = model.load(profile_id, user=user, level=AccessType.ADMIN)
             kwargs['profile'] = profile
 
+        image_spec = self.PARAVIEW_IMAGE.copy()
+        # Setup up image spec
+        if '_id' not in kwargs['cluster']:
+            if has_gpus(kwargs['cluster']):
+                image_spec['tags']['cuda'] = '7.5'
+                image_spec['tags']['nvida_display_driver'] = '367.35'
+            else:
+                image_spec['tags']['mesa'] = '8.0'
+            kwargs['image_spec'] = image_spec
+
+        kwargs['image_spec'] = image_spec
         kwargs['next'] = create_paraview_job.s()
-        kwargs['ami'] = self.PARAVIEW_AMI
 
         super(ParaViewTaskFlow, self).start(
             setup_cluster.s(self, *args, **kwargs))
