@@ -1,7 +1,7 @@
 # Table of Contents
 
-- [Getting Started](/getting-started.md)
-- [Glossary](/glossary.md)
+- [Getting Started](getting-started.md)
+- [Glossary](glossary.md)
 - Usage
   - [Adding traditional clusters](/usage/trad-cluster.md)
   - [Adding AWS profiles](/usage/aws-profiles.md)
