@@ -12,4 +12,4 @@ You cannot edit saved AWS profiles.
 
 ## Deleting
 
-With the profile you want to delete selected, click "Delete profile." You will be prompted before the profile is deleted. This will not terminate still running instances associated with the profile. You will also not be able to access files generated from simulations which ran on instances using this profile, readding the profile will not allow you to do this either.
+With the profile you want to delete selected, click "Delete profile." You will be prompted before the profile is deleted. This will not terminate still running instances associated with the profile. You will also not be able to access files generated from simulations which ran on instances using this profile, re-adding the profile will not allow you to do this either.
