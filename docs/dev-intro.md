@@ -1,4 +1,4 @@
-# Delopment Introduction
+# Development Introduction
 
 HPC-Cloud relies heavily on these libaries:
 
