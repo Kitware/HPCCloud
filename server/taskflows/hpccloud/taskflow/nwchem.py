@@ -122,34 +122,6 @@ def nwchem_terminate(task):
     terminate_jobs(
         task, client, cluster, task.taskflow.get('meta', {}).get('jobs', []))
 
-# TODO: move to base class?
-def update_config_file(task, client, *args, **kwargs):
-
-    ini_file_id = kwargs['input']['iniFile']['id']
-
-    _, path = tempfile.mkstemp()
-
-    task.logger.info('Downloading configuration file.')
-    try:
-        with open(path, 'w') as fp:
-            client.downloadFile(ini_file_id, path)
-
-        config_parser = SafeConfigParser()
-        config_parser.optionxform = str
-        config_parser.read(path)
-
-        with open(path, 'w') as fp:
-            config_parser.write(fp)
-
-        task.logger.info('Uploading updated configuration file.')
-
-        with open(path, 'r') as fp:
-            client.uploadFileContents(
-                ini_file_id, fp, os.path.getsize(path))
-
-    finally:
-        os.remove(path)
-
 @cumulus.taskflow.task
 def setup_input(task, *args, **kwargs):
     input_folder_id = kwargs['input']['folder']['id']
@@ -177,40 +149,9 @@ def setup_input(task, *args, **kwargs):
     client = _create_girder_client(
         task.taskflow.girder_api_url, task.taskflow.girder_token)
 
-    # Get the mesh file metadata to see if we need to import
+    # Get the geometry file metadata to see if we need to import
     geometry_file = client.getResource('file/%s' % geometry_file_id)
-
-    if number_of_procs > 1:
-        task.logger.info('Downloading input mesh.')
-
-        try:
-            _, input_path = tempfile.mkstemp()
-            output_dir =  tempfile.mkdtemp()
-            # TODO: probably to rework this so it works for xyz and pdb files
-            geometry_filename = '%s.xyz' % (geometry_file['name'].rsplit('.', 1)[0])
-            output_path = os.path.join(output_dir, geometry_filename)
-            kwargs['geometryFilename'] = geometry_filename
-
-            client.downloadFile(geometry_file_id, input_path)
-            task.logger.info('Downloading complete.')
-
-            task.logger.info('Uploading converted mesh.')
-            size = os.path.getsize(output_path)
-            with open(output_path) as fp:
-                girder_file = client.uploadFile(
-                    input_folder_id, fp, geometry_filename, size=size,
-                    parentType='folder')
-                kwargs['geometryFileId'] = girder_file['_id']
-
-            task.logger.info('Upload complete.')
-
-        finally:
-            if os.path.exists(input_path):
-                os.remove(input_path)
-            if os.path.exists(output_dir):
-                shutil.rmtree(output_dir)
-
-    update_config_file(task, client, *args, **kwargs)
+    kwargs['geometryFilename'] = geometry_file['name']
 
     ini_file_id = kwargs['input']['iniFile']['id']
     ini_file = client.getResource('file/%s' % ini_file_id)
@@ -222,7 +163,7 @@ def setup_input(task, *args, **kwargs):
 @cumulus.taskflow.task
 def create_job(task, *args, **kwargs):
     task.logger.info('Taskflow %s' % task.taskflow.id)
-    task.taskflow.logger.info('Create PyFr job.')
+    task.taskflow.logger.info('Create NWChem job.')
     input_folder_id = kwargs['input']['folder']['id']
 
     # TODO: setup command to run with mpi
@@ -288,88 +229,6 @@ def monitor_nwchem_job(task, cluster, job, *args, **kwargs):
                                              'monitor_interval': 30},
                             link=upload_output.s(cluster, job, *args, **kwargs))
 
-NUMBER__OF_EXPORT_TASKS = 10
-
-# TODO: list all possible nwchem file types
-def _list_solution_files(client, folder_id):
-    """
-    List the NWChem solution files held in a Girder folder.
-
-    :param client: The Girder client for Girder access.
-    :param folder_id: The folder to list solution files in.
-    """
-
-    items = client.listItem(folder_id)
-    for item in items:
-        files = client.get('item/%s/files' % item['_id'], parameters={
-            'limit': 1,
-        })
-
-        if len(files) == 0:
-            continue
-
-        # TODO: Be more selective of the files listed.
-        file = files[0]
-        yield file
-
-# TODO: is this needed for nwchem?
-def create_export_job(task, job_name, files, job_dir, geometry_filename):
-
-    commands = []
-    geometry_file_path = os.path.join(job_dir, 'input', geometry_filename)
-    for file in files:
-        name = file['name']
-        vtk_filename = '%s.vtu' % name.rsplit('.', 1)[0]
-        output_path = os.path.join(job_dir, vtk_filename)
-        solution_file_path = os.path.join(job_dir, name)
-
-        cmd = 'nwchem export %s %s %s' % (geometry_file_path,
-                                       solution_file_path, output_path)
-        commands.append(cmd)
-
-    body = {
-        'name': job_name,
-        'commands': commands,
-        'input': [],
-        'output': [],
-        'params': {
-            'numberOfSlots': 1
-        }
-    }
-
-    client = _create_girder_client(
-                task.taskflow.girder_api_url, task.taskflow.girder_token)
-
-    job = client.post('jobs', data=json.dumps(body))
-
-    task.logger.info('Created export job %s' % job['_id'])
-
-    return job
-
-@cumulus.taskflow.task
-def upload_export_output(task, _, cluster, job, *args, **kwargs):
-    output_folder_id = kwargs['output']['folder']['id']
-
-    client = _create_girder_client(
-        task.taskflow.girder_api_url, task.taskflow.girder_token)
-
-    for job_id in task.taskflow.get_metadata('export_jobs')['export_jobs']:
-        # Get job
-        export_job = client.get('jobs/%s' % job_id)
-        export_job['output'] = [{
-            'folderId': output_folder_id,
-            'path': '.'
-        }]
-
-        upload_job_output_to_folder(cluster, export_job, log_write_url=None,
-            job_dir=None, girder_token=task.taskflow.girder_token)
-
-    # Upload the vtu files
-    girder_token = task.taskflow.girder_token
-    download_path_from_cluster(cluster, girder_token, output_folder_id, job['dir'],
-                               include=['^.*\\.vtu$'])
-
-
 @cumulus.taskflow.task
 def upload_output(task, _, cluster, job, *args, **kwargs):
     task.taskflow.logger.info('Uploading results from cluster')
@@ -390,111 +249,3 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
 
     task.taskflow.logger.info('Upload job output complete.')
 
-    geometry_file_id = kwargs.pop('geometryFileId')
-
-    solution_files = list(_list_solution_files(client, output_folder_id))
-
-    if len(solution_files) == 0:
-        raise Exception('No solution files where produced, please check output files for errors.')
-
-    # Generate and save the first vtu file that should be loaded for this
-    # run. This can then be used to know which file to open as part of any viz
-    # step.
-    file_names = [f['name'] for f in solution_files]
-    file_names.sort()
-    vtu_file = '%s.vtu' % file_names[0].rsplit('.', 1)[0]
-    task.taskflow.set_metadata('vtuFile', vtu_file)
-
-    number_files = len(solution_files)
-
-    # By default export solution files to VTK format using a set of batch jobs
-    if not 'exportInTaskFlow' in kwargs or not kwargs['exportInTaskFlow']:
-
-        number_of_jobs = kwargs['numberOfProcs']
-        task.logger.info('Generating %d export jobs' % number_of_jobs)
-
-        sim_job_dir = job['dir']
-        jobs = []
-        job_index = 1
-        for chunk in [solution_files[i::number_of_jobs] for i in xrange(number_of_jobs)]:
-            if chunk:
-                name = 'nwchem_export_%d' % job_index
-                geometry_filename = kwargs['geometryFilename']
-                export_job = create_export_job(
-                    task, name, chunk, sim_job_dir, geometry_filename)
-                submit_job(cluster, export_job, log_write_url=None,
-                              girder_token=task.taskflow.girder_token, monitor=False)
-                jobs.append(export_job)
-                job_index += 1
-
-        # Update the jobs list in the metadata
-        task.taskflow.set_metadata('jobs', [j for j in jobs] +
-                                   [job])
-        # Also save just the export job ids
-        task.taskflow.set_metadata('export_jobs', [j['_id'] for j in jobs])
-
-        monitor_jobs.apply_async(
-            (cluster, jobs), {'girder_token': task.taskflow.girder_token},
-            link=upload_export_output.s(cluster, job, *args, **kwargs))
-    else:
-        # The number 100 is pretty arbitrary!
-        if number_files < 100:
-            export_output.delay(
-                output_folder_id, geometry_file_id, solution_files)
-        # Break into chunks a run in parallel
-        else:
-            for chunk in [solution_files[i::NUMBER__OF_EXPORT_TASKS] for i in xrange(NUMBER__OF_EXPORT_TASKS)]:
-                export_output.delay(output_folder_id, geometry_file_id, chunk)
-
-
-def _export_file(task, client, output_folder_id, geometry_path, file, output_dir):
-    """
-    Export a single solution file held in Girder into VTK format
-
-    :param task: The current task we are running in.
-    :param client: The Girder client for access to Girder.
-    :param output_folder_id: The target folder to upload the VTK file to.
-    :param meth_path: The path to the mesh file.
-    :param file: The Girder file object for the solution file.
-    :param output_dir: The temporay working directory to write files into.
-    """
-    name = file['name']
-    solution_file_path = os.path.join(output_dir, name)
-    client.downloadFile(file['_id'], solution_file_path)
-    vtk_filename = '%s.vtu' % name.rsplit('.', 1)[0]
-    vtk_file_path = os.path.join(output_dir, vtk_filename)
-    _export_solution(task.logger, geometry_path, solution_file_path, vtk_file_path)
-    with open(vtk_file_path, 'r') as fp:
-        size = os.path.getsize(vtk_file_path)
-        client.uploadFile(
-            output_folder_id, fp, vtk_filename, size=size,
-            parentType='folder')
-
-
-@cumulus.taskflow.task
-def export_output(task, folder_id, imported_geometry_file_id, files):
-    """
-    Export a batch of NWChem solution files into VTK format.
-
-    :param: folder_id: The target folder id to upload the VTK files to.
-    :param: imported_geometry_file_id: The mesh in NWChem format
-    :param: files: The files to export ( Girder JSON objects )
-    """
-    client = _create_girder_client(
-        task.taskflow.girder_api_url, task.taskflow.girder_token)
-
-    output_dir =  tempfile.mkdtemp()
-
-    try:
-        geometry_path = os.path.join(output_dir, 'mesh.nwchemm')
-
-        task.logger.info('Downloading mesh.')
-        client.downloadFile(imported_geometry_file_id, geometry_path)
-        task.logger.info('Downloading complete.')
-
-        for file in files:
-            _export_file(task, client, folder_id, geometry_path, file, output_dir)
-
-    finally:
-        if os.path.exists(output_dir):
-            shutil.rmtree(output_dir)
