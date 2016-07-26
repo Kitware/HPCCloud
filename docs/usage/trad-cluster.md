@@ -1,6 +1,6 @@
 # Traditional Clusters
 
-Traditional clusters, or simply "clusters" in this document. Are machines that you can provision and run yourself.
+Traditional clusters, or simply "clusters" in this document typically involve physical hardware dedicated to running simulations within the host operating system.
 
 ## Creating
 
