@@ -15,4 +15,4 @@ You can only edit the name of a cluster. If you need to change another detail de
 
 ## Deleting
 
-You cannot delete clusters which are running simulations. With the cluster you want to delete selected, click "Delete cluster." You will be prompted before the cluster is deleted. You can always readd a deleted cluster, however the files generated from simulations will not be available through HPC-Cloud.
+You cannot delete clusters which are running simulations. With the cluster you want to delete selected, click "Delete cluster." You will be prompted before the cluster is deleted. You can always re-add a deleted cluster, however the files generated from simulations will not be available through HPC-Cloud.
