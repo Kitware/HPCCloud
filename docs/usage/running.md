@@ -1,6 +1,6 @@
 # Running Taskflows and Simulations
 
-For this example we're going to run a basic PyFR simulation. There are sample files for this simulation in this directory under `input.ini` and `mesh.msh`.
+For this example we're going to run a basic PyFR simulation. There are sample files for this simulation in this directory under [`input.ini`](https://raw.githubusercontent.com/Kitware/HPCCloud/docs/docs/usage/input.ini) and [`mesh.msh`](https://raw.githubusercontent.com/Kitware/HPCCloud/docs/docs/usage/mesh.msh). (If you're reading this on the web you can right click those links and "Save Link as..." to quickly download them) 
 
 ## Running
 

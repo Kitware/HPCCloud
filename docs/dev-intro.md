@@ -1,4 +1,4 @@
-# Delopment Introduction
+# Development Introduction
 
 HPC-Cloud relies heavily on these libaries:
 
@@ -45,10 +45,10 @@ HPC-Cloud is written in ES6 it's transpiled into ES5 with Babel.
 ESLint ensures that code style is followed and adhered to, we're extending [Airbnb's rules](https://github.com/airbnb/javascript). Webpack will throw errors if something is wrong. The basics are:
 
 - Tab width is two spaces.
-- No padding at the beginning or end of a function.
+- No line padding at the beginning or end of a function.
 - `var` must be declared at the top of the scope, use `const` or `let` otherwise.
-- Spaces surround properties in objects e.g. `{ foo:bar }`;
-- Commas after all properties in objects which are multiple lines.
+- Spaces surround properties in objects, also one space before the value e.g. `{ foo: bar }`;
+- Comma after the final property in objects which are declared over multiple lines.
 - Open brackets are on the same line as the declaration. e.g. `function qux() { \n`
 - Anonymous functions must be [ES6 arrow function](https://babeljs.io/docs/learn-es2015/#arrows-and-lexical-this).
 - String concatenation must be [ES6 string templates](https://babeljs.io/docs/learn-es2015/#template-strings).

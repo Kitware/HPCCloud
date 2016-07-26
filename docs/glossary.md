@@ -14,7 +14,7 @@ Taskflows are a collection of tasks and jobs which are run for simulations.
 
 ### Workflow
 
-Workflows are collections of taskflows which define how you run simulations and jobs.
+Workflows are collections of steps which define some pattern for executing a process.
 
 ### Projects
 
@@ -30,7 +30,7 @@ Clusters are any machine that you can run tasks on.
 
 ### Traditional Clusters
 
-Traditional clusters are machines that you have access and permissions for.
+Traditional clusters are physical hardware dedicated to running simulations within the host operating system.
 
 ### AWS Profile
 
