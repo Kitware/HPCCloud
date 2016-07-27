@@ -57,6 +57,11 @@ export default function taskflowsReducer(state = initialState, action) {
       return Object.assign({}, state, { pending });
     }
 
+    case Actions.TRIGGER_UPDATE: {
+      const updateLogs = [].concat(state.updateLogs, action.taskflowId);
+      return Object.assign({}, state, { updateLogs });
+    }
+
     // appends a new log entry to the taskflow log
     case Actions.UPDATE_TASKFLOW_LOG: {
       const mapById = Object.assign({}, state.mapById);
