@@ -49,7 +49,7 @@ export function handleTaskflowChange(state, taskflow) {
     if (taskflow.flow.meta) {
       const tfClusterId = taskflow.flow.meta.cluster._id,
         tfCluster = state.preferences.clusters.mapById[tfClusterId];
-      if (['launching', 'provisioning'].indexOf(tfCluster.status) === -1) {
+      if (tfCluster && ['launching', 'provisioning'].indexOf(tfCluster.status) === -1) {
         actions.push('terminate');
       }
     }
@@ -88,24 +88,30 @@ export function handleTaskflowChange(state, taskflow) {
     const tfClusterId = taskflow.flow.meta.cluster._id,
       tfCluster = state.preferences.clusters.mapById[tfClusterId];
 
-    // add simulation info to cluster config.
-    if (tfCluster && taskflow.flow.meta.cluster && taskflow.simulation) {
-      const tfSimulation = state.simulations.mapById[taskflow.simulation];
-      if (tfSimulation && tfCluster.config) {
-        const simulation = {
-          name: tfSimulation.name,
-          step: taskflow.stepName,
-        };
-        tfCluster.config.simulation = simulation;
-        dispatch(ClusterActions.updateCluster(tfCluster));
+    // if we have no cluster in preferences, but we have an ID fetch it.
+    if (!tfCluster && tfClusterId.length) {
+      dispatch(ClusterActions.fetchCluster(tfClusterId, taskflow.flow._id));
+    } else {
+      // add simulation info to cluster config.
+      if (taskflow.flow.meta.cluster && taskflow.simulation) {
+        const tfSimulation = state.simulations.mapById[taskflow.simulation];
+        if (tfSimulation && tfCluster.config) {
+          const simulation = {
+            _id: tfSimulation._id,
+            name: tfSimulation.name,
+            step: taskflow.stepName,
+          };
+          tfCluster.config.simulation = simulation;
+          dispatch(ClusterActions.updateCluster(tfCluster));
+        }
       }
-    }
 
-    // add the terminate instance button if running or error
-    if (tfCluster && tfCluster.type === 'ec2' &&
-      taskflow.flow.status !== 'running' &&
-      ['running', 'error'].indexOf(tfCluster.status) !== -1) {
-      actions.push('terminateInstance');
+      // add the terminate instance button if running or error
+      if (tfCluster.type === 'ec2' &&
+        taskflow.flow.status !== 'running' &&
+        ['running', 'error'].indexOf(tfCluster.status) !== -1) {
+        actions.push('terminateInstance');
+      }
     }
   }
 
