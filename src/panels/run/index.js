@@ -14,16 +14,19 @@ export default React.createClass({
     serverTypeChange: React.PropTypes.func,
     profiles: React.PropTypes.object,
     dataChange: React.PropTypes.func,
+    clusterFilter: React.PropTypes.func,
   },
 
   render() {
     var serverForm;
     switch (this.props.serverType) {
       case 'EC2':
-        serverForm = <RunEC2 contents={this.props.profiles.EC2} onChange={this.props.dataChange} />;
+        serverForm = (<RunEC2 contents={this.props.profiles.EC2} onChange={this.props.dataChange}
+          clusterFilter={this.props.clusterFilter} />);
         break;
       case 'Traditional':
-        serverForm = <RunCluster contents={this.props.profiles.Traditional} onChange={this.props.dataChange} />;
+        serverForm = (<RunCluster contents={this.props.profiles.Traditional} onChange={this.props.dataChange}
+          clusterFilter={this.props.clusterFilter} />);
         break;
       case 'OpenStack':
         serverForm = <RunOpenStack />;
