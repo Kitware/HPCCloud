@@ -48,6 +48,10 @@ class NwChemTaskFlow(cumulus.taskflow.TaskFlow):
             "geometry": {
                 "id": <the file id of the geometry file>
             }
+            "nwFile":
+            {
+                "id": <the file id of the input file>
+            }
         },
         "output": {
             "folder": {
@@ -56,7 +60,8 @@ class NwChemTaskFlow(cumulus.taskflow.TaskFlow):
         },
         "cluster": {
             "_id": <id of cluster to run on>
-        }
+        },
+        "numberOfSlots": <number of processors to run on>
     }
     """
     NWCHEM_IMAGE = {
@@ -124,7 +129,7 @@ def nwchem_terminate(task):
 
 def update_config_file(task, client, *args, **kwargs):
 
-    ini_file_id = kwargs['input']['iniFile']['id']
+    ini_file_id = kwargs['input']['nwFile']['id']
 
     _, path = tempfile.mkstemp()
     fileContents = ''
@@ -192,9 +197,9 @@ def setup_input(task, *args, **kwargs):
 
     update_config_file(task, client, *args, **kwargs)
 
-    ini_file_id = kwargs['input']['iniFile']['id']
+    ini_file_id = kwargs['input']['nwFile']['id']
     ini_file = client.getResource('file/%s' % ini_file_id)
-    kwargs['iniFilename'] = ini_file['name']
+    kwargs['nwFilename'] = ini_file['name']
 
     create_job.delay(*args, **kwargs)
 
@@ -209,7 +214,7 @@ def create_job(task, *args, **kwargs):
     body = {
         'name': 'nwchem_run',
         'commands': [
-            "nwchem input/%s" % (kwargs['iniFilename'])
+            "nwchem input/%s" % (kwargs['nwFilename'])
         ],
         'input': [
             {
