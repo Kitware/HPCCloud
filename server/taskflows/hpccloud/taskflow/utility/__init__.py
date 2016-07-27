@@ -45,7 +45,7 @@ def create_girder_client(girder_api_url, girder_token):
 
     return client
 
-def create_ec2_cluster(task, cluster, profile, ami):
+def create_ec2_cluster(task, cluster, profile, ami_spec):
     machine_type = cluster['machine']['id']
     nodeCount = cluster['clusterSize']-1
     launch_spec = 'ec2'
@@ -67,10 +67,10 @@ def create_ec2_cluster(task, cluster, profile, ami):
 
     launch_params = {
         'master_instance_type': machine_type,
-        'master_instance_ami': ami,
+        'master_ami_spec': ami_spec,
         'node_instance_count': nodeCount,
         'node_instance_type': machine_type,
-        'node_instance_ami': ami,
+        'node_ami_spec': ami_spec,
         'gpu': cluster['machine']['gpu'],
         'source_cidr_ip': source_ip,
         'extra_rules': extra_rules
@@ -178,8 +178,8 @@ def setup_cluster(task, *args,**kwargs):
         task.logger.info('Cluster name %s' % cluster['name'])
         kwargs['machine'] = cluster.get('machine')
         profile = kwargs.get('profile')
-        ami = _get_image(task.logger, profile, kwargs['image_spec'])
-        cluster = create_ec2_cluster(task, cluster, profile, ami)
+        cluster = create_ec2_cluster(
+            task, cluster, profile, kwargs['image_spec'])
         task.logger.info('Cluster started.')
 
     # Call any follow on task
