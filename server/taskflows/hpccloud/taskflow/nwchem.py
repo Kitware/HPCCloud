@@ -122,6 +122,43 @@ def nwchem_terminate(task):
     terminate_jobs(
         task, client, cluster, task.taskflow.get('meta', {}).get('jobs', []))
 
+def update_config_file(task, client, *args, **kwargs):
+
+    ini_file_id = kwargs['input']['iniFile']['id']
+
+    _, path = tempfile.mkstemp()
+    fileContents = ''
+
+    task.logger.info('Downloading configuration file.')
+    try:
+        with open(path, 'w') as fp:
+            client.downloadFile(ini_file_id, path)
+
+        with open(path, 'r') as fp:
+            for line in fp.readlines():
+                if 'load' in line:
+                    task.logger.info('Expanding path to geometry files.')
+                    # Find the geometry file and check for input in file path
+                    for w in line.split():
+                        (filePath, fileExt) = os.path.splitext(w)
+                        if fileExt == '.xyz' or fileExt == '.pdb':
+                            (fileDir, fileName) = os.path.split(w)
+                            if (not fileDir.startswith('input')):
+                                newPath = 'input' + os.sep + filePath
+                                line = line.replace(filePath, newPath, 1)
+                fileContents += line
+
+        with open(path, 'w') as fp:
+            fp.write(fileContents)
+
+        task.logger.info('Uploading updated configuration file.')
+
+        with open(path, 'r') as fp:
+            client.uploadFileContents(ini_file_id, fp, os.path.getsize(path))
+
+    finally:
+        os.remove(path)
+
 @cumulus.taskflow.task
 def setup_input(task, *args, **kwargs):
     input_folder_id = kwargs['input']['folder']['id']
@@ -152,6 +189,8 @@ def setup_input(task, *args, **kwargs):
     # Get the geometry file metadata to see if we need to import
     geometry_file = client.getResource('file/%s' % geometry_file_id)
     kwargs['geometryFilename'] = geometry_file['name']
+
+    update_config_file(task, client, *args, **kwargs)
 
     ini_file_id = kwargs['input']['iniFile']['id']
     ini_file = client.getResource('file/%s' % ini_file_id)
