@@ -101,7 +101,7 @@ const VisualizationStart = React.createClass({
 
   render() {
     var actions = [{ name: 'startVisualization', label: 'Start Visualization', icon: '' }],
-      serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional, OpenStack: this.state.OpenStack };
+      serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional };
 
     return (
       <div>

@@ -150,7 +150,7 @@ const SimulationStart = React.createClass({
 
   render() {
     var actions = [{ name: 'runSimulation', label: 'Run Simulation', icon: '' }],
-      serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional, OpenStack: this.state.OpenStack },
+      serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional },
       backendProfiles = { cuda: false, openmp: [], opencl: [] };
     if (this.state.serverType === 'Traditional') {
       const clusterId = this.state.Traditional.profile;
