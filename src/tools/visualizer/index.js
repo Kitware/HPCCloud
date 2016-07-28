@@ -106,7 +106,7 @@ export default React.createClass({
 
   render() {
     if (!this.proxyManager) {
-      return <LoadingPanel />;
+      return <LoadingPanel large center />;
     }
 
     return (
