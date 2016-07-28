@@ -48,55 +48,37 @@ const SimulationStart = React.createClass({
   },
 
   runSimulation() {
-    const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
+    const nwFile = this.props.simulation.metadata.inputFolder.files.nw || this.props.project.metadata.inputFolder.files.nw;
     var sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
-      payload;
+      payload = {
+        backend: this.state.backend,
+        input: {
+          folder: {
+            id: this.props.simulation.metadata.inputFolder._id,
+          },
+          geometryFile: {
+            id: this.props.simulation.metadata.inputFolder.files.geometry,
+          },
+          nwFile: {
+            id: nwFile,
+          },
+        },
+        output: {
+          folder: {
+            id: this.props.simulation.metadata.outputFolder._id,
+          },
+        },
+      };
 
     if (this.state.serverType === 'Traditional') {
-      payload = Object.assign({},
+      payload = Object.assign(payload,
         this.state.Traditional.runtime || {},
-        {
-          backend: this.state.backend,
-          input: {
-            folder: {
-              id: this.props.simulation.metadata.inputFolder._id,
-            },
-            meshFile: {
-              id: meshFile,
-            },
-            iniFile: {
-              id: this.props.simulation.metadata.inputFolder.files.ini,
-            },
-          },
-          output: {
-            folder: {
-              id: this.props.simulation.metadata.outputFolder._id,
-            },
-          },
-          cluster: ClusterPayloads.tradClusterPayload(this.state.Traditional.profile),
-        });
+        { cluster: ClusterPayloads.tradClusterPayload(this.state.Traditional.profile) }
+      );
     } else if (this.state.serverType === 'EC2') {
-      payload = Object.assign({},
-        this.state.EC2.runtime || {},
-        {
-          backend: this.state.backend,
-          input: {
-            folder: {
-              id: this.props.simulation.metadata.inputFolder._id,
-            },
-            meshFile: {
-              id: meshFile,
-            },
-            iniFile: {
-              id: this.props.simulation.metadata.inputFolder.files.ini,
-            },
-          },
-          output: {
-            folder: {
-              id: this.props.simulation.metadata.outputFolder._id,
-            },
-          },
-        });
+      payload = Object.assign(payload,
+        this.state.EC2.runtime || {}
+      );
       if (!this.state.EC2.cluster) {
         payload.cluster = ClusterPayloads.ec2ClusterPayload(
           this.state.EC2.name,
@@ -111,6 +93,7 @@ const SimulationStart = React.createClass({
       console.log('unrecognized serverType: ', this.state.serverType);
       return;
     }
+
     this.props.onRun(
       this.props.taskFlowName,
       this.props.primaryJob,
