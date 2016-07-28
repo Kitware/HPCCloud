@@ -103,6 +103,10 @@
     font-weight: bold;
 }
 
+.largeText {
+    font-size: 1.25em;
+}
+
 .lightText {
     font-weight: 300;
 }

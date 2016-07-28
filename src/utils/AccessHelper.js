@@ -7,7 +7,7 @@ export const ProjectHelper = {
 
   getIcon(project) {
     return {
-      image: Workflow[project.type].logo,
+      image: Workflow[project.type] ? Workflow[project.type].logo : '',
     };
   },
 
