@@ -53,14 +53,15 @@
 
     "babel-polyfill": "6.9.1",
     "paraviewweb": "1.6.0",
-    "simput": "1.2.0",
+    "simput": "1.2.5",
     "pvw-visualizer": "1.0.11",
 
     "kw-web-suite": "2.0.0"
   },
   "scripts": {
     "install:pyfr"  : "cp ./node_modules/simput/dist/types/pyfr.js ./dist/simput-pyfr.js",
-    "postinstall"   : "npm run install:pyfr && fix-kw-web-suite || true",
+    "install:nwchem": "cp ./node_modules/simput/dist/types/nwchem.js ./dist/simput-nwchem.js",
+    "postinstall"   : "npm run install:pyfr && npm run install:nwchem && fix-kw-web-suite || true",
     "check"         : "node bin/version-check.js",
 
     "prebuild"      : "npm run check",
