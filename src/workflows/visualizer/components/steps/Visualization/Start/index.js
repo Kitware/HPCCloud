@@ -99,14 +99,20 @@ const VisualizationStart = React.createClass({
     this.setState({ serverType: e.target.value });
   },
 
+  clusterFilter(cluster) {
+    return 'config' in cluster && 'paraview' in cluster.config &&
+      'installDir' in cluster.config.paraview && cluster.config.paraview.installDir;
+  },
+
+
   render() {
     var actions = [{ name: 'startVisualization', label: 'Start Visualization', icon: '' }],
-      serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional, OpenStack: this.state.OpenStack };
+      serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional };
 
     return (
       <div>
         <RunClusterFrom serverType={this.state.serverType} serverTypeChange={this.updateServerType}
-          profiles={serverProfiles} dataChange={this.dataChange}
+          profiles={serverProfiles} dataChange={this.dataChange} clusterFilter={this.clusterFilter}
         />
         <ButtonBar
           visible={this.state[this.state.serverType].profile !== ''}

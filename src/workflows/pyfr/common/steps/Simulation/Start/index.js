@@ -148,9 +148,16 @@ const SimulationStart = React.createClass({
     this.setState({ backend });
   },
 
+  clusterFilter(cluster) {
+    return 'config' in cluster && 'pyfr' in cluster.config &&
+      (('cuda' in cluster.config.pyfr && cluster.config.pyfr.cuda) ||
+      ('opencl' in cluster.config.pyfr && cluster.config.pyfr.opencl.length > 0) ||
+      ('openmp' in cluster.config.pyfr && cluster.config.pyfr.openmp.length > 0));
+  },
+
   render() {
     var actions = [{ name: 'runSimulation', label: 'Run Simulation', icon: '' }],
-      serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional, OpenStack: this.state.OpenStack },
+      serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional },
       backendProfiles = { cuda: false, openmp: [], opencl: [] };
     if (this.state.serverType === 'Traditional') {
       const clusterId = this.state.Traditional.profile;
@@ -162,7 +169,7 @@ const SimulationStart = React.createClass({
     return (
       <div>
           <RunClusterFrom serverType={this.state.serverType} serverTypeChange={this.updateServerType}
-            profiles={serverProfiles} dataChange={this.dataChange}
+            profiles={serverProfiles} dataChange={this.dataChange} clusterFilter={this.clusterFilter}
           />
           <RuntimeBackend profiles={backendProfiles} onChange={ this.updateBackend } visible={this.state.serverType === 'Traditional'} />
           <ButtonBar
