@@ -2,7 +2,7 @@
 
 ### Jobs 
 
-Jobs, or Primary Jobs, are special types of tasks run in simulations.
+Jobs, or Primary Jobs, are special types of tasks running on an HPC resource.
 
 ### Tasks
 
@@ -10,7 +10,7 @@ Tasks are any thing run within simulations.
 
 ### Taskflow
 
-Taskflows are a collection of tasks and jobs which are run for simulations.
+Taskflows are collections of tasks run to orchestrate a given simulation workflow.
 
 ### Workflow
 
@@ -22,15 +22,15 @@ Projects are collections of simulations.
 
 ### Simulations
 
-Simulations are collections of workflows.
+Simulations are collections of taskflows.
 
 ### Clusters
 
-Clusters are any machine that you can run tasks on.
+Clusters are any machine that you can run jobs on.
 
 ### Traditional Clusters
 
-Traditional clusters are physical hardware dedicated to running simulations within the host operating system.
+Traditional cluster are dedicated HPC resources, usually based on physical hardware.
 
 ### AWS Profile
 
@@ -38,7 +38,7 @@ AWS (Amazon Web Services) profiles consist of a Access key and a Secret key with
 
 ### EC2 Instances
 
-EC2 Instances are clusters, or groups of clusters, running in Amazon's EC2 Cloud.
+EC2 Instances are virtual machines running on [Amazon's EC2](https://aws.amazon.com/ec2/).
 
 ### ParaViewWeb
 
@@ -46,8 +46,8 @@ ParaViewWeb is a tool in Paraview which allows a user to use ParaView through a 
 
 ### Simput
 
-A simulation deck input tool. Consult the Simput GitHub repository for more.
+A simulation deck input tool. Consult the [Simput GitHub repository](https://github.com/Kitware/simput) for more.
 
 ### Simulation step
 
-Steps of taskflows. They can have different states aswell. For example many steps have the substeps "Start" which starts a taskflow and "View" which views logs and statuses for the taskflow.
+Simulation steps symbolize different taskflows within a simulation. They can have different states aswell. For example many steps have the substeps "Start" which starts a taskflow and "View" which views logs and statuses for the taskflow.
