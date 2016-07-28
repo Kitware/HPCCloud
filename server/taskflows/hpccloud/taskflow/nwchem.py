@@ -101,7 +101,7 @@ class NwChemTaskFlow(cumulus.taskflow.TaskFlow):
     def delete(self):
         for job in self.get('meta', {}).get('jobs', []):
             job_id = job['_id']
-            client = _create_girder_client(
+            client = create_girder_client(
             self.girder_api_url, self.girder_token)
             client.delete('jobs/%s' % job_id)
 
@@ -111,18 +111,10 @@ class NwChemTaskFlow(cumulus.taskflow.TaskFlow):
                 if e.status != 404:
                     self.logger.error('Unable to delete job: %s' % job_id)
 
-
-# TODO: move to common class
-def _create_girder_client(girder_api_url, girder_token):
-    client = GirderClient(apiUrl=girder_api_url)
-    client.token = girder_token
-
-    return client
-
 @cumulus.taskflow.task
 def nwchem_terminate(task):
     cluster = task.taskflow['meta']['cluster']
-    client = _create_girder_client(
+    client = create_girder_client(
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
     terminate_jobs(
         task, client, cluster, task.taskflow.get('meta', {}).get('jobs', []))
@@ -188,7 +180,7 @@ def setup_input(task, *args, **kwargs):
     number_of_procs = int(number_of_procs)
     kwargs['numberOfProcs']  = number_of_procs
 
-    client = _create_girder_client(
+    client = create_girder_client(
         task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     # Get the geometry file metadata to see if we need to import
@@ -228,7 +220,7 @@ def create_job(task, *args, **kwargs):
         }
     }
 
-    client = _create_girder_client(
+    client = create_girder_client(
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     job = client.post('jobs', data=json.dumps(body))
@@ -278,7 +270,7 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
     task.taskflow.logger.info('Uploading results from cluster')
     output_folder_id = kwargs['output']['folder']['id']
 
-    client = _create_girder_client(
+    client = create_girder_client(
         task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     # Refresh state of job
