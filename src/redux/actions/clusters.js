@@ -79,6 +79,8 @@ function updateTaskflowActionsForClusterEvent(cluster, status) {
     const taskflow = tfMapById[keys[i]];
     if (!taskflow.flow.meta) {
       dispatch(TaskflowActions.fetchTaskflow(taskflow.flow._id));
+    } else {
+      dispatch(TaskflowActions.triggerUpdate(taskflow.flow._id));
     }
   }
 }
@@ -105,7 +107,7 @@ export function getClusterLog(id, offset) {
   };
 }
 
-export function fetchCluster(id) {
+export function fetchCluster(id, taskflowIdToUpdate = '') {
   return dispatch => {
     const action = netActions.addNetworkCall('fetch_cluster', 'Retreive cluster');
     client.getCluster(id)
@@ -113,6 +115,9 @@ export function fetchCluster(id) {
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(addExistingCluster(resp.data));
+          if (taskflowIdToUpdate.length) {
+            dispatch(TaskflowActions.triggerUpdate(taskflowIdToUpdate));
+          }
         },
         err => {
           dispatch(netActions.errorNetworkCall(action.id, err));
