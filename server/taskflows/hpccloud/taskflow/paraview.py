@@ -49,7 +49,10 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
 
     """
 
-    PARAVIEW_AMI = 'ami-0e38c56e'
+    PARAVIEW_IMAGE = {
+        'name': 'PyFR_ParaView-5.0.1',
+        'owner': '695977956746'
+    }
 
     def start(self, *args, **kwargs):
         user = getCurrentUser()
@@ -70,7 +73,7 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
             kwargs['profile'] = profile
 
         kwargs['next'] = create_paraview_job.s()
-        kwargs['ami'] = self.PARAVIEW_AMI
+        kwargs['image_spec'] = self.PARAVIEW_IMAGE
 
         super(ParaViewTaskFlow, self).start(
             setup_cluster.s(self, *args, **kwargs))
@@ -121,15 +124,25 @@ def paraview_terminate(task):
     jobs = task.taskflow.get('meta', {}).get('jobs', [])
     terminate_jobs(task, client, cluster, jobs)
 
-def _update_cluster_config(cluster):
+def _update_cluster_config(task, cluster):
     if cluster['type'] == 'ec2':
         paraview_config = cluster['config'].setdefault('paraview', {})
         paraview_config['installDir'] = '/opt/paraview'
         paraview_config['websocketPort'] = 9000
 
+        # Update ParaView config on cluster
+        client = _create_girder_client(
+            task.taskflow.girder_api_url, task.taskflow.girder_token)
+        client.patch('clusters/%s' % cluster['_id'],
+                     data=json.dumps({
+                        'config': {
+                            'paraview': cluster['config']['paraview']
+                        }
+                    }))
+
 @cumulus.taskflow.task
 def create_paraview_job(task, *args, **kwargs):
-    _update_cluster_config(kwargs['cluster'])
+    _update_cluster_config(task, kwargs['cluster'])
     task.logger.info('Validating args passed to flow.')
     validate_args(kwargs)
     cluster = kwargs.pop('cluster')

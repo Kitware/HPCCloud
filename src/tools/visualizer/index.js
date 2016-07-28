@@ -1,5 +1,6 @@
 import React            from 'react';
 import Toolbar          from '../../panels/Toolbar';
+import LoadingPanel     from '../../panels/LoadingPanel';
 import * as network     from 'pvw-visualizer/src/network';
 import ProxyManager     from 'pvw-visualizer/src/ProxyManager';
 import ControlPanel     from 'pvw-visualizer/src/panels/ControlPanel';
@@ -105,7 +106,7 @@ export default React.createClass({
 
   render() {
     if (!this.proxyManager) {
-      return null;
+      return <LoadingPanel large center />;
     }
 
     return (
