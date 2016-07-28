@@ -131,7 +131,7 @@ def _update_cluster_config(task, cluster):
         paraview_config['websocketPort'] = 9000
 
         # Update ParaView config on cluster
-        client = _create_girder_client(
+        client = create_girder_client(
             task.taskflow.girder_api_url, task.taskflow.girder_token)
         client.patch('clusters/%s' % cluster['_id'],
                      data=json.dumps({
