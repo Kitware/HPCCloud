@@ -12,6 +12,7 @@ export const UPDATE_TASKFLOW_LOG = 'UPDATE_TASKFLOW_LOG';
 export const GET_TASKFLOW_JOB_LOG = 'GET_TASKFLOW_JOB_LOG';
 export const UPDATE_TASKFLOW_JOB_LOG = 'UPDATE_TASKFLOW_JOB_LOG';
 export const UPDATE_TASKFLOW_TASK_LOG = 'UPDATE_TASKFLOW_TASK_LOG';
+export const TRIGGER_UPDATE = 'TRIGGER_UPDATE';
 
 export const UPDATE_TASKFLOW_JOB_STATUS = 'UPDATE_TASKFLOW_JOB_STATUS';
 export const UPDATE_TASKFLOW_TASK_STATUS = 'UPDATE_TASKFLOW_TASK_STATUS';
@@ -39,6 +40,11 @@ export function clearUpdateLog() {
 
 export function updateTaskflowLog(taskflowId, logEntry) {
   return { type: UPDATE_TASKFLOW_LOG, taskflowId, logEntry };
+}
+
+// this is a bit of a "force update" for StateTransitionBehavior
+export function triggerUpdate(taskflowId) {
+  return { type: TRIGGER_UPDATE, taskflowId };
 }
 
 export function getTaskflowLog(taskflowId) {
