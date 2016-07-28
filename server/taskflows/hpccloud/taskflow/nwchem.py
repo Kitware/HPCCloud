@@ -38,7 +38,7 @@ from girder_client import GirderClient, HttpError
 
 from hpccloud.taskflow.utility import *
 
-class NwChemTaskFlow(cumulus.taskflow.TaskFlow):
+class NWChemTaskFlow(cumulus.taskflow.TaskFlow):
     """
     {
         "input": {
@@ -91,7 +91,7 @@ class NwChemTaskFlow(cumulus.taskflow.TaskFlow):
         kwargs['image_spec'] = self.NWCHEM_IMAGE
         kwargs['next'] = setup_input.s()
 
-        super(NwChemTaskFlow, self).start(
+        super(NWChemTaskFlow, self).start(
             setup_cluster.s(
                 self, *args, **kwargs))
 
