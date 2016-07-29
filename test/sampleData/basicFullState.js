@@ -100,10 +100,6 @@ export default {
     },
     "workflowNames": [
       {
-        "value": "CodeSaturn",
-        "label": "Code Saturn"
-      },
-      {
         "value": "PyFr",
         "label": "PyFR"
       },
