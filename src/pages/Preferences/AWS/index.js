@@ -5,13 +5,14 @@ import Toolbar          from '../../../panels/Toolbar';
 import React            from 'react';
 import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
 import { breadcrumb }   from '..';
+import getNetworkError  from '../../../utils/getNetworkError';
 
 import theme from 'HPCCloudStyle/Theme.mcss';
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
-import get          from 'mout/src/object/get';
 import { connect }  from 'react-redux';
 import * as Actions from '../../../redux/actions/aws';
+import * as NetActions from '../../../redux/actions/network';
 import { dispatch } from '../../../redux';
 
 const awsBreadCrumb = Object.assign({}, breadcrumb, { active: 2 });
@@ -38,6 +39,7 @@ const AWSPrefs = React.createClass({
     onAddItem: React.PropTypes.func,
     onRemoveItem: React.PropTypes.func,
     onMount: React.PropTypes.func,
+    invalidateErrors: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -56,6 +58,19 @@ const AWSPrefs = React.createClass({
   componentDidMount() {
     // this doesn't work without setImmediate ?!
     setImmediate(this.props.onMount);
+    this.timeout = null;
+  },
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState._error !== this.state._error) {
+      this.timeout = setTimeout(() => { this.setState({ _error: null }); }, 3000);
+    }
+  },
+
+  componentWillUnmount() {
+    if (this.props.error) {
+      this.props.invalidateErrors();
+    }
   },
 
   changeItem(item) {
@@ -69,6 +84,9 @@ const AWSPrefs = React.createClass({
   },
 
   addItem() {
+    if (this.props.error) {
+      this.props.invalidateErrors();
+    }
     this.setState({ _error: null });
     this.props.onAddItem();
   },
@@ -159,11 +177,17 @@ const AWSPrefs = React.createClass({
 export default connect(
   state => {
     const localState = state.preferences.aws;
+    var error = getNetworkError(state, 'save_aws_profile');
+
+    if (!error) {
+      error = getNetworkError(state, 'remove_aws_profile');
+    }
+
     return {
       active: localState.active,
       list: localState.list,
       buttonsDisabled: localState.pending,
-      error: get(state, 'network.error.save_aws_profile.resp.data.message'),
+      error,
     };
   },
   () => {
@@ -173,6 +197,7 @@ export default connect(
       onAddItem: () => dispatch(Actions.addAWSProfile()),
       onRemoveItem: (index, profile) => dispatch(Actions.removeAWSProfile(index, profile)),
       onMount: () => dispatch(Actions.fetchAWSProfiles()),
+      invalidateErrors: () => dispatch(NetActions.invalidateErrors(['save_aws_profile', 'remove_aws_profile'])),
     };
   }
 )(AWSPrefs);

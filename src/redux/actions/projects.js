@@ -68,7 +68,7 @@ export function fetchProjectList() {
 
 export function deleteProject(project) {
   return dispatch => {
-    const action = netActions.addNetworkCall(`delete_project_${project._id}`, `Delete project ${project.name}`);
+    const action = netActions.addNetworkCall('delete_project', `Delete project ${project.name}`);
 
     client.deleteProject(project._id)
       .then(

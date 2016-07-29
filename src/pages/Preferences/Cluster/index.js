@@ -7,6 +7,7 @@ import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
 import PresetSelector   from '../PresetSelector';
 import React            from 'react';
 import { breadcrumb }   from '..';
+import getNetworkError  from '../../../utils/getNetworkError';
 
 import theme from 'HPCCloudStyle/Theme.mcss';
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
@@ -14,6 +15,7 @@ import style from 'HPCCloudStyle/PageWithMenu.mcss';
 import get          from 'mout/src/object/get';
 import { connect }  from 'react-redux';
 import * as Actions from '../../../redux/actions/clusters';
+import * as NetActions from '../../../redux/actions/network';
 import { dispatch } from '../../../redux';
 
 const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 1 });
@@ -54,6 +56,7 @@ const ClusterPrefs = React.createClass({
     onTestCluster: React.PropTypes.func,
     fetchPresets: React.PropTypes.func,
     fetchClusters: React.PropTypes.func,
+    invalidateErrors: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -74,6 +77,19 @@ const ClusterPrefs = React.createClass({
     if (!this.props.presetNames.length) {
       this.props.fetchPresets();
       this.props.fetchClusters();
+    }
+    this.timeout = null;
+  },
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState._error !== this.state._error) {
+      this.timeout = setTimeout(() => { this.setState({ _error: null }); }, 3000);
+    }
+  },
+
+  componentWillUnmount() {
+    if (this.props.error) {
+      this.props.invalidateErrors();
     }
   },
 
@@ -102,6 +118,9 @@ const ClusterPrefs = React.createClass({
   },
 
   addItem() {
+    if (this.props.error) {
+      this.props.invalidateErrors();
+    }
     this.setState({ _error: null });
     this.props.onAddItem();
   },
@@ -199,12 +218,18 @@ export default connect(
     const localState = state.preferences.clusters;
     const simulations = state.simulations.mapById;
     const taskflows = Object.keys(state.taskflows.mapById).map((tf) => state.taskflows.mapById[tf]);
+
+    var error = getNetworkError(state, 'save_cluster');
+    if (!error) {
+      error = getNetworkError(state, 'remove_cluster');
+    }
+
     return {
       presetNames: Object.keys(localState.presets || {}),
       active: localState.active,
       list: localState.list.filter((el) => el.type === 'trad'),
       buttonsDisabled: localState.pending,
-      error: get(state, 'network.error.save_cluster.resp.data.message'),
+      error,
       taskflows,
       simulations,
     };
@@ -219,6 +244,7 @@ export default connect(
       onTestCluster: (index, cluster) => dispatch(Actions.testCluster(index, cluster)),
       fetchPresets: () => dispatch(Actions.fetchClusterPresets()),
       fetchClusters: () => dispatch(Actions.fetchClusters('trad')),
+      invalidateErrors: () => dispatch(NetActions.invalidateErrors(['save_cluster', 'remove_cluster'])),
     };
   }
 )(ClusterPrefs);
