@@ -24,12 +24,13 @@ export function successNetworkCall(id, resp) {
   return { type: SUCCESS_NETWORK_CALL, id, resp };
 }
 
-export function errorNetworkCall(id, resp) {
-  return { type: ERROR_NETWORK_CALL, id, resp };
-}
-
 export function invalidateError(id) {
   return { type: INVALIDATE_ERROR, id };
+}
+
+export function errorNetworkCall(id, resp) {
+  setTimeout(() => { dispatch(invalidateError(id)); }, 3000);
+  return { type: ERROR_NETWORK_CALL, id, resp };
 }
 
 export function prepareUpload(files) {

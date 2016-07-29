@@ -38,7 +38,7 @@ export default function networkReducer(state = initialState, action) {
 
     case Actions.ERROR_NETWORK_CALL: {
       const pending = Object.assign({}, state.pending);
-      const callToMove = Object.assign({}, pending[action.id], { resp: action.resp });
+      const callToMove = Object.assign({}, pending[action.id], { resp: action.resp, invalid: false });
       const error = Object.assign({}, state.error, { [action.id]: callToMove });
       delete pending[action.id];
 
@@ -49,10 +49,8 @@ export default function networkReducer(state = initialState, action) {
       const id = action.id;
       const error = Object.assign({}, state.error);
 
-      if (error[`delete_project_${id}`].resp.data.message) {
-        error[`delete_project_${id}`].resp.data.invalid = true;
-      } else if (error.save_project.resp.data.message) {
-        error.save_project.resp.data.invalid = true;
+      if (error[id].resp.data.message) {
+        error[id].invalid = true;
       }
 
       return Object.assign({}, state, { error });
