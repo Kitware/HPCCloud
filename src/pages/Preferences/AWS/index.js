@@ -5,11 +5,11 @@ import Toolbar          from '../../../panels/Toolbar';
 import React            from 'react';
 import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
 import { breadcrumb }   from '..';
+import getNetworkError  from '../../../utils/getNetworkError';
 
 import theme from 'HPCCloudStyle/Theme.mcss';
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
-import get          from 'mout/src/object/get';
 import { connect }  from 'react-redux';
 import * as Actions from '../../../redux/actions/aws';
 import { dispatch } from '../../../redux';
@@ -159,11 +159,17 @@ const AWSPrefs = React.createClass({
 export default connect(
   state => {
     const localState = state.preferences.aws;
+    var error = getNetworkError(state, 'save_aws_profile');
+
+    if (!error) {
+      error = getNetworkError(state, 'remove_aws_profile');
+    }
+
     return {
       active: localState.active,
       list: localState.list,
       buttonsDisabled: localState.pending,
-      error: get(state, 'network.error.save_aws_profile.resp.data.message'),
+      error,
     };
   },
   () => {
