@@ -12,6 +12,7 @@ import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
 import { connect }  from 'react-redux';
 import * as Actions from '../../../redux/actions/aws';
+import * as NetActions from '../../../redux/actions/network';
 import { dispatch } from '../../../redux';
 
 const awsBreadCrumb = Object.assign({}, breadcrumb, { active: 2 });
@@ -38,6 +39,7 @@ const AWSPrefs = React.createClass({
     onAddItem: React.PropTypes.func,
     onRemoveItem: React.PropTypes.func,
     onMount: React.PropTypes.func,
+    invalidateErrors: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -56,6 +58,19 @@ const AWSPrefs = React.createClass({
   componentDidMount() {
     // this doesn't work without setImmediate ?!
     setImmediate(this.props.onMount);
+    this.timeout = null;
+  },
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState._error !== this.state._error) {
+      this.timeout = setTimeout(() => { this.setState({ _error: null }); }, 3000);
+    }
+  },
+
+  componentWillUnmount() {
+    if (this.props.error) {
+      this.props.invalidateErrors();
+    }
   },
 
   changeItem(item) {
@@ -69,6 +84,9 @@ const AWSPrefs = React.createClass({
   },
 
   addItem() {
+    if (this.props.error) {
+      this.props.invalidateErrors();
+    }
     this.setState({ _error: null });
     this.props.onAddItem();
   },
@@ -179,6 +197,7 @@ export default connect(
       onAddItem: () => dispatch(Actions.addAWSProfile()),
       onRemoveItem: (index, profile) => dispatch(Actions.removeAWSProfile(index, profile)),
       onMount: () => dispatch(Actions.fetchAWSProfiles()),
+      invalidateErrors: () => dispatch(NetActions.invalidateErrors(['save_aws_profile', 'remove_aws_profile'])),
     };
   }
 )(AWSPrefs);
