@@ -5,6 +5,7 @@ const initialState = {
   success: {},
   error: {},
   backlog: [],
+  errorTimeout: null,
   progress: {},
   progressReset: false,
 };
@@ -42,7 +43,11 @@ export default function networkReducer(state = initialState, action) {
       const error = Object.assign({}, state.error, { [action.id]: callToMove });
       delete pending[action.id];
 
-      return Object.assign({}, state, { pending, error });
+      if (action.errorTimeout && state.errorTimeout !== null) {
+        clearTimeout(state.errorTimeout);
+      }
+
+      return Object.assign({}, state, { pending, error, errorTimeout: action.errorTimeout });
     }
 
     case Actions.INVALIDATE_ERROR: {
@@ -52,6 +57,19 @@ export default function networkReducer(state = initialState, action) {
       if (error[id].resp.data.message) {
         error[id].invalid = true;
       }
+
+      return Object.assign({}, state, { error, errorTimeout: null });
+    }
+
+    case Actions.INVALIDATE_ERRORS: {
+      const ids = action.ids;
+      const error = Object.assign({}, state.error);
+
+      ids.forEach((id) => {
+        if (error[id]) {
+          error[id].invalid = true;
+        }
+      });
 
       return Object.assign({}, state, { error });
     }

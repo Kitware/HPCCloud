@@ -29,10 +29,18 @@ const ProjectNew = React.createClass({
     };
   },
 
+  componentDidMount() {
+    this.timeout = null;
+  },
+
   componentDidUpdate(prevProps, prevState) {
     if (prevState._error !== this.state._error) {
-      setTimeout(() => { this.setState({ _error: null }); }, 3000);
+      this.timeout = setTimeout(() => { this.setState({ _error: null }); }, 3000);
     }
+  },
+
+  componentWillUnmount() {
+    clearTimeout(this.timeout);
   },
 
   onAction(action, data, attachments) {
