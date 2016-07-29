@@ -13,7 +13,7 @@ export default React.createClass({
     filter: React.PropTypes.bool,
     location: React.PropTypes.object,
     onAction: React.PropTypes.func,
-    title: React.PropTypes.string,
+    title: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.object]),
   },
 
   contextTypes: {

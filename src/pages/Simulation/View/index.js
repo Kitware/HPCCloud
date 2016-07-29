@@ -2,6 +2,11 @@ import React     from 'react';
 import Workflows from '../../../workflows';
 import tools     from  '../../../tools';
 import LoadingPanel from '../../../panels/LoadingPanel';
+import Toolbar      from '../../../panels/Toolbar';
+import { ProjectHelper } from '../../../utils/AccessHelper';
+import { primaryBreadCrumbs } from '../../../utils/Constants';
+
+import style            from 'HPCCloudStyle/PageWithMenu.mcss';
 
 import { connect } from 'react-redux';
 import { dispatch } from '../../../redux';
@@ -61,16 +66,24 @@ const SimulationView = React.createClass({
 
     if (ChildComponent) {
       return (
-        <ChildComponent
-          project={project}
-          simulation={simulation}
-          step={step}
-          view={view}
-          taskFlowName={taskFlowName}
-          primaryJob={primaryJob}
-          location={this.props.location}
-          module={wfModule}
-        />);
+        <div className={ style.rootContainer }>
+          <Toolbar
+            breadcrumb={primaryBreadCrumbs(this.props.project._id, this.props.simulation._id)}
+            title={ <span> <img src={ProjectHelper.getIcon(this.props.project).image} height="20px" />
+              &nbsp;{this.props.project.name} / {this.props.simulation.name}
+              </span> }
+          />
+          <ChildComponent
+            project={project}
+            simulation={simulation}
+            step={step}
+            view={view}
+            taskFlowName={taskFlowName}
+            primaryJob={primaryJob}
+            location={this.props.location}
+            module={wfModule}
+          />
+        </div>);
     }
 
     return <center>No simulation view for simulation of type {project.type}.</center>;

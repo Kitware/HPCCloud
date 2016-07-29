@@ -26,7 +26,7 @@ export default React.createClass({
     items: React.PropTypes.array,
     location: React.PropTypes.object,
     onAction: React.PropTypes.func,
-    title: React.PropTypes.string,
+    title: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.object]),
     placeholder: React.PropTypes.object,
   },
 
