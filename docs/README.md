@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [Introduction](introduction.md)
 - [Getting Started](getting-started.md)
 - [Glossary](glossary.md)
 - Usage
