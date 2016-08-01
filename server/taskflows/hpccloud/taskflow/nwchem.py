@@ -30,6 +30,8 @@ from cumulus.tasks.job import download_job_input_folders, submit_job
 from cumulus.tasks.job import monitor_job, monitor_jobs
 from cumulus.tasks.job import upload_job_output_to_folder
 from cumulus.tasks.job import terminate_job
+from cumulus.tasks.job import job_directory
+from cumulus.transport import get_connection
 from cumulus.transport.files.download import download_path_from_cluster
 from girder.utility.model_importer import ModelImporter
 from girder.api.rest import getCurrentUser
@@ -119,42 +121,12 @@ def nwchem_terminate(task):
     terminate_jobs(
         task, client, cluster, task.taskflow.get('meta', {}).get('jobs', []))
 
-def update_config_file(task, client, *args, **kwargs):
-
-    ini_file_id = kwargs['input']['nwFile']['id']
-
-    _, path = tempfile.mkstemp()
-    fileContents = ''
-
-    task.logger.info('Downloading configuration file.')
-    try:
-        with open(path, 'w') as fp:
-            client.downloadFile(ini_file_id, path)
-
-        with open(path, 'r') as fp:
-            for line in fp.readlines():
-                if 'load' in line:
-                    task.logger.info('Expanding path to geometry files.')
-                    # Find the geometry file and check for input in file path
-                    for w in line.split():
-                        (filePath, fileExt) = os.path.splitext(w)
-                        if fileExt == '.xyz' or fileExt == '.pdb':
-                            (fileDir, fileName) = os.path.split(w)
-                            if (not fileDir.startswith('input')):
-                                newPath = 'input' + os.sep + filePath
-                                line = line.replace(filePath, newPath, 1)
-                fileContents += line
-
-        with open(path, 'w') as fp:
-            fp.write(fileContents)
-
-        task.logger.info('Uploading updated configuration file.')
-
-        with open(path, 'r') as fp:
-            client.uploadFileContents(ini_file_id, fp, os.path.getsize(path))
-
-    finally:
-        os.remove(path)
+def create_geometry_symlink(task, job, cluster, fileName):
+    job_dir = job_directory(cluster, job)
+    filePath = '%s/%s/%s' % (job_dir, job['input'][0]['path'], fileName)
+    linkPath = '%s/%s' % (job_dir, fileName)
+    with get_connection(task.taskflow.girder_token, cluster) as conn:
+        conn.execute('ln -s %s %s' % (filePath, linkPath))
 
 @cumulus.taskflow.task
 def setup_input(task, *args, **kwargs):
@@ -186,8 +158,6 @@ def setup_input(task, *args, **kwargs):
     # Get the geometry file metadata to see if we need to import
     geometry_file = client.getResource('file/%s' % geometry_file_id)
     kwargs['geometryFilename'] = geometry_file['name']
-
-    update_config_file(task, client, *args, **kwargs)
 
     ini_file_id = kwargs['input']['nwFile']['id']
     ini_file = client.getResource('file/%s' % ini_file_id)
@@ -240,6 +210,7 @@ def submit(task, job, *args, **kwargs):
     task.logger.info('Uploading input files to cluster.')
     download_job_input_folders(cluster, job, log_write_url=None,
                         girder_token=girder_token, submit=False)
+    create_geometry_symlink(task, job, cluster, kwargs['geometryFilename'])
     task.logger.info('Uploading complete.')
 
     submit_nwchem_job.delay(cluster, job, *args, **kwargs)
