@@ -1,4 +1,4 @@
-# Running Taskflows and Simulations
+# Running simulation workflows
 
 For this example we're going to run a basic PyFR simulation. There are sample files for this simulation in the PyFR repository [the input](https://raw.githubusercontent.com/vincentlab/PyFR/develop/examples/euler_vortex_2d/euler_vortex_2d.ini) and [the mesh](https://raw.githubusercontent.com/vincentlab/PyFR/develop/examples/euler_vortex_2d/euler_vortex_2d.msh). (If you're reading this on the web you can right click those links and "Save Link as..." to quickly download them) 
 
