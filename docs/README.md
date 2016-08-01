@@ -11,4 +11,4 @@
 - Development
   - [Introduction](development/README.md)
   - [Panels](development/panels.md)
-  - [Adding new workflows](/development/workflows.md)
+  - [Adding new workflows](development/workflows.md)
