@@ -1,9 +1,9 @@
-# HPC Cloud #
+# HPC Cloud
 
 [![codecov.io](https://codecov.io/github/Kitware/HPCCloud/coverage.svg?branch=master)](https://codecov.io/github/Kitware/HPCCloud?branch=master)
 [![Build Status](https://travis-ci.org/Kitware/HPCCloud.svg?branch=master)](https://travis-ci.org/Kitware/HPCCloud)
 
-### Goal ###
+### Goal
 
 Web interface to the HPCCloud infrastructure that abstract simulation
 environment and resources on which you can run those simulations.
@@ -47,7 +47,7 @@ getting started guide, advanced documentation, and API descriptions.
 
 #### Licensing
 
-**HPCCloud**  is licensed under [Apache 2](LICENSE).
+**HPCCloud** is licensed under [Apache 2](LICENSE).
 
 #### Getting Involved
 

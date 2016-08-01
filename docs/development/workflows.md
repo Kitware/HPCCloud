@@ -28,7 +28,7 @@ export default {
   },
 ```
 
-In the `components` object, `NewSimulation` is a view which goes below the "Name" and "Description" fields in a new simulaiton view. They're often where you'll see file upload inputs. `ViewSimulation` is the root component for containing the workflow. It's usually an `ActiveList` panel with the Workflow's steps and the views corresponding to the Workflow step.
+In the `components` object, `NewSimulation` is a view which goes below the "Name" and "Description" fields in a new simulation view. They're often where you'll see file upload inputs. `ViewSimulation` is the root component for containing the workflow. It's usually an `ActiveList` panel with the Workflow's steps and the views corresponding to the Workflow step.
 
 `logo` it not required but helps visually distinguish projects in the projects list.
 
