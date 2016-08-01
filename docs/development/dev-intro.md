@@ -11,7 +11,7 @@ HPC-Cloud relies heavily on these libaries:
 - [Axios](https://github.com/mzabriskie/axios): Network call library
 - [FontAwesome](http://fontawesome.io/): Icons
 
-In the `/src` folder there are several folders: 
+In the `/src` folder there are several folders:
 - `config`: react-router routes config
 - `network`: network stack
 - `pages`: app pages for react-router, each folder is a mapped to a route in [`config/routes.js`](../src/config/routes.js). e.g. `/pages/Simulation/View` maps to `[hostname]/view/simulation/[some simulation id]`
@@ -22,7 +22,7 @@ In the `/src` folder there are several folders:
 - `widgets`: similar to panels but more simple
 - `workflows`: simultion workflows
 
-To get started with development on the front end, in your HPC-Cloud directory run: 
+To get started with development on the front end, in your HPC-Cloud directory run:
 
 ```
 # installs dependancies
@@ -34,7 +34,7 @@ npm start
 
 ## Dev tools
 
-HPC-Cloud is written in ES6 it's transpiled into ES5 with Babel. 
+HPC-Cloud is written in ES6 it's transpiled into ES5 with Babel.
 
 - [Webpack](https://webpack.github.io/) and several loaders for building.
 - [Babel](https://babeljs.io/): ES6 Transpiler
@@ -58,7 +58,7 @@ ESLint ensures that code style is followed and adhered to, we're extending [Airb
 For a full overview of testing consult [/test/README.md](../test/README.md).
 
 - [Karma](https://karma-runner.github.io/0.13/index.html): with [karma-webpack](https://github.com/webpack/karma-webpack) and [istanbul-instrumenter](https://github.com/deepsweet/istanbul-instrumenter-loader) - test runner, transpiles tests with a webpack extension.
-- [Jasmine](http://jasmine.github.io/2.4/introduction.html) - test framework 
+- [Jasmine](http://jasmine.github.io/2.4/introduction.html) - test framework
 - [expect](https://github.com/mjackson/expect) - assertion library
 - [PhantomJS](http://phantomjs.org/) - headless webkit environment for testing in
 - [babel-polyfill](https://github.com/babel/babel/tree/master/packages/babel-polyfill) - PhantomJS has no Promise object, so we supplement it with this.

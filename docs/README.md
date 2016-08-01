@@ -8,7 +8,6 @@
   - [Creating projects and simulations](usage/creating.md)
   - [Running jobs and simulations](usage/running.md)
 - Development
-  - [Introduction](dev-intro.md)
-  - [Adding new workflows](#)
-    - [steps](#)
-    - [substeps](#)
+  - [Introduction](development/README.md)
+  - [Panels](development/panels.md)
+  - [Adding new workflows](/development/workflows.md)
