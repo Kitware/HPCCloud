@@ -3,7 +3,6 @@ import ButtonBar               from '../../../../../../panels/ButtonBar';
 import defaultServerParameters from '../../../../../../panels/run/defaults';
 import RunClusterFrom          from '../../../../../../panels/run';
 import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
-import RuntimeBackend          from '../../../panels/RuntimeBackend';
 
 import merge                   from 'mout/src/object/merge';
 
@@ -14,7 +13,7 @@ import * as Actions from '../../../../../../redux/actions/taskflows';
 
 const SimulationStart = React.createClass({
 
-  displayName: 'pyfr/common/steps/Simulation/Start',
+  displayName: 'nwchem/common/steps/Simulation/Start',
 
   propTypes: {
     location: React.PropTypes.object,
@@ -49,7 +48,7 @@ const SimulationStart = React.createClass({
   },
 
   runSimulation() {
-    const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
+    const nwFile = this.props.simulation.metadata.inputFolder.files.nw || this.props.project.metadata.inputFolder.files.nw;
     var sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
       payload = {
         backend: this.state.backend,
@@ -57,11 +56,11 @@ const SimulationStart = React.createClass({
           folder: {
             id: this.props.simulation.metadata.inputFolder._id,
           },
-          meshFile: {
-            id: meshFile,
+          geometryFile: {
+            id: this.props.simulation.metadata.inputFolder.files.geometry,
           },
-          iniFile: {
-            id: this.props.simulation.metadata.inputFolder.files.ini,
+          nwFile: {
+            id: nwFile,
           },
         },
         output: {
@@ -94,6 +93,7 @@ const SimulationStart = React.createClass({
       console.log('unrecognized serverType: ', this.state.serverType);
       return;
     }
+
     this.props.onRun(
       this.props.taskFlowName,
       this.props.primaryJob,
@@ -130,30 +130,15 @@ const SimulationStart = React.createClass({
     this.setState({ backend });
   },
 
-  clusterFilter(cluster) {
-    return 'config' in cluster && 'pyfr' in cluster.config &&
-      (('cuda' in cluster.config.pyfr && cluster.config.pyfr.cuda) ||
-      ('opencl' in cluster.config.pyfr && cluster.config.pyfr.opencl.length > 0) ||
-      ('openmp' in cluster.config.pyfr && cluster.config.pyfr.openmp.length > 0));
-  },
-
   render() {
     var actions = [{ name: 'runSimulation', label: 'Run Simulation', icon: '' }],
-      serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional },
-      backendProfiles = { cuda: false, openmp: [], opencl: [] };
-    if (this.state.serverType === 'Traditional') {
-      const clusterId = this.state.Traditional.profile;
-      if (this.props.clusters[clusterId] && this.props.clusters[clusterId].config && this.props.clusters[clusterId].config.pyfr) {
-        backendProfiles = this.props.clusters[clusterId].config.pyfr;
-      }
-    }
+      serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional, OpenStack: this.state.OpenStack };
 
     return (
       <div>
           <RunClusterFrom serverType={this.state.serverType} serverTypeChange={this.updateServerType}
-            profiles={serverProfiles} dataChange={this.dataChange} clusterFilter={this.clusterFilter}
+            profiles={serverProfiles} dataChange={this.dataChange}
           />
-          <RuntimeBackend profiles={backendProfiles} onChange={ this.updateBackend } visible={this.state.serverType === 'Traditional'} />
           <ButtonBar
             visible={this.state[this.state.serverType].profile !== ''}
             onAction={this.formAction}
