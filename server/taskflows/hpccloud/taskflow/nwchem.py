@@ -176,7 +176,7 @@ def create_job(task, *args, **kwargs):
     body = {
         'name': 'nwchem_run',
         'commands': [
-            "mpirun -n %s nwchem input/%s" % (
+            "mpiexec -n %s nwchem input/%s" % (
                 kwargs['numberOfProcs'],
                 kwargs['nwFilename'])
         ],

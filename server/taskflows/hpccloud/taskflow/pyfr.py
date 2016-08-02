@@ -351,7 +351,7 @@ def create_job(task, *args, **kwargs):
     body = {
         'name': 'pyfr_run',
         'commands': [
-            "mpirun -n %s pyfr run -b %s input/%s input/%s" % (
+            "mpiexec -n %s pyfr run -b %s input/%s input/%s" % (
                 kwargs['numberOfProcs'],
                 backend,
                 kwargs['meshFilename'],
