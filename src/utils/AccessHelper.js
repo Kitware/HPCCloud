@@ -49,8 +49,8 @@ const projectFunctions = {
   },
 
   getSimulationCount(project) {
-    // return `${Math.floor(Math.random() * 10)} simulations`;
-    return `${project.metadata.simulations || 0} simulations`;
+    const count = project.metadata.simulationCount || 0;
+    return `${count} ${count === 1 ? 'simulation' : 'simulations'}`;
   },
 
   getActions(project) {
