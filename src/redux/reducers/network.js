@@ -5,6 +5,7 @@ const initialState = {
   success: {},
   error: {},
   backlog: [],
+  errorTimeout: null,
   progress: {},
   progressReset: false,
 };
@@ -38,22 +39,37 @@ export default function networkReducer(state = initialState, action) {
 
     case Actions.ERROR_NETWORK_CALL: {
       const pending = Object.assign({}, state.pending);
-      const callToMove = Object.assign({}, pending[action.id], { resp: action.resp });
+      const callToMove = Object.assign({}, pending[action.id], { resp: action.resp, invalid: false });
       const error = Object.assign({}, state.error, { [action.id]: callToMove });
       delete pending[action.id];
 
-      return Object.assign({}, state, { pending, error });
+      if (action.errorTimeout && state.errorTimeout !== null) {
+        clearTimeout(state.errorTimeout);
+      }
+
+      return Object.assign({}, state, { pending, error, errorTimeout: action.errorTimeout });
     }
 
     case Actions.INVALIDATE_ERROR: {
       const id = action.id;
       const error = Object.assign({}, state.error);
 
-      if (error[`delete_project_${id}`].resp.data.message) {
-        error[`delete_project_${id}`].resp.data.invalid = true;
-      } else if (error.save_project.resp.data.message) {
-        error.save_project.resp.data.invalid = true;
+      if (error[id].resp.data.message) {
+        error[id].invalid = true;
       }
+
+      return Object.assign({}, state, { error, errorTimeout: null });
+    }
+
+    case Actions.INVALIDATE_ERRORS: {
+      const ids = action.ids;
+      const error = Object.assign({}, state.error);
+
+      ids.forEach((id) => {
+        if (error[id]) {
+          error[id].invalid = true;
+        }
+      });
 
       return Object.assign({}, state, { error });
     }

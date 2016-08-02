@@ -3,10 +3,6 @@
 // not interested in testing here. So, we resolve 'workflows' to this file when testing.
 module.exports.workflowNames = [
   {
-    value: 'CodeSaturn',
-    label: 'Code Saturn',
-  },
-  {
     value: 'PyFr',
     label: 'PyFR',
   },
