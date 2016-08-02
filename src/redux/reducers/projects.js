@@ -30,6 +30,14 @@ export default function projectsReducer(state = initialState, action) {
 
     case Actions.UPDATE_PROJECT_SIMULATIONS: {
       const id = action.id;
+      const mapById = Object.assign({}, state.mapById);
+      const project = Object.assign({}, mapById[id]);
+      const projMeta = Object.assign({}, project.metadata);
+
+      projMeta.simulationCount = Object.keys(action.simulations).length;
+      project.metadata = projMeta;
+      mapById[id] = project;
+
       const simulations = Object.assign({}, state.simulations);
       const sim = simulations[id] || Helper.initialState;
       simulations[id] = Helper.updateList(sim, action.simulations);
@@ -44,7 +52,7 @@ export default function projectsReducer(state = initialState, action) {
         return Object.assign({}, coreState, { simulations });
       }
 
-      return Object.assign({}, state, { simulations });
+      return Object.assign({}, state, { simulations, mapById });
     }
 
     case Actions.REMOVE_SIMULATION: {
@@ -56,7 +64,15 @@ export default function projectsReducer(state = initialState, action) {
       // Simulation map is kept somewhere else
       delete simulations[id].mapById;
 
-      return Object.assign({}, state, { simulations });
+      const mapById = Object.assign({}, state.mapById);
+      const project = Object.assign({}, state.mapById[id]);
+      const pMeta = Object.assign({}, project.metadata);
+
+      pMeta.simulationCount -= 1;
+      project.metadata = pMeta;
+      mapById[id] = project;
+
+      return Object.assign({}, state, { simulations, mapById });
     }
 
     case Actions.UPDATE_ACTIVE_SIMULATION: {
@@ -76,8 +92,7 @@ export default function projectsReducer(state = initialState, action) {
 
     case Actions.UPDATE_SIMULATION: {
       const id = action.simulation.projectId;
-      const projects = Object.assign({}, state);
-      const pMap = Object.assign({}, state.mapById);
+      const mapById = Object.assign({}, state.mapById);
       const project = Object.assign({}, state.mapById[id]);
       const pMeta = Object.assign({}, project.metadata);
 
@@ -85,15 +100,14 @@ export default function projectsReducer(state = initialState, action) {
       const sims = simulations[id] || Helper.initialState;
       simulations[id] = Helper.updateItem(sims, action.simulation);
 
-      pMeta.simulations = projects.simulations[id].list.length;
+      pMeta.simulationCount = simulations[id].list.length;
       project.metadata = pMeta;
-      pMap[id] = project;
-      projects.mapById = pMap;
+      mapById[id] = project;
 
       // Simulation map is kept somewhere else
       delete simulations[id].mapById;
 
-      return Object.assign({}, state, { simulations, projects });
+      return Object.assign({}, state, { simulations, mapById });
     }
 
     default:
