@@ -1,0 +1,29 @@
+.ToastContainer {
+  composes: errorBox from 'HPCCloudStyle/Theme.mcss';
+  position: absolute;
+  width: 100%;
+  top: calc(100vh - 48px);
+  height: 40px;
+  margin: 0 auto;
+  padding: 9px 18px;
+  font-size: 1.1em;
+  border-radius: 0;
+}
+
+.ToastClearButton {
+  height: 30px;
+  width: 30px;
+  position: absolute;
+  right: 10px;
+  margin-top: -5px;
+  border: 1px solid #c98a88;
+  border-radius: 6px;
+  background-color: transparent;
+}
+
+.CloseIcon {
+  composes: fa    from 'font-awesome/css/font-awesome.css';
+  composes: fa-fw from 'font-awesome/css/font-awesome.css';
+  composes: fa-close from 'font-awesome/css/font-awesome.css';
+  margin-left: -2px;
+}
