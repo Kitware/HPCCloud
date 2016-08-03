@@ -34,7 +34,7 @@ from girder_client import GirderClient, HttpError
 
 from hpccloud.taskflow.utility import *
 
-class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
+class ParaViewTaskFlow(cumulus.taskflow.ClusterProvisioningTaskFlow):
     """
     {
         "dataDir": <passed to --data-dir,

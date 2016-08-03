@@ -40,7 +40,7 @@ from girder_client import GirderClient, HttpError
 
 from hpccloud.taskflow.utility import *
 
-class NWChemTaskFlow(cumulus.taskflow.TaskFlow):
+class NWChemTaskFlow(cumulus.taskflow.ClusterProvisioningTaskFlow):
     """
     {
         "input": {
