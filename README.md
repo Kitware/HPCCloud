@@ -40,17 +40,15 @@ $ sudo service celeryd restart
 
 ## Documentation
 
-FIXME: Not yet available
+See the [documentation](docs/README.md) in this repository for a
+getting started guide, advanced documentation, and workflow descriptions.
 
-See the [documentation](https://kitware.github.io/hpc-cloud) for a
-getting started guide, advanced documentation, and API descriptions.
-
-#### Licensing
+## Licensing
 
 **HPCCloud** is licensed under [Apache 2](LICENSE).
 
-#### Getting Involved
+## Getting Involved
 
 Fork our repository and do great things. At [Kitware](http://www.kitware.com),
-we've been contributing to open-source software for 15 years and counting, and
+we've been contributing to open-source software for 15 years and counting, and we
 want to make **hpc-cloud** useful to as many people as possible.
