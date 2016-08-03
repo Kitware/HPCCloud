@@ -33,6 +33,12 @@ export default React.createClass({
     this.updateState();
   },
 
+  componentWillUnmount() {
+    this.dataChange({
+      currentTarget: { dataset: { key: 'name' } },
+      target: { value: '' } });
+  },
+
   updateState() {
     this.setState({ busy: true });
     let newState;
