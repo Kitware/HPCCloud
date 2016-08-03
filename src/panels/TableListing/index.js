@@ -1,8 +1,6 @@
 import React            from 'react';
 import Toolbar          from '../../panels/Toolbar';
-import ImageIcon        from '../../widgets/ImageIcon';
 import merge            from 'mout/src/object/merge';
-import IconActionList   from '../../panels/IconActionList';
 
 // Styles
 import style from 'HPCCloudStyle/TableListing.mcss';
@@ -119,29 +117,22 @@ export default React.createClass({
         <table className={ style.table }>
           <thead>
               <tr>
-                  <th></th>
-                  <th>Name</th>
-                  <th>Description</th>
-                  <th>Created</th>
-                  <th>Updated</th>
-                  <th></th>
+                  {helper.columns.map((title, index) => (
+                    <th key={`${title}_${index}`}>{title}</th>
+                    ))}
               </tr>
           </thead>
           <tbody>
             { filteredList.map((item, index) =>
-              <tr key={ `${item._id}_${index}` } data-link={ helper.getViewLink(item) } data-index={ index }
+              <tr key={ `${item._id}_${index}` } data-link={ helper.viewLink(item) } data-index={ index }
                 className={this.state.selected.indexOf(index) !== -1 ? style.selected : ''}
               >
-                <td onClick={ this.itemClicked } >
-                  <ImageIcon data={ helper.getIcon(item) } />
-                </td>
-                <td onClick={ this.itemClicked } >{ helper.getName(item) }</td>
-                <td onClick={ this.itemClicked } title={ helper.getDescription(item) }>{ helper.getDescription(item, true) }</td>
-                <td onClick={ this.itemClicked } title={helper.getCreationDate(item)}>{ helper.getCreationDate(item, true) }</td>
-                <td onClick={ this.itemClicked } title={helper.getUpdateDate(item)}>{ helper.getUpdateDate(item, true) }</td>
-                <td>
-                  <IconActionList actions={ helper.getActions(item) } onAction={ this.lineAction } />
-                </td>
+                { helper.cellContentFunctions.map((func, idx) => (
+                  <td key={ `${item._id}_${idx}` } onClick={ this.itemClicked }>
+                    {func(item)}
+                  </td>
+                )) }
+                <td>{ helper.actionItem ? helper.actionItem(item, this.lineAction) : null }</td>
               </tr>
             )}
           </tbody>
