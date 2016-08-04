@@ -1,6 +1,6 @@
 import * as Actions from '../actions/network';
 
-const initialState = {
+export const initialState = {
   pending: {},
   success: {},
   error: {},
@@ -70,6 +70,10 @@ export default function networkReducer(state = initialState, action) {
         error[id].invalid = true;
       }
 
+      if (state.errorTimeout !== null) {
+        clearTimeout(state.errorTimeout);
+      }
+
       activeErrors[errType] = state.activeErrors[errType];
       activeErrors[errType].splice(activeErrors[errType].indexOf(id), 1);
 
@@ -86,7 +90,7 @@ export default function networkReducer(state = initialState, action) {
           error[key].invalid = true;
         });
         activeErrors.application = [];
-        activeErrors.formErrors = [];
+        activeErrors.form = [];
       } else {
         ids.forEach((id) => {
           if (error[id]) {
@@ -96,7 +100,11 @@ export default function networkReducer(state = initialState, action) {
         activeErrors[errType] = [];
       }
 
-      return Object.assign({}, state, { error, activeErrors });
+      if (state.errorTimeout !== null) {
+        clearTimeout(state.errorTimeout);
+      }
+
+      return Object.assign({}, state, { error, activeErrors, errorTimeout: null });
     }
 
     case Actions.PREPARE_UPLOAD: {

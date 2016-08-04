@@ -23,6 +23,5 @@ export default function getNetworkError(state, id) {
   if (Array.isArray(id)) {
     return getNetworkErrorWithArray(state, id);
   }
-
   return getNetworkErrorWithId(state, id);
 }
