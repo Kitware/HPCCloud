@@ -7,8 +7,8 @@ import RuntimeBackend          from '../../../panels/RuntimeBackend';
 
 import merge                   from 'mout/src/object/merge';
 
+import getNetworkError  from '../../../../../../utils/getNetworkError';
 import { connect } from 'react-redux';
-import get          from 'mout/src/object/get';
 import { dispatch } from '../../../../../../redux';
 import * as Actions from '../../../../../../redux/actions/taskflows';
 
@@ -188,8 +188,7 @@ const SimulationStart = React.createClass({
 export default connect(
   state => {
     return {
-      error: get(state, 'network.error.create_taskflow.resp.data.message')
-        || get(state, 'network.error.start_taskflow.resp.data.message'),
+      error: getNetworkError(state, ['create_taskflow', 'start_taskflow']),
       clusters: state.preferences.clusters.mapById,
     };
   },

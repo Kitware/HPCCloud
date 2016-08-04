@@ -25,18 +25,18 @@ export function successNetworkCall(id, resp) {
   return { type: SUCCESS_NETWORK_CALL, id, resp };
 }
 
-export function invalidateError(id) {
-  return { type: INVALIDATE_ERROR, id };
+export function invalidateError(id, errType = 'application') {
+  return { type: INVALIDATE_ERROR, id, errType };
 }
 
 // takes an array of ids which the reducer then invalidates all of
-export function invalidateErrors(ids) {
-  return { type: INVALIDATE_ERRORS, ids };
+export function invalidateErrors(ids, errType = 'application') {
+  return { type: INVALIDATE_ERRORS, ids, errType };
 }
 
-export function errorNetworkCall(id, resp) {
+export function errorNetworkCall(id, resp, errType = 'application') {
   var errorTimeout = setTimeout(() => { dispatch(invalidateError(id)); }, 3000);
-  return { type: ERROR_NETWORK_CALL, id, resp, errorTimeout };
+  return { type: ERROR_NETWORK_CALL, id, resp, errorTimeout, errType };
 }
 
 export function prepareUpload(files) {

@@ -75,15 +75,9 @@ const ProjectEdit = React.createClass({
 
 export default connect(
   (state, props) => {
-    var error = getNetworkError(state, 'save_project');
-
-    if (!error) {
-      error = getNetworkError(state, 'delete_project');
-    }
-
     return {
       project: state.projects.mapById[props.params.id],
-      error,
+      error: getNetworkError(state, ['save_project', 'delete_project']),
     };
   },
   () => {

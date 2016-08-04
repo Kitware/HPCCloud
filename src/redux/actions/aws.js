@@ -63,7 +63,7 @@ export function removeAWSProfile(index, profile) {
           dispatch(fetchAWSProfiles());
         },
         err => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
           dispatch(pendingNetworkCall(false));
         });
 
@@ -86,7 +86,7 @@ export function updateAWSProfile(index, profile, pushToServer = false) {
           dispatch(fetchAWSProfiles());
         },
         err => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
           dispatch(pendingNetworkCall(false));
         });
     return action;
