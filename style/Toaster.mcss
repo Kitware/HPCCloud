@@ -8,6 +8,8 @@
   padding: 9px 18px;
   font-size: 1.1em;
   border-radius: 0;
+  opacity: 1;
+  transition: opacity 0.20s linear; /* fade in */
 }
 
 .ToastClearButton {
@@ -19,6 +21,11 @@
   border: 1px solid #c98a88;
   border-radius: 6px;
   background-color: transparent;
+}
+
+.isHidden {
+  opacity: 0;
+  transition: opacity 1s ease; /* fade out */
 }
 
 .CloseIcon {

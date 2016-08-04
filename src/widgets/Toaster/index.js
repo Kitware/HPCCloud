@@ -1,7 +1,6 @@
 import React from 'react';
 
 import style from 'HPCCloudStyle/Toaster.mcss';
-import states from 'HPCCloudStyle/States.mcss';
 
 import { connect }  from 'react-redux';
 import { dispatch } from '../../redux';
@@ -28,7 +27,7 @@ const ToastComponent = React.createClass({
   },
 
   render() {
-    return (<div className={[style.ToastContainer, (this.props.errorId ? '' : states.isHidden)].join(' ')}>
+    return (<div className={[style.ToastContainer, (this.props.errorId ? '' : style.isHidden)].join(' ')}>
         { this.props.message }
         <button className={style.ToastClearButton} onClick={ this.close }>
           <span className={style.CloseIcon}></span>

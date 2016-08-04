@@ -42,8 +42,13 @@ export default function networkReducer(state = initialState, action) {
       const pending = Object.assign({}, state.pending);
       const callToMove = Object.assign({}, pending[action.id], { resp: action.resp, invalid: false });
       const error = Object.assign({}, state.error, { [action.id]: callToMove });
-      const activeErrors = [action.id].concat(state.activeErrors);
+      const activeErrors = [].concat(state.activeErrors);
       delete pending[action.id];
+
+      // no dublicate errors
+      if (activeErrors.indexOf(action.id) === -1) {
+        activeErrors.unshift(action.id);
+      }
 
       if (action.errorTimeout && state.errorTimeout !== null) {
         clearTimeout(state.errorTimeout);
