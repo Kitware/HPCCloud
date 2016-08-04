@@ -2,8 +2,8 @@
   composes: errorBox from 'HPCCloudStyle/Theme.mcss';
   position: absolute;
   width: 100%;
-  top: calc(100vh - 48px);
-  height: 40px;
+  bottom: 8px;
+  min-height: 40px;
   margin: 0 auto;
   padding: 9px 18px;
   font-size: 1.1em;

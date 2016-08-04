@@ -42,8 +42,8 @@ export default connect(
     const localState = state.network;
     let id = null;
     let message = '';
-    if (localState.activeErrors.length) {
-      id = localState.activeErrors[0];
+    if (localState.activeErrors.application.length) {
+      id = localState.activeErrors.application[0];
       message = localState.error[id].resp.data.message;
     }
 
@@ -53,6 +53,6 @@ export default connect(
     };
   },
   () => ({
-    invalidateError: (id) => dispatch(Actions.invalidateError(id)),
+    invalidateError: (id) => dispatch(Actions.invalidateError(id, 'application')),
   })
 )(ToastComponent);
