@@ -55,28 +55,10 @@ class ParaViewTaskFlow(cumulus.taskflow.ClusterProvisioningTaskFlow):
     }
 
     def start(self, *args, **kwargs):
-        user = getCurrentUser()
-        # Load the cluster
-        cluster_id = parse('cluster._id').find(kwargs)
-        if cluster_id:
-            model = ModelImporter.model('cluster', 'cumulus')
-            cluster = model.load(kwargs['cluster']['_id'],
-                                 user=user, level=AccessType.ADMIN)
-            cluster = model.filter(cluster, user, passphrase=False)
-            kwargs['cluster'] = cluster
-
-        profile_id = parse('cluster.profileId').find(kwargs)
-        if profile_id:
-            profile_id = profile_id[0].value
-            model = ModelImporter.model('aws', 'cumulus')
-            profile = model.load(profile_id, user=user, level=AccessType.ADMIN)
-            kwargs['profile'] = profile
-
         kwargs['next'] = create_paraview_job.s()
         kwargs['image_spec'] = self.PARAVIEW_IMAGE
 
-        super(ParaViewTaskFlow, self).start(
-            setup_cluster.s(self, *args, **kwargs))
+        super(ParaViewTaskFlow, self).start(self, *args, **kwargs)
 
     def terminate(self):
         self.run_task(paraview_terminate.s())

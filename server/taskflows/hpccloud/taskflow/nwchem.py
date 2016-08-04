@@ -72,30 +72,10 @@ class NWChemTaskFlow(cumulus.taskflow.ClusterProvisioningTaskFlow):
     }
 
     def start(self, *args, **kwargs):
-        user = getCurrentUser()
-        # Load the cluster
-        # TODO: should this be in a common class?
-        cluster_id = parse('cluster._id').find(kwargs)
-        if cluster_id:
-            cluster_id = cluster_id[0].value
-            model = ModelImporter.model('cluster', 'cumulus')
-            cluster = model.load(cluster_id, user=user, level=AccessType.ADMIN)
-            cluster = model.filter(cluster, user, passphrase=False)
-            kwargs['cluster'] = cluster
-
-        profile_id = parse('cluster.profileId').find(kwargs)
-        if profile_id:
-            profile_id = profile_id[0].value
-            model = ModelImporter.model('aws', 'cumulus')
-            profile = model.load(profile_id, user=user, level=AccessType.ADMIN)
-            kwargs['profile'] = profile
-
         kwargs['image_spec'] = self.NWCHEM_IMAGE
         kwargs['next'] = setup_input.s()
 
-        super(NWChemTaskFlow, self).start(
-            setup_cluster.s(
-                self, *args, **kwargs))
+        super(NWChemTaskFlow, self).start(self, *args, **kwargs)
 
     def terminate(self):
         self.run_task(nwchem_terminate.s())

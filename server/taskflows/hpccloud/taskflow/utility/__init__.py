@@ -147,23 +147,3 @@ def _get_image(logger, profile, image_spec):
 
     return images[0]['image_id']
 
-@cumulus.taskflow.task
-def setup_cluster(task, *args,**kwargs):
-    cluster = kwargs['cluster']
-
-    if '_id' in cluster:
-        task.taskflow.logger.info('We are using an existing cluster: %s' % cluster['name'])
-    else:
-        task.taskflow.logger.info('We are creating an EC2 cluster.')
-        task.logger.info('Cluster name %s' % cluster['name'])
-        kwargs['machine'] = cluster.get('machine')
-        profile = kwargs.get('profile')
-        ami = _get_image(task.logger, profile, kwargs['image_spec'])
-        cluster = create_ec2_cluster(task, cluster, profile, ami)
-        task.logger.info('Cluster started.')
-
-    # Call any follow on task
-    if 'next' in kwargs:
-        kwargs['cluster'] = cluster
-        next = Signature.from_dict(kwargs['next'])
-        next.delay(*args, **kwargs)
