@@ -25,7 +25,7 @@ from ConfigParser import SafeConfigParser
 from jsonpath_rw import parse
 from bson.objectid import ObjectId
 
-import cumulus.taskflow
+import cumulus.taskflow.core
 from cumulus.tasks.job import download_job_input_folders, submit_job
 from cumulus.tasks.job import monitor_job, monitor_jobs
 from cumulus.tasks.job import upload_job_output_to_folder
@@ -40,7 +40,7 @@ from girder_client import GirderClient, HttpError
 
 from hpccloud.taskflow.utility import *
 
-class NWChemTaskFlow(cumulus.taskflow.ClusterProvisioningTaskFlow):
+class NWChemTaskFlow(cumulus.taskflow.core.ClusterProvisioningTaskFlow):
     """
     {
         "input": {

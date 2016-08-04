@@ -45,7 +45,7 @@ BACKEND_SECTIONS = [
 ]
 PYFR_MESH_EXT = 'pyfrm'
 
-class PyFrTaskFlow(cumulus.taskflow.ClusterProvisioningTaskFlow):
+class PyFrTaskFlow(cumulus.taskflow.core.ClusterProvisioningTaskFlow):
     """
     {
         "input": {
