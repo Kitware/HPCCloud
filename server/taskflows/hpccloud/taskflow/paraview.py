@@ -20,7 +20,8 @@ import json
 import os
 from jsonpath_rw import parse
 
-import cumulus.taskflow
+import cumulus.taskflow.core
+from cumulus.taskflow.core import create_girder_client
 from cumulus.tasks.job import download_job_input_folders, submit_job
 from cumulus.tasks.job import monitor_job, upload_job_output_to_folder
 from cumulus.tasks.job import job_directory

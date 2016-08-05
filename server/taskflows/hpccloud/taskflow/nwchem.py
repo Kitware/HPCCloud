@@ -26,6 +26,7 @@ from jsonpath_rw import parse
 from bson.objectid import ObjectId
 
 import cumulus.taskflow.core
+from cumulus.taskflow.core import create_girder_client
 from cumulus.tasks.job import download_job_input_folders, submit_job
 from cumulus.tasks.job import monitor_job, monitor_jobs
 from cumulus.tasks.job import upload_job_output_to_folder
