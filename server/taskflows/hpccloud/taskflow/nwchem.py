@@ -16,28 +16,18 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 ###############################################################################
-import tempfile
 import json
 import os
-import subprocess
-import shutil
-from ConfigParser import SafeConfigParser
 from jsonpath_rw import parse
-from bson.objectid import ObjectId
 
 import cumulus.taskflow.core
 from cumulus.taskflow.core import create_girder_client
-from cumulus.tasks.job import download_job_input_folders, submit_job
-from cumulus.tasks.job import monitor_job, monitor_jobs
-from cumulus.tasks.job import upload_job_output_to_folder
-from cumulus.tasks.job import terminate_job
-from cumulus.tasks.job import job_directory
+from cumulus.tasks.job import submit_job, monitor_job
+from cumulus.tasks.job import download_job_input_folders
+from cumulus.tasks.job import upload_job_output_to_folder, job_directory
 from cumulus.transport import get_connection
-from cumulus.transport.files.download import download_path_from_cluster
-from girder.utility.model_importer import ModelImporter
-from girder.api.rest import getCurrentUser
-from girder.constants import AccessType
-from girder_client import GirderClient, HttpError
+
+from girder_client import HttpError
 
 from hpccloud.taskflow.utility import *
 

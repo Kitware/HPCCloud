@@ -22,16 +22,12 @@ from jsonpath_rw import parse
 
 import cumulus.taskflow.core
 from cumulus.taskflow.core import create_girder_client
-from cumulus.tasks.job import download_job_input_folders, submit_job
-from cumulus.tasks.job import monitor_job, upload_job_output_to_folder
-from cumulus.tasks.job import job_directory
+from cumulus.tasks.job import submit_job, monitor_job
+from cumulus.tasks.job import upload_job_output_to_folder, job_directory
 from cumulus.transport import get_connection
 from cumulus.transport.files.upload import upload_file
 
-from girder.utility.model_importer import ModelImporter
-from girder.api.rest import getCurrentUser
-from girder.constants import AccessType
-from girder_client import GirderClient, HttpError
+from girder_client import HttpError
 
 from hpccloud.taskflow.utility import *
 
