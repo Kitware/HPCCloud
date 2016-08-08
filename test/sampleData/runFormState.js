@@ -11,7 +11,7 @@ export default {
       "gpu": 0
     },
     "clusterSize": "",
-    "volumneSize": "",
+    "volumeSize": "",
     "cluster": null
   },
   "Traditional": {
