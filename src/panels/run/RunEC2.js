@@ -194,9 +194,9 @@ export default React.createClass({
           />
         </section>
         <section className={style.group}>
-          <label className={style.label}>Volumne size:</label>
+          <label className={style.label}>Volume size:</label>
           <input type="number" min="1" max="16384" className={style.input}
-            data-key="volumneSize" value={this.props.contents.volumneSize}
+            data-key="volumeSize" value={this.props.contents.volumeSize}
             onChange={this.dataChange} required
             disabled={this.props.contents.cluster}
           />
