@@ -21,20 +21,21 @@ const Register = React.createClass({
 
   getDefaultProps() {
     return {
-      error: null,
+      error: '',
       onRegister: (user) => console.log('register', user),
     };
   },
 
   getInitialState() {
     return {
+      error: '',
       password: '',
       confirm: '',
     };
   },
 
   componentWillReceiveProps(newProps) {
-    if (newProps.error) {
+    if (newProps.error !== this.props.error) {
       this.setState({ error: newProps.error });
     }
   },

@@ -4,7 +4,6 @@ import RunClusterFrom          from '../../../../../../panels/run';
 import ButtonBar               from '../../../../../../panels/ButtonBar';
 import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 
-import get             from 'mout/src/object/get';
 import merge           from 'mout/src/object/merge';
 import getNetworkError from '../../../../../../utils/getNetworkError';
 

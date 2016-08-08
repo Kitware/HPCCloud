@@ -24,7 +24,6 @@ const SimulationStart = React.createClass({
     taskFlowName: React.PropTypes.string,
     primaryJob: React.PropTypes.string,
     view: React.PropTypes.string,
-
     error: React.PropTypes.string,
     clusters: React.PropTypes.object,
     onRun: React.PropTypes.func,
@@ -36,9 +35,7 @@ const SimulationStart = React.createClass({
       EC2: defaultServerParameters.EC2,
       Traditional: defaultServerParameters.Traditional,
       OpenStack: defaultServerParameters.OpenStack,
-
       backend: {},
-      error: '',
     };
   },
 
@@ -176,7 +173,7 @@ const SimulationStart = React.createClass({
             visible={this.state[this.state.serverType].profile !== ''}
             onAction={this.formAction}
             actions={actions}
-            error={ this.props.error || this.state.error }
+            error={ this.props.error }
           />
       </div>);
   },

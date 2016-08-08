@@ -32,7 +32,6 @@ const VisualizationStart = React.createClass({
       EC2: defaultServerParameters.EC2,
       Traditional: defaultServerParameters.Traditional,
       OpenStack: defaultServerParameters.OpenStack,
-      error: null,
     };
   },
 
@@ -108,7 +107,6 @@ const VisualizationStart = React.createClass({
   render() {
     var actions = [{ name: 'startVisualization', label: 'Start Visualization', icon: '' }],
       serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional };
-
     return (
       <div>
         <RunClusterFrom serverType={this.state.serverType} serverTypeChange={this.updateServerType}
@@ -118,7 +116,7 @@ const VisualizationStart = React.createClass({
           visible={this.state[this.state.serverType].profile !== ''}
           onAction={this.formAction}
           actions={actions}
-          error={this.state.error}
+          error={this.props.error}
         />
       </div>);
   },

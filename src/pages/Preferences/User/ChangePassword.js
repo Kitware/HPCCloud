@@ -31,7 +31,7 @@ const ChangePassword = React.createClass({
 
   getDefaultProps() {
     return {
-      error: null,
+      error: '',
     };
   },
 
@@ -124,7 +124,7 @@ const ChangePassword = React.createClass({
         </form>
         <ButtonBar
           onAction={ this.handleSubmit }
-          error={ this.state.error ? this.state.error : this.props.error }
+          error={ this.props.error }
           actions={getActions(this.props.icon, !canClick)}
         />
       </div>);
