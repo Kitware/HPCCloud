@@ -3,7 +3,7 @@ export default {
     profile: '',
     machine: '',
     clusterSize: '',
-    volumneSize: '',
+    volumeSize: '',
   },
   Traditional: {
     profile: '',
