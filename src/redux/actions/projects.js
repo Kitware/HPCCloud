@@ -10,6 +10,8 @@ export const UPDATE_PROJECT_LIST = 'UPDATE_PROJECT_LIST';
 export const UPDATE_PROJECT_SIMULATIONS = 'UPDATE_PROJECT_SIMULATIONS';
 export const REMOVE_PROJECT = 'REMOVE_PROJECT';
 export const UPDATE_PROJECT = 'UPDATE_PROJECT';
+export const INC_PROJECT_SIM_COUNT = 'INC_PROJECT_SIM_COUNT';
+export const DEC_PROJECT_SIM_COUNT = 'DEC_PROJECT_SIM_COUNT';
 export const REMOVE_SIMULATION = 'REMOVE_SIMULATION';
 export const UPDATE_ACTIVE_PROJECT = 'UPDATE_ACTIVE_PROJECT';
 export const UPDATE_ACTIVE_SIMULATION = 'UPDATE_ACTIVE_SIMULATION';
@@ -68,7 +70,7 @@ export function fetchProjectList() {
 
 export function deleteProject(project) {
   return dispatch => {
-    const action = netActions.addNetworkCall(`delete_project_${project._id}`, `Delete project ${project.name}`);
+    const action = netActions.addNetworkCall('delete_project', `Delete project ${project.name}`);
 
     client.deleteProject(project._id)
       .then(

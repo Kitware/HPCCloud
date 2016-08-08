@@ -1,11 +1,11 @@
 import ItemEditor   from '../../../panels/ItemEditor';
 import React        from 'react';
 import Workflows    from '../../../workflows';
+import getNetworkError  from '../../../utils/getNetworkError';
 
 import style        from 'HPCCloudStyle/ItemEditor.mcss';
 
 import { connect }  from 'react-redux';
-import get          from 'mout/src/object/get';
 import { dispatch } from '../../../redux';
 import * as Actions from '../../../redux/actions/projects';
 import * as Router  from '../../../redux/actions/router';
@@ -27,6 +27,20 @@ const ProjectNew = React.createClass({
       _error: null,
       type: this.props.workflowNames[0].value,
     };
+  },
+
+  componentDidMount() {
+    this.timeout = null;
+  },
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState._error !== this.state._error) {
+      this.timeout = setTimeout(() => { this.setState({ _error: null }); }, 3000);
+    }
+  },
+
+  componentWillUnmount() {
+    clearTimeout(this.timeout);
   },
 
   onAction(action, data, attachments) {
@@ -111,7 +125,7 @@ export default connect(
   state => {
     return {
       workflowNames: state.projects.workflowNames,
-      error: get(state, 'network.error.save_project.resp.data.message'),
+      error: getNetworkError(state, 'save_project'),
     };
   },
   () => {

@@ -11,6 +11,7 @@ export default React.createClass({
   propTypes: {
     contents: React.PropTypes.object,
     onChange: React.PropTypes.func,
+    clusterFilter: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -30,6 +31,12 @@ export default React.createClass({
 
   componentDidMount() {
     this.updateState();
+  },
+
+  componentWillUnmount() {
+    this.dataChange({
+      currentTarget: { dataset: { key: 'name' } },
+      target: { value: '' } });
   },
 
   updateState() {
@@ -60,6 +67,11 @@ export default React.createClass({
       })
       .then((resp) => {
         newState.clusters = resp.data;
+
+        if (this.props.clusterFilter) {
+          newState.clusters = newState.clusters.filter(this.props.clusterFilter);
+        }
+
         if (this.props.onChange) {
           this.props.onChange('cluster', null, 'EC2');
         }
