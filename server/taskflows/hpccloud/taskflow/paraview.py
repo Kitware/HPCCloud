@@ -27,8 +27,6 @@ from cumulus.tasks.job import upload_job_output_to_folder, job_directory
 from cumulus.transport import get_connection
 from cumulus.transport.files.upload import upload_file
 
-from girder_client import HttpError
-
 from hpccloud.taskflow.utility import *
 
 class ParaViewTaskFlow(cumulus.taskflow.core.ClusterProvisioningTaskFlow):
@@ -58,22 +56,11 @@ class ParaViewTaskFlow(cumulus.taskflow.core.ClusterProvisioningTaskFlow):
         super(ParaViewTaskFlow, self).start(self, *args, **kwargs)
 
     def terminate(self):
-        self.run_task(paraview_terminate.s())
+        super(ParaViewTaskFlow, self).terminate()
         self.run_task(cleanup_proxy_entries.s())
 
     def delete(self):
-        client = create_girder_client(
-            self.girder_api_url, self.girder_token)
-        for job in self.get('meta', {}).get('jobs', []):
-            job_id = job['_id']
-            client.delete('jobs/%s' % job_id)
-
-            try:
-                client.get('jobs/%s' % job_id)
-            except HttpError as e:
-                if e.status != 404:
-                    self.logger.error('Unable to delete job: %s' % job_id)
-
+        super(ParaViewTaskFlow, self).delete()
         self.run_task(cleanup_proxy_entries.s())
 
 def validate_args(kwargs):

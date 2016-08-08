@@ -31,8 +31,6 @@ from cumulus.tasks.job import download_job_input_folders
 from cumulus.tasks.job import upload_job_output_to_folder
 from cumulus.transport.files.download import download_path_from_cluster
 
-from girder_client import HttpError
-
 from hpccloud.taskflow.utility import *
 
 BACKEND_SECTIONS = [
@@ -79,22 +77,6 @@ class PyFrTaskFlow(cumulus.taskflow.core.ClusterProvisioningTaskFlow):
         kwargs['next'] = setup_input.s()
 
         super(PyFrTaskFlow, self).start(self, *args, **kwargs)
-
-    def terminate(self):
-        self.run_task(pyfr_terminate.s())
-
-    def delete(self):
-        for job in self.get('meta', {}).get('jobs', []):
-            job_id = job['_id']
-            client = create_girder_client(
-            self.girder_api_url, self.girder_token)
-            client.delete('jobs/%s' % job_id)
-
-            try:
-                client.get('jobs/%s' % job_id)
-            except HttpError as e:
-                if e.status != 404:
-                    self.logger.error('Unable to delete job: %s' % job_id)
 
 def _import_mesh(logger, input_path, output_path, extn):
     #
