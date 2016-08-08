@@ -8,6 +8,7 @@ import LoadingPanel     from '../../../../../../panels/LoadingPanel';
 import { taskflowActions } from '../../../../../../utils/Constants';
 
 import get              from '../../../../../../utils/get';
+import getNetworkError from '../../../../../../utils/getNetworkError';
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
@@ -148,9 +149,7 @@ export default connect(
       taskflowId, cluster, taskflow,
       buttonsDisabled: !!get(state, 'network.pending.terminate_taskflow') ||
                        !!get(state, 'network.pending.delete_taskflow'),
-      error: get(state, 'network.error.terminate_taskflow.resp.data.message')
-        || get(state, 'network.error.delete_taskflow.resp.data.message')
-        || '',
+      error: getNetworkError(state, ['terminate_taskflow', 'delete_taskflow']),
     };
   },
   () => ({

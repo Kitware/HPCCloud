@@ -4,10 +4,11 @@ import RunClusterFrom          from '../../../../../../panels/run';
 import ButtonBar               from '../../../../../../panels/ButtonBar';
 import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 
-import merge                   from 'mout/src/object/merge';
+import get             from 'mout/src/object/get';
+import merge           from 'mout/src/object/merge';
+import getNetworkError from '../../../../../../utils/getNetworkError';
 
 import { connect }  from 'react-redux';
-import get          from 'mout/src/object/get';
 import { dispatch } from '../../../../../../redux';
 import * as Actions from '../../../../../../redux/actions/taskflows';
 
@@ -130,8 +131,7 @@ const VisualizationStart = React.createClass({
 export default connect(
   (state, props) => {
     return {
-      error: get(state, 'network.error.create_taskflow.resp.data.message')
-        || get(state, 'network.error.start_taskflow.resp.data.message'),
+      error: getNetworkError(state, ['create_taskflow', 'start_taskflow']),
       ec2Clusters: state.preferences.aws.mapById,
       tradClusters: state.preferences.clusters.mapById,
     };

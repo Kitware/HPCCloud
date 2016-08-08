@@ -65,7 +65,7 @@ const Login = React.createClass({
 export default connect(
   state => {
     return {
-      error: !!get(state, 'network.error.user_login'),
+      error: !!get(state, 'network.error.user_login') && !get(state, 'network.error.user_login.invalid'),
     };
   },
   () => {

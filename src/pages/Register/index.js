@@ -1,7 +1,7 @@
 import React  from 'react';
 import style  from 'HPCCloudStyle/Login.mcss';
 
-import get          from 'mout/src/object/get';
+import getNetworkError from '../../utils/getNetworkError';
 import { connect }  from 'react-redux';
 import { dispatch } from '../../redux';
 import { register } from '../../redux/actions/user';
@@ -138,7 +138,7 @@ const Register = React.createClass({
 export default connect(
   state => {
     return {
-      error: get(state, 'network.error.user_register.resp.data.message'),
+      error: getNetworkError(state, 'user_register'),
     };
   },
   () => {
