@@ -311,6 +311,7 @@ def setup_input(task, *args, **kwargs):
 
     # If we are running in the cloud determine backend to use
     if kwargs['cluster']['type'] == 'ec2':
+        pyfr_config = {}
         # If we have GPUs use cuda
         if has_gpus(kwargs['cluster']):
             backend = {
