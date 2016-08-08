@@ -10,7 +10,8 @@ import merge                   from 'mout/src/object/merge';
 import getNetworkError  from '../../../../../../utils/getNetworkError';
 import { connect } from 'react-redux';
 import { dispatch } from '../../../../../../redux';
-import * as Actions from '../../../../../../redux/actions/taskflows';
+import * as Actions    from '../../../../../../redux/actions/taskflows';
+import * as NetActions from '../../../../../../redux/actions/network';
 
 const SimulationStart = React.createClass({
 
@@ -27,6 +28,7 @@ const SimulationStart = React.createClass({
     error: React.PropTypes.string,
     clusters: React.PropTypes.object,
     onRun: React.PropTypes.func,
+    onError: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -48,60 +50,48 @@ const SimulationStart = React.createClass({
   runSimulation() {
     const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
     var sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
-      payload;
+      payload = {
+        backend: this.state.backend,
+        input: {
+          folder: {
+            id: this.props.simulation.metadata.inputFolder._id,
+          },
+          meshFile: {
+            id: meshFile,
+          },
+          iniFile: {
+            id: this.props.simulation.metadata.inputFolder.files.ini,
+          },
+        },
+        output: {
+          folder: {
+            id: this.props.simulation.metadata.outputFolder._id,
+          },
+        },
+      };
 
     if (this.state.serverType === 'Traditional') {
-      payload = Object.assign({},
-        this.state.Traditional.runtime || {},
-        {
-          backend: this.state.backend,
-          input: {
-            folder: {
-              id: this.props.simulation.metadata.inputFolder._id,
-            },
-            meshFile: {
-              id: meshFile,
-            },
-            iniFile: {
-              id: this.props.simulation.metadata.inputFolder.files.ini,
-            },
-          },
-          output: {
-            folder: {
-              id: this.props.simulation.metadata.outputFolder._id,
-            },
-          },
-          cluster: ClusterPayloads.tradClusterPayload(this.state.Traditional.profile),
-        });
+      payload = Object.assign(payload, this.state.Traditional.runtime || {});
+      try {
+        payload.cluster = ClusterPayloads.tradClusterPayload(this.state.Traditional.profile);
+      } catch (error) {
+        this.props.onError(error.message);
+        return;
+      }
     } else if (this.state.serverType === 'EC2') {
-      payload = Object.assign({},
-        this.state.EC2.runtime || {},
-        {
-          backend: this.state.backend,
-          input: {
-            folder: {
-              id: this.props.simulation.metadata.inputFolder._id,
-            },
-            meshFile: {
-              id: meshFile,
-            },
-            iniFile: {
-              id: this.props.simulation.metadata.inputFolder.files.ini,
-            },
-          },
-          output: {
-            folder: {
-              id: this.props.simulation.metadata.outputFolder._id,
-            },
-          },
-        });
+      payload = Object.assign(payload, this.state.EC2.runtime || {});
       if (!this.state.EC2.cluster) {
-        payload.cluster = ClusterPayloads.ec2ClusterPayload(
-          this.state.EC2.name,
-          this.state.EC2.machine,
-          this.state.EC2.clusterSize,
-          this.state.EC2.profile
-        );
+        try {
+          payload.cluster = ClusterPayloads.ec2ClusterPayload(
+            this.state.EC2.name,
+            this.state.EC2.machine,
+            this.state.EC2.clusterSize,
+            this.state.EC2.profile
+          );
+        } catch (error) {
+          this.props.onError(error.message);
+          return;
+        }
       } else {
         payload.cluster = { _id: this.state.EC2.cluster };
       }
@@ -113,7 +103,7 @@ const SimulationStart = React.createClass({
       this.props.taskFlowName,
       this.props.primaryJob,
       payload,
-      {
+      { // simulationStep
         id: this.props.simulation._id,
         name: this.props.simulation.name,
         step: 'Simulation',
@@ -124,7 +114,7 @@ const SimulationStart = React.createClass({
           },
         },
       },
-      {
+      { // new location
         pathname: this.props.location.pathname,
         query: merge(this.props.location.query, {
           view: 'run',
@@ -193,6 +183,7 @@ export default connect(
     return {
       onRun: (taskflowName, primaryJob, payload, simulationStep, location) =>
         dispatch(Actions.createTaskflow(taskflowName, primaryJob, payload, simulationStep, location)),
+      onError: (message) => dispatch(NetActions.errorNetworkCall('create_taskflow', { data: { message } }, 'form')),
     };
   }
 )(SimulationStart);

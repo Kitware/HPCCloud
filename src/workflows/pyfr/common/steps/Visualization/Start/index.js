@@ -10,6 +10,7 @@ import getNetworkError from '../../../../../../utils/getNetworkError';
 import { connect }  from 'react-redux';
 import { dispatch } from '../../../../../../redux';
 import * as Actions from '../../../../../../redux/actions/taskflows';
+import * as NetActions from '../../../../../../redux/actions/network';
 
 const VisualizationStart = React.createClass({
 
@@ -28,6 +29,7 @@ const VisualizationStart = React.createClass({
     tradClusters: React.PropTypes.object,
     ec2Clusters: React.PropTypes.object,
     onRun: React.PropTypes.func,
+    onError: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -57,15 +59,25 @@ const VisualizationStart = React.createClass({
     };
 
     if (this.state.serverType === 'Traditional') {
-      payload.cluster = ClusterPayloads.tradClusterPayload(this.state.Traditional.profile);
+      try {
+        payload.cluster = ClusterPayloads.tradClusterPayload(this.state.Traditional.profile);
+      } catch (error) {
+        this.props.onError(error.message);
+        return;
+      }
     } else if (this.state.serverType === 'EC2') {
       if (!this.state.EC2.cluster) {
-        payload.cluster = ClusterPayloads.ec2ClusterPayload(
-          this.state.EC2.name,
-          this.state.EC2.machine,
-          this.state.EC2.clusterSize,
-          this.state.EC2.profile
-        );
+        try {
+          payload.cluster = ClusterPayloads.ec2ClusterPayload(
+            this.state.EC2.name,
+            this.state.EC2.machine,
+            this.state.EC2.clusterSize,
+            this.state.EC2.profile
+          );
+        } catch (error) {
+          this.props.onError(error.message);
+          return;
+        }
       } else {
         payload.cluster = { _id: this.state.EC2.cluster };
       }
@@ -139,6 +151,7 @@ export default connect(
     return {
       onRun: (taskflowName, primaryJob, payload, simulationStep, location) =>
         dispatch(Actions.createTaskflow(taskflowName, primaryJob, payload, simulationStep, location)),
+      onError: (message) => dispatch(NetActions.errorNetworkCall('create_taskflow', { data: { message } }, 'form')),
     };
   }
 )(VisualizationStart);
