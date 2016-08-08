@@ -67,8 +67,11 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
     }
     """
     PYFR_IMAGE = {
-        'name': 'PyFR_ParaView-5.0.1',
-        'owner': '695977956746'
+        'owner': '695977956746',
+        'tags': {
+            'pyfr': '1.3',
+            'paraview': '5.0.1'
+        }
     }
 
     def start(self, *args, **kwargs):
@@ -89,7 +92,17 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
             profile = model.load(profile_id, user=user, level=AccessType.ADMIN)
             kwargs['profile'] = profile
 
-        kwargs['image_spec'] = self.PYFR_IMAGE
+        image_spec = self.PYFR_IMAGE.copy()
+        # Setup up image spec
+        if '_id' not in kwargs['cluster']:
+            if has_gpus(kwargs['cluster']):
+                image_spec['tags']['cuda'] = '7.5'
+                image_spec['tags']['nvidia_display_driver'] = '367.35'
+            else:
+                image_spec['tags']['blas'] = '3.0'
+
+            kwargs['image_spec'] = image_spec
+
         kwargs['next'] = setup_input.s()
 
         super(PyFrTaskFlow, self).start(
@@ -298,10 +311,9 @@ def setup_input(task, *args, **kwargs):
 
     # If we are running in the cloud determine backend to use
     if kwargs['cluster']['type'] == 'ec2':
-        # If we have GPUs use cuda
-        gpu = parse('cluster.config.launch.params.gpu').find(kwargs)
         pyfr_config = {}
-        if gpu and int(gpu[0].value) > 1:
+        # If we have GPUs use cuda
+        if has_gpus(kwargs['cluster']):
             backend = {
                 'type': 'cuda',
                 'device-id': 'round-robin'
