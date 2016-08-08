@@ -52087,7 +52087,7 @@
 	        _react2.default.createElement(
 	          'label',
 	          { className: _ItemEditor2.default.label },
-	          'Volumne size:'
+	          'Volume size:'
 	        ),
 	        _react2.default.createElement('input', { type: 'number', min: '1', max: '16384', className: _ItemEditor2.default.input,
 	          'data-key': 'volumeSize',
