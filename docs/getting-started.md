@@ -23,9 +23,9 @@ cd HPCCloud
 DEMO=1 vagrant up
 ```
 
-Once the vagrant provisioning process it complete your VM will up and running. You can access the HPCCloud application by visting [http://localhost:8080](http://localhost:8080)
+Once the vagrant provisioning process it complete your VM will up and running. You can access the HPCCloud application by visting [http://localhost:8888](http://localhost:8888)
 
-## Development: 
+## Development:
 
 With the environment variable `DEVELOPMENT=1`, in your HPC-Cloud directory run:
 
