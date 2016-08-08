@@ -1,6 +1,6 @@
 .ToastContainer {
   composes: errorBox from 'HPCCloudStyle/Theme.mcss';
-  position: absolute;
+  position: fixed;
   width: 100%;
   bottom: 8px;
   min-height: 40px;

@@ -120,7 +120,7 @@ describe('network', () => {
     });
 
     it('invalidates all network errors given *', (done) => {
-      const expectedAction = { type: Actions.INVALIDATE_ERRORS, ids: '*'};
+      const expectedAction = { type: Actions.INVALIDATE_ERRORS, ids: '*' };
       expect(Actions.invalidateErrors('*'))
         .toDispatchActions(expectedAction, complete(done));
 
