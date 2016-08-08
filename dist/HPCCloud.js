@@ -50867,7 +50867,7 @@
 	    profile: '',
 	    machine: '',
 	    clusterSize: '',
-	    volumneSize: ''
+	    volumeSize: ''
 	  },
 	  Traditional: {
 	    profile: ''
@@ -52090,8 +52090,8 @@
 	          'Volumne size:'
 	        ),
 	        _react2.default.createElement('input', { type: 'number', min: '1', max: '16384', className: _ItemEditor2.default.input,
-	          'data-key': 'volumneSize',
-	          value: this.props.contents.volumneSize,
+	          'data-key': 'volumeSize',
+	          value: this.props.contents.volumeSize,
 	          onChange: this.dataChange, required: true
 	        })
 	      )
