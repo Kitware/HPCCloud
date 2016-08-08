@@ -64,6 +64,12 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
         "cluster": {
             "_id": <id of cluster to run on>
         }
+        "backend":
+        {
+            "type": "openmp",
+            "cblas": "/usr/lib/openblas-base/libblas.so"
+        },
+        "numberOfSlots": <number of processors to run on>
     }
     """
     PYFR_IMAGE = {
@@ -115,7 +121,7 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
     def delete(self):
         for job in self.get('meta', {}).get('jobs', []):
             job_id = job['_id']
-            client = _create_girder_client(
+            client = create_girder_client(
             self.girder_api_url, self.girder_token)
             client.delete('jobs/%s' % job_id)
 
@@ -124,14 +130,6 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
             except HttpError as e:
                 if e.status != 404:
                     self.logger.error('Unable to delete job: %s' % job_id)
-
-
-
-def _create_girder_client(girder_api_url, girder_token):
-    client = GirderClient(apiUrl=girder_api_url)
-    client.token = girder_token
-
-    return client
 
 def _import_mesh(logger, input_path, output_path, extn):
     #
@@ -173,7 +171,7 @@ def _export_solution(logger, mesh_path, input_path, output_path):
 @cumulus.taskflow.task
 def pyfr_terminate(task):
     cluster = task.taskflow['meta']['cluster']
-    client = _create_girder_client(
+    client = create_girder_client(
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
     terminate_jobs(
         task, client, cluster, task.taskflow.get('meta', {}).get('jobs', []))
@@ -246,7 +244,7 @@ def setup_input(task, *args, **kwargs):
     number_of_procs = int(number_of_procs)
     kwargs['numberOfProcs']  = number_of_procs
 
-    client = _create_girder_client(
+    client = create_girder_client(
         task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     # Get the mesh file metadata to see if we need to import
@@ -365,7 +363,7 @@ def create_job(task, *args, **kwargs):
     body = {
         'name': 'pyfr_run',
         'commands': [
-            "mpirun -n %s pyfr run -b %s input/%s input/%s" % (
+            "mpiexec -n %s pyfr run -b %s input/%s input/%s" % (
                 kwargs['numberOfProcs'],
                 backend,
                 kwargs['meshFilename'],
@@ -383,7 +381,7 @@ def create_job(task, *args, **kwargs):
         }
     }
 
-    client = _create_girder_client(
+    client = create_girder_client(
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     job = client.post('jobs', data=json.dumps(body))
@@ -476,7 +474,7 @@ def create_export_job(task, job_name, files, job_dir, mesh_filename):
         }
     }
 
-    client = _create_girder_client(
+    client = create_girder_client(
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     job = client.post('jobs', data=json.dumps(body))
@@ -489,7 +487,7 @@ def create_export_job(task, job_name, files, job_dir, mesh_filename):
 def upload_export_output(task, _, cluster, job, *args, **kwargs):
     output_folder_id = kwargs['output']['folder']['id']
 
-    client = _create_girder_client(
+    client = create_girder_client(
         task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     for job_id in task.taskflow.get_metadata('export_jobs')['export_jobs']:
@@ -514,7 +512,7 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
     task.taskflow.logger.info('Uploading results from cluster')
     output_folder_id = kwargs['output']['folder']['id']
 
-    client = _create_girder_client(
+    client = create_girder_client(
         task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     # Refresh state of job
@@ -619,7 +617,7 @@ def export_output(task, folder_id, imported_mesh_file_id, files):
     :param: imported_mesh_file_id: The mesh in PyFR format
     :param: files: The files to export ( Girder JSON objects )
     """
-    client = _create_girder_client(
+    client = create_girder_client(
         task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     output_dir =  tempfile.mkdtemp()
