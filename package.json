@@ -26,12 +26,13 @@
     "monologue.js": "0.3.4",
     "mout": "0.11.1",
     "normalize.css": "3.0.3",
-    "react": "0.14.7",
-    "react-dom": "0.14.7",
+    "react": "15.3.0",
+    "react-dom": "15.3.0",
 
     "redux": "3.3.1",
     "react-redux": "4.4.1",
     "react-router-redux": "4.0.0",
+    "reselect": "2.5.3",
 
     "bootstrap": "3.3.6",
     "react-router": "2.0.1",
@@ -53,8 +54,8 @@
 
     "babel-polyfill": "6.9.1",
     "paraviewweb": "1.6.0",
+    "pvw-visualizer": "2.0.2",
     "simput": "1.2.5",
-    "pvw-visualizer": "1.0.11",
 
     "kw-web-suite": "2.0.0"
   },

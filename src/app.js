@@ -13,8 +13,11 @@ import * as ProjectActions          from './redux/actions/projects';
 import * as TaskflowActions         from './redux/actions/taskflows';
 import * as Behavior                from './StateTransitionBehavior';
 
+import { updateVisualizerRootState } from 'pvw-visualizer/src/redux';
+
 // Setup application and pages
 const container = document.querySelector('.react-container');
+updateVisualizerRootState(state => state.visualizer);
 
 export function configure(config = { girderAPI: baseURL }) {
   render(
