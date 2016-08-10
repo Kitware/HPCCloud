@@ -15,8 +15,11 @@ import * as NetworkActions          from './redux/actions/network';
 import * as Behavior                from './StateTransitionBehavior';
 import Toaster                      from './widgets/Toaster';
 
+import { updateVisualizerStateAccessor } from 'pvw-visualizer/src/redux/selectors/stateAccessor';
+
 // Setup application and pages
 const container = document.querySelector('.react-container');
+updateVisualizerStateAccessor(state => state.visualizer);
 
 export function configure(config = { girderAPI: baseURL }) {
   render(
