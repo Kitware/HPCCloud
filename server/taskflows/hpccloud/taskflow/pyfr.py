@@ -85,8 +85,7 @@ class PyFrTaskFlow(cumulus.taskflow.core.ClusterProvisioningTaskFlow):
             else:
                 image_spec['tags']['blas'] = '3.0'
 
-            kwargs['image_spec'] = image_spec
-
+        kwargs['image_spec'] = image_spec
         kwargs['next'] = setup_input.s()
 
         super(PyFrTaskFlow, self).start(self, *args, **kwargs)

@@ -60,7 +60,6 @@ class ParaViewTaskFlow(cumulus.taskflow.core.ClusterProvisioningTaskFlow):
                 image_spec['tags']['nvida_display_driver'] = '367.35'
             else:
                 image_spec['tags']['mesa'] = '8.0'
-            kwargs['image_spec'] = image_spec
 
         kwargs['image_spec'] = image_spec
         kwargs['next'] = create_paraview_job.s()
