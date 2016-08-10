@@ -24,8 +24,8 @@ import shutil
 from ConfigParser import SafeConfigParser
 from jsonpath_rw import parse
 
-import cumulus.taskflow.core
-from cumulus.taskflow.core import create_girder_client
+import cumulus.taskflow.cluster
+from cumulus.taskflow.cluster import create_girder_client
 from cumulus.tasks.job import submit_job, monitor_job, monitor_jobs
 from cumulus.tasks.job import download_job_input_folders
 from cumulus.tasks.job import upload_job_output_to_folder
@@ -40,7 +40,7 @@ BACKEND_SECTIONS = [
 ]
 PYFR_MESH_EXT = 'pyfrm'
 
-class PyFrTaskFlow(cumulus.taskflow.core.ClusterProvisioningTaskFlow):
+class PyFrTaskFlow(cumulus.taskflow.cluster.ClusterProvisioningTaskFlow):
     """
     {
         "input": {
