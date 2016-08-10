@@ -1,7 +1,7 @@
 import React            from 'react';
 import Toolbar          from '../../panels/Toolbar';
 import LoadingPanel     from '../../panels/LoadingPanel';
-import * as network     from 'pvw-visualizer/src/network';
+import network          from 'pvw-visualizer/src/network';
 import ControlPanel     from 'pvw-visualizer/src/panels/ControlPanel';
 import VtkRenderer      from 'paraviewweb/src/React/Renderers/VtkRenderer';
 import client           from '../../network';
@@ -10,7 +10,8 @@ import { primaryBreadCrumbs } from '../../utils/Constants';
 import style            from 'HPCCloudStyle/PageWithMenu.mcss';
 import vizStyle         from 'HPCCloudStyle/Visualizer.mcss';
 
-import { dispatch } from '../../redux';
+import { dispatch, store } from '../../redux';
+import behaviorOnChange from 'pvw-visualizer/src/behavior';
 import Actions from 'pvw-visualizer/src/redux/actions';
 
 export default React.createClass({
@@ -43,6 +44,41 @@ export default React.createClass({
       this.client = network.getClient();
       this.connection = network.getConnection();
       this.session = this.connection.session;
+
+      setImmediate(() => {
+        // Keep track of any server notification
+        this.session.subscribe('pv.time.change', (args) => {
+          const index = args[0].timeStep;
+          setImmediate(() => {
+            dispatch(Actions.time.storeTime(index));
+            const state = store.getState();
+            if (state.visualizer.active.source && state.visualizer.active.source !== '0') {
+              // Update proxy data for info tab...
+              // FIXME implement a lighter implementation on the server side...
+              dispatch(Actions.proxies.fetchProxy(state.visualizer.active.source));
+            }
+          });
+        });
+
+        // Fetch data
+        dispatch(Actions.proxies.fetchPipeline());
+        dispatch(Actions.proxies.fetchAvailableProxies());
+        dispatch(Actions.proxies.fetchSettingProxy());
+        dispatch(Actions.time.fetchTime());
+        dispatch(Actions.files.fetchServerDirectory('.'));
+
+        // Fetch heavy data after full initialization
+        setTimeout(() => {
+          dispatch(Actions.colors.fetchColorMapImages());
+        }, 2000);
+
+
+        // Attach default behavior
+        store.subscribe(() => {
+          const state = store.getState();
+          behaviorOnChange(state.visualizer, dispatch);
+        });
+      });
     });
 
     // props.simulation is not necessarily updated with latest metadata, so we fetch it.
@@ -119,4 +155,3 @@ export default React.createClass({
       </div>);
   },
 });
-

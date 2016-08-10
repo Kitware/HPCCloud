@@ -53,7 +53,7 @@
     "codecov.io": "0.1.6",
 
     "babel-polyfill": "6.9.1",
-    "paraviewweb": "1.6.0",
+    "paraviewweb": "2.0.4",
     "pvw-visualizer": "2.0.3",
     "simput": "1.2.5",
 
