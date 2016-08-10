@@ -69,5 +69,6 @@
     top: 2.4em;
     left: 0;
     right: 0;
-    height: calc(100vh - 4.8em);
+    height: calc(100vh - 4.9em);
+    overflow: hidden;
 }
