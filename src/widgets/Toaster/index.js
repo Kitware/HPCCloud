@@ -44,7 +44,15 @@ export default connect(
     let message = '';
     if (localState.activeErrors.application.length) {
       id = localState.activeErrors.application[0];
-      message = localState.error[id].resp.data.message;
+      if (localState.error[id].resp.data) {
+        message = localState.error[id].resp.data.message;
+      } else if (localState.error[id].resp.message) {
+        message = localState.error[id].resp.message;
+      } else {
+        message = `${localState.error[id].resp.status}: ${localState.error[id].resp.statusText}`;
+      }
+      // the error doesn't necessarily get logged otherwise
+      console.error(localState.error[id]);
     }
 
     return {

@@ -75,7 +75,7 @@ export function build(config = location, ...extensions) {
     },
     busy = (promise) => {
       notification.emit(BUSY_TOPIC, ++busyCounter);
-      promise.then(idle, idle);
+      promise.then(idle);
       return promise;
     },
     { protocol, hostname, port, basepath = '/api/v1' } = config,
