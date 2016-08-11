@@ -46,7 +46,7 @@ DISPLAY=:0
 export DISPLAY
 
 # First run pvpython
-${PV_PYTHON} {{'--mesa-llvm' if not cluster.config.launch.params.gpu else ''}} ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} \
+${PV_PYTHON} {{'--mesa-llvm' if cluster.config.launch and not cluster.config.launch.params.gpu else ''}} ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} \
 {{ '--data-dir %s' % dataDir if dataDir else ''}} \
 {{ '--load-file %s' % fileName if fileName else '' }}
 
