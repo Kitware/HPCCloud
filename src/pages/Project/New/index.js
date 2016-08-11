@@ -40,7 +40,9 @@ const ProjectNew = React.createClass({
   },
 
   componentWillUnmount() {
-    clearTimeout(this.timeout);
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
   },
 
   onAction(action, data, attachments) {

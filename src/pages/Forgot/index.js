@@ -3,6 +3,8 @@ import style    from 'HPCCloudStyle/Login.mcss';
 import layout   from 'HPCCloudStyle/Layout.mcss';
 
 import get                from 'mout/src/object/get';
+import getNetworkError    from '../../utils/getNetworkError';
+
 import { connect }        from 'react-redux';
 import { forgetPassword } from '../../redux/actions/user';
 import { dispatch }       from '../../redux';
@@ -63,7 +65,7 @@ const ForgotPassword = React.createClass({
 export default connect(
   state => {
     return {
-      error: get(state, 'network.error.user_forget.resp.data.message'),
+      error: getNetworkError(state, 'user_forget'),
       success: get(state, 'network.success.user_forget.resp.data.message'),
     };
   },

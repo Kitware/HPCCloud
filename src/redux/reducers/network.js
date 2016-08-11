@@ -1,9 +1,13 @@
 import * as Actions from '../actions/network';
 
-const initialState = {
+export const initialState = {
   pending: {},
   success: {},
   error: {},
+  activeErrors: {
+    application: [],
+    form: [],
+  },
   backlog: [],
   errorTimeout: null,
   progress: {},
@@ -38,40 +42,69 @@ export default function networkReducer(state = initialState, action) {
     }
 
     case Actions.ERROR_NETWORK_CALL: {
+      const { id, resp, errorTimeout, errType } = action;
       const pending = Object.assign({}, state.pending);
-      const callToMove = Object.assign({}, pending[action.id], { resp: action.resp, invalid: false });
-      const error = Object.assign({}, state.error, { [action.id]: callToMove });
-      delete pending[action.id];
+      const callToMove = Object.assign({}, pending[id], { resp, invalid: false });
+      const error = Object.assign({}, state.error, { [id]: callToMove });
+      const activeErrors = Object.assign({}, state.activeErrors);
+      delete pending[id];
+
+      // no duplicate errors
+      if (state.activeErrors[errType].indexOf(id) === -1) {
+        activeErrors[errType] = [id].concat(state.activeErrors[errType]);
+      }
 
       if (action.errorTimeout && state.errorTimeout !== null) {
         clearTimeout(state.errorTimeout);
       }
 
-      return Object.assign({}, state, { pending, error, errorTimeout: action.errorTimeout });
+      return Object.assign({}, state, { pending, error, errorTimeout, activeErrors });
     }
 
     case Actions.INVALIDATE_ERROR: {
-      const id = action.id;
+      const { id, errType } = action;
       const error = Object.assign({}, state.error);
+      const activeErrors = Object.assign({}, state.activeErrors);
 
-      if (error[id].resp.data.message) {
+      if (!error[id].invalid) {
         error[id].invalid = true;
       }
 
-      return Object.assign({}, state, { error, errorTimeout: null });
+      if (state.errorTimeout !== null) {
+        clearTimeout(state.errorTimeout);
+      }
+
+      activeErrors[errType] = state.activeErrors[errType];
+      activeErrors[errType].splice(activeErrors[errType].indexOf(id), 1);
+
+      return Object.assign({}, state, { error, activeErrors, errorTimeout: null });
     }
 
     case Actions.INVALIDATE_ERRORS: {
-      const ids = action.ids;
+      const { ids, errType } = action;
       const error = Object.assign({}, state.error);
+      const activeErrors = Object.assign({}, state.activeErrors);
 
-      ids.forEach((id) => {
-        if (error[id]) {
-          error[id].invalid = true;
-        }
-      });
+      if (ids === '*') {
+        Object.keys(error).forEach((key) => {
+          error[key].invalid = true;
+        });
+        activeErrors.application = [];
+        activeErrors.form = [];
+      } else {
+        ids.forEach((id) => {
+          if (error[id]) {
+            error[id].invalid = true;
+          }
+        });
+        activeErrors[errType] = [];
+      }
 
-      return Object.assign({}, state, { error });
+      if (state.errorTimeout !== null) {
+        clearTimeout(state.errorTimeout);
+      }
+
+      return Object.assign({}, state, { error, activeErrors, errorTimeout: null });
     }
 
     case Actions.PREPARE_UPLOAD: {

@@ -63,7 +63,6 @@
 .errorBox {
     composes: box;
     composes: errorBox from 'HPCCloudStyle/Theme.mcss';
-
 }
 
 .warningBox {

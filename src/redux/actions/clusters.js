@@ -184,7 +184,7 @@ export function removeCluster(index, cluster) {
           dispatch(fetchClusters());
         },
         err => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
         });
 
     return action;
@@ -203,7 +203,7 @@ export function deleteCluster(id) {
           dispatch(removeClusterById(id));
         },
         err => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
         });
 
     return action;
@@ -220,7 +220,7 @@ export function saveCluster(index, cluster, pushToServer = false) {
           dispatch(netActions.successNetworkCall(action.id, resp));
         },
         err => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
         });
   }
   return saveAction;
@@ -236,7 +236,7 @@ export function updateCluster(cluster) {
       })
       .catch((err) => {
         console.log(err);
-        dispatch(netActions.errorNetworkCall(action.id, err));
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
       });
     return action;
   };
@@ -255,7 +255,7 @@ export function testCluster(index, cluster) {
           dispatch(netActions.successNetworkCall(action.id, resp));
         },
         error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
+          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
     return action;
   };
@@ -268,7 +268,7 @@ export function terminateCluster(id) {
       dispatch(netActions.successNetworkCall(action.id, resp));
     })
     .catch((err) => {
-      console.log(err);
+      dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
     });
   return { type: 'NOOP' };
 }

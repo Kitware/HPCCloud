@@ -29,7 +29,7 @@ export function login(username, password) {
         dispatch(routingActions.replace('/'));
       })
       .catch((err) => {
-        dispatch(netActions.errorNetworkCall(action.id, err));
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
         dispatch(authenticationPending(false));
       });
 
@@ -48,7 +48,7 @@ export function register(firstName, lastName, login, email, password) {
           dispatch(routingActions.replace('/Login'));
         },
         error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
+          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
 
     return action;
@@ -86,7 +86,7 @@ export function forgetPassword(email) {
           dispatch(netActions.successNetworkCall(action.id, resp));
         },
         err => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
         });
 
     return action;
@@ -103,7 +103,7 @@ export function changePassword(oldPassword, newPassword) {
           dispatch(netActions.successNetworkCall(action.id, resp));
         },
         err => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
+          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
         });
 
     return action;
@@ -123,7 +123,7 @@ export function updateUser(user, pushOnServer = false) {
             dispatch(loggedIn(resp.data));
           },
           err => {
-            dispatch(netActions.errorNetworkCall(action.id, err));
+            dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
           });
 
       return action;

@@ -4,6 +4,7 @@ import ButtonBar    from '../../../panels/ButtonBar';
 import style        from 'HPCCloudStyle/ItemEditor.mcss';
 
 import get          from 'mout/src/object/get';
+import getNetworkError from '../../../utils/getNetworkError';
 import { connect }  from 'react-redux';
 import * as Actions from '../../../redux/actions/user';
 import { dispatch } from '../../../redux';
@@ -30,7 +31,7 @@ const ChangePassword = React.createClass({
 
   getDefaultProps() {
     return {
-      error: null,
+      error: '',
     };
   },
 
@@ -123,7 +124,7 @@ const ChangePassword = React.createClass({
         </form>
         <ButtonBar
           onAction={ this.handleSubmit }
-          error={ this.state.error ? this.state.error : this.props.error }
+          error={ this.props.error }
           actions={getActions(this.props.icon, !canClick)}
         />
       </div>);
@@ -136,7 +137,7 @@ const ChangePassword = React.createClass({
 
 export default connect(
   state => {
-    const error = get(state, 'network.error.user_updatePassword.resp.data.message');
+    const error = getNetworkError(state, 'user_updatePassword');
     const success = !!get(state, 'network.success.user_updatePassword');
     return {
       error,
