@@ -10,11 +10,17 @@ import { primaryBreadCrumbs } from '../../utils/Constants';
 import style            from 'HPCCloudStyle/PageWithMenu.mcss';
 import vizStyle         from 'HPCCloudStyle/Visualizer.mcss';
 
+import { connect } from 'react-redux';
 import { dispatch, store } from '../../redux';
-import behaviorOnChange from 'pvw-visualizer/src/behavior';
+import { setVisualizerActiveStore } from 'pvw-visualizer/src/redux';
 import Actions from 'pvw-visualizer/src/redux/actions';
+import * as Time from 'pvw-visualizer/src/redux/selectors/time';
+import setup from 'pvw-visualizer/src/setup';
+import ImageProviders from 'pvw-visualizer/src/ImageProviders';
 
-export default React.createClass({
+setVisualizerActiveStore(store);
+
+const visualizer = React.createClass({
 
   displayName: 'Visualization',
 
@@ -24,6 +30,13 @@ export default React.createClass({
     simulation: React.PropTypes.object,
     step: React.PropTypes.string,
     view: React.PropTypes.string,
+
+    index: React.PropTypes.number,
+    playing: React.PropTypes.bool,
+    values: React.PropTypes.array,
+    setTimeStep: React.PropTypes.func,
+    playTime: React.PropTypes.func,
+    stopTime: React.PropTypes.func,
   },
 
   contextTypes: {
@@ -45,40 +58,7 @@ export default React.createClass({
       this.connection = network.getConnection();
       this.session = this.connection.session;
 
-      setImmediate(() => {
-        // Keep track of any server notification
-        this.session.subscribe('pv.time.change', (args) => {
-          const index = args[0].timeStep;
-          setImmediate(() => {
-            dispatch(Actions.time.storeTime(index));
-            const state = store.getState();
-            if (state.visualizer.active.source && state.visualizer.active.source !== '0') {
-              // Update proxy data for info tab...
-              // FIXME implement a lighter implementation on the server side...
-              dispatch(Actions.proxies.fetchProxy(state.visualizer.active.source));
-            }
-          });
-        });
-
-        // Fetch data
-        dispatch(Actions.proxies.fetchPipeline());
-        dispatch(Actions.proxies.fetchAvailableProxies());
-        dispatch(Actions.proxies.fetchSettingProxy());
-        dispatch(Actions.time.fetchTime());
-        dispatch(Actions.files.fetchServerDirectory('.'));
-
-        // Fetch heavy data after full initialization
-        setTimeout(() => {
-          dispatch(Actions.colors.fetchColorMapImages());
-        }, 2000);
-
-
-        // Attach default behavior
-        store.subscribe(() => {
-          const state = store.getState();
-          behaviorOnChange(state.visualizer, dispatch);
-        });
-      });
+      setup(this.session);
     });
 
     // props.simulation is not necessarily updated with latest metadata, so we fetch it.
@@ -97,6 +77,10 @@ export default React.createClass({
 
   componentWillUnmount() {
     // trash visualizer state here
+    setImmediate(() => {
+      ImageProviders.setImageProvider(null);
+    });
+    dispatch(Actions.resetVisualizerState());
   },
 
   onAction(name) {
@@ -112,19 +96,17 @@ export default React.createClass({
   },
 
   nextTimeStep() {
-    // const timeStep = (this.state.timeStep + 1) % this.state.timeValues.length;
-    // dispatch(Actions.time.applyTimeStep())
+    const timeStep = (this.props.index + 1) % this.props.values.length;
+    this.props.setTimeStep(timeStep);
   },
 
   togglePlay() {
-    // const playing = !this.state.playing;
-    // this.setState({ playing });
-    // this.proxyManager[playing ? 'playTime' : 'stopTime']();
+    this.props[this.props.playing ? 'stopTime' : 'playTime']();
   },
 
   previousTimeStep() {
-    // const timeStep = (this.state.timeStep - 1 + this.state.timeValues.length) % this.state.timeValues.length;
-    // this.proxyManager.setTimeStep(timeStep);
+    const timeStep = (this.props.index - 1 + this.props.values.length) % this.props.values.length;
+    this.props.setTimeStep(timeStep);
   },
 
   render() {
@@ -147,7 +129,9 @@ export default React.createClass({
             title={ this.props.simulation.name }
           />
           <ControlPanel className={ this.state.menuVisible ? vizStyle.menu : vizStyle.hiddenMenu } />
-          <VtkRenderer className={ vizStyle.viewport }
+          <VtkRenderer
+            ref={c => { if (!ImageProviders.getImageProvider()) ImageProviders.setImageProvider(c.binaryImageStream); }}
+            className={ vizStyle.viewport }
             client={this.client}
             connection={this.connection}
             session={this.session}
@@ -155,3 +139,20 @@ export default React.createClass({
       </div>);
   },
 });
+
+export default connect(
+  state => ({
+    setTimeStep(index) {
+      dispatch(Actions.time.applyTimeStep(index, state.visualizer.active.source));
+    },
+    playTime() {
+      dispatch(Actions.time.playTime());
+    },
+    stopTime() {
+      dispatch(Actions.time.stopTime());
+    },
+    index: Time.getTimeStep(state),
+    playing: Time.isAnimationPlaying(state),
+    values: Time.getTimeValues(state),
+  })
+)(visualizer);
