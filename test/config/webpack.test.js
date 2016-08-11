@@ -20,7 +20,9 @@ module.exports = {
   ],
   noInfo: true,
   module: {
-    loaders: loaders,
+    loaders: loaders.concat([
+      { test: /\.js$/, include: /node_modules\/pvw-visualizer\//, loader: 'babel?presets[]=es2015,presets[]=react' }
+    ]),
     postLoaders: [
       {
         test: /\.js$/,
