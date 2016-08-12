@@ -110,9 +110,9 @@ const VisualizationView = React.createClass({
         <JobMonitor taskflowId={ taskflowId }
           clusterId={taskflow.flow.meta ? taskflow.flow.meta.cluster._id : null}
         />
-        <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id}
+        <FileListing title="Input Files" folderId={simulation.metadata.outputFolder._id}
           actionsDisbled={fileActionsDisabled} />
-        <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id}
+        <FileListing title="Output Files" folderId={simulation.steps.Visualization.folderId}
           actionsDisbled={fileActionsDisabled} />
         <section>
           <ButtonBar
