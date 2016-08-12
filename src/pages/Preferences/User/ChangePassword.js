@@ -87,7 +87,7 @@ const ChangePassword = React.createClass({
     const canClick = (oldPassword.length > 0 && password.length > 0 && !error);
     return (
       <div className={ this.props.className }>
-        <form onSumbit={this.handleSubmit}>
+        <form onSubmit={this.handleSubmit}>
           <section className={style.group}>
             <label className={style.label}>Password</label>
             <input
