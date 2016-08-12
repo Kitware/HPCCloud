@@ -31,13 +31,18 @@ const SimulationView = React.createClass({
   componentDidMount() {
     if (this.props.simulation) {
       this.props.onMount(this.props.simulation);
-      this.props.fetchClusters();
     }
   },
 
   componentWillReceiveProps(nextProps) {
     if (!this.props.simulation && nextProps.simulation && Object.keys(nextProps.simulation.steps).length) {
       this.props.onMount(nextProps.simulation);
+    }
+  },
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.simulation) {
+      this.props.fetchClusters();
     }
   },
 
