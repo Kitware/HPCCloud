@@ -26,12 +26,13 @@
     "monologue.js": "0.3.4",
     "mout": "0.11.1",
     "normalize.css": "3.0.3",
-    "react": "0.14.7",
-    "react-dom": "0.14.7",
+    "react": "15.3.0",
+    "react-dom": "15.3.0",
 
     "redux": "3.3.1",
     "react-redux": "4.4.1",
     "react-router-redux": "4.0.0",
+    "reselect": "2.5.3",
 
     "bootstrap": "3.3.6",
     "react-router": "2.0.1",
@@ -52,15 +53,16 @@
     "codecov.io": "0.1.6",
 
     "babel-polyfill": "6.9.1",
-    "paraviewweb": "1.6.0",
-    "simput": "1.2.0",
-    "pvw-visualizer": "1.0.11",
+    "paraviewweb": "2.0.5",
+    "pvw-visualizer": "2.0.6",
+    "simput": "1.2.5",
 
     "kw-web-suite": "2.0.0"
   },
   "scripts": {
     "install:pyfr"  : "cp ./node_modules/simput/dist/types/pyfr.js ./dist/simput-pyfr.js",
-    "postinstall"   : "npm run install:pyfr && fix-kw-web-suite || true",
+    "install:nwchem": "cp ./node_modules/simput/dist/types/nwchem.js ./dist/simput-nwchem.js",
+    "postinstall"   : "npm run install:pyfr && npm run install:nwchem && fix-kw-web-suite || true",
     "check"         : "node bin/version-check.js",
 
     "prebuild"      : "npm run check",
