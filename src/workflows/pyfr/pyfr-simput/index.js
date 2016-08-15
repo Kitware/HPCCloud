@@ -11,7 +11,7 @@ import stepVisualizationView  from '../common/steps/Visualization/View';
 
 export default {
   name: 'PyFR',
-  logo: require('./logo.jpg'),
+  logo: require('./logo.png'),
   requiredAttachments: {
     project: ['mesh'],
     simulation: [],

@@ -5,6 +5,7 @@ import network          from 'pvw-visualizer/src/network';
 import ControlPanel     from 'pvw-visualizer/src/panels/ControlPanel';
 import VtkRenderer      from 'paraviewweb/src/React/Renderers/VtkRenderer';
 import client           from '../../network';
+import { projectFunctions }   from '../../utils/AccessHelper';
 import { primaryBreadCrumbs } from '../../utils/Constants';
 
 import style            from 'HPCCloudStyle/PageWithMenu.mcss';
@@ -126,7 +127,9 @@ const visualizer = React.createClass({
                 { name: 'resetCamera', icon: vizStyle.resetCameraButton },
             ]}
             onAction={ this.onAction }
-            title={ this.props.simulation.name }
+            title={ <span> <img src={projectFunctions.getIcon(this.props.project).image} height="20px" />
+              &nbsp;{this.props.project.name} / {this.props.simulation.name}
+              </span> }
           />
           <ControlPanel className={ this.state.menuVisible ? vizStyle.menu : vizStyle.hiddenMenu } />
           <VtkRenderer

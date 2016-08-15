@@ -1,10 +1,8 @@
 import ActiveList   from '../../../../panels/ActiveList';
 import React        from 'react';
-import Toolbar      from '../../../../panels/Toolbar';
 import { activateSimulationStep } from '../../../../network/helpers/simulations';
 
 import style            from 'HPCCloudStyle/PageWithMenu.mcss';
-import { primaryBreadCrumbs } from '../../../../utils/Constants';
 
 export default React.createClass({
 
@@ -48,21 +46,15 @@ export default React.createClass({
     });
 
     return (
-      <div className={ style.rootContainer }>
-          <Toolbar
-            breadcrumb={primaryBreadCrumbs(this.props.project._id, this.props.simulation._id)}
-            title={ `${this.props.project.name} / ${this.props.simulation.name}` }
+      <div className={ style.container }>
+          <ActiveList
+            className={ style.menu }
+            list={menuList}
+            active={stepIdx}
+            onActiveChange={this.updateActiveStep}
           />
-          <div className={ style.container }>
-              <ActiveList
-                className={ style.menu }
-                list={menuList}
-                active={stepIdx}
-                onActiveChange={this.updateActiveStep}
-              />
-              <div className={ style.content }>
-                  { component }
-              </div>
+          <div className={ style.content }>
+              { component }
           </div>
       </div>);
   },

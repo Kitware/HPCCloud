@@ -2,6 +2,11 @@ import React     from 'react';
 import Workflows from '../../../workflows';
 import tools     from  '../../../tools';
 import LoadingPanel from '../../../panels/LoadingPanel';
+import Toolbar      from '../../../panels/Toolbar';
+import { projectFunctions } from '../../../utils/AccessHelper';
+import { primaryBreadCrumbs } from '../../../utils/Constants';
+
+import style            from 'HPCCloudStyle/PageWithMenu.mcss';
 
 import { connect } from 'react-redux';
 import { dispatch } from '../../../redux';
@@ -56,21 +61,30 @@ const SimulationView = React.createClass({
     const step = this.props.params.step || simulation.active || wfModule.steps._order[0];
     const taskFlowName = wfModule.taskFlows && wfModule.taskFlows[step] ? wfModule.taskFlows[step] : null;
     const primaryJob = wfModule.taskFlows && wfModule.primaryJobs[step] ? wfModule.primaryJobs[step] : null;
-    const view = this.props.location.query.view || this.props.simulation.steps[step].view || 'default';
-    const ChildComponent = tools[view] || wfModule.components.ViewSimulation;
+    const viewName = this.props.location.query.view || this.props.simulation.steps[step].view || 'default';
+    const ChildComponent = tools[viewName] ? tools[viewName].view : wfModule.components.ViewSimulation;
+    const childProvidesToolbar = tools[viewName] ? tools[viewName].providesToolbar : false;
 
     if (ChildComponent) {
       return (
-        <ChildComponent
-          project={project}
-          simulation={simulation}
-          step={step}
-          view={view}
-          taskFlowName={taskFlowName}
-          primaryJob={primaryJob}
-          location={this.props.location}
-          module={wfModule}
-        />);
+        <div className={ style.rootContainer }>
+          <Toolbar hidden={childProvidesToolbar}
+            breadcrumb={primaryBreadCrumbs(this.props.project._id, this.props.simulation._id)}
+            title={ <span> <img src={projectFunctions.getIcon(this.props.project).image} height="20px" />
+              &nbsp;{this.props.project.name} / {this.props.simulation.name}
+              </span> }
+          />
+          <ChildComponent
+            project={project}
+            simulation={simulation}
+            step={step}
+            view={viewName}
+            taskFlowName={taskFlowName}
+            primaryJob={primaryJob}
+            location={this.props.location}
+            module={wfModule}
+          />
+        </div>);
     }
 
     return <center>No simulation view for simulation of type {project.type}.</center>;
@@ -98,4 +112,3 @@ export default connect(
     };
   }
 )(SimulationView);
-
