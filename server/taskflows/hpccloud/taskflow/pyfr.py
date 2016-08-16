@@ -23,18 +23,13 @@ import subprocess
 import shutil
 from ConfigParser import SafeConfigParser
 from jsonpath_rw import parse
-from bson.objectid import ObjectId
 
-import cumulus.taskflow
-from cumulus.tasks.job import download_job_input_folders, submit_job
-from cumulus.tasks.job import monitor_job, monitor_jobs
+import cumulus.taskflow.cluster
+from cumulus.taskflow.cluster import create_girder_client
+from cumulus.tasks.job import submit_job, monitor_job, monitor_jobs
+from cumulus.tasks.job import download_job_input_folders
 from cumulus.tasks.job import upload_job_output_to_folder
-from cumulus.tasks.job import terminate_job
 from cumulus.transport.files.download import download_path_from_cluster
-from girder.utility.model_importer import ModelImporter
-from girder.api.rest import getCurrentUser
-from girder.constants import AccessType
-from girder_client import GirderClient, HttpError
 
 from hpccloud.taskflow.utility import *
 
@@ -45,7 +40,7 @@ BACKEND_SECTIONS = [
 ]
 PYFR_MESH_EXT = 'pyfrm'
 
-class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
+class PyFrTaskFlow(cumulus.taskflow.cluster.ClusterProvisioningTaskFlow):
     """
     {
         "input": {
@@ -81,23 +76,6 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
     }
 
     def start(self, *args, **kwargs):
-        user = getCurrentUser()
-        # Load the cluster
-        cluster_id = parse('cluster._id').find(kwargs)
-        if cluster_id:
-            cluster_id = cluster_id[0].value
-            model = ModelImporter.model('cluster', 'cumulus')
-            cluster = model.load(cluster_id, user=user, level=AccessType.ADMIN)
-            cluster = model.filter(cluster, user, passphrase=False)
-            kwargs['cluster'] = cluster
-
-        profile_id = parse('cluster.profileId').find(kwargs)
-        if profile_id:
-            profile_id = profile_id[0].value
-            model = ModelImporter.model('aws', 'cumulus')
-            profile = model.load(profile_id, user=user, level=AccessType.ADMIN)
-            kwargs['profile'] = profile
-
         image_spec = self.PYFR_IMAGE.copy()
         # Setup up image spec
         if '_id' not in kwargs['cluster']:
@@ -107,29 +85,10 @@ class PyFrTaskFlow(cumulus.taskflow.TaskFlow):
             else:
                 image_spec['tags']['blas'] = '3.0'
 
-            kwargs['image_spec'] = image_spec
-
+        kwargs['image_spec'] = image_spec
         kwargs['next'] = setup_input.s()
 
-        super(PyFrTaskFlow, self).start(
-            setup_cluster.s(
-                self, *args, **kwargs))
-
-    def terminate(self):
-        self.run_task(pyfr_terminate.s())
-
-    def delete(self):
-        for job in self.get('meta', {}).get('jobs', []):
-            job_id = job['_id']
-            client = create_girder_client(
-            self.girder_api_url, self.girder_token)
-            client.delete('jobs/%s' % job_id)
-
-            try:
-                client.get('jobs/%s' % job_id)
-            except HttpError as e:
-                if e.status != 404:
-                    self.logger.error('Unable to delete job: %s' % job_id)
+        super(PyFrTaskFlow, self).start(self, *args, **kwargs)
 
 def _import_mesh(logger, input_path, output_path, extn):
     #

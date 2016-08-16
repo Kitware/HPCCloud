@@ -20,21 +20,16 @@ import json
 import os
 from jsonpath_rw import parse
 
-import cumulus.taskflow
-from cumulus.tasks.job import download_job_input_folders, submit_job
-from cumulus.tasks.job import monitor_job, upload_job_output_to_folder
-from cumulus.tasks.job import job_directory
+import cumulus.taskflow.cluster
+from cumulus.taskflow.cluster import create_girder_client
+from cumulus.tasks.job import submit_job, monitor_job
+from cumulus.tasks.job import upload_job_output_to_folder, job_directory
 from cumulus.transport import get_connection
 from cumulus.transport.files.upload import upload_file
 
-from girder.utility.model_importer import ModelImporter
-from girder.api.rest import getCurrentUser
-from girder.constants import AccessType
-from girder_client import GirderClient, HttpError
-
 from hpccloud.taskflow.utility import *
 
-class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
+class ParaViewTaskFlow(cumulus.taskflow.cluster.ClusterProvisioningTaskFlow):
     """
     {
         "dataDir": <passed to --data-dir,
@@ -57,23 +52,6 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
     }
 
     def start(self, *args, **kwargs):
-        user = getCurrentUser()
-        # Load the cluster
-        cluster_id = parse('cluster._id').find(kwargs)
-        if cluster_id:
-            model = ModelImporter.model('cluster', 'cumulus')
-            cluster = model.load(kwargs['cluster']['_id'],
-                                 user=user, level=AccessType.ADMIN)
-            cluster = model.filter(cluster, user, passphrase=False)
-            kwargs['cluster'] = cluster
-
-        profile_id = parse('cluster.profileId').find(kwargs)
-        if profile_id:
-            profile_id = profile_id[0].value
-            model = ModelImporter.model('aws', 'cumulus')
-            profile = model.load(profile_id, user=user, level=AccessType.ADMIN)
-            kwargs['profile'] = profile
-
         image_spec = self.PARAVIEW_IMAGE.copy()
         # Setup up image spec
         if '_id' not in kwargs['cluster']:
@@ -82,31 +60,18 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
                 image_spec['tags']['nvida_display_driver'] = '367.35'
             else:
                 image_spec['tags']['mesa'] = '8.0'
-            kwargs['image_spec'] = image_spec
 
         kwargs['image_spec'] = image_spec
         kwargs['next'] = create_paraview_job.s()
 
-        super(ParaViewTaskFlow, self).start(
-            setup_cluster.s(self, *args, **kwargs))
+        super(ParaViewTaskFlow, self).start(self, *args, **kwargs)
 
     def terminate(self):
-        self.run_task(paraview_terminate.s())
+        super(ParaViewTaskFlow, self).terminate()
         self.run_task(cleanup_proxy_entries.s())
 
     def delete(self):
-        client = create_girder_client(
-            self.girder_api_url, self.girder_token)
-        for job in self.get('meta', {}).get('jobs', []):
-            job_id = job['_id']
-            client.delete('jobs/%s' % job_id)
-
-            try:
-                client.get('jobs/%s' % job_id)
-            except HttpError as e:
-                if e.status != 404:
-                    self.logger.error('Unable to delete job: %s' % job_id)
-
+        super(ParaViewTaskFlow, self).delete()
         self.run_task(cleanup_proxy_entries.s())
 
 def validate_args(kwargs):
