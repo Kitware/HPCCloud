@@ -166,6 +166,19 @@ const FileListing = React.createClass({
   },
 
   render() {
+    // if folderId is not provided just render the toolbar
+    if (!this.props.folderId) {
+      return (<div className={ style.toolbar }>
+        <div className={ style.title }>{this.props.title}</div>
+        <div className={ style.buttons }>
+          <span className={ style.count }>files(0)</span>
+          <i
+            className={ this.state.open ? style.advancedIconOn : style.advancedIconOff}
+            onClick={ this.toggleAdvanced }
+          ></i>
+        </div>
+      </div>);
+    }
     return (<div>
       <div className={ style.toolbar }>
         <div className={ style.title }>{this.props.title}</div>
@@ -197,11 +210,13 @@ const pendingRequests = [];
 export default connect(
   (state, props) => {
     // FIXME that should be managed inside the state manager
-    if (!state.fs.folderMapById[props.folderId] && pendingRequests.indexOf(props.folderId) === -1) {
+    if (props.folderId && !state.fs.folderMapById[props.folderId] && pendingRequests.indexOf(props.folderId) === -1) {
       pendingRequests.push(props.folderId);
       setImmediate(() => {
         dispatch(Actions.fetchFolder(props.folderId));
       });
+    } else if (!props.folderId) {
+      return { folders: null };
     }
 
     return {
