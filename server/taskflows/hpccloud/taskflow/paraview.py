@@ -142,6 +142,10 @@ def paraview_terminate(task):
             task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     jobs = task.taskflow.get('meta', {}).get('jobs', [])
+
+    for job in jobs:
+        upload_output.delay(task, cluster, job)
+
     terminate_jobs(task, client, cluster, jobs)
 
 def _update_cluster_config(task, cluster):
@@ -240,7 +244,7 @@ def upload_input(task, cluster, job, *args, **kwargs):
         task.logger.info('Uploading file to cluster.')
         job_dir = job_directory(cluster, job)
         upload_file(cluster, task.taskflow.girder_token, file, job_dir)
-        task.logger.info('Upload complete.')
+        task.logger.info('Upload input complete.')
 
 def create_proxy_entry(task, cluster, job):
     session_key = job['params']['sessionKey']
@@ -339,7 +343,7 @@ def upload_output(task, cluster, job, *args, **kwargs):
     upload_job_output_to_folder(cluster, job, log_write_url=None, job_dir=None,
                                 girder_token=task.taskflow.girder_token)
 
-    task.taskflow.logger.info('Upload complete.')
+    task.taskflow.logger.info('Upload output complete.')
 
 @cumulus.taskflow.task
 def cleanup_proxy_entries(task):
