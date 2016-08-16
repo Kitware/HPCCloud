@@ -144,7 +144,7 @@ def paraview_terminate(task):
     jobs = task.taskflow.get('meta', {}).get('jobs', [])
 
     for job in jobs:
-        upload_output.delay(task, cluster, job)
+        upload_output.delay(cluster, job)
 
     terminate_jobs(task, client, cluster, jobs)
 
@@ -325,7 +325,6 @@ def monitor_paraview_job(task, cluster, job, *args, **kwargs):
 
 @cumulus.taskflow.task
 def upload_output(task, cluster, job, *args, **kwargs):
-    task.taskflow.logger.info('Uploading results from cluster')
 
     # Refresh state of job
     client = _create_girder_client(
@@ -340,6 +339,8 @@ def upload_output(task, cluster, job, *args, **kwargs):
             'path': '.'
         }]
 
+    task.taskflow.logger.info('Uploading results from cluster to folder: %s' %
+                              output_folder_id)
     upload_job_output_to_folder(cluster, job, log_write_url=None, job_dir=None,
                                 girder_token=task.taskflow.girder_token)
 
