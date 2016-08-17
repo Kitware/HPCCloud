@@ -55,7 +55,12 @@ const VisualizationStart = React.createClass({
     const payload = {
       dataDir, // where the output for the sim will be
       fileName, // the file to load
-      sessionKey, // for pvw, we use this later for connecting
+      sessionKey, // for pvw, we use this later for connecting,
+      output: {
+        folder: {
+          id: this.props.simulation.steps.Visualization.folderId,
+        },
+      },
     };
 
     if (this.state.serverType === 'Traditional') {
