@@ -115,8 +115,6 @@ def _create_girder_client(girder_api_url, girder_token):
 
     return client
 
-
-
 def validate_args(kwargs):
     required = ['cluster.config.paraview.installDir', 'sessionKey']
 
@@ -142,10 +140,6 @@ def paraview_terminate(task):
             task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     jobs = task.taskflow.get('meta', {}).get('jobs', [])
-
-    for job in jobs:
-        upload_output.delay(cluster, job)
-
     terminate_jobs(task, client, cluster, jobs)
 
 def _update_cluster_config(task, cluster):
@@ -317,14 +311,12 @@ def monitor_paraview_job(task, cluster, job, *args, **kwargs):
     task.logger.info('Monitoring job on cluster.')
     girder_token = task.taskflow.girder_token
 
-    task.taskflow.on_complete(monitor_job) \
-        .run(upload_output.s(cluster, job, *args, **kwargs))
-
-    task.taskflow.run_task(
-        monitor_job.s(cluster, job, girder_token=girder_token))
+    monitor_job.apply_async((cluster, job), {'girder_token': girder_token,
+                                         'monitor_interval': 30},
+                        link=upload_output.s(cluster, job, *args, **kwargs))
 
 @cumulus.taskflow.task
-def upload_output(task, cluster, job, *args, **kwargs):
+def upload_output(task, _, cluster, job, *args, **kwargs):
 
     # Refresh state of job
     client = _create_girder_client(
