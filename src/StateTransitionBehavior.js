@@ -69,8 +69,10 @@ export function handleTaskflowChange(state, taskflow) {
     // Need to update simulation status
     if (simulationStatus.length === 2 && (simulationStatus[0] !== simulationStatus[1]) || simulationsStatus[simulation._id] !== simulationStatus[1]) {
       const metadata = Object.assign({}, simulation.metadata, { status: simulationStatus[0] });
+      const sim = state.simulations.mapById[taskflow.simulation];
       simulationsStatus[simulation._id] = simulationStatus[0];
       dispatch(ProjectActions.saveSimulation(Object.assign({}, simulation, { metadata })));
+      dispatch(FSActions.fetchFolder(sim.steps[sim.active].folderId));
     }
   }
 
@@ -125,10 +127,13 @@ export function handleTaskflowChange(state, taskflow) {
 
     // Update simulation folders when all tasks/jobs are done
     if (allComplete && taskflow.simulation && state.simulations.mapById[taskflow.simulation]) {
-      const inputFolder = state.simulations.mapById[taskflow.simulation].metadata.inputFolder._id;
-      const outputFolder = state.simulations.mapById[taskflow.simulation].metadata.outputFolder._id;
+      const sim = state.simulations.mapById[taskflow.simulation];
+      const inputFolder = sim.metadata.inputFolder._id;
+      const outputFolder = sim.metadata.outputFolder._id;
+      const activeFolder = sim.steps[sim.active].folderId;
       // inputFolder is already a little populated on allComplete
       dispatch(FSActions.fetchFolder(inputFolder));
+      dispatch(FSActions.fetchFolder(activeFolder));
       // outputFolder is not, only get it once.
       if (folderItemSize(state, outputFolder) === 0) {
         dispatch(FSActions.fetchFolder(outputFolder));
