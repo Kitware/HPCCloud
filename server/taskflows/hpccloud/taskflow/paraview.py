@@ -87,11 +87,30 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
         kwargs['image_spec'] = image_spec
         kwargs['next'] = create_paraview_job.s()
 
+        # Save the output parameter for the upload_output step
+        self.set_metadata('output', kwargs.get('output', {}))
+
         super(ParaViewTaskFlow, self).start(
             setup_cluster.s(self, *args, **kwargs))
 
     def terminate(self):
-        self.run_task(paraview_terminate.s())
+        meta = self.get('meta', {})
+        cluster = meta.get('cluster')
+        jobs = meta.get('jobs', [])
+        output = meta.get('output', {})
+        upload_jobs = []
+
+        if cluster:
+            for job in jobs:
+                upload_job = upload_output.s(cluster, job, (), output=output)
+                upload_jobs.append(upload_job)
+
+        headers = {
+            cumulus.taskflow.TASKFLOW_HEADER: self
+        }
+        # Terminate and then upload job output
+        paraview_terminate.apply_async(headers=headers,
+                                       link=upload_jobs)
         self.run_task(cleanup_proxy_entries.s())
 
     def delete(self):
