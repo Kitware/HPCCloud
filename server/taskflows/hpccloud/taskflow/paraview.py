@@ -105,12 +105,8 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
                 upload_job = upload_output.s(cluster, job, (), output=output)
                 upload_jobs.append(upload_job)
 
-        headers = {
-            cumulus.taskflow.TASKFLOW_HEADER: self
-        }
         # Terminate and then upload job output
-        paraview_terminate.apply_async(headers=headers,
-                                       link=upload_jobs)
+        self.run_task(paraview_terminate.s(), link=upload_jobs)
         self.run_task(cleanup_proxy_entries.s())
 
     def delete(self):
