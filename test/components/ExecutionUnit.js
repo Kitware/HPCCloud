@@ -71,12 +71,5 @@ describe('ExecutionUnit', () => {
       const logEntries = TestUtils.scryRenderedDOMComponentsWithTag(el, 'p');
       expect(logEntries.length).toEqual(2);
     });
-
-    it('should not update when there\'s a new empty log', () => {
-      const nextProps = deepClone(el.props);
-      nextProps.unit.log = [];
-      el.componentWillUpdate(nextProps, el.state);
-      expect(nextProps.unit.log.length).toEqual(2);
-    });
   });
 });
