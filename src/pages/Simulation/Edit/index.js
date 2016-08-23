@@ -3,9 +3,9 @@ import React      from 'react';
 import Workflows  from '../../../workflows';
 
 import breadCrumbStyle  from 'HPCCloudStyle/Theme.mcss';
+import getNetworkError  from '../../../utils/getNetworkError';
 
 import { connect }  from 'react-redux';
-import get          from 'mout/src/object/get';
 import { dispatch } from '../../../redux';
 import * as Actions from '../../../redux/actions/projects';
 import * as Router  from '../../../redux/actions/router';
@@ -90,8 +90,7 @@ export default connect(
     const simulations = state.projects.simulations[state.projects.active];
     const simulation = state.simulations.mapById[simulations.active];
     return {
-      error: get(state, 'network.error.save_simulation.resp.data.message')
-          || get(state, `network.error.delete_simulation_${props.params.id}.resp.data.message`),
+      error: getNetworkError(state, ['save_simulation', `delete_simulation_${props.params.id}`]),
       project,
       simulation,
     };

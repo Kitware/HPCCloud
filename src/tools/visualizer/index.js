@@ -1,17 +1,27 @@
 import React            from 'react';
 import Toolbar          from '../../panels/Toolbar';
 import LoadingPanel     from '../../panels/LoadingPanel';
-import * as network     from 'pvw-visualizer/src/network';
-import ProxyManager     from 'pvw-visualizer/src/ProxyManager';
+import network          from 'pvw-visualizer/src/network';
 import ControlPanel     from 'pvw-visualizer/src/panels/ControlPanel';
 import VtkRenderer      from 'paraviewweb/src/React/Renderers/VtkRenderer';
 import client           from '../../network';
+import { projectFunctions }   from '../../utils/AccessHelper';
 import { primaryBreadCrumbs } from '../../utils/Constants';
 
 import style            from 'HPCCloudStyle/PageWithMenu.mcss';
 import vizStyle         from 'HPCCloudStyle/Visualizer.mcss';
 
-export default React.createClass({
+import { connect } from 'react-redux';
+import { dispatch, store } from '../../redux';
+import { setVisualizerActiveStore } from 'pvw-visualizer/src/redux';
+import Actions from 'pvw-visualizer/src/redux/actions';
+import * as Time from 'pvw-visualizer/src/redux/selectors/time';
+import setup from 'pvw-visualizer/src/setup';
+import ImageProviders from 'pvw-visualizer/src/ImageProviders';
+
+setVisualizerActiveStore(store);
+
+const visualizer = React.createClass({
 
   displayName: 'Visualization',
 
@@ -21,6 +31,13 @@ export default React.createClass({
     simulation: React.PropTypes.object,
     step: React.PropTypes.string,
     view: React.PropTypes.string,
+
+    index: React.PropTypes.number,
+    playing: React.PropTypes.bool,
+    values: React.PropTypes.array,
+    setTimeStep: React.PropTypes.func,
+    playTime: React.PropTypes.func,
+    stopTime: React.PropTypes.func,
   },
 
   contextTypes: {
@@ -39,18 +56,10 @@ export default React.createClass({
   componentDidMount() {
     network.onReady(() => {
       this.client = network.getClient();
-      this.proxyManager = new ProxyManager(this.client);
+      this.connection = network.getConnection();
+      this.session = this.connection.session;
 
-      /* eslint-disable */
-      this.timeSubcription = this.proxyManager.onTimeChange((data, envelope) => {
-        const {
-          timeStep, timeValues
-        } = data;
-        this.setState({
-          timeStep, timeValues
-        });
-      });
-      /* eslint-enable */
+      setup(this.session);
     });
 
     // props.simulation is not necessarily updated with latest metadata, so we fetch it.
@@ -68,10 +77,11 @@ export default React.createClass({
   },
 
   componentWillUnmount() {
-    if (this.timeSubcription) {
-      this.timeSubcription.unsubscribe();
-      this.timeSubcription = null;
-    }
+    // trash visualizer state here
+    setImmediate(() => {
+      ImageProviders.setImageProvider(null);
+    });
+    dispatch(Actions.resetVisualizerState());
   },
 
   onAction(name) {
@@ -83,29 +93,25 @@ export default React.createClass({
   },
 
   resetCamera() {
-    if (this.proxyManager) {
-      this.proxyManager.resetCamera();
-    }
+    dispatch(Actions.view.resetCamera());
   },
 
   nextTimeStep() {
-    const timeStep = (this.state.timeStep + 1) % this.state.timeValues.length;
-    this.proxyManager.setTimeStep(timeStep);
+    const timeStep = (this.props.index + 1) % this.props.values.length;
+    this.props.setTimeStep(timeStep);
   },
 
   togglePlay() {
-    const playing = !this.state.playing;
-    this.setState({ playing });
-    this.proxyManager[playing ? 'playTime' : 'stopTime']();
+    this.props[this.props.playing ? 'stopTime' : 'playTime']();
   },
 
   previousTimeStep() {
-    const timeStep = (this.state.timeStep - 1 + this.state.timeValues.length) % this.state.timeValues.length;
-    this.proxyManager.setTimeStep(timeStep);
+    const timeStep = (this.props.index - 1 + this.props.values.length) % this.props.values.length;
+    this.props.setTimeStep(timeStep);
   },
 
   render() {
-    if (!this.proxyManager) {
+    if (!this.session) {
       return <LoadingPanel large center />;
     }
 
@@ -121,10 +127,35 @@ export default React.createClass({
                 { name: 'resetCamera', icon: vizStyle.resetCameraButton },
             ]}
             onAction={ this.onAction }
-            title={ this.props.simulation.name }
+            title={ <span> <img src={projectFunctions.getIcon(this.props.project).image} height="20px" />
+              &nbsp;{this.props.project.name} / {this.props.simulation.name}
+              </span> }
           />
-          <ControlPanel className={ this.state.menuVisible ? vizStyle.menu : vizStyle.hiddenMenu } proxyManager={ this.proxyManager } />
-          <VtkRenderer { ...this.proxyManager.getNetworkAdapter() } className={ vizStyle.viewport } />
+          <ControlPanel className={ this.state.menuVisible ? vizStyle.menu : vizStyle.hiddenMenu } />
+          <VtkRenderer
+            ref={c => { if (!ImageProviders.getImageProvider()) ImageProviders.setImageProvider(c.binaryImageStream); }}
+            className={ vizStyle.viewport }
+            client={this.client}
+            connection={this.connection}
+            session={this.session}
+          />
       </div>);
   },
 });
+
+export default connect(
+  state => ({
+    setTimeStep(index) {
+      dispatch(Actions.time.applyTimeStep(index, state.visualizer.active.source));
+    },
+    playTime() {
+      dispatch(Actions.time.playTime());
+    },
+    stopTime() {
+      dispatch(Actions.time.stopTime());
+    },
+    index: Time.getTimeStep(state),
+    playing: Time.isAnimationPlaying(state),
+    values: Time.getTimeValues(state),
+  })
+)(visualizer);

@@ -2,6 +2,7 @@ import React        from 'react';
 import Breadcrumb   from '../../widgets/Breadcrumb';
 import merge        from 'mout/src/object/merge';
 import style        from 'HPCCloudStyle/Toolbar.mcss';
+import states       from 'HPCCloudStyle/States.mcss';
 
 export default React.createClass({
   displayName: 'PreferenceSubBar',
@@ -11,9 +12,10 @@ export default React.createClass({
     breadcrumb: React.PropTypes.object,
     hasTabs: React.PropTypes.bool,
     filter: React.PropTypes.bool,
+    hidden: React.PropTypes.bool,
     location: React.PropTypes.object,
     onAction: React.PropTypes.func,
-    title: React.PropTypes.string,
+    title: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.object]),
   },
 
   contextTypes: {
@@ -31,6 +33,7 @@ export default React.createClass({
         titles: [],
       },
       hasTabs: false,
+      hidden: false,
     };
   },
 
@@ -53,7 +56,7 @@ export default React.createClass({
 
   render() {
     return (
-      <nav className={ style.container }>
+      <nav className={ [style.container, this.props.hidden ? states.isHidden : ''].join(' ') }>
         <Breadcrumb
           className={ this.props.hasTabs ? style.toolbarTab : style.breadcrumb }
           paths={ this.props.breadcrumb.paths }

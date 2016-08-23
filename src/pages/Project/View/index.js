@@ -1,5 +1,5 @@
 import React                from 'react';
-import { SimulationHelper } from '../../../utils/AccessHelper';
+import { projectFunctions, SimulationHelper } from '../../../utils/AccessHelper';
 import TableListing         from '../../../panels/TableListing';
 import EmptyPlaceholder     from '../../../panels/EmptyPlaceholder';
 import { primaryBreadCrumbs } from '../../../utils/Constants';
@@ -62,7 +62,7 @@ const ProjectView = React.createClass({
         accessHelper={ SimulationHelper }
         items={ this.props.simulations }
         onAction={ this.onAction }
-        title={ `${this.props.project.name} / Simulations` }
+        title={ <span> <img src={projectFunctions.getIcon(this.props.project).image} height="20px" /> {this.props.project.name} / Simulations</span> }
         placeholder={
           <EmptyPlaceholder phrase={
             <span>There are no simulations for this project<br />

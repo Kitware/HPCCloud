@@ -33,4 +33,3 @@ karmaConfig.coverageReporters = {
 module.exports = function(config) {
   config.set(karmaConfig);
 };
-

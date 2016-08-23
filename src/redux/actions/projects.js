@@ -124,7 +124,7 @@ export function saveProject(project, attachments) {
           }
         },
         error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
+          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
 
     return action;
@@ -162,7 +162,7 @@ export function saveSimulation(simulation, attachments, location) {
           }
         },
         error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
+          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
     return action;
   };
@@ -182,8 +182,7 @@ export function deleteSimulation(simulation, location) {
           }
         },
         error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
-          // throw new Error('project delete fails');
+          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
 
     return action;

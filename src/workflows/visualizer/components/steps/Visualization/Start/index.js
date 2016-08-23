@@ -4,10 +4,11 @@ import RunClusterFrom          from '../../../../../../panels/run';
 import ButtonBar               from '../../../../../../panels/ButtonBar';
 import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 
+import getNetworkError from '../../../../../../utils/getNetworkError';
 import { connect }  from 'react-redux';
-import get          from 'mout/src/object/get';
 import { dispatch } from '../../../../../../redux';
 import * as Actions from '../../../../../../redux/actions/taskflows';
+import * as NetActions from '../../../../../../redux/actions/network';
 
 const VisualizationStart = React.createClass({
   displayName: 'pvw/start-visualization',
@@ -24,6 +25,7 @@ const VisualizationStart = React.createClass({
     tradClusters: React.PropTypes.object,
     ec2Clusters: React.PropTypes.object,
     onRun: React.PropTypes.func,
+    onError: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -32,7 +34,6 @@ const VisualizationStart = React.createClass({
       EC2: defaultServerParameters.EC2,
       Traditional: defaultServerParameters.Traditional,
       OpenStack: defaultServerParameters.OpenStack,
-      error: null,
     };
   },
 
@@ -54,15 +55,25 @@ const VisualizationStart = React.createClass({
     };
 
     if (this.state.serverType === 'Traditional') {
-      payload.cluster = ClusterPayloads.tradClusterPayload(this.state[this.state.serverType].profile);
+      try {
+        payload.cluster = ClusterPayloads.tradClusterPayload(this.state[this.state.serverType].profile);
+      } catch (error) {
+        this.props.onError(error.message);
+        return;
+      }
     } else if (this.state.serverType === 'EC2') {
       if (!this.state.EC2.cluster) {
-        payload.cluster = ClusterPayloads.ec2ClusterPayload(
-          this.state.EC2.name,
-          this.state.EC2.machine,
-          this.state.EC2.clusterSize,
-          this.state.EC2.profile
-        );
+        try {
+          payload.cluster = ClusterPayloads.ec2ClusterPayload(
+            this.state.EC2.name,
+            this.state.EC2.machine,
+            this.state.EC2.clusterSize,
+            this.state.EC2.profile
+          );
+        } catch (error) {
+          this.props.onError(error.message);
+          return;
+        }
       } else {
         payload.cluster = { _id: this.state.EC2.cluster };
       }
@@ -108,7 +119,6 @@ const VisualizationStart = React.createClass({
   render() {
     var actions = [{ name: 'startVisualization', label: 'Start Visualization', icon: '' }],
       serverProfiles = { EC2: this.state.EC2, Traditional: this.state.Traditional };
-
     return (
       <div>
         <RunClusterFrom serverType={this.state.serverType} serverTypeChange={this.updateServerType}
@@ -118,7 +128,7 @@ const VisualizationStart = React.createClass({
           visible={this.state[this.state.serverType].profile !== ''}
           onAction={this.formAction}
           actions={actions}
-          error={this.state.error}
+          error={this.props.error}
         />
       </div>);
   },
@@ -130,8 +140,7 @@ const VisualizationStart = React.createClass({
 export default connect(
   (state, props) => {
     return {
-      error: get(state, 'network.error.create_taskflow.resp.data.message')
-        || get(state, 'network.error.start_taskflow.resp.data.message'),
+      error: getNetworkError(state, ['create_taskflow', 'start_taskflow']),
       ec2Clusters: state.preferences.aws.mapById,
       tradClusters: state.preferences.clusters.mapById,
     };
@@ -140,6 +149,7 @@ export default connect(
     return {
       onRun: (taskflowName, primaryJob, payload, simulationStep, location) =>
         dispatch(Actions.createTaskflow(taskflowName, primaryJob, payload, simulationStep, location)),
+      onError: (message) => dispatch(NetActions.errorNetworkCall('create_taskflow', { data: { message } }, 'form')),
     };
   }
 )(VisualizationStart);

@@ -11,15 +11,23 @@ import routes                       from './config/routes';
 import { store, history, dispatch } from './redux';
 import * as ProjectActions          from './redux/actions/projects';
 import * as TaskflowActions         from './redux/actions/taskflows';
+import * as NetworkActions          from './redux/actions/network';
 import * as Behavior                from './StateTransitionBehavior';
+import Toaster                      from './widgets/Toaster';
+
+import { updateVisualizerStateAccessor } from 'pvw-visualizer/src/redux/selectors/stateAccessor';
 
 // Setup application and pages
 const container = document.querySelector('.react-container');
+updateVisualizerStateAccessor(state => state.visualizer);
 
 export function configure(config = { girderAPI: baseURL }) {
   render(
     <Provider store={ store }>
-      <Router history={ history } routes={ routes } />
+      <main>
+        <Router history={ history } routes={ routes } />
+        <Toaster />
+      </main>
     </Provider>, container);
 }
 
@@ -62,5 +70,8 @@ if (history) {
     if (type === 'Project') {
       dispatch(ProjectActions.setActiveProject(id));
     }
+
+    // invalidate all errors on a page change
+    dispatch(NetworkActions.invalidateErrors('*'));
   });
 }
