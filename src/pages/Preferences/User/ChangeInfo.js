@@ -3,7 +3,8 @@ import ButtonBar    from '../../../panels/ButtonBar';
 
 import style        from 'HPCCloudStyle/ItemEditor.mcss';
 
-import get          from 'mout/src/object/get';
+import getNetworkError from '../../../utils/getNetworkError';
+import get from 'mout/src/object/get';
 import { connect }  from 'react-redux';
 import * as Actions from '../../../redux/actions/user';
 import { dispatch } from '../../../redux';
@@ -101,7 +102,7 @@ const ChangeInfo = React.createClass({
 
 export default connect(
   state => {
-    const error = get(state, 'network.error.user_update.resp.data.message');
+    const error = getNetworkError(state, 'user_update');
     const success = !!get(state, 'network.success.user_update');
     return {
       user: state.auth.user,

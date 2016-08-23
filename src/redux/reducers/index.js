@@ -9,6 +9,8 @@ import projects     from './projects';
 import simulations  from './simulations';
 import taskflows    from './taskflows';
 
+import visualizer   from 'pvw-visualizer/src/redux/reducers';
+
 export default combineReducers({
   auth,
   fs,
@@ -19,4 +21,5 @@ export default combineReducers({
   taskflows,
 
   routing: routerReducer,
+  visualizer,
 });

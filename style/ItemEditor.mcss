@@ -37,6 +37,11 @@ textarea.input {
     padding: 10px 20px;
 }
 
+.buttonContainer {
+    display: flex;
+    align-items: flex-start;
+}
+
 .button {
     composes: btn from 'bootstrap/dist/css/bootstrap.css';
     composes: btn-default from 'bootstrap/dist/css/bootstrap.css';

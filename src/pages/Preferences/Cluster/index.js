@@ -87,12 +87,6 @@ const ClusterPrefs = React.createClass({
     }
   },
 
-  componentWillUnmount() {
-    if (this.props.error) {
-      this.props.invalidateErrors();
-    }
-  },
-
   changeItem(item) {
     const { active, onUpdateItem } = this.props;
     onUpdateItem(active, item);
@@ -219,17 +213,12 @@ export default connect(
     const simulations = state.simulations.mapById;
     const taskflows = Object.keys(state.taskflows.mapById).map((tf) => state.taskflows.mapById[tf]);
 
-    var error = getNetworkError(state, 'save_cluster');
-    if (!error) {
-      error = getNetworkError(state, 'remove_cluster');
-    }
-
     return {
       presetNames: Object.keys(localState.presets || {}),
       active: localState.active,
       list: localState.list.filter((el) => el.type === 'trad'),
       buttonsDisabled: localState.pending,
-      error,
+      error: getNetworkError(state, ['save_cluster', 'remove_cluster']),
       taskflows,
       simulations,
     };

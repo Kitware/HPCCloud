@@ -8,7 +8,7 @@ import style from 'HPCCloudStyle/Theme.mcss';
 /* eslint-disable new-cap */
 const SHORT_DESCRIPTION_SIZE = 80;
 
-const projectFunctions = {
+export const projectFunctions = {
   getIcon(project) {
     return {
       image: Workflow[project.type] ? Workflow[project.type].logo : '',

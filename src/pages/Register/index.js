@@ -1,7 +1,7 @@
 import React  from 'react';
 import style  from 'HPCCloudStyle/Login.mcss';
 
-import get          from 'mout/src/object/get';
+import getNetworkError from '../../utils/getNetworkError';
 import { connect }  from 'react-redux';
 import { dispatch } from '../../redux';
 import { register } from '../../redux/actions/user';
@@ -21,20 +21,21 @@ const Register = React.createClass({
 
   getDefaultProps() {
     return {
-      error: null,
+      error: '',
       onRegister: (user) => console.log('register', user),
     };
   },
 
   getInitialState() {
     return {
+      error: '',
       password: '',
       confirm: '',
     };
   },
 
   componentWillReceiveProps(newProps) {
-    if (newProps.error) {
+    if (newProps.error !== this.props.error) {
       this.setState({ error: newProps.error });
     }
   },
@@ -138,7 +139,7 @@ const Register = React.createClass({
 export default connect(
   state => {
     return {
-      error: get(state, 'network.error.user_register.resp.data.message'),
+      error: getNetworkError(state, 'user_register'),
     };
   },
   () => {

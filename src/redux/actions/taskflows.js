@@ -152,7 +152,7 @@ export function startTaskflow(id, payload, simulationStep, location) {
           }
         },
         error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
+          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
 
     return action;
@@ -172,7 +172,7 @@ export function createTaskflow(taskFlowName, primaryJob, payload, simulationStep
           dispatch(startTaskflow(resp.data._id, payload, simulationStep, location));
         },
         error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
+          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
 
     return action;
@@ -283,7 +283,7 @@ export function terminateTaskflow(id) {
           dispatch(netActions.successNetworkCall(action.id, resp));
         },
         error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
+          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
 
     return action;

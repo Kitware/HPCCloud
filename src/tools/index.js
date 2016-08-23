@@ -1,5 +1,8 @@
 import visualizer from './visualizer';
 
 export default {
-  visualizer,
+  visualizer: {
+    providesToolbar: true,
+    view: visualizer,
+  },
 };

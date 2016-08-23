@@ -2,11 +2,12 @@ import ItemEditor   from '../../../panels/ItemEditor';
 import React        from 'react';
 
 import Workflows    from '../../../workflows';
+import getNetworkError from '../../../utils/getNetworkError';
+import get          from 'mout/src/object/get';
 
 import breadCrumbStyle from 'HPCCloudStyle/Theme.mcss';
 
 import { connect }  from 'react-redux';
-import get          from 'mout/src/object/get';
 import { dispatch } from '../../../redux';
 import * as Actions from '../../../redux/actions/projects';
 import * as Router  from '../../../redux/actions/router';
@@ -113,7 +114,7 @@ export default connect(
     return {
       project: state.projects.mapById[state.projects.active || props.params.id],
       buttonsDisabled: !!get(state, 'network.pending.save_simulation'),
-      error: get(state, 'network.error.save_simulation.resp.data.message'),
+      error: getNetworkError(state, 'save_simulation'),
     };
   },
   () => {

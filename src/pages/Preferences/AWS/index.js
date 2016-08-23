@@ -68,8 +68,8 @@ const AWSPrefs = React.createClass({
   },
 
   componentWillUnmount() {
-    if (this.props.error) {
-      this.props.invalidateErrors();
+    if (this.timeout) {
+      clearTimeout(this.timeout);
     }
   },
 
@@ -177,17 +177,12 @@ const AWSPrefs = React.createClass({
 export default connect(
   state => {
     const localState = state.preferences.aws;
-    var error = getNetworkError(state, 'save_aws_profile');
-
-    if (!error) {
-      error = getNetworkError(state, 'remove_aws_profile');
-    }
 
     return {
       active: localState.active,
       list: localState.list,
       buttonsDisabled: localState.pending,
-      error,
+      error: getNetworkError(state, ['save_aws_profile', 'remove_aws_profile']),
     };
   },
   () => {

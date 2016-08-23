@@ -45,7 +45,7 @@ export default React.createClass({
         <span>
           { this.props.children }
         </span>
-        <div>
+        <div className={editor.buttonContainer}>
           <span className={ (this.props.error ? editor.errorBox : states.isHidden) }>
             { this.props.error }
           </span>

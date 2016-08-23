@@ -7,10 +7,11 @@ import RuntimeBackend          from '../../../panels/RuntimeBackend';
 
 import merge                   from 'mout/src/object/merge';
 
+import getNetworkError  from '../../../../../../utils/getNetworkError';
 import { connect } from 'react-redux';
-import get          from 'mout/src/object/get';
 import { dispatch } from '../../../../../../redux';
-import * as Actions from '../../../../../../redux/actions/taskflows';
+import * as Actions    from '../../../../../../redux/actions/taskflows';
+import * as NetActions from '../../../../../../redux/actions/network';
 
 const SimulationStart = React.createClass({
 
@@ -24,10 +25,10 @@ const SimulationStart = React.createClass({
     taskFlowName: React.PropTypes.string,
     primaryJob: React.PropTypes.string,
     view: React.PropTypes.string,
-
     error: React.PropTypes.string,
     clusters: React.PropTypes.object,
     onRun: React.PropTypes.func,
+    onError: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -36,9 +37,7 @@ const SimulationStart = React.createClass({
       EC2: defaultServerParameters.EC2,
       Traditional: defaultServerParameters.Traditional,
       OpenStack: defaultServerParameters.OpenStack,
-
       backend: {},
-      error: '',
     };
   },
 
@@ -72,21 +71,27 @@ const SimulationStart = React.createClass({
       };
 
     if (this.state.serverType === 'Traditional') {
-      payload = Object.assign(payload,
-        this.state.Traditional.runtime || {},
-        { cluster: ClusterPayloads.tradClusterPayload(this.state.Traditional.profile) }
-      );
+      payload = Object.assign(payload, this.state.Traditional.runtime || {});
+      try {
+        payload.cluster = ClusterPayloads.tradClusterPayload(this.state.Traditional.profile);
+      } catch (error) {
+        this.props.onError(error.message);
+        return;
+      }
     } else if (this.state.serverType === 'EC2') {
-      payload = Object.assign(payload,
-        this.state.EC2.runtime || {}
-      );
+      payload = Object.assign(payload, this.state.EC2.runtime || {});
       if (!this.state.EC2.cluster) {
-        payload.cluster = ClusterPayloads.ec2ClusterPayload(
-          this.state.EC2.name,
-          this.state.EC2.machine,
-          this.state.EC2.clusterSize,
-          this.state.EC2.profile
-        );
+        try {
+          payload.cluster = ClusterPayloads.ec2ClusterPayload(
+            this.state.EC2.name,
+            this.state.EC2.machine,
+            this.state.EC2.clusterSize,
+            this.state.EC2.profile
+          );
+        } catch (error) {
+          this.props.onError(error.message);
+          return;
+        }
       } else {
         payload.cluster = { _id: this.state.EC2.cluster };
       }
@@ -98,7 +103,7 @@ const SimulationStart = React.createClass({
       this.props.taskFlowName,
       this.props.primaryJob,
       payload,
-      {
+      { // simulationStep
         id: this.props.simulation._id,
         name: this.props.simulation.name,
         step: 'Simulation',
@@ -109,7 +114,7 @@ const SimulationStart = React.createClass({
           },
         },
       },
-      {
+      { // new location
         pathname: this.props.location.pathname,
         query: merge(this.props.location.query, {
           view: 'run',
@@ -158,7 +163,7 @@ const SimulationStart = React.createClass({
             visible={this.state[this.state.serverType].profile !== ''}
             onAction={this.formAction}
             actions={actions}
-            error={ this.props.error || this.state.error }
+            error={ this.props.error }
           />
       </div>);
   },
@@ -170,8 +175,7 @@ const SimulationStart = React.createClass({
 export default connect(
   state => {
     return {
-      error: get(state, 'network.error.create_taskflow.resp.data.message')
-        || get(state, 'network.error.start_taskflow.resp.data.message'),
+      error: getNetworkError(state, ['create_taskflow', 'start_taskflow']),
       clusters: state.preferences.clusters.mapById,
     };
   },
@@ -179,6 +183,7 @@ export default connect(
     return {
       onRun: (taskflowName, primaryJob, payload, simulationStep, location) =>
         dispatch(Actions.createTaskflow(taskflowName, primaryJob, payload, simulationStep, location)),
+      onError: (message) => dispatch(NetActions.errorNetworkCall('create_taskflow', { data: { message } }, 'form')),
     };
   }
 )(SimulationStart);
