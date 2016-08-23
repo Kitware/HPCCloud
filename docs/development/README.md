@@ -2,6 +2,6 @@
 
 - [Development introduction](dev-intro.md)
 - [Panels](panels.md)
-- [Workflows](workflows.md)
-- [Tools](tools.md)
 - [Redux](redux.md)
+- [Tools](tools.md)
+- [Workflows](workflows.md)
