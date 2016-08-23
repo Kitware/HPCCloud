@@ -27,7 +27,6 @@
         [_id]: { name, 
           config, 
           status,
-          logStream: EventSource,
           log: []
         },
       }
