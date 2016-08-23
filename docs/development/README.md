@@ -4,3 +4,4 @@
 - [Panels](panels.md)
 - [Workflows](workflows.md)
 - [Tools](tools.md)
+- [Redux](redux.md)
