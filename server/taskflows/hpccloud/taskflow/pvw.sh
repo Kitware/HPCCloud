@@ -52,7 +52,7 @@ DISPLAY=:0
 export DISPLAY
 
 # First run pvbatch
-${MPIPROG} ${PV_BATCH} {{'--mesa-llvm' if not gpu else ''}} ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} \
+${MPIPROG} -n 2 ${PV_BATCH} {{'--mesa-llvm' if not gpu else ''}} ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} \
 {{ '--data-dir %s' % dataDir if dataDir else ''}} \
 {{ '--load-file %s' % fileName if fileName else '' }}
 
