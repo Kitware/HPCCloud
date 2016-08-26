@@ -131,7 +131,6 @@ export default function clustersReducer(state = initialState, action) {
     case Actions.UPDATE_EXISTING_CLUSTER: {
       const mapById = Object.assign({}, state.mapById);
       if (!action.cluster.log) {
-        console.log('update log of existing', mapById[action.cluster._id].log);
         action.cluster.log = [].concat(mapById[action.cluster._id].log);
       }
       mapById[action.cluster._id] = action.cluster;
@@ -230,7 +229,11 @@ export default function clustersReducer(state = initialState, action) {
       if (!cluster.log) {
         cluster.log = [];
       }
-      cluster.log.push(action.logEntry);
+      if (Array.isArray(action.logEntry)) {
+        cluster.log = cluster.log.concat(action.logEntry);
+      } else {
+        cluster.log.push(action.logEntry);
+      }
       mapById[action.id] = cluster;
       return Object.assign({}, state, { mapById });
     }

@@ -171,7 +171,7 @@ describe('StateTransitionBehavior', () => {
       expect(ClusterActions.updateCluster).toNotHaveBeenCalled();
     });
 
-    it('should update the cluster if there is a tf cluster in state', () => {
+    it('should update the cluster if there is no tf cluster in state', () => {
       const cluster = taskflow.flow.meta.cluster;
       fullState.preferences.clusters.mapById[clusterId] = cluster;
       cluster.config.simulation = {
@@ -179,7 +179,7 @@ describe('StateTransitionBehavior', () => {
         step: 'Simulation',
       };
       handleTaskflowChange(fullState, taskflow);
-      expect(ClusterActions.updateCluster).toHaveBeenCalledWith(cluster);
+      expect(ClusterActions.updateCluster).toNotHaveBeenCalled();
     });
   });
 
