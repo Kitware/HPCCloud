@@ -350,7 +350,7 @@ function updateTaskflowObject() {
   const state = store.getState();
   const taskflows = Object.keys(state.taskflows.mapById).map((key) => state.taskflows.mapById[key]);
   for (let i = 0; i < taskflows.length; i++) {
-    if (!taskflows[i].flow.meta) {
+    if (!taskflows[i].flow.meta && taskflows[i].flow._id) {
       dispatch(fetchTaskflow(taskflows[i].flow._id));
     }
   }
