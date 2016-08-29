@@ -94,7 +94,7 @@ const FileListing = React.createClass({
     } else {
       value = (<span key={file._id}>
         <em>{formatFileSize(file.size)} </em>
-        <a href={`api/v1/item/${file._id}/download`} target="_blank">
+        <a href={`api/v1/item/${file._id}/download?contentDisposition=inline`} target="_blank">
           <i className={style.downloadIcon}></i>
         </a>
         {/* 500,000B (500KB) maximum preview-able size */}
