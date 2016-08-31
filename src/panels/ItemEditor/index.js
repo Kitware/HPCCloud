@@ -24,6 +24,13 @@ const FileUploadEntry = React.createClass({
     };
   },
 
+  componentWillUnmount() {
+    if (this.props.owner()) {
+      this.props.owner().removeMetadata();
+      this.props.owner().removeAttachments();
+    }
+  },
+
   processFile(event) {
     var file;
     if (event.target.files.length) {
@@ -163,6 +170,18 @@ export default React.createClass({
   addMetadata(name, value) {
     const metadata = this.state.metadata || {};
     metadata[name] = value;
+    this.setState({ metadata });
+  },
+
+  removeAttachments() {
+    this.attachement = {};
+  },
+
+  removeMetadata() {
+    const metadata = Object.assign({}, this.state.metadata || {});
+    Object.keys(this.attachement).forEach((el) => {
+      delete metadata[el];
+    });
     this.setState({ metadata });
   },
 
