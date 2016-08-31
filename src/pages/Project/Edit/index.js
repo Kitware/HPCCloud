@@ -25,11 +25,11 @@ const ProjectEdit = React.createClass({
     invalidateError: React.PropTypes.func,
   },
 
-  onAction(action, data, attachement) {
-    this[action](data, attachement);
+  onAction(action, data, attachment) {
+    this[action](data, attachment);
   },
 
-  editProject(data, attachement) {
+  editProject(data, attachment) {
     this.props.onSave(Object.assign({}, this.props.project, data));
   },
 

@@ -48,7 +48,7 @@ const FileUploadEntry = React.createClass({
     // Let's record attachment
     const name = event.target.dataset.name;
     if (this.props.owner && name) {
-      this.props.owner().addAttachement(name, file);
+      this.props.owner().addAttachment(name, file);
     }
 
     // Let's post process it
@@ -157,14 +157,14 @@ export default React.createClass({
 
   onAction(action) {
     if (this.props.onAction) {
-      this.props.onAction(action, this.state, this.attachement);
+      this.props.onAction(action, this.state, this.attachment);
     }
   },
 
-  addAttachement(name, file) {
-    const attachement = this.attachement || {};
-    attachement[name] = file;
-    this.attachement = attachement;
+  addAttachment(name, file) {
+    const attachment = this.attachment || {};
+    attachment[name] = file;
+    this.attachment = attachment;
   },
 
   addMetadata(name, value) {
@@ -174,12 +174,12 @@ export default React.createClass({
   },
 
   removeAttachments() {
-    this.attachement = {};
+    this.attachment = {};
   },
 
   removeMetadata() {
     const metadata = Object.assign({}, this.state.metadata || {});
-    Object.keys(this.attachement).forEach((el) => {
+    Object.keys(this.attachment).forEach((el) => {
       delete metadata[el];
     });
     this.setState({ metadata });

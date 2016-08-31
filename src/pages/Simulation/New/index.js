@@ -58,7 +58,7 @@ const SimulationNew = React.createClass({
       return;
     }
 
-    // check for requiredAttachements.
+    // check for requiredAttachments.
     if (get(Workflows[this.props.project.type], 'requiredAttachments.simulation.length')) {
       const reqAttachments = Workflows[this.props.project.type].requiredAttachments.simulation;
       if (!attachments || !reqAttachments.every((el) => attachments.hasOwnProperty(el))) {
