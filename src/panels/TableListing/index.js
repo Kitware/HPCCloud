@@ -44,6 +44,8 @@ export default React.createClass({
     return {
       selected: [],
       actions: [TOOLBAR_ACTIONS.add],
+      sortKey: '',
+      sortReverse: false,
     };
   },
 
@@ -106,11 +108,57 @@ export default React.createClass({
     }
   },
 
+  sortBy(e) {
+    const sortKey = e.currentTarget.dataset.title;
+    let sortReverse;
+    if (this.state.sortKey !== sortKey && this.state.sortKey !== '') {
+      sortReverse = false;
+    } else {
+      sortReverse = !this.state.sortReverse;
+    }
+    this.setState({ sortKey, sortReverse });
+  },
+
   render() {
-    updateQuery(this.props.location.query.filter);
-    const filteredList = this.props.items.filter(itemFilter);
     const helper = this.props.accessHelper;
+    let comparisonFn = helper.cellContentFunctions[1];
     let content = null;
+    let fnIndex = 1; // default sortBy index, the second column which for us is the name
+    if (!this.state.sortKey.length) {
+      comparisonFn = helper.cellContentFunctions[fnIndex];
+    } else {
+      fnIndex = helper.columns.indexOf(this.state.sortKey);
+      comparisonFn = helper.cellContentFunctions[fnIndex];
+    }
+
+    let sorter;
+    if (this.props.items.length && typeof comparisonFn(this.props.items[0]) === 'number') {
+      sorter = (a, b) => a - b;
+    } else {
+      sorter = (a, b) => comparisonFn(a).localeCompare(comparisonFn(b));
+    }
+
+    updateQuery(this.props.location.query.filter);
+    const filteredList = this.props.items.filter(itemFilter).sort(sorter);
+    if (this.state.sortReverse) {
+      filteredList.reverse(); // modifies filteredList in place, odd that const doesn't guard that
+    }
+
+    const columnMapper = (title, index) => {
+      // if there is no title then you cannot sort by that item, nothing to click on
+      if (!title) {
+        return null;
+      }
+      // return the title with a sorted icon, if the column is not being sorted the icon is hidden
+      return (
+        <span onClick={this.sortBy} data-title={title}>
+          { title }
+          { index === fnIndex ?
+            this.state.sortReverse ? <i className={style.sortedAsc}></i> : <i className={style.sortedDesc}></i>
+            : <i className={[style.sortedAsc, style.visHidden].join(' ')}></i>
+          }
+        </span>);
+    };
 
     if (this.props.items.length) {
       content = (
@@ -118,7 +166,9 @@ export default React.createClass({
           <thead>
               <tr>
                   {helper.columns.map((title, index) => (
-                    <th key={`${title}_${index}`}>{title}</th>
+                    <th key={`${title}_${index}`}>
+                      { columnMapper(title, index) }
+                    </th>
                     ))}
               </tr>
           </thead>

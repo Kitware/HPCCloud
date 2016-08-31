@@ -16,6 +16,10 @@
     cursor: default;
 }
 
+.table > thead > tr > th > span {
+    cursor: pointer;
+}
+
 .table > tbody > tr {
     transition: all 0.2s ease;
 }
@@ -55,4 +59,20 @@
 .deleteIcon {
     composes: fa        from 'font-awesome/css/font-awesome.css';
     composes: fa-trash  from 'font-awesome/css/font-awesome.css';
+}
+
+.sortedDesc {
+    composes: fa        from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw     from 'font-awesome/css/font-awesome.css';
+    composes: fa-sort-desc  from 'font-awesome/css/font-awesome.css';
+}
+
+.sortedAsc {
+    composes: fa        from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw     from 'font-awesome/css/font-awesome.css';
+    composes: fa-sort-asc  from 'font-awesome/css/font-awesome.css';
+}
+
+.visHidden {
+    visibility: hidden;
 }
