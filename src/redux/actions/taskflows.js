@@ -1,7 +1,8 @@
-import * as netActions  from './network';
-import * as projActions from './projects';
+import * as netActions     from './network';
+import * as projActions    from './projects';
 import * as clusterActions from './clusters';
-import client           from '../../network';
+import client              from '../../network';
+import get                 from '../../utils/get';
 import { store, dispatch } from '..';
 
 export const PENDING_TASKFLOW_NETWORK = 'PENDING_TASKFLOW_NETWORK';
@@ -159,6 +160,27 @@ export function startTaskflow(id, payload, simulationStep, location) {
   };
 }
 
+export function deleteTaskflow(id, simulationStep, location) {
+  return dispatch => {
+    const action = netActions.addNetworkCall('delete_taskflow', 'Delete taskflow');
+
+    client.deleteTaskflow(id)
+      .then(
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch({ type: DELETE_TASKFLOW, id });
+          if (simulationStep) {
+            dispatch(projActions.updateSimulationStep(simulationStep.id, simulationStep.step, simulationStep.data, location));
+          }
+        },
+        error => {
+          dispatch(netActions.errorNetworkCall(action.id, error));
+        });
+
+    return action;
+  };
+}
+
 export function createTaskflow(taskFlowName, primaryJob, payload, simulationStep, location) {
   return dispatch => {
     const action = netActions.addNetworkCall('create_taskflow', 'Create taskflow');
@@ -167,6 +189,10 @@ export function createTaskflow(taskFlowName, primaryJob, payload, simulationStep
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
+          const targetSimulationStep = store.getState().simulations.mapById[simulationStep.id].steps[simulationStep.step];
+          if (get(targetSimulationStep, 'metadata.taskflowId')) {
+            dispatch(deleteTaskflow(targetSimulationStep.metadata.taskflowId));
+          }
           dispatch(addTaskflow(resp.data, primaryJob));
           dispatch(attachSimulationToTaskflow(simulationStep.id, resp.data._id, simulationStep.step));
           dispatch(startTaskflow(resp.data._id, payload, simulationStep, location));
@@ -249,27 +275,6 @@ export function updateTaskflowFromSimulation(simulation) {
     });
 
     return { type: 'NOOP' };
-  };
-}
-
-export function deleteTaskflow(id, simulationStep, location) {
-  return dispatch => {
-    const action = netActions.addNetworkCall('delete_taskflow', 'Delete taskflow');
-
-    client.deleteTaskflow(id)
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch({ type: DELETE_TASKFLOW, id });
-          if (simulationStep) {
-            dispatch(projActions.updateSimulationStep(simulationStep.id, simulationStep.step, simulationStep.data, location));
-          }
-        },
-        error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
-        });
-
-    return action;
   };
 }
 
