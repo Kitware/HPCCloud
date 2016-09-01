@@ -65,7 +65,7 @@ const ProjectAll = React.createClass({
         placeholder={
           <EmptyPlaceholder phrase={
             <div>
-              <h3>Welcome to HPC Cloud</h3>
+              <h3>Welcome to HPCCloud</h3>
               <span>You haven't created any projects yet<br />
                 Add one with the <i className={ theme.addIcon }></i> above.
               </span>

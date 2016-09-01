@@ -1,8 +1,7 @@
 import React  from 'react';
+import { Link } from 'react-router';
 import client from '../../network';
 import style  from 'HPCCloudStyle/Theme.mcss';
-
-const staticContent = require('./content.html');
 
 export default React.createClass({
 
@@ -30,8 +29,13 @@ export default React.createClass({
   /* eslint-disable react/no-danger */
   render() {
     return (
-      <div dangerouslySetInnerHTML={{ __html: staticContent.replace('CLASS', style.landingIcon) }}>
-      </div>);
+      <main style={{ margin: 'auto', textAlign: 'center' }}>
+        <br />
+        <br />
+        <i className={style.landingIcon} style={{ fontSize: '250px' }}></i>
+        <h2>Welcome to HPCCloud</h2>
+        <p>Get started by <Link to="/Register">registering</Link> or <Link to="/Login">logging in</Link></p>
+      </main>);
   },
   /* eslint-enable react/no-danger */
 });
