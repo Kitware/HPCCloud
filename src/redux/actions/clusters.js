@@ -98,7 +98,11 @@ export function getClusterLog(id, offset) {
     client.getClusterLog(id, offset)
       .then(resp => {
         dispatch(netActions.successNetworkCall(action.id, resp));
-        dispatch(updateClusterLog(id, resp.data.log));
+        if (!offset) { // offset is 0 or undefined
+          dispatch(updateClusterLog(id, resp.data.log));
+        } else {
+          dispatch(appendToClusterLog(id, resp.data.log));
+        }
       })
       .catch(error => {
         dispatch(netActions.errorNetworkCall(action.id, error));

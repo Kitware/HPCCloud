@@ -52,6 +52,11 @@ const VisualizationStart = React.createClass({
           id: this.props.simulation.metadata.inputFolder.files.dataset,
         },
       },
+      output: {
+        folder: {
+          id: this.props.simulation.metadata.outputFolder._id,
+        },
+      },
     };
 
     if (this.state.serverType === 'Traditional') {

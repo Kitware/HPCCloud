@@ -87,11 +87,26 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
         kwargs['image_spec'] = image_spec
         kwargs['next'] = create_paraview_job.s()
 
+        # Save the output parameter for the upload_output step
+        self.set_metadata('output', kwargs.get('output', {}))
+
         super(ParaViewTaskFlow, self).start(
             setup_cluster.s(self, *args, **kwargs))
 
     def terminate(self):
-        self.run_task(paraview_terminate.s())
+        meta = self.get('meta', {})
+        cluster = meta.get('cluster')
+        jobs = meta.get('jobs', [])
+        output = meta.get('output', {})
+        upload_jobs = []
+
+        if cluster:
+            for job in jobs:
+                upload_job = upload_output.s(cluster, job, (), output=output)
+                upload_jobs.append(upload_job)
+
+        # Terminate and then upload job output
+        self.run_task(paraview_terminate.s(), link=upload_jobs)
         self.run_task(cleanup_proxy_entries.s())
 
     def delete(self):
@@ -114,8 +129,6 @@ def _create_girder_client(girder_api_url, girder_token):
     client.token = girder_token
 
     return client
-
-
 
 def validate_args(kwargs):
     required = ['cluster.config.paraview.installDir', 'sessionKey']
@@ -240,7 +253,7 @@ def upload_input(task, cluster, job, *args, **kwargs):
         task.logger.info('Uploading file to cluster.')
         job_dir = job_directory(cluster, job)
         upload_file(cluster, task.taskflow.girder_token, file, job_dir)
-        task.logger.info('Upload complete.')
+        task.logger.info('Upload input complete.')
 
 def create_proxy_entry(task, cluster, job):
     session_key = job['params']['sessionKey']
@@ -313,15 +326,12 @@ def monitor_paraview_job(task, cluster, job, *args, **kwargs):
     task.logger.info('Monitoring job on cluster.')
     girder_token = task.taskflow.girder_token
 
-    task.taskflow.on_complete(monitor_job) \
-        .run(upload_output.s(cluster, job, *args, **kwargs))
-
-    task.taskflow.run_task(
-        monitor_job.s(cluster, job, girder_token=girder_token))
+    monitor_job.apply_async((cluster, job), {'girder_token': girder_token,
+                                         'monitor_interval': 30},
+                        link=upload_output.s(cluster, job, *args, **kwargs))
 
 @cumulus.taskflow.task
-def upload_output(task, cluster, job, *args, **kwargs):
-    task.taskflow.logger.info('Uploading results from cluster')
+def upload_output(task, _, cluster, job, *args, **kwargs):
 
     # Refresh state of job
     client = _create_girder_client(
@@ -336,10 +346,12 @@ def upload_output(task, cluster, job, *args, **kwargs):
             'path': '.'
         }]
 
+    task.taskflow.logger.info('Uploading results from cluster to folder: %s' %
+                              output_folder_id)
     upload_job_output_to_folder(cluster, job, log_write_url=None, job_dir=None,
                                 girder_token=task.taskflow.girder_token)
 
-    task.taskflow.logger.info('Upload complete.')
+    task.taskflow.logger.info('Upload output complete.')
 
 @cumulus.taskflow.task
 def cleanup_proxy_entries(task):

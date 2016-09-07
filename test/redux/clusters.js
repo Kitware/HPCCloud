@@ -218,6 +218,14 @@ describe('cluster actions', () => {
         .toDispatchActions({ type: Actions.UPDATE_CLUSTER_LOG, id, log }, complete(done));
     });
 
+    it('should fetch cluster log with an offset and append', (done) => {
+      const id = cluster._id;
+      const log = [{ entry: 'one' }, { entry: 'two' }];
+      setSpy(client, 'getClusterLog', { log });
+      expect(Actions.getClusterLog(id, 50))
+        .toDispatchActions({ type: Actions.APPEND_TO_CLUSTER_LOG, id, logEntry: log }, complete(done));
+    });
+
     it('should fetch a cluster', (done) => {
       const expectedAction = { type: Actions.ADD_EXISTING_CLUSTER, cluster };
       setSpy(client, 'getCluster', expectedAction.cluster);

@@ -153,14 +153,14 @@ export default connect(
     }
 
     // Sort the tasks by created timestamp
-    tasks.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
+    tasks.sort((task1, task2) => task1.created - task2.created);
 
     // get cluster status, logs, and stream state.
     if (cluster) {
       clusterName = cluster.name;
       clusterStatus = cluster.status;
       if (cluster.log && cluster.log.length) {
-        clusterLog = cluster.log.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
+        clusterLog = cluster.log.sort((task1, task2) => task1.created - task2.created);
       }
     }
 
