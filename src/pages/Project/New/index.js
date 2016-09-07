@@ -68,7 +68,7 @@ const ProjectNew = React.createClass({
       this.setState({ _error: 'The project needs to have a name' });
     }
 
-    // check for requiredAttachements.
+    // check for requiredAttachments.
     if (Workflows[this.state.type].requiredAttachments &&
         Workflows[this.state.type].requiredAttachments.project &&
         Workflows[this.state.type].requiredAttachments.project.length) {

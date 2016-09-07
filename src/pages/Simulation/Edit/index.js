@@ -26,11 +26,11 @@ const SimulationEdit = React.createClass({
     onCancel: React.PropTypes.func,
   },
 
-  onAction(action, data, attachement) {
-    this[action](data, attachement);
+  onAction(action, data, attachment) {
+    this[action](data, attachment);
   },
 
-  editSimulation(data, attachement) {
+  editSimulation(data, attachment) {
     this.props.onSave(Object.assign({}, this.props.simulation, data));
   },
 
