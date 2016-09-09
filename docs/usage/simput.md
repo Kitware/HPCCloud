@@ -4,8 +4,8 @@ Simput is a tool for simplifying the process of writing and editing simulation i
 
 ## Usage with PyFR - euler-vortex-2d
 
-This example will lead you through the creation of an input file for PyFR using SimPut. You will create an input file
-that can be used with one of PyFR's [examples](https://github.com/vincentlab/PyFR/blob/develop/examples/euler_vortex_2d/)
+This example will lead you through the creation of an input file for PyFR using SimPut. You will create an input file that can be used with one of PyFR's [examples](https://github.com/vincentlab/PyFR/blob/develop/examples/euler_vortex_2d/).
+
 With the steps below you'll create a similar input file to [euler-vortex-2d.ini](https://github.com/vincentlab/PyFR/blob/develop/examples/euler_vortex_2d/euler_vortex_2d.ini) in Simput, a few changes have been made to reduce the simulation runtime. Unless mentioned below do not change default values. To begin, create a plain PyFR project and a simulation, for the simulation you will need to uplaod a mesh. Inside the simulation, to the input step and enter the values for each attribute:
 
 ### Constants
@@ -64,7 +64,9 @@ If you've filled in each filed as instructed above go to the simulation step you
 
 ## Adding simulation types
 
-For instructions on adding simulation types follow [these instructions on the Simput Github repository](https://github.com/Kitware/simput#creating-a-new-simulation-type). When you have completed the new type add a script command to `package.json` which installs the new type:
+For instructions on adding simulation types follow [these instructions on the Simput Github repository](https://github.com/Kitware/simput#creating-a-new-simulation-type). In Simput be sure to add your type to the `/dist` folder and commit the changes.
+
+In HPCCloud, you'll want to have the latest Simput version installed and a new script command `package.json` which installs the new type:
 
 ```json
 scripts: {
