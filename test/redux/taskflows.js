@@ -170,7 +170,7 @@ describe('taskflow actions', () => {
         .toHaveBeenCalled();
     });
 
-    it('shuold create a taskflow', (done) => {
+    it('should create a taskflow', (done) => {
       const expectedActions = [
         { type: Actions.ADD_TASKFLOW, primaryJob: 'pyfr' },
         { type: Actions.BIND_SIMULATION_TO_TASKFLOW, taskflowId, simulationId: 'mySimStep', stepName: 'Visuzlization' },

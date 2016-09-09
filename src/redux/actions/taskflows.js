@@ -189,8 +189,8 @@ export function createTaskflow(taskFlowName, primaryJob, payload, simulationStep
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-          const targetSimulationStep = store.getState().simulations.mapById[simulationStep.id].steps[simulationStep.step];
-          if (get(targetSimulationStep, 'metadata.taskflowId')) {
+          const targetSimulationStep = get(store.getState().simulations, `mapById.${simulationStep.id}.steps.${simulationStep.step}`);
+          if (targetSimulationStep && get(targetSimulationStep, 'metadata.taskflowId')) {
             dispatch(deleteTaskflow(targetSimulationStep.metadata.taskflowId));
           }
           dispatch(addTaskflow(resp.data, primaryJob));

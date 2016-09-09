@@ -13,7 +13,7 @@ import expect from 'expect';
 import { registerAssertions } from 'redux-actions-assertions/expect';
 import deepClone    from 'mout/src/lang/deepClone';
 
-/* global describe it beforeAll afterEach afterAll*/
+/* global describe it beforeEach beforeAll afterEach afterAll*/
 registerAssertions();
 
 // we spy on redux actions here, and they just need to return an action with some type
@@ -42,7 +42,6 @@ describe('StateTransitionBehavior', () => {
   });
 
   describe('simulation status and taskflow actions', () => {
-
     const newMeta = {
       actions: ['rerun'],
       allComplete: false,
