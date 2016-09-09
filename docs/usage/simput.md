@@ -6,7 +6,7 @@ Simput is a tool for simplifying the process of writing and editing simulation i
 
 This example will lead you through the creation of an input file for PyFR using SimPut. You will create an input file
 that can be used with one of PyFR's [examples](https://github.com/vincentlab/PyFR/blob/develop/examples/euler_vortex_2d/)
-With the steps below you'll recreate [euler-vortex-2d.ini](https://github.com/vincentlab/PyFR/blob/develop/examples/euler_vortex_2d/euler_vortex_2d.ini) in Simput. Unless mentioned below do not change default values. To begin, create a plain PyFR project and a simulation, for the simulation you will need to uplaod a mesh. Inside the simulation, to the input step and enter the values for each attribute:
+With the steps below you'll create a similar input file to [euler-vortex-2d.ini](https://github.com/vincentlab/PyFR/blob/develop/examples/euler_vortex_2d/euler_vortex_2d.ini) in Simput, a few changes have been made to reduce the simulation runtime. Unless mentioned below do not change default values. To begin, create a plain PyFR project and a simulation, for the simulation you will need to uplaod a mesh. Inside the simulation, to the input step and enter the values for each attribute:
 
 ### Constants
 - Add three custom constants, the constants names are case-sensitive
@@ -48,9 +48,9 @@ Rename the property in the sidebar if desired.
     - _nsteps_ = `50`
 
 - type: **Plugin Writer**
-    - _disk write time interval_ = `10.0`
-    - _basedir_ = `.`
-    - _basename_ = `euler_vortex_2d-{t:.1f}`
+    - _Disk write time interval_ = `10.0`
+    - _Basedir_ = `.`
+    - _Output name pattern_ = `euler_vortex_2d-{t:.1f}`
 
 - type: **ics**
     - _Initial Density_ = `pow(1 - S*S*M*M*(gamma - 1)*exp(2*%(f)s)/(8*pi*pi), 1/(gamma - 1))`
