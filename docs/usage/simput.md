@@ -14,6 +14,8 @@ With the steps below you'll create a similar input file to [euler-vortex-2d.ini]
     - `M = 0.4`
     - `R = 1.5`
 
+![custom constants fields](custom-consts.png)
+
 ### Solver
 - **Settings**
     - Order = 3
