@@ -275,7 +275,7 @@ export function deleteTaskflow(id, simulationStep, location) {
 
 export function terminateTaskflow(id) {
   return dispatch => {
-    const action = netActions.addNetworkCall('terminate_taskflow', 'Terminate taskflow');
+    const action = netActions.addNetworkCall(`terminate_taskflow_${id}`, 'Terminate taskflow');
 
     client.endTaskflow(id)
       .then(
