@@ -6,26 +6,15 @@ import LoadingPanel     from '../../../../../../panels/LoadingPanel';
 import merge            from 'mout/src/object/merge';
 import deepClone        from 'mout/src/lang/deepClone';
 
-import { taskflowActions } from '../../../../../../utils/Constants';
-import getDisabledButtons  from '../../../../../../utils/getDisabledButtons';
-import get                 from '../../../../../../utils/get';
-import getNetworkError     from '../../../../../../utils/getNetworkError';
-import Theme               from 'HPCCloudStyle/Theme.mcss';
+import get              from '../../../../../../utils/get';
+import getNetworkError  from '../../../../../../utils/getNetworkError';
+import { getActions, getDisabledButtons }  from '../../../../../../utils/getDisabledButtons';
 
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
 import * as SimActions  from '../../../../../../redux/actions/projects';
 import * as ClusterActions  from '../../../../../../redux/actions/clusters';
-
-function getActions(actionsList, disabled) {
-  return actionsList.map((action) => Object.assign(
-    taskflowActions[action],
-    {
-      disabled: !!disabled[action],
-      icon: !!disabled[action] ? Theme.loadingIcon : null,
-    }));
-}
 
 const SimualtionView = React.createClass({
   displayName: 'pyfr/common/steps/Simulation/View',
@@ -153,11 +142,9 @@ export default connect(
       cluster = state.preferences.clusters.mapById[clusterId];
     }
 
-    const disabledButtons = getDisabledButtons(state.network, taskflow);
-
     return {
       taskflowId, cluster, taskflow,
-      disabledButtons,
+      disabledButtons: getDisabledButtons(state.network, taskflow),
       error: getNetworkError(state, ['terminate_taskflow', 'delete_taskflow']),
     };
   },

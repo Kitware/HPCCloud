@@ -1,6 +1,17 @@
 import get from './get';
+import { taskflowActions } from './Constants';
+import Theme               from 'HPCCloudStyle/Theme.mcss';
 
-export default function getDisabledButtons(network, taskflow = {}) {
+export function getActions(actionsList, disabled) {
+  return actionsList.map((action) => Object.assign(
+    taskflowActions[action],
+    {
+      disabled: !!disabled[action],
+      icon: !!disabled[action] ? Theme.loadingIcon : null,
+    }));
+}
+
+export function getDisabledButtons(network, taskflow = {}) {
   const disabledButtons = {};
   const actions = get(taskflow, 'actions');
   const taskflowId = get(taskflow, 'flow._id');
