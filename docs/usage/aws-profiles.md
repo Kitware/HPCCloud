@@ -1,6 +1,6 @@
 # AWS Profiles
 
-AWS profiles allow you to provision and run simulations on Amazon EC2 instances.
+AWS profiles allow you to provision and run simulations on Amazon EC2 instances. To get to the page for AWS profiles go to the preferences page -by clicking on the username in the top right- and click "EC2."
 
 In order for an AWS user to be able to use HPCCloud with EC2 the user must have
 been granted permissions to perform certain EC2 related actions. The example

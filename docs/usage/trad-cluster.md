@@ -1,6 +1,6 @@
 # Traditional Clusters
 
-Traditional clusters, or simply "clusters" in this document typically involve physical hardware dedicated to running simulations within the host operating system.
+Traditional clusters, or simply "clusters" in this document typically involve physical hardware dedicated to running simulations within the host operating system. To get to the page for Traditional Clusters go to the preferences page -by clicking on the username in the top right- and click "Cluster."
 
 ## Creating
 
