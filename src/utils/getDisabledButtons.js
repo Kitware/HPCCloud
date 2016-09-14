@@ -39,6 +39,5 @@ export function getDisabledButtons(network, taskflow = {}) {
     }
   });
 
-  console.log(actions, taskflowId, clusterId, actions);
   return disabledButtons;
 }
