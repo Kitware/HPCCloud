@@ -6,7 +6,7 @@ import theme    from 'HPCCloudStyle/Theme.mcss';
 import style    from 'HPCCloudStyle/ItemEditor.mcss';
 
 export default React.createClass({
-  displayName: 'run/cluster',
+  displayName: 'panels/run/RunEC2',
 
   propTypes: {
     contents: React.PropTypes.object,

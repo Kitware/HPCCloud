@@ -1,5 +1,6 @@
 import React      from 'react';
 import deepEquals from 'mout/src/lang/deepEquals';
+import get        from '../../../../..//utils/get';
 import formStyle  from 'HPCCloudStyle/ItemEditor.mcss';
 
 const TYPES = {
@@ -46,12 +47,12 @@ export default React.createClass({
         type = 'cuda';
         types.push(type);
       }
-      if (props.profiles.opencl && props.profiles.opencl.length) {
+      if (get(props, 'profiles.opencl.length')) {
         type = 'opencl';
         types.push(type);
         profile = props.profiles.opencl[0].name;
       }
-      if (props.profiles.openmp && props.profiles.openmp.length) {
+      if (get(props, 'profiles.openmp.length')) {
         type = 'openmp';
         types.push(type);
         profile = props.profiles.openmp[0].name;
@@ -110,9 +111,11 @@ export default React.createClass({
       return null;
     }
 
-    const profiles =
-      this.props.profiles && this.props.profiles[this.state.type] && Array.isArray(this.props.profiles[this.state.type])
-      ? this.props.profiles[this.state.type] : [];
+    let profiles = [];
+    if (get(this.props, `profiles.${this.state.type}`) && Array.isArray(this.props.profiles[this.state.type])) {
+      profiles = this.props.profiles[this.state.type];
+    }
+
     return (
       <div>
           <section className={formStyle.group}>
