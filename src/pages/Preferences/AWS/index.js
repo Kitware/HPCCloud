@@ -6,6 +6,7 @@ import React            from 'react';
 import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
 import { breadcrumb }   from '..';
 import getNetworkError  from '../../../utils/getNetworkError';
+import get              from '../../../utils/get';
 
 import theme from 'HPCCloudStyle/Theme.mcss';
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
@@ -16,11 +17,12 @@ import * as NetActions from '../../../redux/actions/network';
 import { dispatch } from '../../../redux';
 
 const awsBreadCrumb = Object.assign({}, breadcrumb, { active: 2 });
-function getActions(disabled) {
-  return [
-    { name: 'removeItem', label: 'Delete', icon: style.deleteIcon, disabled },
-    { name: 'saveItem', label: 'Save', icon: style.saveIcon, disabled },
-  ];
+function getActions(disabled, showSave) {
+  var ret = [{ name: 'removeItem', label: 'Delete', icon: style.deleteIcon, disabled }];
+  if (showSave) {
+    ret.push({ name: 'saveItem', label: 'Save', icon: style.saveIcon, disabled });
+  }
+  return ret;
 }
 
 /* eslint-disable no-alert */
@@ -139,7 +141,7 @@ const AWSPrefs = React.createClass({
           visible={!!activeData}
           onAction={ this.formAction }
           error={ this.state._error || error }
-          actions={getActions(buttonsDisabled)}
+          actions={getActions(buttonsDisabled, !get(activeData, '_id'))}
         />
       </div>);
     } else {

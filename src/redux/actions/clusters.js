@@ -266,15 +266,17 @@ export function testCluster(index, cluster) {
 }
 
 export function terminateCluster(id) {
-  const action = netActions.addNetworkCall('terminate_cluster', 'terminate cluster');
-  client.terminateCluster(id)
-    .then((resp) => {
-      dispatch(netActions.successNetworkCall(action.id, resp));
-    })
-    .catch((err) => {
-      dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-    });
-  return { type: 'NOOP' };
+  return dispatch => {
+    const action = netActions.addNetworkCall(`terminate_cluster_${id}`, 'terminate cluster');
+    client.terminateCluster(id)
+      .then((resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+      })
+      .catch((err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+      });
+    return action;
+  };
 }
 
 // Auto trigger actions on authentication change...

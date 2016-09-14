@@ -285,7 +285,7 @@ describe('cluster actions', () => {
     });
 
     it('should terminate a cluster', (done) => {
-      const expectedAction = { type: 'NOOP' };
+      const expectedAction = { type: 'SUCCESS_NETWORK_CALL', id: 'terminate_cluster_a1', resp: { data: null } };
       setSpy(client, 'terminateCluster', null);
       expect(Actions.terminateCluster(cluster._id))
         .toDispatchActions(expectedAction, complete(done));
