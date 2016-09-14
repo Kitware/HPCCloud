@@ -4,18 +4,16 @@ import JobMonitor       from '../../../../../../panels/JobMonitor';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
 import LoadingPanel     from '../../../../../../panels/LoadingPanel';
-import { taskflowActions } from '../../../../../../utils/Constants';
 
 import get              from '../../../../../../utils/get';
+import getNetworkError  from '../../../../../../utils/getNetworkError';
+import { getActions, getDisabledButtons }  from '../../../../../../utils/getDisabledButtons';
+
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
 import * as SimActions  from '../../../../../../redux/actions/projects';
 import * as ClusterActions  from '../../../../../../redux/actions/clusters';
-
-function getActions(actionsList, disabled) {
-  return actionsList.map((action) => Object.assign({ disabled }, taskflowActions[action]));
-}
 
 const visualizationView = React.createClass({
   displayName: 'pvw/view-visualization',
@@ -37,6 +35,7 @@ const visualizationView = React.createClass({
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
     cluster: React.PropTypes.object,
+    disabledButtons: React.PropTypes.object,
     error: React.PropTypes.string,
   },
 
@@ -90,7 +89,7 @@ const visualizationView = React.createClass({
       return <LoadingPanel />;
     }
 
-    const { taskflow, taskflowId, cluster, error, simulation } = this.props;
+    const { taskflow, taskflowId, cluster, error, simulation, disabledButtons } = this.props;
     const actions = [].concat(taskflow.actions);
     const tasks = taskflow.taskMapById ? Object.keys(taskflow.taskMapById).map(id => taskflow.taskMapById[id]) : [];
     const jobs = taskflow.jobMapById ? Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]) : [];
@@ -111,11 +110,11 @@ const visualizationView = React.createClass({
           clusterId={taskflow.flow.meta ? taskflow.flow.meta.cluster._id : null}
         />
         <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} actionsDisabled={fileActionsDisabled} />
-        <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} actionsDisabled={fileActionsDisabled} />
+        <FileListing title="Output Files" folderId={simulation.steps.Visualization.folderId} actionsDisabled={fileActionsDisabled} />
         <section>
             <ButtonBar
               onAction={ this.onAction }
-              actions={ getActions(actions, false)}
+              actions={ getActions(actions, disabledButtons)}
               error={error}
             />
         </section>
@@ -147,7 +146,8 @@ export default connect(
 
     return {
       taskflowId, cluster, taskflow,
-      error: null,
+      disabledButtons: getDisabledButtons(state.network, taskflow),
+      error: getNetworkError(state, ['terminate_taskflow', 'delete_taskflow']),
     };
   },
   () => ({

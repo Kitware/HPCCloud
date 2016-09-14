@@ -307,4 +307,3 @@ def cleanup_proxy_entries(task):
     if session_key:
         session_key = session_key[0].value
         client.delete('proxy/%s' % session_key)
-

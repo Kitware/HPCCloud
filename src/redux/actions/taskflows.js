@@ -275,7 +275,7 @@ export function deleteTaskflow(id, simulationStep, location) {
 
 export function terminateTaskflow(id) {
   return dispatch => {
-    const action = netActions.addNetworkCall('terminate_taskflow', 'Terminate taskflow');
+    const action = netActions.addNetworkCall(`terminate_taskflow_${id}`, 'Terminate taskflow');
 
     client.endTaskflow(id)
       .then(
@@ -350,7 +350,7 @@ function updateTaskflowObject() {
   const state = store.getState();
   const taskflows = Object.keys(state.taskflows.mapById).map((key) => state.taskflows.mapById[key]);
   for (let i = 0; i < taskflows.length; i++) {
-    if (!taskflows[i].flow.meta) {
+    if (!taskflows[i].flow.meta && taskflows[i].flow._id) {
       dispatch(fetchTaskflow(taskflows[i].flow._id));
     }
   }

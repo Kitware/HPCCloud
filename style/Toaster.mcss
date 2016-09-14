@@ -1,6 +1,7 @@
 .ToastContainer {
   composes: errorBox from 'HPCCloudStyle/Theme.mcss';
   position: fixed;
+  visibility: visible;
   width: 100%;
   bottom: 8px;
   min-height: 40px;
@@ -9,7 +10,8 @@
   font-size: 1.1em;
   border-radius: 0;
   opacity: 1;
-  transition: opacity 0.20s linear; /* fade in */
+  transition-delay:0s;
+  transition: all 0.20s linear; /* fade in */
 }
 
 .ToastClearButton {
@@ -24,8 +26,10 @@
 }
 
 .isHidden {
+  visibility: hidden;
   opacity: 0;
-  transition: opacity 1s ease; /* fade out */
+  transition-delay:0s;
+  transition: visibility 0s linear 1s, opacity 1s ease; /* fade out */
 }
 
 .CloseIcon {

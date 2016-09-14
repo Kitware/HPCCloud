@@ -98,7 +98,11 @@ export function getClusterLog(id, offset) {
     client.getClusterLog(id, offset)
       .then(resp => {
         dispatch(netActions.successNetworkCall(action.id, resp));
-        dispatch(updateClusterLog(id, resp.data.log));
+        if (!offset) { // offset is 0 or undefined
+          dispatch(updateClusterLog(id, resp.data.log));
+        } else {
+          dispatch(appendToClusterLog(id, resp.data.log));
+        }
       })
       .catch(error => {
         dispatch(netActions.errorNetworkCall(action.id, error));
@@ -262,15 +266,17 @@ export function testCluster(index, cluster) {
 }
 
 export function terminateCluster(id) {
-  const action = netActions.addNetworkCall('terminate_cluster', 'terminate cluster');
-  client.terminateCluster(id)
-    .then((resp) => {
-      dispatch(netActions.successNetworkCall(action.id, resp));
-    })
-    .catch((err) => {
-      dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-    });
-  return { type: 'NOOP' };
+  return dispatch => {
+    const action = netActions.addNetworkCall(`terminate_cluster_${id}`, 'terminate cluster');
+    client.terminateCluster(id)
+      .then((resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+      })
+      .catch((err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+      });
+    return action;
+  };
 }
 
 // Auto trigger actions on authentication change...

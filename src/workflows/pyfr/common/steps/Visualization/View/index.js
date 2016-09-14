@@ -4,18 +4,16 @@ import JobMonitor       from '../../../../../../panels/JobMonitor';
 import merge            from 'mout/src/object/merge';
 import React            from 'react';
 import LoadingPanel     from '../../../../../../panels/LoadingPanel';
-import { taskflowActions } from '../../../../../../utils/Constants';
 
 import get              from '../../../../../../utils/get';
+import getNetworkError  from '../../../../../../utils/getNetworkError';
+import { getActions, getDisabledButtons }  from '../../../../../../utils/getDisabledButtons';
+
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
 import * as SimActions  from '../../../../../../redux/actions/projects';
 import * as ClusterActions  from '../../../../../../redux/actions/clusters';
-
-function getActions(actionsList, disabled) {
-  return actionsList.map((action) => Object.assign({ disabled }, taskflowActions[action]));
-}
 
 const VisualizationView = React.createClass({
   displayName: 'pyfr/common/steps/Visualization/View',
@@ -37,7 +35,7 @@ const VisualizationView = React.createClass({
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
     cluster: React.PropTypes.object,
-    buttonsDisabled: React.PropTypes.bool,
+    disabledButtons: React.PropTypes.bool,
     error: React.PropTypes.string,
   },
 
@@ -82,7 +80,7 @@ const VisualizationView = React.createClass({
   },
 
   render() {
-    const { taskflow, taskflowId, error, simulation, cluster, buttonsDisabled } = this.props;
+    const { taskflow, taskflowId, error, simulation, cluster, disabledButtons } = this.props;
 
     // these can be undefined sometimes, show a loading icon if any are missing.
     if (!taskflow || !taskflow.flow ||
@@ -110,14 +108,14 @@ const VisualizationView = React.createClass({
         <JobMonitor taskflowId={ taskflowId }
           clusterId={taskflow.flow.meta ? taskflow.flow.meta.cluster._id : null}
         />
-        <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id}
+        <FileListing title="Input Files" folderId={simulation.metadata.outputFolder._id}
           actionsDisbled={fileActionsDisabled} />
-        <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id}
+        <FileListing title="Output Files" folderId={simulation.steps.Visualization.folderId}
           actionsDisbled={fileActionsDisabled} />
         <section>
           <ButtonBar
             onAction={ this.buttonBarAction }
-            actions={ getActions(actions, buttonsDisabled) }
+            actions={ getActions(actions, disabledButtons) }
             error={ error }
           />
         </section>
@@ -153,9 +151,8 @@ export default connect(
 
     return {
       taskflowId, taskflow, cluster,
-      buttonsDisabled: !!get(state, 'network.pending.terminate_taskflow') ||
-                       !!get(state, 'network.pending.delete_taskflow'),
-      error: null,
+      disabledButtons: getDisabledButtons(state.network, taskflow),
+      error: getNetworkError(state, ['terminate_taskflow', 'delete_taskflow']),
     };
   },
   () => ({
