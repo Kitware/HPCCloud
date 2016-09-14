@@ -1,5 +1,5 @@
 export function formatTime(time) {
-  var date = new Date(time),
+  var date = new Date(time * 1000),
     hours = date.getHours().toString(),
     minutes = date.getMinutes().toString(),
     seconds = date.getSeconds().toString(),

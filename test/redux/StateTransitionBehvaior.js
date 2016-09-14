@@ -171,7 +171,7 @@ describe('StateTransitionBehavior', () => {
       expect(ClusterActions.updateCluster).toNotHaveBeenCalled();
     });
 
-    it('should update the cluster if there is a tf cluster in state', () => {
+    it('should update the cluster if there is no tf cluster in state', () => {
       const cluster = taskflow.flow.meta.cluster;
       fullState.preferences.clusters.mapById[clusterId] = cluster;
       cluster.config.simulation = {
@@ -179,7 +179,7 @@ describe('StateTransitionBehavior', () => {
         step: 'Simulation',
       };
       handleTaskflowChange(fullState, taskflow);
-      expect(ClusterActions.updateCluster).toHaveBeenCalledWith(cluster);
+      expect(ClusterActions.updateCluster).toNotHaveBeenCalled();
     });
   });
 
@@ -241,10 +241,11 @@ describe('StateTransitionBehavior', () => {
       handleTaskflowChange(fullState, taskflow);
       expect(FSActions.fetchFolder).toHaveBeenCalledWith(simulation.metadata.inputFolder._id);
       expect(FSActions.fetchFolder).toHaveBeenCalledWith(simulation.metadata.outputFolder._id);
-      expect(fsSpy.calls.length).toEqual(2);
+      expect(FSActions.fetchFolder).toHaveBeenCalledWith(simulation.steps[simulation.active].folderId);
+      expect(fsSpy.calls.length).toEqual(3);
     });
 
-    it('should not update output folders it has children', () => {
+    it('should not update output folders if it has children', () => {
       // if the output folder already has items, do not update it.
       taskflow.jobMapById = { someId: { _id: 'someId', status: 'complete' } };
       taskflow.taskMapById[taskId].status = 'complete';
@@ -257,7 +258,8 @@ describe('StateTransitionBehavior', () => {
 
       handleTaskflowChange(fullState, taskflow);
       expect(FSActions.fetchFolder).toHaveBeenCalledWith(simulation.metadata.inputFolder._id);
-      expect(fsSpy.calls.length).toEqual(1);
+      expect(FSActions.fetchFolder).toHaveBeenCalledWith(simulation.steps[simulation.active].folderId);
+      expect(fsSpy.calls.length).toEqual(2);
     });
   });
 });

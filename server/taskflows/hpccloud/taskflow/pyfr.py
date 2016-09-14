@@ -256,7 +256,7 @@ def setup_input(task, *args, **kwargs):
                     parentType='folder')
                 kwargs['meshFileId'] = girder_file['_id']
 
-            task.logger.info('Upload complete.')
+            task.logger.info('Upload input complete.')
 
             task.logger.info('Updating backend configuration.')
 

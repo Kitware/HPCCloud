@@ -118,6 +118,18 @@ const JobMonitor = React.createClass({
   },
 });
 
+// manipulates target's status count
+function statusCounter(source, target) {
+  Object.keys(source).forEach(id => {
+    const status = source[id].status;
+    if (target[status]) {
+      target[status] += 1;
+    } else {
+      target[status] = 1;
+    }
+  });
+}
+
 // Binding --------------------------------------------------------------------
 export default connect(
   (state, props) => {
@@ -136,31 +148,25 @@ export default connect(
 
     // get tasks and jobs
     if (taskflow && taskflow.taskMapById && taskflow.jobMapById) {
+      // tasks
       taskflowStatus = taskflow.flow.status;
-      Object.keys(taskflow.taskMapById).forEach(id => {
-        tasks.push(taskflow.taskMapById[id]);
-        const status = taskflow.taskMapById[id].status;
-        if (taskStatusCount[status]) {
-          taskStatusCount[status]++;
-        } else {
-          taskStatusCount[status] = 1;
-        }
-      });
-      Object.keys(taskflow.jobMapById).forEach(id => {
-        jobs.push(taskflow.jobMapById[id]);
-      });
+      tasks.push(...Object.keys(taskflow.taskMapById).map((id) => taskflow.taskMapById[id]));
+      statusCounter(taskflow.taskMapById, taskStatusCount);
+      // jobs
+      jobs.push(...Object.keys(taskflow.jobMapById).map((id) => taskflow.jobMapById[id]));
+      statusCounter(taskflow.jobMapById, taskStatusCount);
       taskflowLog = taskflow.log;
     }
 
     // Sort the tasks by created timestamp
-    tasks.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
+    tasks.sort((task1, task2) => task1.created - task2.created);
 
     // get cluster status, logs, and stream state.
     if (cluster) {
       clusterName = cluster.name;
       clusterStatus = cluster.status;
       if (cluster.log && cluster.log.length) {
-        clusterLog = cluster.log.sort((task1, task2) => Date.parse(task1.created) > Date.parse(task2.created));
+        clusterLog = cluster.log.sort((task1, task2) => task1.created - task2.created);
       }
     }
 

@@ -40,7 +40,7 @@ const Login = React.createClass({
         <div className={layout.textCenter}>
             <div className={style.header}>
                 <i className={style.topIcon}></i>
-                <p className={style.subtitle}> Login to HPC Cloud</p>
+                <p className={style.subtitle}> Login to HPCCloud</p>
             </div>
             <form className={style.loginForm} onSubmit={this.handleSubmit}>
                 <input ref="login" className={style.loginInput} type="login" placeholder="login" required />

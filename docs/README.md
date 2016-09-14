@@ -3,12 +3,14 @@
 - [Introduction](introduction.md)
 - [Getting Started](getting-started.md)
 - [Glossary](glossary.md)
-- Usage
+- [Usage](usage/README.md)
+  - [Signing up](usage/create-account.md)
   - [Adding traditional clusters](usage/trad-cluster.md)
   - [Adding AWS profiles](usage/aws-profiles.md)
   - [Creating projects and simulations](usage/creating.md)
-  - [Running jobs and simulations](usage/running.md)
-- Development
+  - [Simput](usage/simput.md)
+- [Running simulation workflows](running.md)
+- [Development](development/README.md)
   - [Introduction](development/README.md)
   - [Panels](development/panels.md)
   - [Adding new workflows](development/workflows.md)

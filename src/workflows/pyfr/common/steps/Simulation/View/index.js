@@ -1,23 +1,20 @@
+import React            from 'react';
 import ButtonBar        from '../../../../../../panels/ButtonBar';
 import JobMonitor       from '../../../../../../panels/JobMonitor';
 import FileListing      from '../../../../../../panels/FileListing';
-import deepClone        from 'mout/src/lang/deepClone';
-import merge            from 'mout/src/object/merge';
-import React            from 'react';
 import LoadingPanel     from '../../../../../../panels/LoadingPanel';
-import { taskflowActions } from '../../../../../../utils/Constants';
+import merge            from 'mout/src/object/merge';
+import deepClone        from 'mout/src/lang/deepClone';
 
 import get              from '../../../../../../utils/get';
-import getNetworkError from '../../../../../../utils/getNetworkError';
+import getNetworkError  from '../../../../../../utils/getNetworkError';
+import { getActions, getDisabledButtons }  from '../../../../../../utils/getDisabledButtons';
+
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
 import * as SimActions  from '../../../../../../redux/actions/projects';
 import * as ClusterActions  from '../../../../../../redux/actions/clusters';
-
-function getActions(actionsList, disabled) {
-  return actionsList.map((action) => Object.assign({ disabled }, taskflowActions[action]));
-}
 
 const SimualtionView = React.createClass({
   displayName: 'pyfr/common/steps/Simulation/View',
@@ -40,7 +37,7 @@ const SimualtionView = React.createClass({
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
     cluster: React.PropTypes.object,
-    buttonsDisabled: React.PropTypes.bool,
+    disabledButtons: React.PropTypes.object,
     error: React.PropTypes.string,
   },
 
@@ -94,7 +91,7 @@ const SimualtionView = React.createClass({
       return <LoadingPanel />;
     }
 
-    const { taskflow, taskflowId, cluster, error, simulation, buttonsDisabled } = this.props;
+    const { taskflow, taskflowId, cluster, error, simulation, disabledButtons } = this.props;
     const actions = [].concat(taskflow.actions ? taskflow.actions : []);
     const fileActionsDisabled = cluster ? cluster.status !== 'running' : true;
 
@@ -112,7 +109,7 @@ const SimualtionView = React.createClass({
         <section>
             <ButtonBar
               onAction={ this.onAction }
-              actions={ getActions(actions, buttonsDisabled) }
+              actions={ getActions(actions, disabledButtons) }
               error={ error}
             />
         </section>
@@ -147,8 +144,7 @@ export default connect(
 
     return {
       taskflowId, cluster, taskflow,
-      buttonsDisabled: !!get(state, 'network.pending.terminate_taskflow') ||
-                       !!get(state, 'network.pending.delete_taskflow'),
+      disabledButtons: getDisabledButtons(state.network, taskflow),
       error: getNetworkError(state, ['terminate_taskflow', 'delete_taskflow']),
     };
   },

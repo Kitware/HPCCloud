@@ -3,7 +3,7 @@ import React        from 'react';
 
 import Workflows    from '../../../workflows';
 import getNetworkError from '../../../utils/getNetworkError';
-import get          from 'mout/src/object/get';
+import get          from '../../../utils/get';
 
 import breadCrumbStyle from 'HPCCloudStyle/Theme.mcss';
 
@@ -58,10 +58,8 @@ const SimulationNew = React.createClass({
       return;
     }
 
-    // check for requiredAttachements.
-    if (Workflows[this.props.project.type].requiredAttachments &&
-        Workflows[this.props.project.type].requiredAttachments.simulation &&
-        Workflows[this.props.project.type].requiredAttachments.simulation.length) {
+    // check for requiredAttachments.
+    if (get(Workflows[this.props.project.type], 'requiredAttachments.simulation.length')) {
       const reqAttachments = Workflows[this.props.project.type].requiredAttachments.simulation;
       if (!attachments || !reqAttachments.every((el) => attachments.hasOwnProperty(el))) {
         // ['this', 'that', 'other'] => '"this", "that" and "other"'

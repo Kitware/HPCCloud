@@ -7,6 +7,9 @@ import get               from '../../utils/get';
 
 // takes log array -> jsx lines, or if there's more information LogFold
 function logMapper(entry, index) {
+  if (!entry) {
+    return null;
+  }
   let content = '';
   let foldContent = null;
   let msg = entry.msg;
@@ -74,8 +77,8 @@ export default React.createClass({
 
   componentWillUpdate(nextProps, nextState) {
     // we want to update other stuff, but if the unit log is empty, ignore it.
-    if (!get(nextProps, 'unit.log.length')) {
-      nextProps.unit.log = this.props.unit.log;
+    if (get(nextProps, 'unit.log.length') < get(this.props, 'unit.log.length')) {
+      nextProps.unit.log = (this.props.unit.log || []).concat(nextProps.unit.log);
     }
   },
 

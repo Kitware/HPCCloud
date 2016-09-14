@@ -83,7 +83,9 @@ export default function clustersReducer(state = initialState, action) {
       const newCluster = action.cluster;
       const list = [].concat(state.list);
       const mapById = Object.assign({}, state.mapById);
+
       mapById[newCluster._id] = newCluster;
+      mapById[newCluster._id].log = [];
 
       if (newCluster.type === 'trad' && list.some((el) => el._id === newCluster._id)) {
         for (let i = 0; i < list.length; i++) {
@@ -123,14 +125,14 @@ export default function clustersReducer(state = initialState, action) {
     }
 
     case Actions.UPDATE_ACTIVE_CLUSTER: {
-      return Object.assign(
-        {},
-        state,
-        { active: action.index });
+      return Object.assign({}, state, { active: action.index });
     }
 
     case Actions.UPDATE_EXISTING_CLUSTER: {
       const mapById = Object.assign({}, state.mapById);
+      if (!action.cluster.log) {
+        action.cluster.log = [].concat(mapById[action.cluster._id].log);
+      }
       mapById[action.cluster._id] = action.cluster;
       return Object.assign({}, state, { mapById });
     }
@@ -142,7 +144,7 @@ export default function clustersReducer(state = initialState, action) {
       const mapById = Object.assign({}, state.mapById);
       updateIcon(list);
       action.clusters.forEach(cluster => {
-        if (cluster._id) {
+        if (cluster._id && !mapById[cluster._id]) {
           mapById[cluster._id] = cluster;
         }
       });
@@ -227,7 +229,11 @@ export default function clustersReducer(state = initialState, action) {
       if (!cluster.log) {
         cluster.log = [];
       }
-      cluster.log.push(action.logEntry);
+      if (Array.isArray(action.logEntry)) {
+        cluster.log = cluster.log.concat(action.logEntry);
+      } else {
+        cluster.log.push(action.logEntry);
+      }
       mapById[action.id] = cluster;
       return Object.assign({}, state, { mapById });
     }

@@ -14,10 +14,15 @@ export default React.createClass({
   },
 
   getInitialState() {
-    return { loading: true, contents: '' };
+    return {
+      loading: true,
+      fullscreen: false,
+      contents: '',
+    };
   },
 
   componentDidMount() {
+    document.addEventListener('keyup', this.keyPressed);
     client.downloadItem(this.props.fileId, null, null, 'inline')
       .then((resp) => {
         this.setState({ loading: false, contents: resp.data });
@@ -27,14 +32,29 @@ export default React.createClass({
       });
   },
 
+  componentWillUnmount() {
+    document.removeEventListener('keyup', this.keyPressed);
+  },
+
+  keyPressed(e) {
+    if (e.key === 'Escape') {
+      this.props.closer();
+    }
+  },
+
+  toggleFullscreen(e) {
+    this.setState({ fullscreen: !this.state.fullscreen });
+  },
+
   render() {
-    return (<div className={style.modalContainer}>
+    return (<div className={`${style.modalContainer} ${this.state.fullscreen ? style.fullscreen : ''}`}>
       <div className={style.header}>
         <span className={style.title}>{this.props.title}</span>
+        <i className={style.fullscreenIcon} onClick={this.toggleFullscreen}></i>
         <i className={style.closeIcon} onClick={this.props.closer}></i>
       </div>
       <div className={`${style.modal} ${theme.fixedWidth}`}>
-      { this.state.loading ? <LoadingPanel /> : this.state.contents}
+        { this.state.loading ? <LoadingPanel /> : this.state.contents}
       </div>
     </div>);
   },

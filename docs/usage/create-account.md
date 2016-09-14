@@ -2,7 +2,7 @@
 
 ## Registration 
 
-With HPC Cloud up and running: 
+With HPCCloud up and running: 
 
 1. Click on 'Register' link in the top right.
 2. Fill out the form. If you wish, you can change your first name, last name, and password on the preferences page.
