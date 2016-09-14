@@ -36,6 +36,7 @@ const SimulationView = React.createClass({
   componentDidMount() {
     if (this.props.simulation) {
       this.props.onMount(this.props.simulation);
+      this.props.fetchClusters();
     }
   },
 
