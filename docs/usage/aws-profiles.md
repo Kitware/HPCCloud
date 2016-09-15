@@ -1,6 +1,6 @@
 # AWS Profiles
 
-AWS profiles allow you to provision and run simulations on Amazon EC2 instances.
+AWS profiles allow you to provision and run simulations on Amazon EC2 instances. To get to the page for AWS profiles go to the preferences page -by clicking on the username in the top right- and click "EC2."
 
 In order for an AWS user to be able to use HPCCloud with EC2 the user must have
 been granted permissions to perform certain EC2 related actions. The example
@@ -51,7 +51,11 @@ from within the AWS Identity and Access management (IAM) console.
 
 ## Creating
 
-Click the "+" icon in the toolbar. You'll be presented a blank form in which you can fill out details of your AWS profile. Most important are AWS key and secret key (do not share these keys with anyone and especially don't commit them to a repository, much less this one). If necessary select a different region and availability zone, US-East(a) is selected by default. Click "Save Profile" and your AWS credentials will be validated. If they're valid the profile will be saved. Your profile will be added to the list in the sidebar and you can now provision and launch EC2 instances from a Simulation Start view in a workflow.
+Click the "+" icon in the toolbar. You'll be presented a blank form in which you can fill out details of your AWS profile. Most important are AWS key and secret key (do not share these keys with anyone and especially don't commit them to a repository, much less this one). 
+
+![aws preferences page](images/prefs-aws.png)
+
+If necessary select a different region and availability zone, US-East-1a is selected by default. Click "Save Profile" and your AWS credentials will be validated. If they're valid the profile will be saved. Your profile will be added to the list in the sidebar and you can now provision and launch EC2 instances from a Simulation Start view in a workflow.
 
 ## Editing
 
