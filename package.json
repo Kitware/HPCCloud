@@ -75,10 +75,7 @@
     "test": "NODE_ENV='test' karma start test/karma.all.js",
     "test:redux": "NODE_ENV='test' karma start test/karma.redux.js",
     "test:component": "NODE_ENV='test' karma start test/karma.component.js",
-    "codecov": "cat coverage/lcov/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js",
-
-    "commit"            : "git cz",
-    "semantic-release"  : "semantic-release pre && npm publish && semantic-release post"
+    "codecov": "cat coverage/lcov/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js"
   },
   "bin": {
     "HPCCloud": "./bin/hpc-cloud-cli.js"
