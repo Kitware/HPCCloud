@@ -1,5 +1,4 @@
 import * as Actions from '../../src/redux/actions/taskflows';
-import * as ProjActions from '../../src/redux/actions/projects';
 import taskflowsReducer, { initialState } from '../../src/redux/reducers/taskflows';
 import client from '../../src/network';
 
