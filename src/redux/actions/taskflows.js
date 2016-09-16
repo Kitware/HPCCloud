@@ -2,7 +2,6 @@ import * as netActions     from './network';
 import * as projActions    from './projects';
 import * as clusterActions from './clusters';
 import client              from '../../network';
-import get                 from '../../utils/get';
 import { store, dispatch } from '..';
 
 export const PENDING_TASKFLOW_NETWORK = 'PENDING_TASKFLOW_NETWORK';
@@ -144,7 +143,6 @@ export function startTaskflow(id, payload, simulationStep, location) {
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-
           if (simulationStep) {
             const data = Object.assign({}, simulationStep.data,
               { metadata: Object.assign({}, simulationStep.data.metadata, { taskflowId: id }),
@@ -189,10 +187,6 @@ export function createTaskflow(taskFlowName, primaryJob, payload, simulationStep
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-          const targetSimulationStep = get(store.getState().simulations, `mapById.${simulationStep.id}.steps.${simulationStep.step}`);
-          if (targetSimulationStep && get(targetSimulationStep, 'metadata.taskflowId')) {
-            dispatch(deleteTaskflow(targetSimulationStep.metadata.taskflowId));
-          }
           dispatch(addTaskflow(resp.data, primaryJob));
           dispatch(attachSimulationToTaskflow(simulationStep.id, resp.data._id, simulationStep.step));
           dispatch(startTaskflow(resp.data._id, payload, simulationStep, location));
