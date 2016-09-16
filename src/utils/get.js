@@ -15,6 +15,11 @@ export default function get(obj, prop) {
     }
   }
 
+  // we don't want to return undefined
+  if (obj[last] == null) {
+    return falseyReturn;
+  }
+
   return obj[last];
 }
 
