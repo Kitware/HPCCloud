@@ -159,11 +159,17 @@ describe('simulation actions', () => {
         .toDispatchActions(expectedActions, complete(done));
     });
 
-    it('should delete simulation', (done) => {
+    it('should delete simulation and its taskflows', (done) => {
       const deletedSim = Object.assign({}, simulationData[0]);
+      const expectedActions = [
+        { type: Actions.REMOVE_SIMULATION, simulation: deletedSim },
+        { type: 'DELETE_TASKFLOW', id: simulationData[0].steps.Simulation.metadata.taskflowId },
+        { type: 'DELETE_TASKFLOW', id: 'viz_taskflow_id' },
+      ];
       setSpy(client, 'deleteSimulation', null);
+      setSpy(client, 'deleteTaskflow', '');
       expect(Actions.deleteSimulation(deletedSim))
-        .toDispatchActions({ type: Actions.REMOVE_SIMULATION, simulation: deletedSim }, complete(done));
+        .toDispatchActions(expectedActions, complete(done));
     });
   });
 });
