@@ -251,6 +251,9 @@ def submit_paraview_job(task, cluster, job, *args, **kwargs):
         paraview_install_dir = paraview_install_dir[0].value
         params['paraviewInstallDir'] = paraview_install_dir
 
+    # Does the cluster have GPUs?
+    params['gpu'] = has_gpus(cluster) or kwargs.get('numberOfGpusPerNode', 0) > 0
+
     job['params'] = params
 
     # Create proxy entry
