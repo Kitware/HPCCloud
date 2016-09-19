@@ -8,7 +8,7 @@ export const baseURL = '/api/v1';
 export const taskflowActions = {
   terminate: { name: 'terminateTaskflow', label: 'Terminate', icon: '' },
   visualize: { name: 'visualizeTaskflow', label: 'Visualize', icon: '' },
-  rerun: { name: 'deleteTaskflow', label: 'Rerun', icon: '' },
+  rerun: { name: 'rerun', label: 'Rerun', icon: '' },
   terminateInstance: { name: 'terminateInstance', label: 'Terminate EC2 Instance', icon: '' },
 };
 
