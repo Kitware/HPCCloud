@@ -283,5 +283,6 @@ export function terminateCluster(id) {
 client.onAuthChange(authenticated => {
   if (!authenticated) {
     dispatch(updateClusters([]));
+    dispatch(updateClusterPresets({}));
   }
 });

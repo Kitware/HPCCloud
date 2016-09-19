@@ -7,6 +7,7 @@ export const initialState = {
   list: [],
   active: 0,
   pending: false,
+  presets: {},
   mapById: {},
 };
 
