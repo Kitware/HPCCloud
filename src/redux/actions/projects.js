@@ -224,7 +224,7 @@ export function updateSimulationStep(id, stepName, data, location) {
     const state = store.getState().simulations.mapById[id];
     const stateTaskflowId = get(state, `steps.${stepName}.metadata.taskflowId`);
 
-    if (stateTaskflowId && stateTaskflowId !== data.metadata.taskflowId) {
+    if (stateTaskflowId && stateTaskflowId !== get(data, 'metadata.taskflowId')) {
       dispatch(taskflowActions.deleteTaskflow(stateTaskflowId));
     }
 
