@@ -1,7 +1,7 @@
-import * as netActions  from './network';
-import * as projActions from './projects';
+import * as netActions     from './network';
+import * as projActions    from './projects';
 import * as clusterActions from './clusters';
-import client           from '../../network';
+import client              from '../../network';
 import { store, dispatch } from '..';
 
 export const PENDING_TASKFLOW_NETWORK = 'PENDING_TASKFLOW_NETWORK';
@@ -143,7 +143,6 @@ export function startTaskflow(id, payload, simulationStep, location) {
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-
           if (simulationStep) {
             const data = Object.assign({}, simulationStep.data,
               { metadata: Object.assign({}, simulationStep.data.metadata, { taskflowId: id }),
@@ -153,6 +152,27 @@ export function startTaskflow(id, payload, simulationStep, location) {
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
+        });
+
+    return action;
+  };
+}
+
+export function deleteTaskflow(id, simulationStep, location) {
+  return dispatch => {
+    const action = netActions.addNetworkCall('delete_taskflow', 'Delete taskflow');
+
+    client.deleteTaskflow(id)
+      .then(
+        resp => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch({ type: DELETE_TASKFLOW, id });
+          if (simulationStep) {
+            dispatch(projActions.updateSimulationStep(simulationStep.id, simulationStep.step, simulationStep.data, location));
+          }
+        },
+        error => {
+          dispatch(netActions.errorNetworkCall(action.id, error));
         });
 
     return action;
@@ -249,27 +269,6 @@ export function updateTaskflowFromSimulation(simulation) {
     });
 
     return { type: 'NOOP' };
-  };
-}
-
-export function deleteTaskflow(id, simulationStep, location) {
-  return dispatch => {
-    const action = netActions.addNetworkCall('delete_taskflow', 'Delete taskflow');
-
-    client.deleteTaskflow(id)
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch({ type: DELETE_TASKFLOW, id });
-          if (simulationStep) {
-            dispatch(projActions.updateSimulationStep(simulationStep.id, simulationStep.step, simulationStep.data, location));
-          }
-        },
-        error => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
-        });
-
-    return action;
   };
 }
 
