@@ -158,18 +158,22 @@ export function startTaskflow(id, payload, simulationStep, location) {
   };
 }
 
-export function deleteTaskflow(id, simulationStep, location) {
+export function deleteTaskflow(taskflowId, simulationStep, location) {
+  if (store.getState().taskflows.pending.indexOf(`${taskflowId}_delete`) !== -1) {
+    return { type: 'NOOP' };
+  }
   return dispatch => {
     const action = netActions.addNetworkCall('delete_taskflow', 'Delete taskflow');
-
-    client.deleteTaskflow(id)
+    dispatch(pendingNetworkCall(`${taskflowId}_delete`, true));
+    client.deleteTaskflow(taskflowId)
       .then(
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch({ type: DELETE_TASKFLOW, id });
+          dispatch({ type: DELETE_TASKFLOW, id: taskflowId });
           if (simulationStep) {
             dispatch(projActions.updateSimulationStep(simulationStep.id, simulationStep.step, simulationStep.data, location));
           }
+          dispatch(pendingNetworkCall(`${taskflowId}_delete`, false));
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
@@ -217,6 +221,7 @@ export function fetchTaskflowTasks(taskflowId) {
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error));
           dispatch(pendingNetworkCall(taskflowId, false));
+          dispatch({ type: DELETE_TASKFLOW, id: taskflowId });
         });
 
     return action;
@@ -249,7 +254,7 @@ export function fetchTaskflow(id) {
       })
       .catch(error => {
         dispatch(netActions.errorNetworkCall(action.id, error));
-        dispatch({ type: DELETE_TASKFLOW, id: action.id });
+        dispatch({ type: DELETE_TASKFLOW, id });
       });
 
     dispatch(fetchTaskflowTasks(id));

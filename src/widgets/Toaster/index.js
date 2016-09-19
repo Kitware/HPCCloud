@@ -1,5 +1,5 @@
 import React from 'react';
-
+import get   from '../../utils/get';
 import style from 'HPCCloudStyle/Toaster.mcss';
 
 import { connect }  from 'react-redux';
@@ -44,9 +44,9 @@ export default connect(
     let message = '';
     if (localState.activeErrors.application.length) {
       id = localState.activeErrors.application[0];
-      if (localState.error[id].resp.data) {
+      if (get(localState, `error.${id}.resp.data`)) {
         message = localState.error[id].resp.data.message;
-      } else if (localState.error[id].resp.message) {
+      } else if (get(localState, `error.${id}.resp.message`)) {
         message = localState.error[id].resp.message;
       } else {
         message = `${localState.error[id].resp.status}: ${localState.error[id].resp.statusText}`;

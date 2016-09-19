@@ -35,7 +35,7 @@ const VisualizationView = React.createClass({
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
     cluster: React.PropTypes.object,
-    disabledButtons: React.PropTypes.bool,
+    disabledButtons: React.PropTypes.object,
     error: React.PropTypes.string,
   },
 
@@ -64,6 +64,7 @@ const VisualizationView = React.createClass({
       step: 'Visualization',
       data: {
         view: 'default',
+        metadata: {},
       },
     };
     const location = {
