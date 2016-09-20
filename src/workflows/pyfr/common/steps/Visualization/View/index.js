@@ -59,7 +59,13 @@ const VisualizationView = React.createClass({
   },
 
   rerun() {
-    const stepData = { view: 'default', metadata: {} };
+    const stepData = {
+      view: 'default',
+      metadata: Object.assign({}, this.props.simulation.steps.Visualization.metadata),
+    };
+    // we want to preserve some metadata objects
+    delete stepData.metadata.taskflowId;
+    delete stepData.metadata.sessionKey;
     const location = {
       pathname: this.props.location.pathname,
       query: { view: 'default' },
