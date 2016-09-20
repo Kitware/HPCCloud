@@ -206,6 +206,21 @@ export function deleteSimulation(simulation, location) {
   };
 }
 
+export function patchSimulation(simulation) {
+  return dispatch => {
+    const action = netActions.addNetworkCall(`update_simulation_${simulation._id}`, `update simulation ${simulation.name}`);
+    client.editSimulation(simulation)
+      .then((resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(updateSimulation(resp.data));
+      })
+      .catch((error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error));
+      });
+    return action;
+  };
+}
+
 export function setActiveSimulation(id, location) {
   return dispatch => {
     const updateActive = { type: UPDATE_ACTIVE_SIMULATION, id };
