@@ -1,10 +1,10 @@
 import * as Actions from '../actions/projects';
 
-const initialState = {
+export const simInitialState = {
   mapById: {},
 };
 
-export default function simulationsReducer(state = initialState, action) {
+export default function simulationsReducer(state = simInitialState, action) {
   switch (action.type) {
     case Actions.REMOVE_SIMULATION: {
       const mapById = Object.assign({}, state.mapById);
@@ -13,7 +13,8 @@ export default function simulationsReducer(state = initialState, action) {
     }
 
     case Actions.UPDATE_SIMULATION: {
-      const mapById = Object.assign({}, state.mapById, { [action.simulation._id]: action.simulation });
+      const mapById = Object.assign({}, state.mapById);
+      mapById[action.simulation._id] = action.simulation;
       return Object.assign({}, state, { mapById });
     }
 

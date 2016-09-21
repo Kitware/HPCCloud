@@ -53,7 +53,9 @@ export default [
       },
       "Visualization": {
         "folderId": "574c8aa00640fd3f1a3b379d",
-        "metadata": {},
+        "metadata": {
+          "taskflowId": "viz_taskflow_id",
+        },
         "status": "created",
         "type": "output"
       }

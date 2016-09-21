@@ -179,9 +179,11 @@ export default React.createClass({
 
   removeMetadata() {
     const metadata = Object.assign({}, this.state.metadata || {});
-    Object.keys(this.attachment).forEach((el) => {
-      delete metadata[el];
-    });
+    if (this.attachment) {
+      Object.keys(this.attachment).forEach((el) => {
+        delete metadata[el];
+      });
+    }
     this.setState({ metadata });
   },
 

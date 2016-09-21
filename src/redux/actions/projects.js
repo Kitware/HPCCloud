@@ -1,9 +1,11 @@
-import client           from '../../network';
+import client                from '../../network';
 import * as SimulationHelper from '../../network/helpers/simulations';
 import * as ProjectHelper    from '../../network/helpers/projects';
-import * as netActions  from './network';
-import * as router          from './router';
-import { dispatch }     from '../index.js';
+import * as netActions       from './network';
+import * as taskflowActions  from './taskflows';
+import * as router           from './router';
+import get                   from '../../utils/get';
+import { store, dispatch }   from '../index.js';
 
 export const FETCH_PROJECT_LIST = 'FETCH_PROJECT_LIST';
 export const UPDATE_PROJECT_LIST = 'UPDATE_PROJECT_LIST';
@@ -168,10 +170,20 @@ export function saveSimulation(simulation, attachments, location) {
   };
 }
 
+function getTaskflowsFromSimulation(simulation) {
+  const ret = [];
+  Object.keys(simulation.steps).forEach((stepName) => {
+    if (get(simulation.steps[stepName], 'metadata.taskflowId')) {
+      ret.push(simulation.steps[stepName].metadata.taskflowId);
+    }
+  });
+  return ret;
+}
+
 export function deleteSimulation(simulation, location) {
   return dispatch => {
     const action = netActions.addNetworkCall(`delete_simulation_${simulation._id}`, `Delete simulation ${simulation.name}`);
-
+    const simStepTaskflows = getTaskflowsFromSimulation(simulation);
     client.deleteSimulation(simulation._id)
       .then(
         resp => {
@@ -180,11 +192,31 @@ export function deleteSimulation(simulation, location) {
           if (location) {
             dispatch(router.replace(location));
           }
+          if (simStepTaskflows.length) {
+            simStepTaskflows.forEach((taskflowId) => {
+              dispatch(taskflowActions.deleteTaskflow(taskflowId));
+            });
+          }
         },
         error => {
           dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
 
+    return action;
+  };
+}
+
+export function patchSimulation(simulation) {
+  return dispatch => {
+    const action = netActions.addNetworkCall(`update_simulation_${simulation._id}`, `update simulation ${simulation.name}`);
+    client.editSimulation(simulation)
+      .then((resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(updateSimulation(resp.data));
+      })
+      .catch((error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error));
+      });
     return action;
   };
 }
@@ -204,10 +236,16 @@ export function setActiveSimulation(id, location) {
 export function updateSimulationStep(id, stepName, data, location) {
   return dispatch => {
     const action = netActions.addNetworkCall(`update_simulation_step_${id}`, 'Update simulation step');
+    const state = store.getState().simulations.mapById[id];
+    const stateTaskflowId = get(state, `steps.${stepName}.metadata.taskflowId`);
+
+    if (stateTaskflowId && stateTaskflowId !== get(data, 'metadata.taskflowId')) {
+      dispatch(taskflowActions.deleteTaskflow(stateTaskflowId));
+    }
 
     client.updateSimulationStep(id, stepName, data)
       .then((resp) => {
-        // dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateSimulation(resp.data));
         if (location) {
           dispatch(router.replace(location));

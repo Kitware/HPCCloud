@@ -64,12 +64,10 @@ const SimputPanel = React.createClass({
       simulationsHelper.addEmptyFileForSimulation(this.props.simulation, 'pyfr.ini')
         .then(resp => {
           const _id = resp.data._id; // itemId
-          this.props.simulation.metadata.inputFolder.files.ini = _id;
+          const newSim = deepClone(this.props.simulation);
+          newSim.metadata.inputFolder.files.ini = _id;
           this.setState({ iniFile: _id });
-          simulationsHelper.saveSimulation(this.props.simulation)
-            .then(() => {
-              this.props.updateSimulation(this.props.simulation);
-            });
+          dispatch(Actions.patchSimulation(newSim));
         });
     } else if (!this.state.iniFile) {
       this.setState({ iniFile });
@@ -97,7 +95,7 @@ const SimputPanel = React.createClass({
       }).then((resp) => {
         var newSim = deepClone(this.props.simulation);
         newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
-        this.props.saveSimulation(newSim);
+        dispatch(Actions.patchSimulation(newSim));
       });
     } else {
       if (typeof jsonData === 'string') {
@@ -148,8 +146,9 @@ const SimputPanel = React.createClass({
           });
         const simulationStepIndex = this.props.simulation.disabled.indexOf('Simulation');
         if (simulationStepIndex !== -1) {
-          this.props.simulation.disabled.splice(simulationStepIndex, 1);
-          simulationsHelper.updateDisabledSimulationSteps(this.props.simulation);
+          const newSim = deepClone(this.props.simulation);
+          newSim.disabled.splice(simulationStepIndex, 1);
+          dispatch(Actions.patchSimulation(newSim));
         }
       } else {
         console.log('no .ini file');

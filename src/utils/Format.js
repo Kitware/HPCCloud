@@ -1,3 +1,4 @@
+// this formatter takes a decimal that represents time in unix seconds
 export function formatTime(time) {
   var date = new Date(time * 1000),
     hours = date.getHours().toString(),
@@ -8,10 +9,8 @@ export function formatTime(time) {
   hours = hours.length === 1 ? `0${hours}` : hours;
   minutes = minutes.length === 1 ? `0${minutes}` : minutes;
   seconds = seconds.length === 1 ? `0${seconds}` : seconds;
-  if (ms.length < 3) {
-    while (ms.length < 3) {
-      ms = `0${ms}`;
-    }
+  while (ms.length < 3) {
+    ms = `0${ms}`;
   }
 
   return `${hours}:${minutes}:${seconds}.${ms}`;
