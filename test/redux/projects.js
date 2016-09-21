@@ -138,6 +138,17 @@ describe('simulation actions', () => {
         .toDispatchActions(expectedAction, complete(done));
     });
 
+    it('should patch a simulation', (done) => {
+      const patchedSimulation = { _id: '123', metadata: { inputFiles: ['ini', 'msh'] } };
+      const expectedAction = { type: Actions.UPDATE_SIMULATION, simulation: patchedSimulation };
+      setSpy(client, 'editSimulation', patchedSimulation);
+
+      expect(Actions.patchSimulation(patchedSimulation))
+        .toDispatchActions(expectedAction, complete(done));
+      expect(client.editSimulation).toHaveBeenCalled();
+    });
+
+
     it('should update simulation step, delete the old taskflow', (done) => {
       const newStatus = 'complete';
       const newTaskflowId = 'some_id';
