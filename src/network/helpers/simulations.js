@@ -96,11 +96,6 @@ export function saveSimulation(simulation_, attachments) {
   return girder.editSimulation(simulation);
 }
 
-export function updateDisabledSimulationSteps(simulation) {
-  invalidateSimulation(simulation);
-  return girder.editSimulation(simulation);
-}
-
 export function activateSimulationStep(simulation, active, disabled) {
   // Update local data
   simulation.active = active;

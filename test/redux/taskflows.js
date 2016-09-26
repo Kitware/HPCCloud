@@ -160,24 +160,36 @@ describe('taskflow actions', () => {
     });
 
     it('should start taskflow', (done) => {
+      const fauxSim = { simulation: 'my sim' };
+      const simulationStep = { id: 'mySimStep', step: 'Visuzlization',
+        data: { metadata: { taskflowId: 'some_taskflow_id' } } };
+
       setSpy(client, 'startTaskflow', '');
-      // calls projects @updateSimulationStep which we're testing elsewhere
-      // let's just make sure it's calling startTaskflow
-      expect(Actions.startTaskflow(taskflowId, {}, 'Visuzlization'))
-        .toDispatchActions([], complete(done));
+      setSpy(client, 'updateSimulationStep', fauxSim);
+
+      expect(Actions.startTaskflow(taskflowId, {}, simulationStep))
+        .toDispatchActions([{ type: 'UPDATE_SIMULATION', simulation: fauxSim }], complete(done));
 
       expect(client.startTaskflow)
         .toHaveBeenCalled();
     });
 
-    it('shuold create a taskflow', (done) => {
+    it('should create a taskflow', (done) => {
+      const fauxSim = { simulation: 'my sim' };
+      const simulationStep = { id: 'mySimStep', step: 'Visuzlization',
+        data: { metadata: { } } };
+
       const expectedActions = [
         { type: Actions.ADD_TASKFLOW, primaryJob: 'pyfr' },
         { type: Actions.BIND_SIMULATION_TO_TASKFLOW, taskflowId, simulationId: 'mySimStep', stepName: 'Visuzlization' },
-        // also starts taskflow
+        { type: 'UPDATE_SIMULATION', simulation: fauxSim },
       ];
+
       setSpy(client, 'createTaskflow', taskflow.flow);
-      expect(Actions.createTaskflow('myFlow', 'pyfr', {}, { id: 'mySimStep', step: 'Visuzlization' }))
+      setSpy(client, 'startTaskflow', '');
+      setSpy(client, 'updateSimulationStep', fauxSim);
+
+      expect(Actions.createTaskflow('myFlow', 'pyfr', { payload: 'some payload' }, simulationStep))
         .toDispatchActions(expectedActions, complete(done));
     });
 

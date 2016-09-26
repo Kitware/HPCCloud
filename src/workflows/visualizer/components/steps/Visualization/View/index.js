@@ -28,7 +28,7 @@ const visualizationView = React.createClass({
     view: React.PropTypes.string,
 
     onTerminateTaskflow: React.PropTypes.func,
-    onDeleteTaskflow: React.PropTypes.func,
+    onRerun: React.PropTypes.func,
     onVisualizeTaskflow: React.PropTypes.func,
     onTerminateInstance: React.PropTypes.func,
 
@@ -66,22 +66,15 @@ const visualizationView = React.createClass({
     this.props.onTerminateTaskflow(this.props.taskflowId);
   },
 
-  deleteTaskflow() {
-    const simulationStep = {
-      id: this.props.simulation._id,
-      step: 'Visualization',
-      data: {
-        view: 'default',
-        metadata: {},
-      },
-    };
+  rerun() {
+    const stepData = { view: 'default', metadata: {} };
     const location = {
       pathname: this.props.location.pathname,
       query: { view: 'default' },
       state: this.props.location.state,
     };
 
-    this.props.onDeleteTaskflow(this.props.taskflowId, simulationStep, location);
+    this.props.onRerun(this.props.simulation._id, this.props.step, stepData, location);
   },
 
   render() {
@@ -152,7 +145,7 @@ export default connect(
   },
   () => ({
     onVisualizeTaskflow: (sim, location) => dispatch(SimActions.saveSimulation(sim, null, location)),
-    onDeleteTaskflow: (id, simulationStep, location) => dispatch(Actions.deleteTaskflow(id, simulationStep, location)),
+    onRerun: (id, stepName, stepData, location) => dispatch(SimActions.updateSimulationStep(id, stepName, stepData, location)),
     onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
     onTerminateInstance: (id) => dispatch(ClusterActions.terminateCluster(id)),
   })

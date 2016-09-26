@@ -6,8 +6,9 @@ import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 import RuntimeBackend          from '../../../panels/RuntimeBackend';
 
 import merge                   from 'mout/src/object/merge';
-
+import get              from '../../../../../../utils/get';
 import getNetworkError  from '../../../../../../utils/getNetworkError';
+
 import { connect } from 'react-redux';
 import { dispatch } from '../../../../../../redux';
 import * as Actions    from '../../../../../../redux/actions/taskflows';
@@ -148,7 +149,7 @@ const SimulationStart = React.createClass({
       backendProfiles = { cuda: false, openmp: [], opencl: [] };
     if (this.state.serverType === 'Traditional') {
       const clusterId = this.state.Traditional.profile;
-      if (this.props.clusters[clusterId] && this.props.clusters[clusterId].config && this.props.clusters[clusterId].config.pyfr) {
+      if (get(this.props, `clusters.${clusterId}.config.pyfr`)) {
         backendProfiles = this.props.clusters[clusterId].config.pyfr;
       }
     }

@@ -1,20 +1,20 @@
 import * as Actions from '../../src/redux/actions/projects';
 import projectsReducer, { initialState } from '../../src/redux/reducers/projects';
+import simulationsReducer, { simInitialState } from '../../src/redux/reducers/simulations';
+import { store } from '../../src/redux';
 import client from '../../src/network';
 import * as ProjectHelper from '../../src/network/helpers/projects';
 import * as SimulationHelper from '../../src/network/helpers/simulations';
 
+import deepClone from 'mout/src/lang/deepClone';
 import projectsData from '../sampleData/projectsData';
 import simulationData from '../sampleData/simulationsForProj1';
 
 import expect from 'expect';
-import thunk from 'redux-thunk';
 import complete from '../helpers/complete';
-import { registerMiddlewares } from 'redux-actions-assertions';
 import { registerAssertions } from 'redux-actions-assertions/expect';
 /* global describe it afterEach */
 
-registerMiddlewares([thunk]);
 registerAssertions();
 
 function setSpy(target, method, data) {
@@ -115,6 +115,12 @@ describe('simulation actions', () => {
 
       expect(projectsReducer(initialState, expectedAction).simulations[projId].list)
         .toContain(simulationData[0]._id);
+
+      const expectedSim = simulationData[0];
+      const expectedState = deepClone(simInitialState);
+      expectedState.mapById[expectedSim._id] = expectedSim;
+      expect(simulationsReducer(simInitialState, expectedAction))
+        .toEqual(expectedState);
     });
   });
 
@@ -125,24 +131,56 @@ describe('simulation actions', () => {
 
     it('should save simulation', (done) => {
       const expectedSim = Object.assign({}, simulationData[0]);
+      const expectedAction = { type: Actions.UPDATE_SIMULATION, simulation: expectedSim };
       setSpy(SimulationHelper, 'saveSimulation', expectedSim);
+
       expect(Actions.saveSimulation(expectedSim))
-        .toDispatchActions({ type: Actions.UPDATE_SIMULATION, simulation: expectedSim }, complete(done));
+        .toDispatchActions(expectedAction, complete(done));
     });
 
-    it('should update simulation step', (done) => {
-      const expectedSim = Object.assign({}, simulationData[0]);
-      expectedSim.steps.Introduction.status = 'complete';
+    it('should patch a simulation', (done) => {
+      const patchedSimulation = { _id: '123', metadata: { inputFiles: ['ini', 'msh'] } };
+      const expectedAction = { type: Actions.UPDATE_SIMULATION, simulation: patchedSimulation };
+      setSpy(client, 'editSimulation', patchedSimulation);
+
+      expect(Actions.patchSimulation(patchedSimulation))
+        .toDispatchActions(expectedAction, complete(done));
+      expect(client.editSimulation).toHaveBeenCalled();
+    });
+
+
+    it('should update simulation step, delete the old taskflow', (done) => {
+      const newStatus = 'complete';
+      const newTaskflowId = 'some_id';
+      const expectedSim = deepClone(simulationData[0]);
+      expectedSim.steps.Simulation.status = newStatus;
+      expectedSim.steps.Simulation.metadata.taskflowId = newTaskflowId;
+
+      const expectedActions = [
+        { type: 'DELETE_TASKFLOW', id: simulationData[0].steps.Simulation.metadata.taskflowId },
+        { type: Actions.UPDATE_SIMULATION, simulation: expectedSim },
+      ];
+
+      // we need to manually add the simulation to the state.
+      store.getState().simulations.mapById[simulationData[0]._id] = simulationData[0];
+
       setSpy(client, 'updateSimulationStep', expectedSim);
-      expect(Actions.updateSimulationStep(expectedSim._id, 'Introduction', { status: 'complete' }))
-        .toDispatchActions({ type: Actions.UPDATE_SIMULATION, simulation: expectedSim }, complete(done));
+      setSpy(client, 'deleteTaskflow', '');
+      expect(Actions.updateSimulationStep(expectedSim._id, 'Simulation', { status: 'complete', metadata: { taskflowId: newTaskflowId } }))
+        .toDispatchActions(expectedActions, complete(done));
     });
 
-    it('should delete simulation', (done) => {
+    it('should delete simulation and its taskflows', (done) => {
       const deletedSim = Object.assign({}, simulationData[0]);
+      const expectedActions = [
+        { type: Actions.REMOVE_SIMULATION, simulation: deletedSim },
+        { type: 'DELETE_TASKFLOW', id: simulationData[0].steps.Simulation.metadata.taskflowId },
+        { type: 'DELETE_TASKFLOW', id: 'viz_taskflow_id' },
+      ];
       setSpy(client, 'deleteSimulation', null);
+      setSpy(client, 'deleteTaskflow', '');
       expect(Actions.deleteSimulation(deletedSim))
-        .toDispatchActions({ type: Actions.REMOVE_SIMULATION, simulation: deletedSim }, complete(done));
+        .toDispatchActions(expectedActions, complete(done));
     });
   });
 });

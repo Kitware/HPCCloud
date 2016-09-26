@@ -2,7 +2,7 @@
   "name": "hpc-cloud",
   "description": "Virtual platform for running simulations and visualization",
   "license": "Apache-2.0",
-  "version": "0.0.0-semantically-release",
+  "version": "0.9.0",
   "main": "./lib/app.js",
   "repository": {
     "type": "git",
@@ -47,7 +47,7 @@
     "istanbul-instrumenter-loader": "0.2.0",
     "phantomjs-prebuilt": "2.1.7",
     "jasmine": "2.4.1",
-    "redux-actions-assertions": "1.1.0",
+    "redux-actions-assertions": "1.2.0",
     "redux-thunk": "2.1.0",
     "expect": "1.20.1",
     "codecov.io": "0.1.6",
@@ -75,10 +75,7 @@
     "test": "NODE_ENV='test' karma start test/karma.all.js",
     "test:redux": "NODE_ENV='test' karma start test/karma.redux.js",
     "test:component": "NODE_ENV='test' karma start test/karma.component.js",
-    "codecov": "cat coverage/lcov/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js",
-
-    "commit"            : "git cz",
-    "semantic-release"  : "semantic-release pre && npm publish && semantic-release post"
+    "codecov": "cat coverage/lcov/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js"
   },
   "bin": {
     "HPCCloud": "./bin/hpc-cloud-cli.js"
