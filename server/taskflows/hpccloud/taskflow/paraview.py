@@ -20,21 +20,16 @@ import json
 import os
 from jsonpath_rw import parse
 
-import cumulus.taskflow
-from cumulus.tasks.job import download_job_input_folders, submit_job
-from cumulus.tasks.job import monitor_job, upload_job_output_to_folder
-from cumulus.tasks.job import job_directory
+import cumulus.taskflow.cluster
+from cumulus.taskflow.cluster import create_girder_client
+from cumulus.tasks.job import submit_job, monitor_job
+from cumulus.tasks.job import upload_job_output_to_folder, job_directory
 from cumulus.transport import get_connection
 from cumulus.transport.files.upload import upload_file
 
-from girder.utility.model_importer import ModelImporter
-from girder.api.rest import getCurrentUser
-from girder.constants import AccessType
-from girder_client import GirderClient, HttpError
-
 from hpccloud.taskflow.utility import *
 
-class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
+class ParaViewTaskFlow(cumulus.taskflow.cluster.ClusterProvisioningTaskFlow):
     """
     {
         "dataDir": <passed to --data-dir,
@@ -57,23 +52,6 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
     }
 
     def start(self, *args, **kwargs):
-        user = getCurrentUser()
-        # Load the cluster
-        cluster_id = parse('cluster._id').find(kwargs)
-        if cluster_id:
-            model = ModelImporter.model('cluster', 'cumulus')
-            cluster = model.load(kwargs['cluster']['_id'],
-                                 user=user, level=AccessType.ADMIN)
-            cluster = model.filter(cluster, user, passphrase=False)
-            kwargs['cluster'] = cluster
-
-        profile_id = parse('cluster.profileId').find(kwargs)
-        if profile_id:
-            profile_id = profile_id[0].value
-            model = ModelImporter.model('aws', 'cumulus')
-            profile = model.load(profile_id, user=user, level=AccessType.ADMIN)
-            kwargs['profile'] = profile
-
         image_spec = self.PARAVIEW_IMAGE.copy()
         # Setup up image spec
         if '_id' not in kwargs['cluster']:
@@ -82,53 +60,19 @@ class ParaViewTaskFlow(cumulus.taskflow.TaskFlow):
                 image_spec['tags']['nvida_display_driver'] = '367.35'
             else:
                 image_spec['tags']['mesa'] = '8.0'
-            kwargs['image_spec'] = image_spec
 
         kwargs['image_spec'] = image_spec
         kwargs['next'] = create_paraview_job.s()
 
-        # Save the output parameter for the upload_output step
-        self.set_metadata('output', kwargs.get('output', {}))
-
-        super(ParaViewTaskFlow, self).start(
-            setup_cluster.s(self, *args, **kwargs))
+        super(ParaViewTaskFlow, self).start(self, *args, **kwargs)
 
     def terminate(self):
-        meta = self.get('meta', {})
-        cluster = meta.get('cluster')
-        jobs = meta.get('jobs', [])
-        output = meta.get('output', {})
-        upload_jobs = []
-
-        if cluster:
-            for job in jobs:
-                upload_job = upload_output.s(cluster, job, (), output=output)
-                upload_jobs.append(upload_job)
-
-        # Terminate and then upload job output
-        self.run_task(paraview_terminate.s(), link=upload_jobs)
+        super(ParaViewTaskFlow, self).terminate()
         self.run_task(cleanup_proxy_entries.s())
 
     def delete(self):
-        client = _create_girder_client(
-            self.girder_api_url, self.girder_token)
-        for job in self.get('meta', {}).get('jobs', []):
-            job_id = job['_id']
-            client.delete('jobs/%s' % job_id)
-
-            try:
-                client.get('jobs/%s' % job_id)
-            except HttpError as e:
-                if e.status != 404:
-                    self.logger.error('Unable to delete job: %s' % job_id)
-
+        super(ParaViewTaskFlow, self).delete()
         self.run_task(cleanup_proxy_entries.s())
-
-def _create_girder_client(girder_api_url, girder_token):
-    client = GirderClient(apiUrl=girder_api_url)
-    client.token = girder_token
-
-    return client
 
 def validate_args(kwargs):
     required = ['cluster.config.paraview.installDir', 'sessionKey']
@@ -151,7 +95,7 @@ def paraview_terminate(task):
         task.logger.warning('Unable to extract cluster from taskflow. '
                          'Unable to terminate ParaView job.')
 
-    client = _create_girder_client(
+    client = create_girder_client(
             task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     jobs = task.taskflow.get('meta', {}).get('jobs', [])
@@ -164,7 +108,7 @@ def _update_cluster_config(task, cluster):
         paraview_config['websocketPort'] = 9000
 
         # Update ParaView config on cluster
-        client = _create_girder_client(
+        client = create_girder_client(
             task.taskflow.girder_api_url, task.taskflow.girder_token)
         client.patch('clusters/%s' % cluster['_id'],
                      data=json.dumps({
@@ -183,7 +127,7 @@ def create_paraview_job(task, *args, **kwargs):
     # Save the cluster in the taskflow for termination
     task.taskflow.set_metadata('cluster', cluster)
 
-    client = _create_girder_client(
+    client = create_girder_client(
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     task.taskflow.logger.info('Creating ParaView job.')
@@ -241,7 +185,7 @@ def upload_input(task, cluster, job, *args, **kwargs):
         job['params']['dataDir'] = '.'
 
         # Fetch the file
-        girder_client = _create_girder_client(
+        girder_client = create_girder_client(
             task.taskflow.girder_api_url, task.taskflow.girder_token)
         file = girder_client.getResource('file', file_id)
 
@@ -253,7 +197,7 @@ def upload_input(task, cluster, job, *args, **kwargs):
         task.logger.info('Uploading file to cluster.')
         job_dir = job_directory(cluster, job)
         upload_file(cluster, task.taskflow.girder_token, file, job_dir)
-        task.logger.info('Upload input complete.')
+        task.logger.info('Upload complete.')
 
 def create_proxy_entry(task, cluster, job):
     session_key = job['params']['sessionKey']
@@ -263,7 +207,7 @@ def create_proxy_entry(task, cluster, job):
         'port': cluster['config']['paraview']['websocketPort'],
         'key': session_key
     }
-    client = _create_girder_client(
+    client = create_girder_client(
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
     client.post('proxy', data=json.dumps(body))
 
@@ -329,15 +273,18 @@ def monitor_paraview_job(task, cluster, job, *args, **kwargs):
     task.logger.info('Monitoring job on cluster.')
     girder_token = task.taskflow.girder_token
 
-    monitor_job.apply_async((cluster, job), {'girder_token': girder_token,
-                                         'monitor_interval': 30},
-                        link=upload_output.s(cluster, job, *args, **kwargs))
+    task.taskflow.on_complete(monitor_job) \
+        .run(upload_output.s(cluster, job, *args, **kwargs))
+
+    task.taskflow.run_task(
+        monitor_job.s(cluster, job, girder_token=girder_token))
 
 @cumulus.taskflow.task
-def upload_output(task, _, cluster, job, *args, **kwargs):
+def upload_output(task, cluster, job, *args, **kwargs):
+    task.taskflow.logger.info('Uploading results from cluster')
 
     # Refresh state of job
-    client = _create_girder_client(
+    client = create_girder_client(
             task.taskflow.girder_api_url, task.taskflow.girder_token)
     job = client.get('jobs/%s' % job['_id'])
 
@@ -349,20 +296,17 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
             'path': '.'
         }]
 
-    task.taskflow.logger.info('Uploading results from cluster to folder: %s' %
-                              output_folder_id)
     upload_job_output_to_folder(cluster, job, log_write_url=None, job_dir=None,
                                 girder_token=task.taskflow.girder_token)
 
-    task.taskflow.logger.info('Upload output complete.')
+    task.taskflow.logger.info('Upload complete.')
 
 @cumulus.taskflow.task
 def cleanup_proxy_entries(task):
-    client = _create_girder_client(
+    client = create_girder_client(
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     session_key = parse('meta.sessionKey').find(task.taskflow)
     if session_key:
         session_key = session_key[0].value
         client.delete('proxy/%s' % session_key)
-
