@@ -28,7 +28,11 @@ cd HPCCloud
 DEMO=1 vagrant up
 ```
 
-Once the vagrant provisioning process it complete your VM will up and running. You can access the HPCCloud application by visting [http://localhost:8888](http://localhost:8888)
+Once the vagrant provisioning process it complete your VM will up and running.
+
+You can then access the HPCCloud application by visiting [http://localhost:8888](http://localhost:8888) and logging in as user `hpccloud` with password `letmein`.
+
+(Note: you could also register as a new user, but then the preconfigurated "demo_cluster" wouldn't be available, which is provisioned within the Vagrant machine)
 
 ## Development
 
