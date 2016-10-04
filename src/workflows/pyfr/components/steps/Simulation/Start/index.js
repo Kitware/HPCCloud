@@ -49,7 +49,7 @@ const SimulationStart = React.createClass({
   },
 
   runSimulation() {
-    const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
+    const meshFile = this.props.project.metadata.inputFolder.files.mesh;
     var sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
       payload = {
         backend: this.state.backend,

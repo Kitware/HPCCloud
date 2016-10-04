@@ -1,21 +1,24 @@
-import rootNewSimulation  from './components/root/NewSimulation';
-import rootViewSimulation from '../common/root/ViewSimulation';
+import rootNewProject         from './components/root/NewProject';
+// import rootNewSimulation      from './components/root/NewSimulation';
+import rootViewSimulation     from './components/root/ViewSimulation';
 
-import stepIntroduction       from '../common/steps/Introduction';
-import stepSimulationStart    from '../common/steps/Simulation/Start';
-import stepSimulationView     from '../common/steps/Simulation/View';
-import stepVisualizationStart from '../common/steps/Visualization/Start';
-import stepVisualizationView  from '../common/steps/Visualization/View';
+import stepIntroduction       from './components/steps/Introduction';
+import stepInput              from './components/steps/Input';
+import stepSimulationStart    from './components/steps/Simulation/Start';
+import stepSimulationView     from './components/steps/Simulation/View';
+import stepVisualizationStart from './components/steps/Visualization/Start';
+import stepVisualizationView  from './components/steps/Visualization/View';
 
 export default {
-  name: 'PyFR (Runtime)',
+  name: 'PyFR',
   logo: require('./logo.png'),
   requiredAttachments: {
-    project: [],
-    simulation: ['mesh', 'ini'],
+    project: ['mesh'],
+    simulation: [],
   },
   components: {
-    NewSimulation: rootNewSimulation,
+    NewProject: rootNewProject,
+    // NewSimulation: rootNewSimulation,
     ViewSimulation: rootViewSimulation,
   },
   config: {
@@ -83,12 +86,17 @@ export default {
     },
   },
   steps: {
-    _order: ['Introduction', 'Simulation', 'Visualization'],
+    _order: ['Introduction', 'Input', 'Simulation', 'Visualization'],
     _disabled: ['Visualization'],
-    _active: 'Introduction',
     _initial_state: {
       Introduction: {
-        type: 'information',
+        type: 'input',
+        metadata: {
+          alwaysAvailable: true,
+        },
+      },
+      Input: {
+        type: 'input',
         metadata: {},
       },
       Simulation: {
@@ -102,6 +110,9 @@ export default {
     },
     Introduction: {
       default: stepIntroduction,
+    },
+    Input: {
+      default: stepInput,
     },
     Simulation: {
       default: stepSimulationStart,
@@ -123,6 +134,9 @@ export default {
   labels: {
     Introduction: {
       default: 'Introduction',
+    },
+    Input: {
+      default: 'Input definition',
     },
     Simulation: {
       default: 'Simulation',

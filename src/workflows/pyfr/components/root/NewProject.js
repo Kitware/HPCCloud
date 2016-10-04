@@ -1,5 +1,5 @@
 import React                from 'react';
-import { FileUploadEntry }  from '../../../../../panels/ItemEditor';
+import { FileUploadEntry }  from '../../../../panels/ItemEditor';
 
 function extractPhysicalNames(file) {
   return new Promise((accept, reject) => {
@@ -39,6 +39,9 @@ export default React.createClass({
   },
 
   render() {
-    return <FileUploadEntry name="mesh" label="Mesh file (.msh)" postProcess={ extractPhysicalNames } accept=".msh" owner={ this.props.owner } />;
+    return (<div>
+      <FileUploadEntry name="mesh" label="Mesh (msh, pyfrm)" accept=".msh,.pyfrm" owner={ this.props.owner } postProcess={ extractPhysicalNames } />
+      <FileUploadEntry name="ini" label="Ini file" accept=".ini" owner={ this.props.owner } />
+    </div>);
   },
 });

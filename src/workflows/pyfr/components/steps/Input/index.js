@@ -4,16 +4,16 @@ import React                from 'react';
 import SimputLabels         from 'simput/src/Labels';
 import ViewMenu             from 'simput/src/ViewMenu';
 import modelGenerator       from 'simput/src/modelGenerator';
-import client               from '../../../../../../network';
-import * as simulationsHelper from '../../../../../../network/helpers/simulations';
+import client               from '../../../../../network';
+import * as simulationsHelper from '../../../../../network/helpers/simulations';
 import deepClone            from 'mout/src/lang/deepClone';
 
 import PropertyPanelBlock   from 'paraviewweb/src/React/Properties/PropertyPanel';
 
 import style                from 'HPCCloudStyle/PageWithMenu.mcss';
 import { connect } from 'react-redux';
-import { dispatch } from '../../../../../../redux';
-import * as Actions from '../../../../../../redux/actions/projects';
+import { dispatch } from '../../../../../redux';
+import * as Actions from '../../../../../redux/actions/projects';
 
 const SimputPanel = React.createClass({
 
@@ -21,6 +21,7 @@ const SimputPanel = React.createClass({
 
   propTypes: {
     convert: React.PropTypes.func,
+    parse: React.PropTypes.func,
     model: React.PropTypes.object,
     project: React.PropTypes.object,
     simulation: React.PropTypes.object,
@@ -34,6 +35,7 @@ const SimputPanel = React.createClass({
       // PyFr Simput code
       model: Simput.types.pyfr.model,
       convert: Simput.types.pyfr.convert,
+      parse: Simput.types.pyfr.parse,
     };
   },
 
@@ -61,13 +63,28 @@ const SimputPanel = React.createClass({
 
     // Create ini file container if not already here
     if (!iniFile) {
-      simulationsHelper.addEmptyFileForSimulation(this.props.simulation, 'pyfr.ini')
+      // download ini file contents
+      client.downloadFile(this.props.project.metadata.inputFolder.files.ini, 0, null, 'inline')
+        // parse contents
+        .then((resp) => {
+          try {
+            const parsedIni = this.props.parse('pyfr', resp.data);
+            this.setState({ jsonData: { data: parsedIni } });
+            return simulationsHelper.addFileForSimulationWithContents(this.props.simulation, 'pyfr.ini', resp.data);
+          } catch (e) {
+            throw e;
+          }
+        })
+        // upload contents to new file for simulation
         .then(resp => {
-          const _id = resp.data._id; // itemId
+          const _id = resp._id; // itemId, custom response
           const newSim = deepClone(this.props.simulation);
           newSim.metadata.inputFolder.files.ini = _id;
           this.setState({ iniFile: _id });
           dispatch(Actions.patchSimulation(newSim));
+        })
+        .catch((error) => {
+          console.log(error);
         });
     } else if (!this.state.iniFile) {
       this.setState({ iniFile });
@@ -132,6 +149,7 @@ const SimputPanel = React.createClass({
     // Update ini file content
     try {
       if (this.state.iniFile) {
+        delete jsonData.backend; // we want to use the backend configured from the cluster
         const convertedData = this.props.convert(jsonData);
         console.log(convertedData);
         const content = convertedData.results['pyfr.ini'];
