@@ -1,11 +1,13 @@
 import React                   from 'react';
+import client                  from '../../../../../../network';
 import ButtonBar               from '../../../../../../panels/ButtonBar';
 import defaultServerParameters from '../../../../../../panels/run/defaults';
 import RunClusterFrom          from '../../../../../../panels/run';
 import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 import RuntimeBackend          from '../../../panels/RuntimeBackend';
 
-import merge                   from 'mout/src/object/merge';
+import deepClone            from 'mout/src/lang/deepClone';
+import merge                from 'mout/src/object/merge';
 import get              from '../../../../../../utils/get';
 import getNetworkError  from '../../../../../../utils/getNetworkError';
 
@@ -40,6 +42,26 @@ const SimulationStart = React.createClass({
       OpenStack: defaultServerParameters.OpenStack,
       backend: {},
     };
+  },
+
+  componentWillMount() {
+    var iniFile = this.props.simulation.metadata.inputFolder.files.ini;
+    // use the ini file from the project
+    if (!iniFile) {
+      client.createItem(this.props.simulation.metadata.inputFolder._id, 'ini')
+        .then(resp =>
+          client.copyFile(this.props.simulation.metadata.inputFolder.files.ini, resp.data._id)
+        )
+        .then(resp => {
+          const newSim = deepClone(this.props.simulation);
+          newSim.metadata.inputFolder.files.ini = resp.data._id;
+          this.setState({ iniFile: resp.data._id });
+          dispatch(Actions.patchSimulation(newSim));
+        })
+        .catch(err => {
+          console.log('Error copying ini file for simulation', err);
+        });
+    }
   },
 
   dataChange(key, value, which) {

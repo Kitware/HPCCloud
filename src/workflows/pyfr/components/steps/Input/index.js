@@ -76,7 +76,7 @@ const SimputPanel = React.createClass({
             throw e;
           }
         })
-        // updata ini file for simulation
+        // update ini file for simulation
         .then(resp => {
           const _id = resp._id; // file Id, custom response
           const newSim = deepClone(this.props.simulation);
