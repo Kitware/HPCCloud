@@ -70,14 +70,15 @@ const SimputPanel = React.createClass({
           try {
             const parsedIni = this.props.parse('pyfr', resp.data);
             this.setState({ jsonData: { data: parsedIni } });
+            // create a new item, add an empty file to that item, upload contents to that file
             return simulationsHelper.addFileForSimulationWithContents(this.props.simulation, 'pyfr.ini', resp.data);
           } catch (e) {
             throw e;
           }
         })
-        // upload contents to new file for simulation
+        // updata ini file for simulation
         .then(resp => {
-          const _id = resp._id; // itemId, custom response
+          const _id = resp._id; // file Id, custom response
           const newSim = deepClone(this.props.simulation);
           newSim.metadata.inputFolder.files.ini = _id;
           this.setState({ iniFile: _id });

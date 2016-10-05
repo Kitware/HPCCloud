@@ -25,10 +25,10 @@ function createItemForSimulation(simulation, name, file) {
 }
 
 export function addFileForSimulationWithContents(simulation, name, contents) {
-  let parentId;
+  let fileId;
   return girder.createItem(simulation.metadata.inputFolder._id, name)
     .then(resp => {
-      parentId = resp.data._id;
+      const parentId = resp.data._id;
       return girder.newFile({
         parentType: 'item',
         parentId,
@@ -37,13 +37,14 @@ export function addFileForSimulationWithContents(simulation, name, contents) {
       });
     })
     .then(resp => {
+      fileId = resp.data._id;
       const blob = new Blob([contents], { type: 'text/plain' });
       return girder.updateFileContent(resp.data._id, contents.length)
         .then(upload => {
-          girder.uploadChunk(upload.data._id, 0, blob);
+          girder.uploadChunk(fileId, 0, blob);
         });
     })
-    .then(resp => ({ _id: parentId }))
+    .then(resp => ({ _id: fileId }))
     .catch(err => {
       console.log('Error adding ini content', err);
     });
