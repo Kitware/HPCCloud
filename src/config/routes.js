@@ -10,7 +10,6 @@ import Logout               from '../pages/Logout';
 import Preferences          from '../pages/Preferences';
 import PreferencesAWS       from '../pages/Preferences/AWS';
 import PreferencesCluster   from '../pages/Preferences/Cluster';
-import PreferencesOpenStack from '../pages/Preferences/OpenStack';
 import PreferencesUser      from '../pages/Preferences/User';
 import PreferencesStatus    from '../pages/Preferences/ServerStatus';
 import PreferencesNetwork   from '../pages/Preferences/Network';
@@ -174,9 +173,6 @@ export default {
         }, {
           path: 'Network',
           component: PreferencesNetwork,
-        }, {
-          path: 'OpenStack',
-          component: PreferencesOpenStack,
         },
       ],
     },

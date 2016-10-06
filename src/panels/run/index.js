@@ -2,7 +2,6 @@ import React        from 'react';
 
 import RunCluster   from './RunCluster';
 import RunEC2       from './RunEC2';
-import RunOpenStack from './RunOpenStack';
 
 import formStyle    from 'HPCCloudStyle/ItemEditor.mcss';
 
@@ -27,9 +26,6 @@ export default React.createClass({
       case 'Traditional':
         serverForm = (<RunCluster contents={this.props.profiles.Traditional} onChange={this.props.dataChange}
           clusterFilter={this.props.clusterFilter} />);
-        break;
-      case 'OpenStack':
-        serverForm = <RunOpenStack />;
         break;
       default:
         serverForm = <span>no valid serverType: {this.props.serverType}</span>;

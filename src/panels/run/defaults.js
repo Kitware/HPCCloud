@@ -8,7 +8,4 @@ export default {
   Traditional: {
     profile: '',
   },
-  OpenStack: {
-    profile: '',
-  },
 };
