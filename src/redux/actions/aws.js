@@ -1,6 +1,6 @@
 import client           from '../../network';
 import * as netActions  from './network';
-import { dispatch }     from '..';
+import { store, dispatch }     from '..';
 
 export const ADD_AWS_PROFILE = 'ADD_AWS_PROFILE';
 export const UPDATE_AWS_PROFILES = 'UPDATE_AWS_PROFILES';
@@ -28,6 +28,9 @@ export function updateAWSProfiles(profiles) {
 }
 
 export function fetchAWSProfiles() {
+  if (store.getState().preferences.aws.pending) {
+    return { type: 'NOOP' };
+  }
   return (dispatch) => {
     const action = netActions.addNetworkCall('fetch_aws_profiles', 'Retreive AWS profiles');
     dispatch(pendingNetworkCall(true));

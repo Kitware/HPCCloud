@@ -54,13 +54,13 @@ export default function ({ client, filterQuery, mustContain, encodeQueryAsString
     // put /volumes/{id}/attach/{cluster}
     //     Attach a volume to a cluster
     attachVolume(id, cluster) {
-      return busy(client._.get(`/volumes/${id}/attach/${cluster}`));
+      return busy(client._.put(`/volumes/${id}/attach/${cluster}`));
     },
 
     // put /volumes/{id}/attach/{cluster}
     //     Detach a volume to a cluster
     detachVolume(id) {
-      return busy(client._.get(`/volumes/${id}/detach`));
+      return busy(client._.put(`/volumes/${id}/detach`));
     },
   };
 }

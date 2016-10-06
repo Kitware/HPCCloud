@@ -1,5 +1,5 @@
 import React        from 'react';
-import Breadcrumb   from '../../widgets/Breadcrumb';
+import Breadcrumb   from '../../panels/Breadcrumb';
 import merge        from 'mout/src/object/merge';
 import style        from 'HPCCloudStyle/Toolbar.mcss';
 import states       from 'HPCCloudStyle/States.mcss';

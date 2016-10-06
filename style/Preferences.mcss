@@ -38,6 +38,11 @@
     composes: fa-mixcloud from 'font-awesome/css/font-awesome.css';
 }
 
+.volumesIcon {
+    composes: preferenceIcon;
+    composes: fa-hdd-o from 'font-awesome/css/font-awesome.css';
+}
+
 .statusIcon {
     composes: preferenceIcon;
     composes: fa-info from 'font-awesome/css/font-awesome.css';
