@@ -3,7 +3,7 @@ import { FileUploadEntry }  from '../../../../panels/ItemEditor';
 
 export default React.createClass({
 
-  displayName: 'Simulation/New/PyFRExec',
+  displayName: 'Simulation/New/PyFR',
 
   propTypes: {
     owner: React.PropTypes.func,

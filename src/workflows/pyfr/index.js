@@ -1,5 +1,5 @@
 import rootNewProject         from './components/root/NewProject';
-// import rootNewSimulation      from './components/root/NewSimulation';
+import rootNewSimulation      from './components/root/NewSimulation';
 import rootViewSimulation     from './components/root/ViewSimulation';
 
 import stepIntroduction       from './components/steps/Introduction';
@@ -13,12 +13,12 @@ export default {
   name: 'PyFR',
   logo: require('./logo.png'),
   requiredAttachments: {
-    project: ['mesh'],
+    project: ['mesh', 'ini'],
     simulation: [],
   },
   components: {
     NewProject: rootNewProject,
-    // NewSimulation: rootNewSimulation,
+    NewSimulation: rootNewSimulation,
     ViewSimulation: rootViewSimulation,
   },
   config: {
