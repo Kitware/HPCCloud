@@ -1,4 +1,5 @@
 import rootNewProject         from './components/root/NewProject';
+import rootEditProject        from './components/root/EditProject';
 import rootNewSimulation      from './components/root/NewSimulation';
 import rootViewSimulation     from './components/root/ViewSimulation';
 
@@ -18,6 +19,7 @@ export default {
   },
   components: {
     NewProject: rootNewProject,
+    EditProject: rootEditProject,
     NewSimulation: rootNewSimulation,
     ViewSimulation: rootViewSimulation,
   },

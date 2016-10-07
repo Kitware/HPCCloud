@@ -83,7 +83,9 @@ const SimulationNew = React.createClass({
 
     const type = this.props.project.type;
     const childComponent = type ? Workflows[type].components.NewSimulation : null;
-    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container }) : null;
+    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container,
+      parentProps: this.props }) : null;
+
     return (
       <ItemEditor
         breadcrumb={{

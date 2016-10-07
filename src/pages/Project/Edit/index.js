@@ -51,7 +51,8 @@ const ProjectEdit = React.createClass({
     }
 
     const childComponent = project.type ? Workflows[project.type].components.EditProject : null;
-    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container }) : null;
+    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container,
+      parentProps: this.props }) : null;
 
     return (
       <ItemEditor
@@ -65,7 +66,9 @@ const ProjectEdit = React.createClass({
           { name: 'delete', label: 'Delete project' },
           { name: 'editProject', label: 'Save project' }]}
         onAction={ this.onAction }
-      >{ workflowAddOn }</ItemEditor>);
+      >
+        { workflowAddOn }
+      </ItemEditor>);
   },
 });
 
