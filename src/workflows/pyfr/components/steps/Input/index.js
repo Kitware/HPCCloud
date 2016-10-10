@@ -14,6 +14,7 @@ import style                from 'HPCCloudStyle/PageWithMenu.mcss';
 import { connect } from 'react-redux';
 import { dispatch } from '../../../../../redux';
 import * as Actions from '../../../../../redux/actions/projects';
+import * as NetActions from '../../../../../redux/actions/network';
 
 const SimputPanel = React.createClass({
 
@@ -69,10 +70,23 @@ const SimputPanel = React.createClass({
         .then((resp) => {
           try {
             const parsedIni = this.props.parse('pyfr', resp.data);
-            this.setState({ jsonData: { data: parsedIni } });
+            const boundaryNames = {};
+            if (this.props.project.metadata.boundaries) {
+              this.props.project.metadata.boundaries.forEach(name => {
+                boundaryNames[name] = name;
+              });
+            }
+            jsonData = jsonData = {
+              data: parsedIni,
+              type: 'pyfr',
+              external: { 'boundary-names': boundaryNames },
+              hideViews: ['backend'],
+            };
+            this.setState({ jsonData });
             // create a new item, add an empty file to that item, upload contents to that file
             return simulationsHelper.addFileForSimulationWithContents(this.props.simulation, 'pyfr.ini', resp.data);
           } catch (e) {
+            NetActions.errorNetworkCall('simput_parse', { message: 'Problem parsing input file, loading default values.' });
             throw e;
           }
         })
@@ -81,12 +95,18 @@ const SimputPanel = React.createClass({
           const _id = resp._id; // file Id, custom response
           const newSim = deepClone(this.props.simulation);
           newSim.metadata.inputFolder.files.ini = _id;
+          newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
           this.setState({ iniFile: _id });
           dispatch(Actions.patchSimulation(newSim));
+          // Update step metadata
+          return client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+            metadata: { model: JSON.stringify(jsonData) },
+          });
         })
         .catch((error) => {
           console.log(error);
         });
+      return;
     } else if (!this.state.iniFile) {
       this.setState({ iniFile });
     }

@@ -1,5 +1,10 @@
+/* global Simput */
 import React                from 'react';
 import { FileUploadEntry }  from '../../../../panels/ItemEditor';
+
+import { connect }  from 'react-redux';
+import { dispatch } from '../../../../redux';
+import * as NetActions from '../../../../redux/actions/network';
 
 function extractPhysicalNames(file) {
   return new Promise((accept, reject) => {
@@ -30,18 +35,48 @@ function extractPhysicalNames(file) {
   });
 }
 
-export default React.createClass({
+const NewProject = React.createClass({
 
   displayName: 'Project/New/PyFR',
 
   propTypes: {
     owner: React.PropTypes.func,
+    onParseError: React.PropTypes.func,
+  },
+
+  parseAndValidate(file) {
+    return new Promise((accept, reject) => {
+      var reader = new FileReader();
+      reader.onloadend = function onLoad() {
+        if (reader.readyState !== FileReader.DONE) {
+          this.props.onParseError('Ini file is invalid');
+          reject();
+        }
+        try {
+          Simput.types.pyfr.parse('pyfr', reader.result);
+        } catch (e) {
+          this.props.onParseError('Ini file is invalid');
+          reject();
+        }
+        accept({});
+      };
+
+      reader.readAsText(file);
+    });
   },
 
   render() {
     return (<div>
       <FileUploadEntry name="mesh" label="Mesh (msh, pyfrm)" accept=".msh,.pyfrm" owner={ this.props.owner } postProcess={ extractPhysicalNames } />
-      <FileUploadEntry name="ini" label="Ini file" accept=".ini" owner={ this.props.owner } />
+      <FileUploadEntry name="ini" label="Ini file" accept=".ini" owner={ this.props.owner } postProcess={ this.parseAndValidate } />
     </div>);
   },
 });
+
+export default connect(
+  (state, props) => ({ props }),
+  () => ({
+    onParseError: (message) => dispatch(NetActions.errorNetworkCall('New Project', { message })),
+  })
+)(NewProject);
+
