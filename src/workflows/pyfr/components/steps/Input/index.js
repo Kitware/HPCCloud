@@ -86,7 +86,7 @@ const SimputPanel = React.createClass({
             // create a new item, add an empty file to that item, upload contents to that file
             return simulationsHelper.addFileForSimulationWithContents(this.props.simulation, 'pyfr.ini', resp.data);
           } catch (e) {
-            NetActions.errorNetworkCall('simput_parse', { message: 'Problem parsing input file, loading default values.' });
+            NetActions.errorNetworkCall('simput_parse', { message: `Error parsing input file:\n${e}\nLoading default values.` });
             throw e;
           }
         })

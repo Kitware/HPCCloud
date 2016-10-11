@@ -55,7 +55,7 @@
     "babel-polyfill": "6.9.1",
     "paraviewweb": "2.0.5",
     "pvw-visualizer": "2.0.6",
-    "simput": "1.3.1",
+    "simput": "1.3.3",
 
     "kw-web-suite": "2.0.0"
   },

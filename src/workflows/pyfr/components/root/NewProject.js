@@ -47,7 +47,7 @@ const NewProject = React.createClass({
   parseAndValidate(file) {
     return new Promise((accept, reject) => {
       var reader = new FileReader();
-      reader.onloadend = function onLoad() {
+      reader.onloadend = () => {
         if (reader.readyState !== FileReader.DONE) {
           this.props.onParseError('Ini file is invalid');
           reject();
@@ -55,7 +55,8 @@ const NewProject = React.createClass({
         try {
           Simput.types.pyfr.parse('pyfr', reader.result);
         } catch (e) {
-          this.props.onParseError('Ini file is invalid');
+          this.props.onParseError(`Error parsing file:\n${e}`);
+          this.props.owner().removeMetadata('ini');
           reject();
         }
         accept({});
