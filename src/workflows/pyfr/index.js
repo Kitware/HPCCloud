@@ -1,6 +1,7 @@
 import rootNewProject         from './components/root/NewProject';
 import rootEditProject        from './components/root/EditProject';
 import rootNewSimulation      from './components/root/NewSimulation';
+import rootEditSimulation     from './components/root/EditSimulation';
 import rootViewSimulation     from './components/root/ViewSimulation';
 
 import stepIntroduction       from './components/steps/Introduction';
@@ -21,6 +22,7 @@ export default {
     NewProject: rootNewProject,
     EditProject: rootEditProject,
     NewSimulation: rootNewSimulation,
+    EditSimulation: rootEditSimulation,
     ViewSimulation: rootViewSimulation,
   },
   config: {
