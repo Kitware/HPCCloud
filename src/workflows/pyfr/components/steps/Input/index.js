@@ -62,9 +62,9 @@ const SimputPanel = React.createClass({
     var iniFile = this.props.simulation.metadata.inputFolder.files.ini;
     var jsonData = this.props.simulation.steps[this.props.step].metadata.model;
 
-    // Create ini file container if not already here
+    // Create ini file from the project level ini if not already here
     if (!iniFile) {
-      // download ini file contents
+      // download ini file contents of project ini
       client.downloadFile(this.props.project.metadata.inputFolder.files.ini, 0, null, 'inline')
         // parse contents
         .then((resp) => {
@@ -83,7 +83,7 @@ const SimputPanel = React.createClass({
               hideViews: ['backend'],
             };
             this.setState({ jsonData });
-            // create a new item, add an empty file to that item, upload contents to that file
+        // create a new item, add an empty file to that item, upload contents to that file
             return simulationsHelper.addFileForSimulationWithContents(this.props.simulation, 'pyfr.ini', resp.data);
           } catch (e) {
             NetActions.errorNetworkCall('simput_parse', { message: `Error parsing input file:\n${e}\nLoading default values.` });
@@ -111,30 +111,41 @@ const SimputPanel = React.createClass({
       this.setState({ iniFile });
     }
 
-    // Need to fill up the jsonData
+    // Need to fill up the jsonData with simulation ini file
     if (!jsonData) {
-      const boundaryNames = {};
-      if (this.props.project.metadata.boundaries) {
-        this.props.project.metadata.boundaries.forEach(name => {
-          boundaryNames[name] = name;
+      client.downloadFile(iniFile, 0, null, 'inline')
+        // parse contents
+        .then((resp) => {
+          try {
+            const parsedIni = this.props.parse('pyfr', resp.data);
+            const boundaryNames = {};
+            if (this.props.project.metadata.boundaries) {
+              this.props.project.metadata.boundaries.forEach(name => {
+                boundaryNames[name] = name;
+              });
+            }
+
+            jsonData = {
+              data: parsedIni,
+              type: 'pyfr',
+              external: { 'boundary-names': boundaryNames },
+              hideViews: ['backend'],
+            };
+            this.setState({ jsonData });
+
+            // Update step metadata
+            client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+              metadata: { model: JSON.stringify(jsonData) },
+            }).then((simResp) => {
+              var newSim = deepClone(this.props.simulation);
+              newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
+              dispatch(Actions.patchSimulation(newSim));
+            });
+          } catch (e) {
+            NetActions.errorNetworkCall('simput_parse', { message: `Error parsing input file:\n${e}\nLoading default values.` });
+            throw e;
+          }
         });
-      }
-
-      jsonData = {
-        data: {},
-        type: 'pyfr',
-        external: { 'boundary-names': boundaryNames },
-        hideViews: ['backend'],
-      };
-
-      // Update step metadata
-      client.updateSimulationStep(this.props.simulation._id, this.props.step, {
-        metadata: { model: JSON.stringify(jsonData) },
-      }).then((resp) => {
-        var newSim = deepClone(this.props.simulation);
-        newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
-        dispatch(Actions.patchSimulation(newSim));
-      });
     } else {
       if (typeof jsonData === 'string') {
         jsonData = JSON.parse(jsonData);
@@ -142,9 +153,6 @@ const SimputPanel = React.createClass({
         console.log('Can not convert jsonData (?)', jsonData);
       }
     }
-
-    // Push model to state
-    this.setState({ jsonData });
   },
 
   componentWillUnmount() {
@@ -170,7 +178,7 @@ const SimputPanel = React.createClass({
     // Update ini file content
     try {
       if (this.state.iniFile) {
-        delete jsonData.backend; // we want to use the backend configured from the cluster
+        delete jsonData.data.backend; // we want to use the backend configured from the cluster
         const convertedData = this.props.convert(jsonData);
         console.log(convertedData);
         const content = convertedData.results['pyfr.ini'];
@@ -193,7 +201,7 @@ const SimputPanel = React.createClass({
         console.log('no .ini file');
       }
     } catch (e) {
-      console.error('Error when generating .ini file', e);
+      console.error('Error when generating ini file: ', e);
     }
   },
 
@@ -217,6 +225,7 @@ const SimputPanel = React.createClass({
 
   render() {
     if (!this.state.jsonData) {
+      console.log('no jsonData in state');
       return null;
     }
 
