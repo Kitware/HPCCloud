@@ -109,8 +109,9 @@ def setup_input(task, *args, **kwargs):
     client = create_girder_client(
         task.taskflow.girder_api_url, task.taskflow.girder_token)
 
-    if 'geometryFile' in kwargs['input']:
-        geometry_file_id = kwargs['input']['geometryFile']['id']
+    geometry_file_id = parse('input.geometryFile.id').find(kwargs)
+    if geometry_file_id:
+        geometry_file_id = geometry_file_id[0].value
         kwargs['geometryFileId'] = geometry_file_id
 
         # Get the geometry file metadata to see if we need to import
@@ -173,7 +174,10 @@ def submit(task, upstream_result):
     task.logger.info('Uploading input files to cluster.')
     download_job_input_folders(cluster, job, log_write_url=None,
                         girder_token=girder_token, submit=False)
-    create_geometry_symlink(task, job, cluster, upstream_result['geometryFilename'])
+
+    if 'geometryFilename' in upstream_result:
+        create_geometry_symlink(task, job, cluster, upstream_result['geometryFilename'])
+
     task.logger.info('Uploading complete.')
 
     return upstream_result
