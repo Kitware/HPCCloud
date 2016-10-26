@@ -1,0 +1,75 @@
+{
+    "order": [
+        "dft", "basis", "neb"
+    ],
+    "views": {
+        "dft": {
+            "attributes": [ "dft" ]
+        },
+        "basis": {
+          "attributes": [ "basis" ]
+        },
+        "neb": {
+          "attributes": [ "neb" ]
+        }
+    },
+    "definitions": {
+        "dft": {
+            "parameters": [{
+              "id": "dft.maxiter",
+              "type": "integer",
+              "default": [5000],
+              "size": 1
+            }]
+        },
+        "basis": {
+            "parameters": [{
+                "id": "basis.theory_basis",
+                "type": "string",
+                "ui": "enum",
+                "size": 1,
+                "default": ["6-31G*"],
+                "domain": {
+                    "STO-3G": "STO-3G",
+                    "3-21 G": "3-21G",
+                    "6-31 G": "6-31G",
+                    "6-31 G(d)": "6-31G*",
+                    "6-31 G(d,p)": "6-31G**",
+                    "6-31+ G(d)": "6-31+G*",
+                    "6-311 G(d)": "6-311G*",
+                    "cc-pVDZ": "cc-pVDZ",
+                    "cc-pVTZ": "cc-pVTZ",
+                    "LANL2DZ": "LANL2DZ ECP"
+                }
+            }]
+        },
+        "neb": {
+            "parameters": [
+                {
+                    "id"  : "neb.nbeads",
+                    "type": "integer",
+                    "default": [10],
+                    "size": 1
+                },
+                {
+                    "id": "neb.kbeads",
+                    "type": "double",
+                    "default": [0.1],
+                    "size": 1
+                },
+                {
+                    "id": "neb.maxiter",
+                    "type": "integer",
+                    "default": [20],
+                    "size": 1
+                },
+                {
+                    "id": "neb.stepsize",
+                    "type": "double",
+                    "default": [1.0],
+                    "size": 1
+                }
+            ]
+        }
+    }
+}
