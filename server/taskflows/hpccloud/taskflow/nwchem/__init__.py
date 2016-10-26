@@ -202,4 +202,3 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
                                 girder_token=task.taskflow.girder_token)
 
     task.taskflow.logger.info('Upload job output complete.')
-
