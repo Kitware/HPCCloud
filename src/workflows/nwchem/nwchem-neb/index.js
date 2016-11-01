@@ -6,8 +6,7 @@ import stepInput              from './components/steps/Input';
 import stepIntroduction       from '../common/steps/Introduction';
 import stepSimulationStart    from '../common/steps/Simulation/Start';
 import stepSimulationView     from '../common/steps/Simulation/View';
-import stepVisualizationStart from '../common/steps/Visualization/Start';
-import stepVisualizationView  from '../common/steps/Visualization/View';
+import stepVisualization from './components/steps/Visualization/View';
 
 export default {
   name: 'NWChem - Nudged Elastic Band (NEB) method',
@@ -55,8 +54,7 @@ export default {
       run: stepSimulationView,
     },
     Visualization: {
-      default: stepVisualizationStart,
-      run: stepVisualizationView,
+      default: stepVisualization,
     },
   },
   taskFlows: {
