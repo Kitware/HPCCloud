@@ -46,6 +46,8 @@ export default connect(
       id = localState.activeErrors.application[0];
       if (get(localState, `error.${id}.resp.message`)) {
         message = localState.error[id].resp.message;
+      } else if (get(localState, `error.${id}.resp.data.message`)) {
+        message = localState.error[id].resp.data.message;
       } else if (get(localState, `error.${id}.resp.data`)) {
         message = localState.error[id].resp.data;
       } else {

@@ -1,8 +1,9 @@
 // import client           from '../../../network';
-import OutputPanel    from '../../../panels/OutputPanel';
-import ClusterStatus  from './ClusterStatus';
-import Toolbar        from '../../../panels/Toolbar';
 import React          from 'react';
+import ClusterStatus  from './ClusterStatus';
+import OutputPanel    from '../../../panels/OutputPanel';
+import Toolbar        from '../../../panels/Toolbar';
+import { getDisabledButtons }  from '../../../utils/getDisabledButtons';
 import { breadcrumb } from '..';
 
 import style from 'HPCCloudStyle/JobMonitor.mcss';
@@ -25,6 +26,7 @@ const StatusPage = React.createClass({
     ec2: React.PropTypes.array,
     ec2Clusters: React.PropTypes.array,
     tradClusters: React.PropTypes.array,
+    network: React.PropTypes.object,
 
     getClusterLog: React.PropTypes.func,
     terminateCluster: React.PropTypes.func,
@@ -66,6 +68,7 @@ const StatusPage = React.createClass({
       logToggle={this.logToggle(el._id, offset)}
       terminateCluster={this.props.terminateCluster}
       deleteCluster={this.props.deleteCluster}
+      disabledButtons={getDisabledButtons(this.props.network, el.taskflow)}
     />);
   },
 
@@ -123,6 +126,7 @@ export default connect(
     });
     return {
       simulations: state.simulations.mapById,
+      network: state.network,
       ec2: localState.statuses.ec2,
       ec2Clusters,
       tradClusters,
