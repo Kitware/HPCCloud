@@ -19,8 +19,10 @@ export const volumeTemplate = {
 export default function volumesReducer(state = initialState, action) {
   switch (action.type) {
     case Actions.ADD_VOLUME: {
+      const newVol = deepClone(volumeTemplate);
+      newVol.profileId = action.profileId;
       return Object.assign({}, state, {
-        list: [].concat(state.list, deepClone(volumeTemplate)),
+        list: [].concat(state.list, newVol),
         active: state.list.length,
       });
     }

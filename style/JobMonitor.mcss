@@ -87,6 +87,12 @@ p.logEntry {
   margin-right: 5px;
 }
 
+.table {
+  composes: table         from 'bootstrap/dist/css/bootstrap.css';
+  composes: table-striped from 'bootstrap/dist/css/bootstrap.css';
+  margin-bottom: 0;
+}
+
 /* Icons */
 .advancedIconOn {
     composes: fa     from 'font-awesome/css/font-awesome.css';

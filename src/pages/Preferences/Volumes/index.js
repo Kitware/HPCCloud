@@ -1,5 +1,6 @@
 // import client           from '../../../network';
 import React            from 'react';
+import { Link }         from 'react-router';
 import VolumeForm       from './VolumeForm';
 import ActiveList       from '../../../panels/ActiveList';
 import Toolbar          from '../../../panels/Toolbar';
@@ -24,14 +25,9 @@ const volumeBreadCrumb = Object.assign({}, breadcrumb, { active: 3 });
 
 function getActions(disabled, config) {
   if (config.isAttached) {
-    return [
-      { name: 'detachVolume', label: 'Detach', icon: style.detatchIcon, disabled },
-    ];
+    return [];
   } else if (config.isSaved) {
-    return [
-      { name: 'removeItem', label: 'Delete', icon: style.deleteIcon, disabled },
-      { name: 'attachVolume', label: 'Attach', icon: style.attachIcon, disabled },
-    ];
+    return [{ name: 'removeItem', label: 'Delete', icon: style.deleteIcon, disabled }];
   }
   // neither saved nor attached
   return [
@@ -96,7 +92,7 @@ const ClusterPrefs = React.createClass({
       this.props.invalidateErrors();
     }
     this.setState({ _error: null });
-    this.props.onAddItem();
+    this.props.onAddItem(this.props.profiles[0]._id);
   },
 
   attachVolume() {
@@ -158,18 +154,32 @@ const ClusterPrefs = React.createClass({
         />
       </div>);
     } else {
-      content = (<EmptyPlaceholder phrase={
-        <span>
-          There are no Volumes available <br />
-          You can create some with the <i className={theme.addIcon}></i> above
-        </span> }
-      />);
+      if (!this.props.profiles.length) {
+        content = (<EmptyPlaceholder phrase={
+          <span>
+            AWS Profile required to create volumes <br />
+            Create some under the <Link to="/Preferences/AWS">AWS Profiles preferences page</Link>.
+          </span> }
+        />);
+      } else {
+        content = (<EmptyPlaceholder phrase={
+          <span>
+            There are no Volumes available <br />
+            You can create some with the <i className={theme.addIcon}></i> above
+          </span> }
+        />);
+      }
+    }
+
+    let actions = [];
+    if (!this.props.profiles.length) {
+      actions = [{ name: 'add', icon: style.addIcon }];
     }
 
     return (
       <div className={ style.rootContainer }>
         <Toolbar breadcrumb={ volumeBreadCrumb } title="Volume"
-          actions={[{ name: 'add', icon: style.addIcon }]} onAction={this.addItem}
+          actions={actions} onAction={this.addItem}
           hasTabs
         />
         <div className={ style.container }>
@@ -206,7 +216,7 @@ export default connect(
     return {
       onUpdateItem: (index, volume, server) => dispatch(Actions.updateVolume(index, volume, server)),
       onActiveChange: (index) => dispatch(Actions.updateActiveVolume(index)),
-      onAddItem: () => dispatch(Actions.addVolume()),
+      onAddItem: (profileId) => dispatch(Actions.addVolume(profileId)),
       onRemoveItem: (index, volume) => dispatch(Actions.removeVolume(index, volume)),
       fetchAWS: () => dispatch(AWSActions.fetchAWSProfiles()),
       fetchClusters: () => dispatch(ClusterActions.fetchClusters()),

@@ -12,8 +12,8 @@ export const PENDING_VOLUME_NETWORK = 'PENDING_VOLUME_NETWORK';
 
 /* eslint-disable no-shadow */
 
-export function addVolume() {
-  return { type: ADD_VOLUME };
+export function addVolume(profileId) {
+  return { type: ADD_VOLUME, profileId };
 }
 
 export function updateActiveVolume(active) {

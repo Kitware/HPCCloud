@@ -12,6 +12,7 @@ import style from 'HPCCloudStyle/JobMonitor.mcss';
 import { connect }  from 'react-redux';
 import { dispatch }   from '../../../redux';
 import * as ClusterActions from '../../../redux/actions/clusters';
+import * as VolumeActions from '../../../redux/actions/volumes';
 import { fetchServers } from '../../../redux/actions/statuses';
 
 const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 4 });
@@ -22,6 +23,7 @@ const StatusPage = React.createClass({
 
   propTypes: {
     ec2: React.PropTypes.array,
+    volumes: React.PropTypes.array,
     ec2Clusters: React.PropTypes.array,
     tradClusters: React.PropTypes.array,
     network: React.PropTypes.object,
@@ -31,6 +33,7 @@ const StatusPage = React.createClass({
     deleteCluster: React.PropTypes.func,
     fetchClusters: React.PropTypes.func,
     fetchServers: React.PropTypes.func,
+    fetchVolumes: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -43,6 +46,7 @@ const StatusPage = React.createClass({
   componentDidMount() {
     this.props.fetchClusters();
     this.props.fetchServers();
+    this.props.fetchVolumes();
   },
 
   logToggle(id, offset) {
@@ -55,6 +59,15 @@ const StatusPage = React.createClass({
 
   profileMapper(el, index) {
     return { name: el.name, value: el.status };
+  },
+
+  volumesMapper(el, index) {
+    return (<tr key={el._id}>
+      <td>{el.name}</td>
+      <td>{el.size}</td>
+      <td>{el.status}</td>
+      <td></td>
+    </tr>);
   },
 
   ec2Mapper(el, index) {
@@ -90,8 +103,10 @@ const StatusPage = React.createClass({
           onAction={this.addItem} hasTabs
         />
         <div className={ style.container }>
-          <OutputPanel items={ this.props.ec2.map(this.profileMapper) } title="EC2 Profiles" />
+        {/* AWS Profiles */}
+          <OutputPanel items={ this.props.ec2.map(this.profileMapper) } title="AWS Profiles" />
 
+        {/* EC2 Clusters */}
           <div className={ style.toolbar }>
             <div className={ style.title }> EC2 Clusters </div>
             <div className={ style.buttons } />
@@ -100,6 +115,28 @@ const StatusPage = React.createClass({
             { this.props.ec2Clusters.map(this.ec2Mapper) }
           </div>
 
+        {/* Volumes */}
+          <div className={ style.toolbar }>
+            <div className={ style.title }> EBS Volumes </div>
+            <div className={ style.buttons }></div>
+          </div>
+          <div className={ style.taskflowContent } style={{ padding: '0 18px' }}>
+            <table className={ style.table }>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Size</th>
+                  <th>Status</th>
+                  <th>Cluster</th>
+                </tr>
+              </thead>
+              <tbody>
+                { this.props.volumes.map(this.volumesMapper) }
+              </tbody>
+            </table>
+          </div>
+
+        {/* Trad Clusters */}
           <div className={ style.toolbar }>
             <div className={ style.title }> Traditional Clusters </div>
             <div className={ style.buttons } />
@@ -126,6 +163,7 @@ export default connect(
       simulations: state.simulations.mapById,
       network: state.network,
       ec2: localState.statuses.ec2,
+      volumes: localState.volumes.list,
       ec2Clusters,
       tradClusters,
     };
@@ -136,5 +174,6 @@ export default connect(
     deleteCluster: (id) => dispatch(ClusterActions.deleteCluster(id)),
     fetchClusters: () => dispatch(ClusterActions.fetchClusters()),
     fetchServers: () => dispatch(fetchServers()),
+    fetchVolumes: () => dispatch(VolumeActions.fetchVolumes()),
   })
 )(StatusPage);

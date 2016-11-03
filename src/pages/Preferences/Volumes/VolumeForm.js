@@ -109,6 +109,7 @@ export default React.createClass({
                 data-key="profileId"
                 onChange={this.formChange}
                 disabled={this.props.data._id}
+                defaultValue={this.props.profiles[0]._id}
                 required
               >
                 { this.props.profiles.map((prof) =>
