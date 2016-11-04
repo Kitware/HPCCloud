@@ -1,14 +1,7 @@
 import React              from 'react';
 import deepClone          from 'mout/src/lang/deepClone';
 import style              from 'HPCCloudStyle/ItemEditor.mcss';
-
-// const types = {
-//   'General Purpose SSD': 'GP2',
-//   'Provisioned IOPS SSD': 'IO1',
-//   Magnetic: 'Magnetic',
-//   'Throughput Optimized HDD': 'ST1',
-//   'Cold HDD': 'SC1',
-// };
+// import { volumeTypes }    from '../../utils/Constants';
 
 export default React.createClass({
 

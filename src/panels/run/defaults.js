@@ -3,6 +3,8 @@ export default {
     profile: '',
     machine: '',
     clusterSize: '',
+    volume: '',
+    volumeName: '',
     volumeSize: '',
   },
   Traditional: {

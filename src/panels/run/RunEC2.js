@@ -1,6 +1,7 @@
 import client   from '../../network';
 import React    from 'react';
 import { Link } from 'react-router';
+// import { volumeTypes }    from '../../utils/Constants';
 
 import theme    from 'HPCCloudStyle/Theme.mcss';
 import style    from 'HPCCloudStyle/ItemEditor.mcss';
@@ -18,6 +19,7 @@ export default React.createClass({
     return {
       busy: false,
 
+      clusters: [],
       selectedCluster: '',
 
       profiles: [],
@@ -26,6 +28,8 @@ export default React.createClass({
       machines: {},
       machineFamilies: [],
       machinesInFamily: [],
+
+      volumes: [],
     };
   },
 
@@ -67,13 +71,15 @@ export default React.createClass({
       })
       .then((resp) => {
         newState.clusters = resp.data;
-
-        if (this.props.clusterFilter) {
-          newState.clusters = newState.clusters.filter(this.props.clusterFilter);
-        }
-
         if (this.props.onChange) {
           this.props.onChange('cluster', null, 'EC2');
+        }
+        return client.listVolumes();
+      })
+      .then((resp) => {
+        newState.volumes = resp.data;
+        if (this.props.onChange) {
+          this.props.onChange('volume', null, 'EC2');
         }
         this.setState(newState);
       })
@@ -123,7 +129,7 @@ export default React.createClass({
         </div>;
     }
 
-    const runningClusters = this.state.clusters ? this.state.clusters.filter((el) => el.status === 'running') : [];
+    const runningClusters = this.state.clusters.filter((el) => el.status === 'running');
     const optionMapper = (el, index) =>
       <option key={ `${el.name}_${index}` } value={index}>
         {el.name}
@@ -198,9 +204,53 @@ export default React.createClass({
           <input type="number" min="1" max="16384" className={style.input}
             data-key="volumeSize" value={this.props.contents.volumeSize}
             onChange={this.dataChange} required
-            disabled={this.props.contents.cluster}
+            disabled={this.props.contents.cluster || this.props.contents.volume}
           />
         </section>
+      { /* EBS Volume */ }
+        <section className={style.group}>
+          <label className={style.label}>Existing Volume:</label>
+          <select className={style.input} onChange={this.dataChange}
+            data-key="volume" disabled={this.props.contents.cluster}
+          >
+            <option value={null}></option>
+            {this.state.volumes.map((el, index) => <option key={el._id} value={el._id}>{el.name}</option>)}
+          </select>
+        </section>
+        <section className={style.group}>
+          <label className={style.label}>Volume Name:</label>
+          <input type="text" className={style.input}
+            data-key="volumeName" value={this.props.contents.volumeName}
+            onChange={this.dataChange} required
+            disabled={this.props.contents.volume}
+            placeholder="New Volume Name"
+          />
+        </section>
+        <section className={style.group}>
+          <label className={style.label}>Size:</label>
+          <input type="number" min="1" max="16384" className={style.input}
+            data-key="volumeSize" value={this.props.contents.volumeSize}
+            onChange={this.dataChange} required
+            disabled={this.props.contents.volume}
+            placeholder="New Volume Size"
+          />
+        </section>
+        {/* only valid type on the endpoint is ebs?
+          <section className={style.group}>
+              <label className={style.label}>Type</label>
+              <select
+                className={style.input}
+                data-key="type"
+                onChange={this.formChange}
+                disabled={this.props.data._id}
+                required
+              >
+                { Object.keys(types).map((key, index) =>
+                  <option key={`${key}_${index}`} value={types[key]}>{key} ({types[key]})</option>)
+                }
+              </select>
+          </section>
+          */}
       </div>);
   },
 });
