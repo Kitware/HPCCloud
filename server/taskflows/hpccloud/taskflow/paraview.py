@@ -232,14 +232,15 @@ def submit_paraview_job(task, cluster, job, *args, **kwargs):
         # Save the sessionKey so we can clean up the proxy entry
         task.taskflow.set_metadata('sessionKey', kwargs['sessionKey'])
 
+    if 'numberOfSlots' in kwargs:
+        params['numberOfSlots'] = kwargs['numberOfSlots']
+
     parallel_environment \
         = parse('config.parallelEnvironment').find(cluster)
 
     if parallel_environment:
         parallel_environment = parallel_environment[0].value
         params['parallelEnvironment'] = parallel_environment
-
-    params['numberOfSlots'] = 1
 
     job_output_dir = get_cluster_job_output_dir(cluster)
     if job_output_dir:
