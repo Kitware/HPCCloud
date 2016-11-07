@@ -13,6 +13,9 @@ GET_PORT_PYTHON_CMD='import socket; s=socket.socket(); s.bind(("", 0)); print(s.
 RC_PORT=`python -c "${GET_PORT_PYTHON_CMD}"`
 echo ${RC_PORT} > /tmp/{{job._id}}.rc_port
 
+# Enable interactors for pvbatch
+export PV_ALLOW_BATCH_INTERACTION=1
+
 # Run in MPI mode
 MPIPROG="mpiexec"
 
