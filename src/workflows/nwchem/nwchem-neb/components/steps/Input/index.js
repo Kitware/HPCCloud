@@ -61,16 +61,15 @@ const SimputPanel = React.createClass({
     var jsonData = this.props.simulation.steps[this.props.step].metadata.model;
 
     // Create ini file container if not already here
+    let promise = null;
     if (!nwFile) {
-      simulationsHelper.addEmptyFileForSimulation(this.props.simulation, 'job.nw')
+      promise = simulationsHelper.addEmptyFileForSimulation(this.props.simulation, 'job.nw')
         .then(resp => {
           const _id = resp.data._id; // itemId
           this.props.simulation.metadata.inputFolder.files.nw = _id;
           this.setState({ nwFile: _id });
-          simulationsHelper.saveSimulation(this.props.simulation)
-            .then(() => {
-              this.props.updateSimulation(this.props.simulation);
-            });
+          return simulationsHelper.saveSimulation(this.props.simulation)
+            .then(() => this.props.updateSimulation(this.props.simulation));
         });
     } else if (!this.state.nwFile) {
       this.setState({ nwFile });
@@ -85,14 +84,25 @@ const SimputPanel = React.createClass({
         hideViews: [],
       };
 
-      // Update step metadata
-      client.updateSimulationStep(this.props.simulation._id, this.props.step, {
-        metadata: { model: JSON.stringify(jsonData) },
-      }).then((resp) => {
-        var newSim = deepClone(this.props.simulation);
-        newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
-        this.props.saveSimulation(newSim);
-      });
+      const updateSimulationStep = () => {
+        // Update step metadata
+        client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+          metadata: { model: JSON.stringify(jsonData) },
+        }).then((resp) => {
+          var newSim = deepClone(this.props.simulation);
+          newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
+          newSim.metadata.here = 'here';
+          this.props.saveSimulation(newSim);
+        });
+      };
+
+      // If we have outstanding requests ensure they are chained to avoid lost
+      // updates.
+      if (promise) {
+        this.promise.then(updateSimulationStep);
+      } else {
+        updateSimulationStep();
+      }
     } else {
       if (typeof jsonData === 'string') {
         jsonData = JSON.parse(jsonData);
@@ -177,7 +187,7 @@ const SimputPanel = React.createClass({
         const simulationStepIndex = this.props.simulation.disabled.indexOf('Simulation');
         if (simulationStepIndex !== -1) {
           this.props.simulation.disabled.splice(simulationStepIndex, 1);
-          //simulationsHelper.updateDisabledSimulationSteps(this.props.simulation);
+          simulationsHelper.updateDisabledSimulationSteps(this.props.simulation);
         }
       } else {
         console.log('no .nw file');
