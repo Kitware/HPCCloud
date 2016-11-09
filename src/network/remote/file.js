@@ -110,7 +110,7 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
     downloadFile(id, offset, endByte, contentDisposition) {
       const params = { offset, endByte, contentDisposition };
       Object.keys(params).forEach((key) => {
-        if (params[key] === null) {
+        if (params[key] === null || typeof params[key] === 'undefined') {
           delete params[key];
         }
       });
