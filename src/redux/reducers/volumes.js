@@ -50,6 +50,11 @@ export default function volumesReducer(state = initialState, action) {
       console.log('todo');
       return state;
     }
+    case Actions.UPDATE_VOLUME_STATUS: {
+      const newState = Object.assign({}, state);
+      newState.mapById[action.volumeId].status = action.status;
+      return newState;
+    }
     case Actions.SAVE_VOLUME: {
       const { index, volume } = action;
 

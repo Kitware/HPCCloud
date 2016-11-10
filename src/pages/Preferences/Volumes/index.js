@@ -158,7 +158,7 @@ const ClusterPrefs = React.createClass({
         content = (<EmptyPlaceholder phrase={
           <span>
             AWS Profile required to create volumes <br />
-            Create some under the <Link to="/Preferences/AWS">AWS Profiles preferences page</Link>.
+            Create some under the <Link to="/Preferences/AWS"><span>AWS Profiles preferences page</span></Link>.
           </span> }
         />);
       } else {

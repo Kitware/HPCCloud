@@ -7,6 +7,7 @@ export const UPDATE_ACTIVE_VOLUME = 'UPDATE_ACTIVE_VOLUME';
 export const REMOVE_VOLUME = 'REMOVE_VOLUME';
 export const UPDATE_VOLUMES = 'UPDATE_VOLUMES';
 export const UPDATE_VOLUME = 'UPDATE_VOLUME';
+export const UPDATE_VOLUME_STATUS = 'UPDATE_VOLUME_STATUS';
 export const SAVE_VOLUME = 'SAVE_VOLUME';
 export const PENDING_VOLUME_NETWORK = 'PENDING_VOLUME_NETWORK';
 
@@ -26,6 +27,10 @@ export function pendingNetworkCall(pending = false) {
 
 export function updateVolumes(volumes) {
   return { type: UPDATE_VOLUMES, volumes };
+}
+
+export function updateVolumeStatus(volumeId, status) {
+  return { type: UPDATE_VOLUME_STATUS, status };
 }
 
 export function fetchVolumes() {

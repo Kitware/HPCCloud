@@ -2,6 +2,7 @@ import * as netActions     from './network';
 import * as projActions    from './projects';
 import * as clusterActions from './clusters';
 import * as progressActions from './progress';
+import * as volumeActions  from './volumes';
 import client              from '../../network';
 import { store, dispatch } from '..';
 
@@ -407,6 +408,9 @@ function processStatusEvent(id, type, status) {
       case 'profile':
         dispatch(clusterActions.updateClusterStatus(id, status));
         break;
+      case 'volume':
+        dispatch(volumeActions.updateVolumeStatus(id, status));
+        break;
       default:
         console.log(`unrecognized ServerEvent with type "${type}",` +
           ` taskflowId "${taskflowId}", and status "${status}"`);
@@ -428,6 +432,9 @@ function processStatusEvent(id, type, status) {
         break;
       case 'profile':
         dispatch(clusterActions.fetchClusters('ec2'));
+        break;
+      case 'volume':
+        dispatch(volumeActions.updateVolumeStatus(id, status));
         break;
       default:
         console.log(`unrecognized ServerEvent with type "${type}",` +
@@ -454,6 +461,9 @@ function processLogEvent(id, type, log) {
       case 'cluster':
         dispatch(clusterActions.appendToClusterLog(id, log));
         break;
+      case 'volume':
+        console.log('unimplemented: volume log event with taskflowId');
+        break;
       default:
         console.log(`unrecognized ServerEvent with type "${type}",` +
           ` id "${id}", and log: `, log);
@@ -468,6 +478,9 @@ function processLogEvent(id, type, log) {
         break;
       case 'cluster':
         dispatch(clusterActions.fetchClusters(null));
+        break;
+      case 'volume':
+        console.log('unimplemented: volume log event without taskflowId');
         break;
       default:
         console.log(`unrecognized ServerEvent with type "${type}",` +
