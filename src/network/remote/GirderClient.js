@@ -89,15 +89,16 @@ export function build(config = location, ...extensions) {
         };
 
         eventSource.onerror = (e) => {
-          // Wait 10 seconds if the browser hasn't reconnected then
-          // reinitialize.
+          // Wait 2 seconds if the browser hasn't reconnected then reinitialize.
           setTimeout(() => {
             if (eventSource && eventSource.readyState === EventSource.CLOSED) {
               connectToNotificationStream();
             } else {
+              eventSource.close();
               eventSource = null;
+              connectToNotificationStream();
             }
-          }, 10000);
+          }, 2000);
         };
       }
     },
