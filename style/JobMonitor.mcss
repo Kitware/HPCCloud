@@ -156,3 +156,21 @@ p.logEntry {
     composes: foldIcon;
     color: black;
 }
+
+.unchecked {
+    composes: fa     from 'font-awesome/css/font-awesome.css';
+    composes: fw     from 'font-awesome/css/font-awesome.css';
+    composes: fa-square-o  from 'font-awesome/css/font-awesome.css';
+    cursor: pointer;
+    padding-right: 10px;
+    color: black;
+}
+
+.checked {
+    composes: fa     from 'font-awesome/css/font-awesome.css';
+    composes: fw     from 'font-awesome/css/font-awesome.css';
+    composes: fa-check-square-o  from 'font-awesome/css/font-awesome.css';
+    cursor: pointer;
+    padding-right: 8px;
+    color: black;
+}

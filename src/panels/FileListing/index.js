@@ -67,6 +67,7 @@ const FileListing = React.createClass({
       previewOpen: false,
       previewTitle: '',
       previewId: '',
+      selection: [], // array of file id's which the user has selected
     };
   },
 
@@ -78,6 +79,18 @@ const FileListing = React.createClass({
 
   closePreview() {
     this.setState({ previewOpen: false });
+  },
+
+  toggleSelection(e) {
+    const selection = this.state.selection;
+    const fileId = e.target.dataset.fileId;
+    if (selection.indexOf(fileId) !== -1) {
+      selection.splice(selection.indexOf(fileId), 1);
+    } else {
+      selection.push(fileId);
+    }
+
+    this.setState({ selection });
   },
 
   fileMapper(file, index) {
@@ -104,8 +117,17 @@ const FileListing = React.createClass({
           </i>) : null }
       </span>);
     }
+
+    let checkbox = null;
+    if (!this.props.actionsDisabled && this.state.selection.indexOf(file._id) !== -1) {
+      checkbox = <i className={style.checked} onClick={this.toggleSelection} data-file-id={file._id}></i>;
+    } else if (!this.props.actionsDisabled && this.state.selection.indexOf(file._id) === -1) {
+      checkbox = <i className={style.unchecked} onClick={this.toggleSelection} data-file-id={file._id}></i>;
+    }
+
     return (<section key={`${file._id}_${index}`} className={ style.listItem }>
       <strong className={ style.itemContent } style={{ paddingLeft: depth * indentWidth }}>
+        { checkbox }
         <i className={style.fileIcon}></i> {file.name}
       </strong>
       <span>{value}</span>
