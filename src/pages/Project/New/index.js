@@ -90,7 +90,9 @@ const ProjectNew = React.createClass({
 
   render() {
     const childComponent = this.state.type ? Workflows[this.state.type].components.NewProject : null;
-    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container }) : null;
+    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container,
+      parentProps: this.props }) : null;
+
     return (
       <ItemEditor
         error={ this.state._error || this.props.error }

@@ -110,6 +110,7 @@ const visualizer = React.createClass({
     this.props.setTimeStep(timeStep);
   },
 
+/* eslint-disable react/jsx-no-bind */
   render() {
     if (!this.session) {
       return <LoadingPanel large center />;

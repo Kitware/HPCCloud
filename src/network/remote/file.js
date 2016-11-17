@@ -103,6 +103,10 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
 
     uploadFileToItem,
 
+    getFile(id) {
+      return busy(client._.get(`/file/${id}`));
+    },
+
     getUploadOffset(id) {
       return busy(client._.get('/file/offset', { params: { uploadId: id } }));
     },
