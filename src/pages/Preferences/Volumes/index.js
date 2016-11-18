@@ -172,7 +172,7 @@ const ClusterPrefs = React.createClass({
     }
 
     let actions = [];
-    if (!this.props.profiles.length) {
+    if (this.props.profiles.length) {
       actions = [{ name: 'add', icon: style.addIcon }];
     }
 
