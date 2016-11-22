@@ -48,9 +48,12 @@ const FileListing = React.createClass({
   propTypes: {
     folderId: React.PropTypes.string.isRequired,
     title: React.PropTypes.string.isRequired,
+    selection: React.PropTypes.array,
     folders: React.PropTypes.object, // { [id]: { children: [..], depth: 0 } }
     actionsDisabled: React.PropTypes.bool, // if true you cannot download or preview files
     toggleOpenFolder: React.PropTypes.func,
+    onFileSelection: React.PropTypes.func,
+    clearFileSelection: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -67,8 +70,11 @@ const FileListing = React.createClass({
       previewOpen: false,
       previewTitle: '',
       previewId: '',
-      selection: [], // array of file id's which the user has selected
     };
+  },
+
+  componentWillUnmount() {
+    this.props.clearFileSelection();
   },
 
   togglePreview(e) {
@@ -82,15 +88,8 @@ const FileListing = React.createClass({
   },
 
   toggleSelection(e) {
-    const selection = this.state.selection;
     const fileId = e.target.dataset.fileId;
-    if (selection.indexOf(fileId) !== -1) {
-      selection.splice(selection.indexOf(fileId), 1);
-    } else {
-      selection.push(fileId);
-    }
-
-    this.setState({ selection });
+    this.props.onFileSelection(fileId);
   },
 
   fileMapper(file, index) {
@@ -119,9 +118,9 @@ const FileListing = React.createClass({
     }
 
     let checkbox = null;
-    if (!this.props.actionsDisabled && this.state.selection.indexOf(file._id) !== -1) {
+    if (!this.props.actionsDisabled && this.props.selection.indexOf(file._id) !== -1) {
       checkbox = <i className={style.checked} onClick={this.toggleSelection} data-file-id={file._id}></i>;
-    } else if (!this.props.actionsDisabled && this.state.selection.indexOf(file._id) === -1) {
+    } else if (!this.props.actionsDisabled && this.props.selection.indexOf(file._id) === -1) {
       checkbox = <i className={style.unchecked} onClick={this.toggleSelection} data-file-id={file._id}></i>;
     }
 
@@ -242,10 +241,13 @@ export default connect(
     }
 
     return {
+      selection: state.fs.selection,
       folders: buildFolders(state.fs, props.folderId),
     };
   },
   () => ({
     toggleOpenFolder: (folderId, opening) => dispatch(Actions.toggleOpenFolder(folderId, opening)),
+    onFileSelection: (fileId) => dispatch(Actions.toggleFileSelection(fileId)),
+    clearFileSelection: () => dispatch(Actions.clearFileSelection()),
   })
 )(FileListing);

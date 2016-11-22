@@ -38,6 +38,7 @@ const SimualtionView = React.createClass({
     taskflow: React.PropTypes.object,
     cluster: React.PropTypes.object,
     disabledButtons: React.PropTypes.object,
+    fileSelection: React.PropTypes.array,
     error: React.PropTypes.string,
   },
 
@@ -92,6 +93,10 @@ const SimualtionView = React.createClass({
       actions.push('visualize');
     }
 
+    if (this.props.fileSelection.length) {
+      actions.push('moveOffline');
+    }
+
     return (
       <div>
         <JobMonitor taskflowId={ taskflowId }
@@ -118,6 +123,7 @@ export default connect(
     var taskflowId = null;
     const activeProject = state.projects.active;
     const activeSimulation = activeProject ? state.projects.simulations[activeProject].active : null;
+    const fileSelection = get(state, 'fs.selection') ? state.fs.selection : [];
 
     if (activeSimulation) {
       const simulation = state.simulations.mapById[activeSimulation];
@@ -135,8 +141,9 @@ export default connect(
       cluster = state.preferences.clusters.mapById[clusterId];
     }
 
+
     return {
-      taskflowId, cluster, taskflow,
+      taskflowId, cluster, taskflow, fileSelection,
       disabledButtons: getDisabledButtons(state.network, taskflow),
       error: getNetworkError(state, ['terminate_taskflow', 'delete_taskflow']),
     };

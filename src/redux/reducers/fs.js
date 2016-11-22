@@ -3,6 +3,7 @@ import * as Actions from '../actions/fs';
 export const initialState = {
   folderMapById: {},
   itemMapById: {},
+  selection: [],
 };
 
 export const folderInitialState = {
@@ -52,6 +53,22 @@ export default function fsReducer(state = initialState, action) {
       folderMapById[id] = folderObject;
 
       return Object.assign({}, state, { folderMapById });
+    }
+
+    case Actions.TOGGLE_FILE_SELECTION: {
+      const fileId = action.fileId;
+      const selection = [].concat(state.selection);
+      if (selection.indexOf(fileId) !== -1) {
+        selection.splice(selection.indexOf(fileId), 1);
+      } else {
+        selection.push(fileId);
+      }
+
+      return Object.assign({}, state, { selection });
+    }
+
+    case Actions.CLEAR_FILE_SELECTION: {
+      return Object.assign({}, state, { selection: [] });
     }
 
     default:
