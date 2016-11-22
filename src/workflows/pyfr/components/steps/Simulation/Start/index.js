@@ -14,6 +14,7 @@ import getNetworkError  from '../../../../../../utils/getNetworkError';
 import { connect } from 'react-redux';
 import { dispatch } from '../../../../../../redux';
 import * as Actions    from '../../../../../../redux/actions/taskflows';
+import { patchSimulation } from '../../../../../../redux/actions/projects';
 import * as NetActions from '../../../../../../redux/actions/network';
 
 const SimulationStart = React.createClass({
@@ -32,6 +33,7 @@ const SimulationStart = React.createClass({
     clusters: React.PropTypes.object,
     onRun: React.PropTypes.func,
     onError: React.PropTypes.func,
+    patchSimulation: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -50,13 +52,13 @@ const SimulationStart = React.createClass({
     if (!iniFile) {
       client.createItem(this.props.simulation.metadata.inputFolder._id, 'ini')
         .then(resp =>
-          client.copyFile(this.props.simulation.metadata.inputFolder.files.ini, resp.data._id)
+          client.copyFile(this.props.project.metadata.inputFolder.files.ini, resp.data._id)
         )
         .then(resp => {
           const newSim = deepClone(this.props.simulation);
           newSim.metadata.inputFolder.files.ini = resp.data._id;
           this.setState({ iniFile: resp.data._id });
-          dispatch(Actions.patchSimulation(newSim));
+          this.props.patchSimulation(newSim);
         })
         .catch(err => {
           console.log('Error copying ini file for simulation', err);
@@ -207,6 +209,7 @@ export default connect(
       onRun: (taskflowName, primaryJob, payload, simulationStep, location) =>
         dispatch(Actions.createTaskflow(taskflowName, primaryJob, payload, simulationStep, location)),
       onError: (message) => dispatch(NetActions.errorNetworkCall('create_taskflow', { data: { message } }, 'form')),
+      patchSimulation: (newSim) => dispatch(patchSimulation(newSim)),
     };
   }
 )(SimulationStart);

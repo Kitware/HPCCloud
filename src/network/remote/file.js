@@ -137,6 +137,10 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
       return missingKeys ? promise : busy(client._.put(`/file/${file._id}${encodeQueryAsString(params)}`));
     },
 
+    copyFile(fileId, itemId) {
+      return busy(client._.post(`/file/${fileId}/copy?itemId=${itemId}`));
+    },
+
     newFile(file) {
       const expected = ['parentType', 'parentId', 'name', 'size', 'mimeType', 'linkUrl'],
         params = filterQuery(file, ...expected),

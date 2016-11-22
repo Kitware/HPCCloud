@@ -27,8 +27,9 @@ const SimputPanel = React.createClass({
     project: React.PropTypes.object,
     simulation: React.PropTypes.object,
     step: React.PropTypes.string,
-    updateSimulation: React.PropTypes.func,
     saveSimulation: React.PropTypes.func,
+    updateSimulation: React.PropTypes.func,
+    patchSimulation: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -97,7 +98,7 @@ const SimputPanel = React.createClass({
           newSim.metadata.inputFolder.files.ini = _id;
           newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
           this.setState({ iniFile: _id });
-          dispatch(Actions.patchSimulation(newSim));
+          this.props.patchSimulation(newSim);
           // Update step metadata
           return client.updateSimulationStep(this.props.simulation._id, this.props.step, {
             metadata: { model: JSON.stringify(jsonData) },
@@ -139,7 +140,7 @@ const SimputPanel = React.createClass({
             }).then((simResp) => {
               var newSim = deepClone(this.props.simulation);
               newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
-              dispatch(Actions.patchSimulation(newSim));
+              this.props.patchSimulation(newSim);
             });
           } catch (e) {
             NetActions.errorNetworkCall('simput_parse', { message: `Error parsing input file:\n${e}\nLoading default values.` });
@@ -256,5 +257,6 @@ export default connect(
   () => ({
     saveSimulation: (simulation) => dispatch(Actions.saveSimulation(simulation)),
     updateSimulation: (simulation) => dispatch(Actions.updateSimulation(simulation)),
+    patchSimulation: (simulation) => dispatch(Actions.patchSimulation(simulation)),
   })
 )(SimputPanel);
