@@ -108,7 +108,7 @@ const VisualizationView = React.createClass({
     return (
       <div>
         <JobMonitor taskflowId={ taskflowId }
-          clusterId={taskflow.flow.meta ? taskflow.flow.meta.cluster._id : null}
+          clusterId={get(taskflow, 'flow.meta.cluster._id') ? taskflow.flow.meta.cluster._id : null}
         />
         <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id}
           actionsDisbled={fileActionsDisabled} />
