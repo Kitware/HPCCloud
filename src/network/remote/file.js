@@ -103,6 +103,10 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
 
     uploadFileToItem,
 
+    getFile(id) {
+      return busy(client._.get(`/file/${id}`));
+    },
+
     getUploadOffset(id) {
       return busy(client._.get('/file/offset', { params: { uploadId: id } }));
     },
@@ -131,6 +135,10 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
         { missingKeys, promise } = mustContain(file, '_id');
 
       return missingKeys ? promise : busy(client._.put(`/file/${file._id}${encodeQueryAsString(params)}`));
+    },
+
+    copyFile(fileId, itemId) {
+      return busy(client._.post(`/file/${fileId}/copy?itemId=${itemId}`));
     },
 
     newFile(file) {

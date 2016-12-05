@@ -1,17 +1,20 @@
 import React                   from 'react';
+import client                  from '../../../../../../network';
 import ButtonBar               from '../../../../../../panels/ButtonBar';
 import defaultServerParameters from '../../../../../../panels/run/defaults';
 import RunClusterFrom          from '../../../../../../panels/run';
 import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 import RuntimeBackend          from '../../../panels/RuntimeBackend';
 
-import merge                   from 'mout/src/object/merge';
+import deepClone            from 'mout/src/lang/deepClone';
+import merge                from 'mout/src/object/merge';
 import get              from '../../../../../../utils/get';
 import getNetworkError  from '../../../../../../utils/getNetworkError';
 
 import { connect } from 'react-redux';
 import { dispatch } from '../../../../../../redux';
 import * as Actions    from '../../../../../../redux/actions/taskflows';
+import { patchSimulation } from '../../../../../../redux/actions/projects';
 import * as NetActions from '../../../../../../redux/actions/network';
 
 const SimulationStart = React.createClass({
@@ -30,6 +33,7 @@ const SimulationStart = React.createClass({
     clusters: React.PropTypes.object,
     onRun: React.PropTypes.func,
     onError: React.PropTypes.func,
+    patchSimulation: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -42,6 +46,26 @@ const SimulationStart = React.createClass({
     };
   },
 
+  componentWillMount() {
+    var iniFile = this.props.simulation.metadata.inputFolder.files.ini;
+    // use the ini file from the project
+    if (!iniFile) {
+      client.createItem(this.props.simulation.metadata.inputFolder._id, 'ini')
+        .then(resp =>
+          client.copyFile(this.props.project.metadata.inputFolder.files.ini, resp.data._id)
+        )
+        .then(resp => {
+          const newSim = deepClone(this.props.simulation);
+          newSim.metadata.inputFolder.files.ini = resp.data._id;
+          this.setState({ iniFile: resp.data._id });
+          this.props.patchSimulation(newSim);
+        })
+        .catch(err => {
+          console.log('Error copying ini file for simulation', err);
+        });
+    }
+  },
+
   dataChange(key, value, which) {
     var profile = this.state[which];
     profile[key] = value;
@@ -49,7 +73,7 @@ const SimulationStart = React.createClass({
   },
 
   runSimulation() {
-    const meshFile = this.props.simulation.metadata.inputFolder.files.mesh || this.props.project.metadata.inputFolder.files.mesh;
+    const meshFile = this.props.project.metadata.inputFolder.files.mesh;
     var sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
       payload = {
         backend: this.state.backend,
@@ -185,6 +209,7 @@ export default connect(
       onRun: (taskflowName, primaryJob, payload, simulationStep, location) =>
         dispatch(Actions.createTaskflow(taskflowName, primaryJob, payload, simulationStep, location)),
       onError: (message) => dispatch(NetActions.errorNetworkCall('create_taskflow', { data: { message } }, 'form')),
+      patchSimulation: (newSim) => dispatch(patchSimulation(newSim)),
     };
   }
 )(SimulationStart);

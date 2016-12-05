@@ -1,8 +1,7 @@
 import NWChem       from './nwchem/nwchem-simput';
 import NWChemExec   from './nwchem/nwchem-exec';
 import NWChemNeb   from './nwchem/nwchem-neb';
-import PyFr         from './pyfr/pyfr-simput';
-import PyFrExec     from './pyfr/pyfr-exec';
+import PyFr         from './pyfr';
 import Visualizer   from './visualizer';
 
 const Workflows = {
@@ -10,7 +9,6 @@ const Workflows = {
   NWChemExec,
   NWChemNeb,
   PyFr,
-  PyFrExec,
   Visualizer,
 };
 

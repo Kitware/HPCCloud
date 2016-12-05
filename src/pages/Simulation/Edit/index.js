@@ -53,7 +53,8 @@ const SimulationEdit = React.createClass({
     const { simulation, project, error } = this.props;
     const projectId = simulation.projectId;
     const childComponent = project.type ? Workflows[project.type].components.EditSimulation : null;
-    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container }) : null;
+    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container,
+      parentProps: this.props }) : null;
 
     return (
       <ItemEditor

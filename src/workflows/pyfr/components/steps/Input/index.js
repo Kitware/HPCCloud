@@ -4,16 +4,17 @@ import React                from 'react';
 import SimputLabels         from 'simput/src/Labels';
 import ViewMenu             from 'simput/src/ViewMenu';
 import modelGenerator       from 'simput/src/modelGenerator';
-import client               from '../../../../../../network';
-import * as simulationsHelper from '../../../../../../network/helpers/simulations';
+import client               from '../../../../../network';
+import * as simulationsHelper from '../../../../../network/helpers/simulations';
 import deepClone            from 'mout/src/lang/deepClone';
 
 import PropertyPanelBlock   from 'paraviewweb/src/React/Properties/PropertyPanel';
 
 import style                from 'HPCCloudStyle/PageWithMenu.mcss';
 import { connect } from 'react-redux';
-import { dispatch } from '../../../../../../redux';
-import * as Actions from '../../../../../../redux/actions/projects';
+import { dispatch } from '../../../../../redux';
+import * as Actions from '../../../../../redux/actions/projects';
+import * as NetActions from '../../../../../redux/actions/network';
 
 const SimputPanel = React.createClass({
 
@@ -21,12 +22,14 @@ const SimputPanel = React.createClass({
 
   propTypes: {
     convert: React.PropTypes.func,
+    parse: React.PropTypes.func,
     model: React.PropTypes.object,
     project: React.PropTypes.object,
     simulation: React.PropTypes.object,
     step: React.PropTypes.string,
-    updateSimulation: React.PropTypes.func,
     saveSimulation: React.PropTypes.func,
+    updateSimulation: React.PropTypes.func,
+    patchSimulation: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -34,6 +37,7 @@ const SimputPanel = React.createClass({
       // PyFr Simput code
       model: Simput.types.pyfr.model,
       convert: Simput.types.pyfr.convert,
+      parse: Simput.types.pyfr.parse,
     };
   },
 
@@ -59,44 +63,90 @@ const SimputPanel = React.createClass({
     var iniFile = this.props.simulation.metadata.inputFolder.files.ini;
     var jsonData = this.props.simulation.steps[this.props.step].metadata.model;
 
-    // Create ini file container if not already here
+    // Create ini file from the project level ini if not already here
     if (!iniFile) {
-      simulationsHelper.addEmptyFileForSimulation(this.props.simulation, 'pyfr.ini')
+      // download ini file contents of project ini
+      client.downloadFile(this.props.project.metadata.inputFolder.files.ini, 0, null, 'inline')
+        // parse contents
+        .then((resp) => {
+          try {
+            const parsedIni = this.props.parse('pyfr', resp.data);
+            const boundaryNames = {};
+            if (this.props.project.metadata.boundaries) {
+              this.props.project.metadata.boundaries.forEach(name => {
+                boundaryNames[name] = name;
+              });
+            }
+            jsonData = jsonData = {
+              data: parsedIni,
+              type: 'pyfr',
+              external: { 'boundary-names': boundaryNames },
+              hideViews: ['backend'],
+            };
+            this.setState({ jsonData });
+        // create a new item, add an empty file to that item, upload contents to that file
+            return simulationsHelper.addFileForSimulationWithContents(this.props.simulation, 'pyfr.ini', resp.data);
+          } catch (e) {
+            NetActions.errorNetworkCall('simput_parse', { message: `Error parsing input file:\n${e}\nLoading default values.` });
+            throw e;
+          }
+        })
+        // update ini file for simulation
         .then(resp => {
-          const _id = resp.data._id; // itemId
+          const _id = resp._id; // file Id, custom response
           const newSim = deepClone(this.props.simulation);
           newSim.metadata.inputFolder.files.ini = _id;
+          newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
           this.setState({ iniFile: _id });
-          dispatch(Actions.patchSimulation(newSim));
+          this.props.patchSimulation(newSim);
+          // Update step metadata
+          return client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+            metadata: { model: JSON.stringify(jsonData) },
+          });
+        })
+        .catch((error) => {
+          console.log(error);
         });
+      return;
     } else if (!this.state.iniFile) {
       this.setState({ iniFile });
     }
 
-    // Need to fill up the jsonData
+    // Need to fill up the jsonData with simulation ini file
     if (!jsonData) {
-      const boundaryNames = {};
-      if (this.props.project.metadata.boundaries) {
-        this.props.project.metadata.boundaries.forEach(name => {
-          boundaryNames[name] = name;
+      client.downloadFile(iniFile, 0, null, 'inline')
+        // parse contents
+        .then((resp) => {
+          try {
+            const parsedIni = this.props.parse('pyfr', resp.data);
+            const boundaryNames = {};
+            if (this.props.project.metadata.boundaries) {
+              this.props.project.metadata.boundaries.forEach(name => {
+                boundaryNames[name] = name;
+              });
+            }
+
+            jsonData = {
+              data: parsedIni,
+              type: 'pyfr',
+              external: { 'boundary-names': boundaryNames },
+              hideViews: ['backend'],
+            };
+            this.setState({ jsonData });
+
+            // Update step metadata
+            client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+              metadata: { model: JSON.stringify(jsonData) },
+            }).then((simResp) => {
+              var newSim = deepClone(this.props.simulation);
+              newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
+              this.props.patchSimulation(newSim);
+            });
+          } catch (e) {
+            NetActions.errorNetworkCall('simput_parse', { message: `Error parsing input file:\n${e}\nLoading default values.` });
+            throw e;
+          }
         });
-      }
-
-      jsonData = {
-        data: {},
-        type: 'pyfr',
-        external: { 'boundary-names': boundaryNames },
-        hideViews: ['backend'],
-      };
-
-      // Update step metadata
-      client.updateSimulationStep(this.props.simulation._id, this.props.step, {
-        metadata: { model: JSON.stringify(jsonData) },
-      }).then((resp) => {
-        var newSim = deepClone(this.props.simulation);
-        newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
-        dispatch(Actions.patchSimulation(newSim));
-      });
     } else {
       if (typeof jsonData === 'string') {
         jsonData = JSON.parse(jsonData);
@@ -104,9 +154,6 @@ const SimputPanel = React.createClass({
         console.log('Can not convert jsonData (?)', jsonData);
       }
     }
-
-    // Push model to state
-    this.setState({ jsonData });
   },
 
   componentWillUnmount() {
@@ -132,6 +179,7 @@ const SimputPanel = React.createClass({
     // Update ini file content
     try {
       if (this.state.iniFile) {
+        delete jsonData.data.backend; // we want to use the backend configured from the cluster
         const convertedData = this.props.convert(jsonData);
         console.log(convertedData);
         const content = convertedData.results['pyfr.ini'];
@@ -154,7 +202,7 @@ const SimputPanel = React.createClass({
         console.log('no .ini file');
       }
     } catch (e) {
-      console.error('Error when generating .ini file', e);
+      console.error('Error when generating ini file: ', e);
     }
   },
 
@@ -178,6 +226,7 @@ const SimputPanel = React.createClass({
 
   render() {
     if (!this.state.jsonData) {
+      console.log('no jsonData in state');
       return null;
     }
 
@@ -208,5 +257,6 @@ export default connect(
   () => ({
     saveSimulation: (simulation) => dispatch(Actions.saveSimulation(simulation)),
     updateSimulation: (simulation) => dispatch(Actions.updateSimulation(simulation)),
+    patchSimulation: (simulation) => dispatch(Actions.patchSimulation(simulation)),
   })
 )(SimputPanel);

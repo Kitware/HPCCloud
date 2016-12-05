@@ -1,9 +1,10 @@
-import ButtonBar        from '../../../../../../panels/ButtonBar';
-import FileListing      from '../../../../../../panels/FileListing';
-import JobMonitor       from '../../../../../../panels/JobMonitor';
-import merge            from 'mout/src/object/merge';
 import React            from 'react';
+import ButtonBar        from '../../../../../../panels/ButtonBar';
+import JobMonitor       from '../../../../../../panels/JobMonitor';
+import FileListing      from '../../../../../../panels/FileListing';
 import LoadingPanel     from '../../../../../../panels/LoadingPanel';
+import merge            from 'mout/src/object/merge';
+import deepClone        from 'mout/src/lang/deepClone';
 
 import get              from '../../../../../../utils/get';
 import getNetworkError  from '../../../../../../utils/getNetworkError';
@@ -15,8 +16,8 @@ import * as Actions     from '../../../../../../redux/actions/taskflows';
 import * as SimActions  from '../../../../../../redux/actions/projects';
 import * as ClusterActions  from '../../../../../../redux/actions/clusters';
 
-const VisualizationView = React.createClass({
-  displayName: 'pyfr/common/steps/Visualization/View',
+const SimualtionView = React.createClass({
+  displayName: 'pyfr/common/steps/Simulation/View',
 
   propTypes: {
     location: React.PropTypes.object,
@@ -31,6 +32,7 @@ const VisualizationView = React.createClass({
     onRerun: React.PropTypes.func,
     onVisualizeTaskflow: React.PropTypes.func,
     onTerminateInstance: React.PropTypes.func,
+    onMount: React.PropTypes.func,
 
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
@@ -39,13 +41,21 @@ const VisualizationView = React.createClass({
     error: React.PropTypes.string,
   },
 
+  onAction(action) {
+    this[action]();
+  },
+
   visualizeTaskflow() {
-    const newSimState = Object.assign({}, this.props.simulation, { active: 'Visualization' });
     const location = {
-      pathname: this.props.location.pathname,
-      query: merge(this.props.location.query, { view: 'visualizer' }),
+      pathname: `View/Simulation/${this.props.simulation._id}/Visualization`,
+      query: merge(this.props.location.query, { view: 'default' }),
       state: this.props.location.state,
     };
+    const newSimState = deepClone(this.props.simulation);
+    newSimState.steps.Visualization.metadata.dataDir = this.props.taskflow.outputDirectory;
+    newSimState.steps.Visualization.metadata.fileName = this.props.taskflow.flow.meta.vtuFile;
+    newSimState.active = 'Visualization';
+    newSimState.disabled = newSimState.disabled.filter(step => step !== 'Visualization');
 
     this.props.onVisualizeTaskflow(newSimState, location);
   },
@@ -59,13 +69,7 @@ const VisualizationView = React.createClass({
   },
 
   rerun() {
-    const stepData = {
-      view: 'default',
-      metadata: Object.assign({}, this.props.simulation.steps.Visualization.metadata),
-    };
-    // we want to preserve some metadata objects
-    delete stepData.metadata.taskflowId;
-    delete stepData.metadata.sessionKey;
+    const stepData = { view: 'default', metadata: {} };
     const location = {
       pathname: this.props.location.pathname,
       query: { view: 'default' },
@@ -75,52 +79,34 @@ const VisualizationView = React.createClass({
     this.props.onRerun(this.props.simulation._id, this.props.step, stepData, location);
   },
 
-  buttonBarAction(action) {
-    this[action]();
-  },
-
   render() {
-    const { taskflow, taskflowId, error, simulation, cluster, disabledButtons } = this.props;
-
-    // these can be undefined sometimes, show a loading icon if any are missing.
-    if (!taskflow || !taskflow.flow ||
-      !taskflow.jobMapById || !taskflow.actions || !taskflow.hasOwnProperty('allComplete')) {
+    if (!this.props.taskflow || !this.props.taskflow.flow) {
       return <LoadingPanel />;
     }
 
-    const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
-    const actions = [];
+    const { taskflow, taskflowId, cluster, error, simulation, disabledButtons } = this.props;
+    const actions = [].concat(taskflow.actions ? taskflow.actions : []);
     const fileActionsDisabled = cluster ? cluster.status !== 'running' : true;
 
-    taskflow.actions.forEach(action => {
-      actions.push(action);
-    });
-
-    // name is paraview and status is running -> visualize
-    if (jobs.some(job => job.name === this.props.primaryJob && job.status === 'running')) {
+    if (taskflow.allComplete) {
       actions.push('visualize');
-    } else if (taskflow.allComplete) {
-      actions.push('rerun');
     }
 
     return (
       <div>
         <JobMonitor taskflowId={ taskflowId }
-          clusterId={taskflow.flow.meta ? taskflow.flow.meta.cluster._id : null}
+          clusterId={get(taskflow, 'flow.meta.cluster._id') ? taskflow.flow.meta.cluster._id : null}
         />
-        <FileListing title="Input Files" folderId={simulation.metadata.outputFolder._id}
-          actionsDisbled={fileActionsDisabled} />
-        <FileListing title="Output Files" folderId={simulation.steps.Visualization.folderId}
-          actionsDisbled={fileActionsDisabled} />
+        <FileListing title="Input Files" folderId={simulation.metadata.inputFolder._id} actionsDisabled={fileActionsDisabled} />
+        <FileListing title="Output Files" folderId={simulation.metadata.outputFolder._id} actionsDisabled={fileActionsDisabled} />
         <section>
-          <ButtonBar
-            onAction={ this.buttonBarAction }
-            actions={ getActions(actions, disabledButtons) }
-            error={ error }
-          />
+            <ButtonBar
+              onAction={ this.onAction }
+              actions={ getActions(actions, disabledButtons) }
+              error={ error}
+            />
         </section>
-      </div>
-    );
+      </div>);
   },
 });
 
@@ -135,7 +121,7 @@ export default connect(
 
     if (activeSimulation) {
       const simulation = state.simulations.mapById[activeSimulation];
-      taskflowId = simulation.steps.Visualization.metadata.taskflowId;
+      taskflowId = simulation.steps.Simulation.metadata.taskflowId;
     }
 
     let taskflow = null;
@@ -150,15 +136,18 @@ export default connect(
     }
 
     return {
-      taskflowId, taskflow, cluster,
+      taskflowId, cluster, taskflow,
       disabledButtons: getDisabledButtons(state.network, taskflow),
       error: getNetworkError(state, ['terminate_taskflow', 'delete_taskflow']),
     };
   },
   () => ({
-    onVisualizeTaskflow: (sim, location) => dispatch(SimActions.saveSimulation(sim, null, location)),
+    onVisualizeTaskflow: (sim, location) => {
+      dispatch(SimActions.saveSimulation(sim, null, location));
+    },
     onRerun: (id, stepName, stepData, location) => dispatch(SimActions.updateSimulationStep(id, stepName, stepData, location)),
     onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
     onTerminateInstance: (id) => dispatch(ClusterActions.terminateCluster(id)),
   })
-)(VisualizationView);
+)(SimualtionView);
+

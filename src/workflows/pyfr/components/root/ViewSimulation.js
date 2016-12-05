@@ -1,5 +1,5 @@
-import ActiveList   from '../../../../panels/ActiveList';
 import React        from 'react';
+import ActiveList   from '../../../../panels/ActiveList';
 import { activateSimulationStep } from '../../../../network/helpers/simulations';
 
 import style            from 'HPCCloudStyle/PageWithMenu.mcss';
