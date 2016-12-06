@@ -1,0 +1,30 @@
+echo
+
+start neb
+
+geometry nocenter noautosym noautoz
+{{start_geometry}}
+end
+
+geometry endgeom nocenter noautosym noautoz
+{{end_geometry}}
+end
+
+basis {{basis}}
+  * library {{theory_basis}}
+end
+
+dft
+  xc b3lyp
+  maxiter {{dft_maxiter}}
+  cgmin
+end
+
+neb
+   nbeads {{nbeads}}
+   kbeads {{kbeads}}
+   maxiter {{maxiter}}
+   stepsize {{stepsize}}
+end
+
+task dft neb ignore

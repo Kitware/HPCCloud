@@ -19,10 +19,11 @@
 import json
 import os
 from jsonpath_rw import parse
+from celery.exceptions import Retry
 
 import cumulus.taskflow.cluster
 from cumulus.taskflow.cluster import create_girder_client
-from cumulus.tasks.job import submit_job, monitor_job
+from cumulus.tasks.job import submit_job, _monitor_jobs
 from cumulus.tasks.job import download_job_input_folders
 from cumulus.tasks.job import upload_job_output_to_folder, job_directory
 from cumulus.transport import get_connection
@@ -62,9 +63,19 @@ class NWChemTaskFlow(cumulus.taskflow.cluster.ClusterProvisioningTaskFlow):
 
     def start(self, *args, **kwargs):
         kwargs['image_spec'] = self.NWCHEM_IMAGE
-        kwargs['next'] = setup_input.s()
+
+        # Define the flow using a chain
+        kwargs['next'] = (
+            setup_input.s() | \
+            create_job.s() | \
+            submit.s() | \
+            submit_nwchem_job.s() | \
+            monitor_nwchem_job.s().set(queue='monitor') | \
+            upload_output.s() )
 
         super(NWChemTaskFlow, self).start(self, *args, **kwargs)
+
+
 
 def create_geometry_symlink(task, job, cluster, fileName):
     job_dir = job_directory(cluster, job)
@@ -76,8 +87,6 @@ def create_geometry_symlink(task, job, cluster, fileName):
 @cumulus.taskflow.task
 def setup_input(task, *args, **kwargs):
     input_folder_id = kwargs['input']['folder']['id']
-    geometry_file_id = kwargs['input']['geometryFile']['id']
-    kwargs['geometryFileId'] = geometry_file_id
 
     number_of_procs = kwargs.get('numberOfSlots')
     if not number_of_procs:
@@ -100,30 +109,35 @@ def setup_input(task, *args, **kwargs):
     client = create_girder_client(
         task.taskflow.girder_api_url, task.taskflow.girder_token)
 
-    # Get the geometry file metadata to see if we need to import
-    geometry_file = client.getResource('file/%s' % geometry_file_id)
-    kwargs['geometryFilename'] = geometry_file['name']
+    geometry_file_id = parse('input.geometryFile.id').find(kwargs)
+    if geometry_file_id:
+        geometry_file_id = geometry_file_id[0].value
+        kwargs['geometryFileId'] = geometry_file_id
+
+        # Get the geometry file metadata to see if we need to import
+        geometry_file = client.getResource('file/%s' % geometry_file_id)
+        kwargs['geometryFilename'] = geometry_file['name']
 
     ini_file_id = kwargs['input']['nwFile']['id']
     ini_file = client.getResource('file/%s' % ini_file_id)
     kwargs['nwFilename'] = ini_file['name']
 
-    create_job.delay(*args, **kwargs)
+    return kwargs
 
 
 @cumulus.taskflow.task
-def create_job(task, *args, **kwargs):
+def create_job(task, upstream_result):
     task.logger.info('Taskflow %s' % task.taskflow.id)
     task.taskflow.logger.info('Create NWChem job.')
-    input_folder_id = kwargs['input']['folder']['id']
+    input_folder_id = upstream_result['input']['folder']['id']
 
     # TODO: setup command to run with mpi
     body = {
         'name': 'nwchem_run',
         'commands': [
             "mpiexec -n %s nwchem input/%s" % (
-                kwargs['numberOfProcs'],
-                kwargs['nwFilename'])
+                upstream_result['numberOfProcs'],
+                upstream_result['nwFilename'])
         ],
         'input': [
             {
@@ -133,7 +147,7 @@ def create_job(task, *args, **kwargs):
         ],
         'output': [],
         'params': {
-            'numberOfSlots': kwargs['numberOfProcs']
+            'numberOfSlots': upstream_result['numberOfProcs']
         }
     }
 
@@ -141,52 +155,72 @@ def create_job(task, *args, **kwargs):
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
 
     job = client.post('jobs', data=json.dumps(body))
+    upstream_result['job'] = job
 
     task.taskflow.set_metadata('jobs', [job])
 
-    submit.delay(job, *args, **kwargs)
+    return upstream_result
+
 
 @cumulus.taskflow.task
-def submit(task, job, *args, **kwargs):
+def submit(task, upstream_result):
     task.taskflow.logger.info('Submitting job to cluster.')
     girder_token = task.taskflow.girder_token
-    cluster = kwargs.pop('cluster')
+    cluster = upstream_result['cluster']
+    job = upstream_result['job']
     task.taskflow.set_metadata('cluster', cluster)
 
     # Now download and submit job to the cluster
     task.logger.info('Uploading input files to cluster.')
     download_job_input_folders(cluster, job, log_write_url=None,
                         girder_token=girder_token, submit=False)
-    create_geometry_symlink(task, job, cluster, kwargs['geometryFilename'])
+
+    if 'geometryFilename' in upstream_result:
+        create_geometry_symlink(task, job, cluster, upstream_result['geometryFilename'])
+
     task.logger.info('Uploading complete.')
 
-    submit_nwchem_job.delay(cluster, job, *args, **kwargs)
+    return upstream_result
 
 @cumulus.taskflow.task
-def submit_nwchem_job(task, cluster,  job, *args, **kwargs):
+def submit_nwchem_job(task, upstream_result):
+    job = upstream_result['job']
     task.logger.info('Submitting job %s to cluster.' % job['_id'])
     girder_token = task.taskflow.girder_token
+    cluster = upstream_result['cluster']
 
-    job['params'].update(kwargs)
+    job_params = upstream_result.copy()
+    job_params.pop('cluster')
+    job_params.pop('job')
+    job['params'].update(job_params)
 
     submit_job(cluster, job, log_write_url=None,
                           girder_token=girder_token, monitor=False)
 
-    monitor_nwchem_job.delay(cluster, job, *args, **kwargs)
+    return upstream_result
 
 @cumulus.taskflow.task
-def monitor_nwchem_job(task, cluster, job, *args, **kwargs):
+def monitor_nwchem_job(task, upstream_result):
     task.logger.info('Monitoring job on cluster.')
     girder_token = task.taskflow.girder_token
+    cluster = upstream_result['cluster']
 
-    monitor_job.apply_async((cluster, job), {'girder_token': girder_token,
-                                             'monitor_interval': 30},
-                            link=upload_output.s(cluster, job, *args, **kwargs))
+
+    task.max_retries = None
+    task.throws=(Retry,),
+
+    job = upstream_result['job']
+    # TODO - We are currently reaching in and used a 'private' function
+    _monitor_jobs(task, cluster, [job], girder_token=girder_token, monitor_interval=30)
+
+    return upstream_result
 
 @cumulus.taskflow.task
-def upload_output(task, _, cluster, job, *args, **kwargs):
+def upload_output(task, upstream_result):
     task.taskflow.logger.info('Uploading results from cluster')
-    output_folder_id = kwargs['output']['folder']['id']
+    output_folder_id = upstream_result['output']['folder']['id']
+    cluster = upstream_result['cluster']
+    job = upstream_result['job']
 
     client = create_girder_client(
         task.taskflow.girder_api_url, task.taskflow.girder_token)
@@ -203,3 +237,4 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
 
     task.taskflow.logger.info('Upload job output complete.')
 
+    return upstream_result
