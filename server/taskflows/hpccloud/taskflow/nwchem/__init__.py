@@ -26,6 +26,7 @@ from cumulus.taskflow.cluster import create_girder_client
 from cumulus.tasks.job import submit_job, _monitor_jobs
 from cumulus.tasks.job import download_job_input_folders
 from cumulus.tasks.job import upload_job_output_to_folder, job_directory
+from cumulus.tasks.job import _put_script
 from cumulus.transport import get_connection
 
 from hpccloud.taskflow.utility import *
@@ -84,6 +85,17 @@ def create_geometry_symlink(task, job, cluster, fileName):
     with get_connection(task.taskflow.girder_token, cluster) as conn:
         conn.execute('ln -s %s %s' % (filePath, linkPath))
 
+def create_json_output(task, job, cluster):
+    job_dir = job_directory(cluster, job)
+    cmds = ['cd %s' % job_dir]
+    outFile = '%s-%s.o%s' % (job['name'], os.path.basename(job_dir), job['queueJobId'])
+    nwchem_cmd = 'python /opt/NWChemOutputToJson/NWChemJsonConversion.py %s\n' % outFile
+    cmds.append(nwchem_cmd)
+
+    with get_connection(task.taskflow.girder_token, cluster) as conn:
+        cmd = _put_script(conn, '\n'.join(cmds))
+        conn.execute(cmd)
+
 @cumulus.taskflow.task
 def setup_input(task, *args, **kwargs):
     input_folder_id = kwargs['input']['folder']['id']
@@ -131,7 +143,6 @@ def create_job(task, upstream_result):
     task.taskflow.logger.info('Create NWChem job.')
     input_folder_id = upstream_result['input']['folder']['id']
 
-    # TODO: setup command to run with mpi
     body = {
         'name': 'nwchem_run',
         'commands': [
@@ -210,7 +221,6 @@ def monitor_nwchem_job(task, upstream_result):
     task.throws=(Retry,),
 
     job = upstream_result['job']
-    # TODO - We are currently reaching in and used a 'private' function
     _monitor_jobs(task, cluster, [job], girder_token=girder_token, monitor_interval=30)
 
     return upstream_result
@@ -221,6 +231,8 @@ def upload_output(task, upstream_result):
     output_folder_id = upstream_result['output']['folder']['id']
     cluster = upstream_result['cluster']
     job = upstream_result['job']
+
+    create_json_output(task, job, cluster)
 
     client = create_girder_client(
         task.taskflow.girder_api_url, task.taskflow.girder_token)
