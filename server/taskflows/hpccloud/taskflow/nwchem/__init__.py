@@ -88,7 +88,7 @@ def create_geometry_symlink(task, job, cluster, fileName):
 def create_json_output(task, job, cluster):
     job_dir = job_directory(cluster, job)
     cmds = ['cd %s' % job_dir]
-    outFile = '%s-%s.o%s' % (job['name'], os.path.basename(job_dir), job['queueJobId'])
+    outFile = '%s.out' % (job['name'])
     nwchem_cmd = 'python /opt/NWChemOutputToJson/NWChemJsonConversion.py %s\n' % outFile
     cmds.append(nwchem_cmd)
 
@@ -146,7 +146,7 @@ def create_job(task, upstream_result):
     body = {
         'name': 'nwchem_run',
         'commands': [
-            "mpiexec -n %s nwchem input/%s" % (
+            "mpiexec -n %s nwchem input/%s &> nwchem_run.out" % (
                 upstream_result['numberOfProcs'],
                 upstream_result['nwFilename'])
         ],
