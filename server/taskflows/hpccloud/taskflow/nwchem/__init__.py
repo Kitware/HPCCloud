@@ -72,6 +72,7 @@ class NWChemTaskFlow(cumulus.taskflow.cluster.ClusterProvisioningTaskFlow):
             submit.s() | \
             submit_nwchem_job.s() | \
             monitor_nwchem_job.s().set(queue='monitor') | \
+            create_json_output.s() | \
             upload_output.s() )
 
         super(NWChemTaskFlow, self).start(self, *args, **kwargs)
@@ -85,16 +86,6 @@ def create_geometry_symlink(task, job, cluster, fileName):
     with get_connection(task.taskflow.girder_token, cluster) as conn:
         conn.execute('ln -s %s %s' % (filePath, linkPath))
 
-def create_json_output(task, job, cluster):
-    job_dir = job_directory(cluster, job)
-    cmds = ['cd %s' % job_dir]
-    outFile = '%s.out' % (job['name'])
-    nwchem_cmd = 'python /opt/NWChemOutputToJson/NWChemJsonConversion.py %s\n' % outFile
-    cmds.append(nwchem_cmd)
-
-    with get_connection(task.taskflow.girder_token, cluster) as conn:
-        cmd = _put_script(conn, '\n'.join(cmds))
-        conn.execute(cmd)
 
 @cumulus.taskflow.task
 def setup_input(task, *args, **kwargs):
@@ -226,13 +217,28 @@ def monitor_nwchem_job(task, upstream_result):
     return upstream_result
 
 @cumulus.taskflow.task
+def create_json_output(task, upstream_result):
+    task.logger.info('Converting nwchem output to json format.')
+    cluster = upstream_result['cluster']
+    job = upstream_result['job']
+    job_dir = job_directory(cluster, job)
+    cmds = ['cd %s' % job_dir]
+    outFile = '%s.out' % (job['name'])
+    conversion_cmd = 'python /opt/NWChemOutputToJson/NWChemJsonConversion.py %s\n' % outFile
+    cmds.append(conversion_cmd)
+
+    with get_connection(task.taskflow.girder_token, cluster) as conn:
+        cmd = _put_script(conn, '\n'.join(cmds))
+        conn.execute(cmd)
+
+    return upstream_result
+
+@cumulus.taskflow.task
 def upload_output(task, upstream_result):
     task.taskflow.logger.info('Uploading results from cluster')
     output_folder_id = upstream_result['output']['folder']['id']
     cluster = upstream_result['cluster']
     job = upstream_result['job']
-
-    create_json_output(task, job, cluster)
 
     client = create_girder_client(
         task.taskflow.girder_api_url, task.taskflow.girder_token)
