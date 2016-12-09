@@ -7,6 +7,7 @@ import Toolbar          from '../../../panels/Toolbar';
 import ButtonBar        from '../../../panels/ButtonBar';
 import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
 import { breadcrumb }   from '..';
+import get              from '../../../utils/get';
 
 // import getNetworkError  from '../../../utils/getNetworkError';
 
@@ -150,7 +151,7 @@ const ClusterPrefs = React.createClass({
           onAction={ this.formAction }
           error={ error || this.state._error }
           actions={getActions(false,
-            { isAttached: activeData.status === 'in-use', isSaved: activeData.hasOwnProperty('_id') })}
+            { isAttached: activeData.status === 'in-use', isSaved: get(activeData, '_id') })}
         />
       </div>);
     } else {
@@ -158,7 +159,8 @@ const ClusterPrefs = React.createClass({
         content = (<EmptyPlaceholder phrase={
           <span>
             AWS Profile required to create volumes <br />
-            Create some under the <Link to="/Preferences/AWS"><span>AWS Profiles preferences page</span></Link>.
+            Create some under the <Link to="/Preferences/AWS">
+            <span>AWS Profiles preferences page</span></Link>.
           </span> }
         />);
       } else {

@@ -1,6 +1,7 @@
 import React              from 'react';
 import deepClone          from 'mout/src/lang/deepClone';
 import style              from 'HPCCloudStyle/ItemEditor.mcss';
+
 // import { volumeTypes }    from '../../utils/Constants';
 
 export default React.createClass({
@@ -102,7 +103,7 @@ export default React.createClass({
                 data-key="profileId"
                 onChange={this.formChange}
                 disabled={this.props.data._id}
-                defaultValue={this.props.profiles[0]._id}
+                defaultValue={this.props.profiles.length ? this.props.profiles[0]._id : null}
                 required
               >
                 { this.props.profiles.map((prof) =>
