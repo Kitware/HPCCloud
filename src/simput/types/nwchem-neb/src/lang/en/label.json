@@ -1,0 +1,30 @@
+{
+    "views": {
+        "dft": "Density Functional Theory",
+        "basis": "Basis Sets",
+        "neb": "Nudged Elastic Band"
+    },
+    "attributes": {
+        "dft": {
+            "title": "Density Functional Theory",
+            "parameters": {
+                "dft.maxiter": "Maximum number of iteration to perform"
+            }
+        },
+        "basis": {
+            "title": "Basis Sets",
+            "parameters": {
+                "basis.theory_basis": "Basis"
+            }
+        },
+        "neb": {
+            "title": "Nudged Elastic Band",
+            "parameters": {
+                "neb.nbeads": "Number of beads",
+                "neb.kbeads": "Value for the NEB spring constant",
+                "neb.maxiter": "Maximum number of NEB path optimizations to be performed",
+                "neb.stepsize": "Optimization step size. Typically less than 1"
+            }
+        }
+    }
+}

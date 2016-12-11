@@ -58,6 +58,9 @@ const FileUploadEntry = React.createClass({
           Object.keys(metadata).forEach(key => {
             this.props.owner().addMetadata(key, metadata[key]);
           });
+        })
+        .catch(err => {
+          this.refs.input.value = '';
         });
     }
   },
@@ -67,6 +70,7 @@ const FileUploadEntry = React.createClass({
       <div className={style.group}>
         <label className={style.label}>{this.props.label}</label>
         <input
+          ref="input"
           className={style.input}
           data-name={this.props.name}
           accept={this.props.accept}
@@ -155,6 +159,10 @@ export default React.createClass({
     };
   },
 
+  componentDidMount() {
+    this.attachment = {};
+  },
+
   onAction(action) {
     if (this.props.onAction) {
       this.props.onAction(action, this.state, this.attachment);
@@ -177,7 +185,17 @@ export default React.createClass({
     this.attachment = {};
   },
 
-  removeMetadata() {
+  removeMetadata(key = null) {
+    if (key) {
+      const metadata = Object.assign({}, this.state.metadata || {});
+      delete metadata[key];
+      if (this.attachment[key]) {
+        delete this.attachment[key];
+      }
+      this.setState({ metadata });
+      return;
+    }
+
     const metadata = Object.assign({}, this.state.metadata || {});
     if (this.attachment) {
       Object.keys(this.attachment).forEach((el) => {

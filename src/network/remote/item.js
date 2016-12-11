@@ -16,9 +16,9 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
       return busy(client._.put(`/item/${id}/metadata`, metadata, { transformRequest }));
     },
 
-    // query = { folderId, text, limit, offset, sort, sortdir }
+    // query = { folderId, text, limit, name, offset, sort, sortdir }
     listItems(query = {}) {
-      const allowed = ['folderId', 'text', 'limit', 'offset', 'sort', 'sortdir'],
+      const allowed = ['folderId', 'text', 'name', 'limit', 'offset', 'sort', 'sortdir'],
         params = filterQuery(query, ...allowed);
 
       return busy(client._.get(`/item${encodeQueryAsString(params)}`));
