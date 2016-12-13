@@ -71,13 +71,28 @@ class Simulations(Resource):
     addModel('UpdateProperties', {
         'id': 'UpdateProperties',
         'properties': {
-            'name': {'type': 'string', 'description': 'The simulation name.'},
-            'description': {'type': 'string', 'description': 'The description '
-                            'of the simulation.'},
-            'active': {'type': 'string', 'description': 'The name of the'
-                       'active step.'},
-            'disabled': {'type': 'array', 'description': 'List of disabled '
-                         'steps.'},
+            'name': {
+                'type': 'string',
+                'description': 'The simulation name.'
+            },
+            'description': {
+                'type': 'string',
+                'description': 'The description of the simulation.'
+            },
+            'active': {
+                'type': 'string',
+                'items': {
+                    'type': 'string'
+                },
+                'description': 'The name of the active step.'
+            },
+            'disabled': {
+                'type': 'array',
+                'items': {
+                    'type': 'string'
+                },
+                'description': 'List of disabled steps.'
+            },
         }
     }, 'simulations')
 
