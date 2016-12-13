@@ -12,6 +12,7 @@ HPC-Cloud relies heavily on these libaries:
 - [FontAwesome](http://fontawesome.io/): Icons
 
 In the `/src` folder there are several folders:
+
 - `config`: react-router routes config
 - `network`: network stack
 - `pages`: app pages for react-router, each folder is a mapped to a route in [`config/routes.js`](../src/config/routes.js). e.g. `/pages/Simulation/View` maps to `[hostname]/view/simulation/[some simulation id]`

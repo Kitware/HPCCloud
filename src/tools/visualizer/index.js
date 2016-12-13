@@ -47,7 +47,6 @@ const visualizer = React.createClass({
   getInitialState() {
     return {
       menuVisible: true,
-      playing: false,
       timeStep: 0,
       timeValues: [],
     };
@@ -123,7 +122,7 @@ const visualizer = React.createClass({
             actions={[
                 { name: 'toggleMenu', icon: vizStyle.toggleMenuButton },
                 { name: 'nextTimeStep', icon: vizStyle.nextButton },
-                { name: 'togglePlay', icon: this.state.playing ? vizStyle.stopButton : vizStyle.playButton },
+                { name: 'togglePlay', icon: this.props.playing ? vizStyle.stopButton : vizStyle.playButton },
                 { name: 'previousTimeStep', icon: vizStyle.previousButton },
                 { name: 'resetCamera', icon: vizStyle.resetCameraButton },
             ]}

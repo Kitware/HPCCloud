@@ -49,9 +49,30 @@ export default React.createClass({
     };
   },
 
+  getSorter() {
+    const helper = this.props.accessHelper;
+    let fnIndex = 1; // default sortBy index, the second column which for us is the name
+    let comparisonFn = helper.cellContentFunctions[1];
+    if (!this.state.sortKey.length) {
+      comparisonFn = helper.cellContentFunctions[fnIndex];
+    } else {
+      fnIndex = helper.columns.indexOf(this.state.sortKey);
+      comparisonFn = helper.cellContentFunctions[fnIndex];
+    }
+
+    if (this.props.items.length && typeof comparisonFn(this.props.items[0]) === 'number') {
+      return (a, b) => a - b;
+    }
+    return { sorter: (a, b) => comparisonFn(a).localeCompare(comparisonFn(b)), helper, fnIndex };
+  },
+
   toolbarAction(action) {
     if (this.props.onAction) {
-      this.props.onAction(action, this.state.selected.map((index) => this.props.items[index]));
+      // items may be sorted in rendered view so selected items will not
+      // necesarily have the same index as those in props.items
+      const { sorter } = this.getSorter();
+      const items = [].concat(this.props.items).sort(sorter);
+      this.props.onAction(action, this.state.selected.map((index) => items[index]));
       // reset selection after action is performed on them.
       this.setState({ selected: [], actions: [TOOLBAR_ACTIONS.add] });
     }
@@ -90,7 +111,6 @@ export default React.createClass({
       }
 
       this.setState({ selected, actions });
-      return;
     } else if (e.target) {
       let trEl = e.target;
       while (!trEl.dataset.link) {
@@ -120,23 +140,8 @@ export default React.createClass({
   },
 
   render() {
-    const helper = this.props.accessHelper;
-    let comparisonFn = helper.cellContentFunctions[1];
     let content = null;
-    let fnIndex = 1; // default sortBy index, the second column which for us is the name
-    if (!this.state.sortKey.length) {
-      comparisonFn = helper.cellContentFunctions[fnIndex];
-    } else {
-      fnIndex = helper.columns.indexOf(this.state.sortKey);
-      comparisonFn = helper.cellContentFunctions[fnIndex];
-    }
-
-    let sorter;
-    if (this.props.items.length && typeof comparisonFn(this.props.items[0]) === 'number') {
-      sorter = (a, b) => a - b;
-    } else {
-      sorter = (a, b) => comparisonFn(a).localeCompare(comparisonFn(b));
-    }
+    const { helper, sorter, fnIndex } = this.getSorter();
 
     updateQuery(this.props.location.query.filter);
     const filteredList = this.props.items.filter(itemFilter).sort(sorter);
