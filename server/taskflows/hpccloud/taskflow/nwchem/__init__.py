@@ -16,8 +16,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 ###############################################################################
+import tempfile
 import json
 import os
+import subprocess
+import shutil
 from jsonpath_rw import parse
 from celery.exceptions import Retry
 
@@ -222,14 +225,41 @@ def create_json_output(task, upstream_result):
     cluster = upstream_result['cluster']
     job = upstream_result['job']
     job_dir = job_directory(cluster, job)
-    cmds = ['cd %s' % job_dir]
-    outFile = '%s.out' % (job['name'])
-    conversion_cmd = 'python /opt/NWChemOutputToJson/NWChemJsonConversion.py %s\n' % outFile
-    cmds.append(conversion_cmd)
+    out_file = '%s.out' % (job['name'])
 
-    with get_connection(task.taskflow.girder_token, cluster) as conn:
-        cmd = _put_script(conn, '\n'.join(cmds))
-        conn.execute(cmd)
+    try:
+        # Copy the nwchem output to server
+        tmp_dir = tempfile.mkdtemp()
+        cluster_path = os.path.join(job_dir, out_file)
+        local_path = os.path.join(tmp_dir, out_file)
+        with open(local_path, 'w') as local_fp:
+            with get_connection(task.taskflow.girder_token, cluster) as conn:
+                with conn.get(cluster_path) as remote_fp:
+                    local_fp.write(remote_fp.read())
+
+        # Run docker container to post-process results - need to add docker image to upstream_result
+        command = ['docker', 'run', '--rm', '-v', '%s:/hpccloud' % tmp_dir, 'chetnieter/nwchem-postprocess']
+        p = subprocess.Popen(args=command, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        stdout, stderr = p.communicate()
+
+        if p.returncode != 0:
+            print('Error running Docker container.')
+            print('STDOUT: ' + stdout)
+            print('STDERR: ' + stderr)
+            raise Exception('Docker returned code {}.'.format(p.returncode))
+
+        # Copy json file back to cluster?
+        cluster_path = os.path.join(job_dir, out_file + '.json')
+        local_path = os.path.join(tmp_dir, out_file + '.json')
+        with get_connection(task.taskflow.girder_token, cluster) as conn:
+            with open(local_path, 'r') as local_fp:
+                conn.put(local_fp, cluster_path)
+
+    # Delete temporary storage
+    finally:
+        if os.path.exists(tmp_dir):
+            shutil.rmtree(tmp_dir)
 
     return upstream_result
 
