@@ -15,4 +15,4 @@ WORKDIR /hpccloud
 
 RUN git clone https://github.com/wadejong/NWChemOutputToJson.git /opt/NWChemOutputToJson
 
-CMD ["python", "/opt/NWChemOutputToJson/NWChemJsonConversion.py", "/hpccloud/nwchem_run.out"]
+ENTRYPOINT ["python", "/opt/NWChemOutputToJson/NWChemJsonConversion.py"]

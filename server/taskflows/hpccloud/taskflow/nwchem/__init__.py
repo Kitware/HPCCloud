@@ -238,7 +238,8 @@ def create_json_output(task, upstream_result):
                     local_fp.write(remote_fp.read())
 
         # Run docker container to post-process results - need to add docker image to upstream_result
-        command = ['docker', 'run', '--rm', '-v', '%s:/hpccloud' % tmp_dir, 'chetnieter/nwchem-postprocess']
+        command = ['docker', 'run', '--rm', '-v', '%s:/hpccloud' % tmp_dir,
+                'chetnieter/nwchem-postprocess', out_file]
         p = subprocess.Popen(args=command, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
