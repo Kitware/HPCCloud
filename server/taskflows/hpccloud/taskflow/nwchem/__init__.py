@@ -29,7 +29,6 @@ from cumulus.taskflow.cluster import create_girder_client
 from cumulus.tasks.job import submit_job, _monitor_jobs
 from cumulus.tasks.job import download_job_input_folders
 from cumulus.tasks.job import upload_job_output_to_folder, job_directory
-from cumulus.tasks.job import _put_script
 from cumulus.transport import get_connection
 
 from hpccloud.taskflow.utility import *
