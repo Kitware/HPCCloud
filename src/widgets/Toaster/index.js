@@ -44,10 +44,12 @@ export default connect(
     let message = '';
     if (localState.activeErrors.application.length) {
       id = localState.activeErrors.application[0];
-      if (get(localState, `error.${id}.resp.data`)) {
-        message = localState.error[id].resp.data.message;
-      } else if (get(localState, `error.${id}.resp.message`)) {
+      if (get(localState, `error.${id}.resp.message`)) {
         message = localState.error[id].resp.message;
+      } else if (get(localState, `error.${id}.resp.data.message`)) {
+        message = localState.error[id].resp.data.message;
+      } else if (get(localState, `error.${id}.resp.data`)) {
+        message = localState.error[id].resp.data;
       } else {
         message = `${localState.error[id].resp.status}: ${localState.error[id].resp.statusText}`;
       }

@@ -2,6 +2,7 @@ import React from 'react';
 import CollapsibleWidget from 'paraviewweb/src/React/Widgets/CollapsibleWidget';
 import ExecutionUnit  from '../../../panels/JobMonitor/ExecutionUnit';
 import ButtonBar  from '../../../panels/ButtonBar';
+import { getActions }  from '../../../utils/getDisabledButtons';
 import style      from 'HPCCloudStyle/JobMonitor.mcss';
 
 export default React.createClass({
@@ -16,14 +17,19 @@ export default React.createClass({
     logToggle: React.PropTypes.func.isRequired,
     terminateCluster: React.PropTypes.func,
     deleteCluster: React.PropTypes.func,
+    disabledButtons: React.PropTypes.object,
     noControls: React.PropTypes.bool,
+  },
+
+  getDefaultProps() {
+    return { disabledButtons: {} };
   },
 
   barAction(action) {
     this[action]();
   },
 
-  terminateCluster() {
+  terminateInstance() {
     this.props.terminateCluster(this.props.clusterId);
   },
 
@@ -33,11 +39,11 @@ export default React.createClass({
   },
 
   render() {
-    const actions = [];
+    let actions = [];
     if (this.props.status === 'terminated') {
-      actions.push({ name: 'deleteCluster', label: 'Delete Cluster' });
+      actions = getActions(['deleteCluster'], this.props.disabledButtons);
     } else if (this.props.status === 'running' || this.props.status === 'error') {
-      actions.push({ name: 'terminateCluster', label: 'Terminate Cluster' });
+      actions = getActions(['terminateInstance'], this.props.disabledButtons);
     }
 
     return (<div className={style.logListItem}>
