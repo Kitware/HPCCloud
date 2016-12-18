@@ -48,7 +48,7 @@
             },
             "export": {
                 "type": "array",
-                "item": {
+                "items": {
                     "$ref": "#/objectId"
                 }
             },

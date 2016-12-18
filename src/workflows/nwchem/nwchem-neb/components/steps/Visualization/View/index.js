@@ -70,13 +70,25 @@ const VisualizationView = React.createClass({
 
     return energies;
   },
+
   _createLineChart() {
+    // Add indexes to values, to use when a point is clicked on
+    const energies = this.state.energies.map((energy, index) => {
+      energy.index = index;
+      return energy;
+    });
+
     this.chart = new candela.components.LineChart(this.refs.container, {
-      data: this.state.energies,
+      data: energies,
       x,
       y: [y],
       width: 700,
       height: 400,
+      showPoints: true,
+    });
+
+    this.chart.on('click', (d, item) => {
+      // Place holder
     });
 
     this.chart.render();
