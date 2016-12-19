@@ -16,11 +16,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 ###############################################################################
-import tempfile
 import json
 import os
 import subprocess
 import shutil
+from backports.tempfile import TemporaryDirectory
 from jsonpath_rw import parse
 from celery.exceptions import Retry
 
@@ -226,9 +226,8 @@ def create_json_output(task, upstream_result):
     job_dir = job_directory(cluster, job)
     out_file = '%s.out' % (job['name'])
 
-    try:
+    with TemporaryDirectory() as tmp_dir:
         # Copy the nwchem output to server
-        tmp_dir = tempfile.mkdtemp()
         cluster_path = os.path.join(job_dir, out_file)
         local_path = os.path.join(tmp_dir, out_file)
         with open(local_path, 'w') as local_fp:
@@ -244,9 +243,10 @@ def create_json_output(task, upstream_result):
         stdout, stderr = p.communicate()
 
         if p.returncode != 0:
-            print('Error running Docker container.')
-            print('STDOUT: ' + stdout)
-            print('STDERR: ' + stderr)
+            task
+            task.logger.error('Error running Docker container.')
+            task.logger.error('STDOUT: ' + stdout)
+            task.logger.error('STDERR: ' + stderr)
             raise Exception('Docker returned code {}.'.format(p.returncode))
 
         # Copy json file back to cluster?
@@ -255,11 +255,6 @@ def create_json_output(task, upstream_result):
         with get_connection(task.taskflow.girder_token, cluster) as conn:
             with open(local_path, 'r') as local_fp:
                 conn.put(local_fp, cluster_path)
-
-    # Delete temporary storage
-    finally:
-        if os.path.exists(tmp_dir):
-            shutil.rmtree(tmp_dir)
 
     return upstream_result
 
