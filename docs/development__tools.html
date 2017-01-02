@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+  <meta charset="utf-8">
+  <title>HPCCloud</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://kitware.github.io/HPCCloud/docs/development__tools.html">
+  <!-- Alternative links -->
+  
+    
+      <link rel="alternative" hreflang="en" href="https://kitware.github.io/HPCCloud/docs/development__tools.html">
+    
+  
+  <!-- Icon -->
+  <link rel="apple-touch-icon" sizes="57x57" href="/HPCCloud/icon/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/HPCCloud/icon/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/HPCCloud/icon/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/HPCCloud/icon/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/HPCCloud/icon/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/HPCCloud/icon/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/HPCCloud/icon/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/HPCCloud/icon/apple-touch-icon-152x152.png">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-196x196.png" sizes="196x196">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-160x160.png" sizes="160x160">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-32x32.png" sizes="32x32">
+  <meta name="msapplication-TileColor" content="#2f83cd">
+  <meta name="msapplication-TileImage" content="/HPCCloud/icon/mstile-144x144.png">
+  <!-- CSS -->
+  <!-- build:css build/css/navy.css -->
+  <link rel="stylesheet" href="/HPCCloud/css/navy.css">
+  <!-- endbuild -->
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css">
+  <!-- RSS -->
+  <link rel="alternate" href="/HPCCloud/atom.xml" title="HPCCloud">
+  <!-- Open Graph -->
+  <meta name="description" content="ToolsTools are external . They are shown from the simulation/view page with this line:
+const ChildComponent = tools[viewName] ? tools[viewName].view : wfModule.components.ViewSimulation;
+Tools are bun">
+<meta property="og:type" content="website">
+<meta property="og:title" content="HPCCloud">
+<meta property="og:url" content="https://kitware.github.io/HPCCloud/docs/development__tools.html">
+<meta property="og:site_name" content="HPCCloud">
+<meta property="og:description" content="ToolsTools are external . They are shown from the simulation/view page with this line:
+const ChildComponent = tools[viewName] ? tools[viewName].view : wfModule.components.ViewSimulation;
+Tools are bun">
+<meta property="og:updated_time" content="2017-01-02T22:51:11.364Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HPCCloud">
+<meta name="twitter:description" content="ToolsTools are external . They are shown from the simulation/view page with this line:
+const ChildComponent = tools[viewName] ? tools[viewName].view : wfModule.components.ViewSimulation;
+Tools are bun">
+  <!-- Google Analytics -->
+  
+</head>
+
+<body>
+  <div id="container">
+    <header id="header" class="wrapper">
+  <div id="header-inner" class="inner">
+    <h1 id="logo-wrap">
+      <a href="/HPCCloud/" id="logo">ParaViewWeb</a>
+    </h1>
+    <nav id="main-nav">
+      <a href="/HPCCloud/docs/" class="main-nav-link">Docs</a>
+      <a href="https://github.com/kitware/HPCCloud" class="main-nav-link"><i class="fa fa-github-alt"></i></a>
+      <div id="search-input-wrap">
+        <div id="search-input-icon">
+          <i class="fa fa-search"></i>
+        </div>
+        <input type="search" id="search-input" placeholder="Search...">
+      </div>
+    </nav>
+    <a id="mobile-nav-toggle">
+      <span class="mobile-nav-toggle-bar"></span>
+      <span class="mobile-nav-toggle-bar"></span>
+      <span class="mobile-nav-toggle-bar"></span>
+    </a>
+  </div>
+</header>
+
+    <div id="content-wrap">
+  <div id="content" class="wrapper">
+    <div id="content-inner">
+      <article class="article-container" itemscope itemtype="http://schema.org/Article">
+        <div class="article-inner">
+          <div class="article">
+            <div class="inner">
+              <header class="article-header">
+                <h1 class="article-title" itemprop="name"></h1>
+              </header>
+              <div class="article-content" itemprop="articleBody">
+                <h1 id="Tools" class="article-heading"><a href="#Tools" class="headerlink" title="Tools"></a>Tools<a class="article-anchor" href="#Tools" aria-hidden="true"></a></h1><p>Tools are external . They are shown from the <code>simulation/view</code> page with this line:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line"><span class="keyword">const</span> ChildComponent = tools[viewName] ? tools[viewName].view : wfModule.components.ViewSimulation;</div></pre></td></tr></table></figure>
+<p>Tools are bundled in <code>src/tools/index.js</code> each tool has a <code>view</code> which is the primary view container for the tool and <code>providesToolbar</code> a boolean which prevents displaying a double toolbar. Feel free to add other properties to make your tool more accessible, such properties could include <code>requiresFullscreen</code> or <code>openInNewWindow</code></p>
+<h2 id="View-container" class="article-heading"><a href="#View-container" class="headerlink" title="View container"></a>View container<a class="article-anchor" href="#View-container" aria-hidden="true"></a></h2><p>While the tool itself does not need to be integrated with the Redux store, the container does. To pass the necessary information to your tool you’ll  want to include the important information in the step metadata. We do this with the <a href="https://github.com/Kitware/HPCCloud/blob/master/src/workflows/pyfr/common/steps/Visualization/Start/index.js#L74-L86" target="_blank" rel="external"><code>sessionId</code></a> for steps that use the Paraview Web Visualizer.</p>
+<h2 id="Redux" class="article-heading"><a href="#Redux" class="headerlink" title="Redux"></a>Redux<a class="article-anchor" href="#Redux" aria-hidden="true"></a></h2><p>It is not necessary for your tool to use Redux. However if it does you’ll need to provide accessor methods to override which state it operates on, see the <a href="https://github.com/Kitware/visualizer" target="_blank" rel="external">Paraview Web Visualizer repository</a> for an example how to do this. You’ll also need to combine the reducers with HPCCloud’s reducers.</p>
+
+              </div>
+              <footer class="article-footer">
+                <time class="article-footer-updated" datetime="2017-01-02T22:51:11.364Z" itemprop="dateModified">Last updated: 2017-01-02</time>
+                <a href="development__redux.html" class="article-footer-prev" title="Redux data model"><i class="fa fa-chevron-left"></i><span>Prev</span></a>
+              </footer>
+              
+            </div>
+          </div>
+          <aside id="article-toc" role="navigation">
+            <div id="article-toc-inner">
+              <strong class="sidebar-title">Contents</strong>
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Tools"><span class="toc-text">Tools</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#View-container"><span class="toc-text">View container</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Redux"><span class="toc-text">Redux</span></a></li></ol></li></ol>
+              <a href="#" id="article-toc-top">Back to Top</a>
+            </div>
+          </aside>
+        </div>
+      </article>
+      <aside id="sidebar" role="navigation">
+  <div class="inner"><strong class="sidebar-title">Basics</strong><a href="index.html" class="sidebar-link">Introduction</a><a href="general__getting-started.html" class="sidebar-link">Getting Started</a><a href="general__glossary.html" class="sidebar-link">Glossary</a><strong class="sidebar-title">Usage</strong><a href="usage__create-account.html" class="sidebar-link">Signing up</a><a href="usage__trad-cluster.html" class="sidebar-link">Adding traditional clusters</a><a href="usage__aws-profiles.html" class="sidebar-link">Adding AWS profiles</a><a href="usage__creating.html" class="sidebar-link">Projects and simulations</a><a href="usage__simput.html" class="sidebar-link">Simput</a><a href="usage__running.html" class="sidebar-link">Running workflows</a><strong class="sidebar-title">Development</strong><a href="development__dev-intro.html" class="sidebar-link">Introduction</a><a href="development__panels.html" class="sidebar-link">Panels</a><a href="development__workflows.html" class="sidebar-link">Adding new workflows</a><a href="development__redux.html" class="sidebar-link">Redux data model</a><a href="development__tools.html" class="sidebar-link current">Available tools</a></div>
+</aside>
+    </div>
+  </div>
+</div>
+
+    <footer id="footer" class="wrapper">
+  <div class="inner">
+    <div id="footer-copyright">
+      &copy; 2017 <a href="http://www.kitware.com" target="_blank">Kitware Inc.</a>
+    </div>
+    <div id="footer-links">
+      <a href="https://github.com/kitware/HPCCloud" class="footer-link" target="_blank"><i class="fa fa-github-alt"></i></a>
+    </div>
+  </div>
+</footer>
+
+  </div>
+  <div id="mobile-nav-dimmer"></div>
+  <nav id="mobile-nav">
+  <div id="mobile-nav-inner">
+    <ul id="mobile-nav-list">
+      <a href="/HPCCloud/docs/" class="mobile-nav-link">Docs</a>
+      <li class="mobile-nav-item">
+        <a href="https://github.com/kitware/HPCCloud" class="mobile-nav-link" rel="external" target="_blank">GitHub</a>
+      </li>
+    </ul>
+    
+      <strong class="mobile-nav-title">Basics</strong><a href="index.html" class="mobile-nav-link">Introduction</a><a href="general__getting-started.html" class="mobile-nav-link">Getting Started</a><a href="general__glossary.html" class="mobile-nav-link">Glossary</a><strong class="mobile-nav-title">Usage</strong><a href="usage__create-account.html" class="mobile-nav-link">Signing up</a><a href="usage__trad-cluster.html" class="mobile-nav-link">Adding traditional clusters</a><a href="usage__aws-profiles.html" class="mobile-nav-link">Adding AWS profiles</a><a href="usage__creating.html" class="mobile-nav-link">Projects and simulations</a><a href="usage__simput.html" class="mobile-nav-link">Simput</a><a href="usage__running.html" class="mobile-nav-link">Running workflows</a><strong class="mobile-nav-title">Development</strong><a href="development__dev-intro.html" class="mobile-nav-link">Introduction</a><a href="development__panels.html" class="mobile-nav-link">Panels</a><a href="development__workflows.html" class="mobile-nav-link">Adding new workflows</a><a href="development__redux.html" class="mobile-nav-link">Redux data model</a><a href="development__tools.html" class="mobile-nav-link current">Available tools</a>
+    
+  </div>
+  <div id="mobile-lang-select-wrap">
+    <span id="mobile-lang-select-label"><i class="fa fa-globe"></i><span>English</span></span>
+    <select id="mobile-lang-select" data-canonical="docs/development__tools.html">
+      
+        <option value="en" selected>English</option>
+      
+    </select>
+  </div>
+</nav>
+  <!-- Scripts -->
+<!-- build:js build/js/main.js -->
+<script src="/HPCCloud/js/lang_select.js"></script>
+<script src="/HPCCloud/js/toc.js"></script>
+<script src="/HPCCloud/js/mobile_nav.js"></script>
+<!-- endbuild -->
+<script src="https://cdn.jsdelivr.net/retinajs/1.3.0/retina.min.js" async></script>
+
+
+
+</body>
+</html>

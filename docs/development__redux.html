@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+  <meta charset="utf-8">
+  <title>HPCCloud</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://kitware.github.io/HPCCloud/docs/development__redux.html">
+  <!-- Alternative links -->
+  
+    
+      <link rel="alternative" hreflang="en" href="https://kitware.github.io/HPCCloud/docs/development__redux.html">
+    
+  
+  <!-- Icon -->
+  <link rel="apple-touch-icon" sizes="57x57" href="/HPCCloud/icon/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/HPCCloud/icon/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/HPCCloud/icon/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/HPCCloud/icon/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/HPCCloud/icon/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/HPCCloud/icon/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/HPCCloud/icon/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/HPCCloud/icon/apple-touch-icon-152x152.png">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-196x196.png" sizes="196x196">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-160x160.png" sizes="160x160">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-32x32.png" sizes="32x32">
+  <meta name="msapplication-TileColor" content="#2f83cd">
+  <meta name="msapplication-TileImage" content="/HPCCloud/icon/mstile-144x144.png">
+  <!-- CSS -->
+  <!-- build:css build/css/navy.css -->
+  <link rel="stylesheet" href="/HPCCloud/css/navy.css">
+  <!-- endbuild -->
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css">
+  <!-- RSS -->
+  <link rel="alternate" href="/HPCCloud/atom.xml" title="HPCCloud">
+  <!-- Open Graph -->
+  <meta name="description" content="ReduxRedux handles our data flow and storage throughout the application. We trigger actions which can can call asyncronus client calls and other actions which in turn get dispatched to reducers which">
+<meta property="og:type" content="website">
+<meta property="og:title" content="HPCCloud">
+<meta property="og:url" content="https://kitware.github.io/HPCCloud/docs/development__redux.html">
+<meta property="og:site_name" content="HPCCloud">
+<meta property="og:description" content="ReduxRedux handles our data flow and storage throughout the application. We trigger actions which can can call asyncronus client calls and other actions which in turn get dispatched to reducers which">
+<meta property="og:updated_time" content="2017-01-02T22:51:11.364Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HPCCloud">
+<meta name="twitter:description" content="ReduxRedux handles our data flow and storage throughout the application. We trigger actions which can can call asyncronus client calls and other actions which in turn get dispatched to reducers which">
+  <!-- Google Analytics -->
+  
+</head>
+
+<body>
+  <div id="container">
+    <header id="header" class="wrapper">
+  <div id="header-inner" class="inner">
+    <h1 id="logo-wrap">
+      <a href="/HPCCloud/" id="logo">ParaViewWeb</a>
+    </h1>
+    <nav id="main-nav">
+      <a href="/HPCCloud/docs/" class="main-nav-link">Docs</a>
+      <a href="https://github.com/kitware/HPCCloud" class="main-nav-link"><i class="fa fa-github-alt"></i></a>
+      <div id="search-input-wrap">
+        <div id="search-input-icon">
+          <i class="fa fa-search"></i>
+        </div>
+        <input type="search" id="search-input" placeholder="Search...">
+      </div>
+    </nav>
+    <a id="mobile-nav-toggle">
+      <span class="mobile-nav-toggle-bar"></span>
+      <span class="mobile-nav-toggle-bar"></span>
+      <span class="mobile-nav-toggle-bar"></span>
+    </a>
+  </div>
+</header>
+
+    <div id="content-wrap">
+  <div id="content" class="wrapper">
+    <div id="content-inner">
+      <article class="article-container" itemscope itemtype="http://schema.org/Article">
+        <div class="article-inner">
+          <div class="article">
+            <div class="inner">
+              <header class="article-header">
+                <h1 class="article-title" itemprop="name"></h1>
+              </header>
+              <div class="article-content" itemprop="articleBody">
+                <h1 id="Redux" class="article-heading"><a href="#Redux" class="headerlink" title="Redux"></a>Redux<a class="article-anchor" href="#Redux" aria-hidden="true"></a></h1><p>Redux handles our data flow and storage throughout the application. We trigger actions which can can call asyncronus client calls and other actions which in turn get dispatched to reducers which updates our data store. What follows is an annotated version of our Redux data model as outlined <a href="../../src/redux/README.md">here</a>. The term “… object” (e.g. “simulation object”) refers to the plain object you would get back from the Girder endpoint.</p>
+<h2 id="Auth" class="article-heading"><a href="#Auth" class="headerlink" title="Auth"></a>Auth<a class="article-anchor" href="#Auth" aria-hidden="true"></a></h2><figure class="highlight js"><table><tr><td class="code"><pre><div class="line">auth: &#123;</div><div class="line">  <span class="attr">pending</span>: <span class="literal">false</span>,</div><div class="line">  <span class="attr">user</span>: &#123;&#125;,</div><div class="line">&#125;,</div></pre></td></tr></table></figure>
+<ul>
+<li><code>pending</code> determines if there is an async auth action in progress.</li>
+<li><code>user</code> is <em>the</em> user object we use throughout the application.</li>
+</ul>
+<h2 id="Network" class="article-heading"><a href="#Network" class="headerlink" title="Network"></a>Network<a class="article-anchor" href="#Network" aria-hidden="true"></a></h2><figure class="highlight js"><table><tr><td class="code"><pre><div class="line">network: &#123;</div><div class="line">  <span class="attr">pending</span>: &#123;</div><div class="line">    [id] : &#123; id, name, progress &#125;,</div><div class="line">  &#125;,</div><div class="line">  <span class="attr">success</span>: &#123;&#125;,</div><div class="line">  <span class="attr">error</span>: &#123;&#125;,</div><div class="line">  <span class="attr">backlog</span>: [ &#123;contents <span class="keyword">of</span> outdated pending, success, and errors&#125; ],</div><div class="line">  <span class="attr">progress</span>: &#123; [fileId]: &#123;<span class="attr">current</span>: number, <span class="attr">total</span>: number&#125;, ... &#125;</div><div class="line">  progressReset: bool</div><div class="line">&#125;,</div></pre></td></tr></table></figure>
+<ul>
+<li><code>pending</code> keeps track of network calls that are still in progress, once they are complete they are moved into either <code>success</code> or <code>error</code></li>
+<li><code>success</code> is a store of successfull network calls</li>
+<li><code>error</code> is a store of failed network calls</li>
+<li><code>progress</code> is an object keeping track of file uploads</li>
+<li><code>progressReset</code> is a boolean which controls the opacity and progress of the progress bar.</li>
+</ul>
+<h2 id="Preferences" class="article-heading"><a href="#Preferences" class="headerlink" title="Preferences"></a>Preferences<a class="article-anchor" href="#Preferences" aria-hidden="true"></a></h2><figure class="highlight js"><table><tr><td class="code"><pre><div class="line">preferences: &#123;</div><div class="line">  <span class="attr">clusters</span>: &#123;</div><div class="line">    <span class="attr">active</span>: <span class="number">0</span>,</div><div class="line">    <span class="attr">list</span>: [</div><div class="line">      &#123; name, config, status &#125;</div><div class="line">    ],</div><div class="line">    <span class="attr">mapById</span>: &#123;</div><div class="line">      [_id]: &#123; name, </div><div class="line">        config, </div><div class="line">        status,</div><div class="line">        <span class="attr">log</span>: []</div><div class="line">      &#125;,</div><div class="line">    &#125;</div><div class="line">    pending: <span class="literal">false</span>,</div><div class="line">    <span class="attr">presets</span>: &#123;</div><div class="line">      [name]: &#123; <span class="attr">prop</span>: value, ... &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  <span class="attr">aws</span>: &#123;</div><div class="line">    <span class="attr">active</span>: <span class="number">0</span>,</div><div class="line">    <span class="attr">list</span>: [],</div><div class="line">    <span class="attr">mapById</span>: &#123;</div><div class="line">      [_id]: &#123; &#125;,</div><div class="line">    &#125;</div><div class="line">    pending: <span class="literal">false</span>,</div><div class="line">  &#125;,</div><div class="line">  <span class="attr">statuses</span>: &#123;</div><div class="line">    <span class="attr">ec2</span>: [ &#123;...&#125; ],</div><div class="line">    <span class="attr">clusters</span>: [ &#123;...&#125; ],</div><div class="line">  &#125;</div><div class="line">&#125;,</div></pre></td></tr></table></figure>
+<p>Each property is self explanatory for what the data contains, they have some common properties too.</p>
+<ul>
+<li><code>mapById</code> This is the main container for the parent property categorized by their id.</li>
+<li><code>pending</code> if there are any pending network calls, we use this to make sure we don’t poll the endpoints more than necessary.</li>
+<li><code>list</code> This is the source for the item list in the <code>ActiveList</code> panel.</li>
+<li><code>active</code> determines which item in the list is active, -1 if none are active.</li>
+</ul>
+<p>Under <code>clusters</code> there’s <code>presets</code> this is a list of preset machines so you don’t have to enter them everytime. We have some preset machines at Kitware setup, if you’d like to add your own machines you can edit the source file for the presets at <a href="../../dist/clusters-presets.json"><code>dist/clusters-presets.json</code></a>.</p>
+<h2 id="Taskflows" class="article-heading"><a href="#Taskflows" class="headerlink" title="Taskflows"></a>Taskflows<a class="article-anchor" href="#Taskflows" aria-hidden="true"></a></h2><figure class="highlight js"><table><tr><td class="code"><pre><div class="line">taskflows: &#123;</div><div class="line">  <span class="attr">pending</span>: <span class="literal">false</span>,</div><div class="line">  <span class="attr">mapById</span>: &#123;</div><div class="line">    [id]: &#123;</div><div class="line">      <span class="attr">flow</span>: &#123; taskflow... &#125;,</div><div class="line">      <span class="attr">taskMapById</span>: &#123;</div><div class="line">        [id] : &#123; task... &#125;</div><div class="line">      &#125;,</div><div class="line">      <span class="attr">jobMapById</span>: &#123;</div><div class="line">        [id] : &#123; job... &#125;</div><div class="line">      &#125;,</div><div class="line">      <span class="attr">log</span>: [ ...log entries ],</div><div class="line">      <span class="attr">simulation</span>: id,</div><div class="line">      <span class="attr">primaryJob</span>: <span class="string">'pyfr_run'</span>,</div><div class="line">      <span class="attr">stepName</span>: <span class="string">'Simulation'</span>,</div><div class="line">      <span class="attr">actions</span>: [ <span class="string">'rerun'</span>, <span class="string">'terminate'</span> ],</div><div class="line">      <span class="attr">allComplete</span>: <span class="literal">false</span>,</div><div class="line">      <span class="attr">outputDirectory</span>: <span class="string">'/opt/hpccloud-jobs/23452345234'</span>,</div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  <span class="attr">taskflowMapByTaskId</span>: &#123;</div><div class="line">    [taskId]: $&#123;taskflowId&#125;,</div><div class="line">  &#125;,</div><div class="line">  <span class="attr">taskflowMapByJobId</span>: &#123;</div><div class="line">    [jobId]: $&#123;taskflowId&#125;,</div><div class="line">  &#125;,</div><div class="line">  <span class="attr">updateLogs</span>: [ taskflowId, ... ],</div><div class="line">&#125;,</div></pre></td></tr></table></figure>
+<p>The taskflow store is the most complicated store because of the amount of relations a single taskflow can have to other objects. </p>
+<ul>
+<li><code>mapById</code> is similar to mapById in clusters however it contains some extra information and the actual taskflow object is stored in <code>flow</code>, all other properties are effectively metadata.<ul>
+<li><code>taskMayById</code> contains full task objects by id for the taskflow.</li>
+<li><code>jobMayById</code> contains full job objects by id for the taskflow.</li>
+<li><code>log</code> is the taskflow’s log, we display this as “Workflow log” in the  JobMonitor component.</li>
+<li><code>simulation</code> is the simulation id the taskflow belongs to</li>
+<li><code>primaryJob</code> is the primary job for the taskflow</li>
+<li><code>actions</code> contains button objects for the button bar on the simulation view page, they are updated in StateTransitionBehavior.</li>
+<li><code>allComplete</code> is a bool which helps StateTransitionBehavior determine actions.</li>
+</ul>
+</li>
+<li><code>taskflowMapByTaskId</code> and <code>taskflowMapByJobId</code> are maps of tasks and job id’s which correspond to taskflows. These are used for connecting status and log events to the right objects.</li>
+<li><code>updateLogs</code> used by StateTransitionBehavior to know if it should update.</li>
+</ul>
+<h2 id="Projects" class="article-heading"><a href="#Projects" class="headerlink" title="Projects"></a>Projects<a class="article-anchor" href="#Projects" aria-hidden="true"></a></h2><figure class="highlight"><table><tr><td class="code"><pre><div class="line">projects: &#123;</div><div class="line">  workflowNames: [&#123; label: 'Saturn', value: 'saturn' &#125;, ...],</div><div class="line">  list: [ '2345', '3456345' ],</div><div class="line">  active: '2345', // or null</div><div class="line">  mapById: &#123;</div><div class="line">    '2345' : &#123;</div><div class="line">      _id: 2345,</div><div class="line">      name: 'sdfsdf',</div><div class="line">      description: '',</div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  simulations: &#123;</div><div class="line">    [project id]: &#123;</div><div class="line">      list: ['2345', '567657'],</div><div class="line">      active: '2345',</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;,</div></pre></td></tr></table></figure>
+<ul>
+<li><code>workflowNames</code> names of avalable workflows, used for project creation.</li>
+<li><code>list</code> list of projects by name.</li>
+<li><code>active</code> the name of the active project.</li>
+<li><code>mapById</code> a map of projects by id.</li>
+<li><code>simulations</code> project id’s which correspond to list of simulations that belong to that project.</li>
+</ul>
+<h2 id="Simulations" class="article-heading"><a href="#Simulations" class="headerlink" title="Simulations"></a>Simulations<a class="article-anchor" href="#Simulations" aria-hidden="true"></a></h2><figure class="highlight"><table><tr><td class="code"><pre><div class="line">simulations: &#123;</div><div class="line">  mapById: &#123;</div><div class="line">    [simId]: &#123; ...full simulation object &#125;</div><div class="line">  &#125;</div><div class="line">&#125;,</div></pre></td></tr></table></figure>
+<ul>
+<li><code>mapById</code> map of simulation objects by id.</li>
+</ul>
+<h2 id="Files" class="article-heading"><a href="#Files" class="headerlink" title="Files"></a>Files<a class="article-anchor" href="#Files" aria-hidden="true"></a></h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">fs: &#123;</div><div class="line">  folderMapById: &#123;</div><div class="line">    [id]: &#123;</div><div class="line">      open: false,</div><div class="line">      folder: &#123; full folder... &#125;,</div><div class="line">      folderChildren: [ id&apos;s... ],</div><div class="line">      itemChildren: [ id&apos;s... ], </div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  itemMapById: &#123;</div><div class="line">    [id]: &#123; fullItem &#125;,</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li><code>folderMapById</code> folders by id, which contains:<ul>
+<li><code>open</code> a bool for if the folder is open.</li>
+<li><code>folder</code> the folder object.</li>
+<li><code>folderChildren</code> id’s of folders inside the folder.</li>
+<li><code>itemChildren</code> id’s of items inside the folder.</li>
+</ul>
+</li>
+<li><code>itemMapById</code> a map of item id’s and to which folder othey belong.</li>
+</ul>
+
+              </div>
+              <footer class="article-footer">
+                <time class="article-footer-updated" datetime="2017-01-02T22:51:11.364Z" itemprop="dateModified">Last updated: 2017-01-02</time>
+                <a href="development__workflows.html" class="article-footer-prev" title="Adding new workflows"><i class="fa fa-chevron-left"></i><span>Prev</span></a><a href="development__tools.html" class="article-footer-next" title="Available tools"><span>Next</span><i class="fa fa-chevron-right"></i></a>
+              </footer>
+              
+            </div>
+          </div>
+          <aside id="article-toc" role="navigation">
+            <div id="article-toc-inner">
+              <strong class="sidebar-title">Contents</strong>
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Redux"><span class="toc-text">Redux</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Auth"><span class="toc-text">Auth</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Network"><span class="toc-text">Network</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Preferences"><span class="toc-text">Preferences</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Taskflows"><span class="toc-text">Taskflows</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Projects"><span class="toc-text">Projects</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Simulations"><span class="toc-text">Simulations</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Files"><span class="toc-text">Files</span></a></li></ol></li></ol>
+              <a href="#" id="article-toc-top">Back to Top</a>
+            </div>
+          </aside>
+        </div>
+      </article>
+      <aside id="sidebar" role="navigation">
+  <div class="inner"><strong class="sidebar-title">Basics</strong><a href="index.html" class="sidebar-link">Introduction</a><a href="general__getting-started.html" class="sidebar-link">Getting Started</a><a href="general__glossary.html" class="sidebar-link">Glossary</a><strong class="sidebar-title">Usage</strong><a href="usage__create-account.html" class="sidebar-link">Signing up</a><a href="usage__trad-cluster.html" class="sidebar-link">Adding traditional clusters</a><a href="usage__aws-profiles.html" class="sidebar-link">Adding AWS profiles</a><a href="usage__creating.html" class="sidebar-link">Projects and simulations</a><a href="usage__simput.html" class="sidebar-link">Simput</a><a href="usage__running.html" class="sidebar-link">Running workflows</a><strong class="sidebar-title">Development</strong><a href="development__dev-intro.html" class="sidebar-link">Introduction</a><a href="development__panels.html" class="sidebar-link">Panels</a><a href="development__workflows.html" class="sidebar-link">Adding new workflows</a><a href="development__redux.html" class="sidebar-link current">Redux data model</a><a href="development__tools.html" class="sidebar-link">Available tools</a></div>
+</aside>
+    </div>
+  </div>
+</div>
+
+    <footer id="footer" class="wrapper">
+  <div class="inner">
+    <div id="footer-copyright">
+      &copy; 2017 <a href="http://www.kitware.com" target="_blank">Kitware Inc.</a>
+    </div>
+    <div id="footer-links">
+      <a href="https://github.com/kitware/HPCCloud" class="footer-link" target="_blank"><i class="fa fa-github-alt"></i></a>
+    </div>
+  </div>
+</footer>
+
+  </div>
+  <div id="mobile-nav-dimmer"></div>
+  <nav id="mobile-nav">
+  <div id="mobile-nav-inner">
+    <ul id="mobile-nav-list">
+      <a href="/HPCCloud/docs/" class="mobile-nav-link">Docs</a>
+      <li class="mobile-nav-item">
+        <a href="https://github.com/kitware/HPCCloud" class="mobile-nav-link" rel="external" target="_blank">GitHub</a>
+      </li>
+    </ul>
+    
+      <strong class="mobile-nav-title">Basics</strong><a href="index.html" class="mobile-nav-link">Introduction</a><a href="general__getting-started.html" class="mobile-nav-link">Getting Started</a><a href="general__glossary.html" class="mobile-nav-link">Glossary</a><strong class="mobile-nav-title">Usage</strong><a href="usage__create-account.html" class="mobile-nav-link">Signing up</a><a href="usage__trad-cluster.html" class="mobile-nav-link">Adding traditional clusters</a><a href="usage__aws-profiles.html" class="mobile-nav-link">Adding AWS profiles</a><a href="usage__creating.html" class="mobile-nav-link">Projects and simulations</a><a href="usage__simput.html" class="mobile-nav-link">Simput</a><a href="usage__running.html" class="mobile-nav-link">Running workflows</a><strong class="mobile-nav-title">Development</strong><a href="development__dev-intro.html" class="mobile-nav-link">Introduction</a><a href="development__panels.html" class="mobile-nav-link">Panels</a><a href="development__workflows.html" class="mobile-nav-link">Adding new workflows</a><a href="development__redux.html" class="mobile-nav-link current">Redux data model</a><a href="development__tools.html" class="mobile-nav-link">Available tools</a>
+    
+  </div>
+  <div id="mobile-lang-select-wrap">
+    <span id="mobile-lang-select-label"><i class="fa fa-globe"></i><span>English</span></span>
+    <select id="mobile-lang-select" data-canonical="docs/development__redux.html">
+      
+        <option value="en" selected>English</option>
+      
+    </select>
+  </div>
+</nav>
+  <!-- Scripts -->
+<!-- build:js build/js/main.js -->
+<script src="/HPCCloud/js/lang_select.js"></script>
+<script src="/HPCCloud/js/toc.js"></script>
+<script src="/HPCCloud/js/mobile_nav.js"></script>
+<!-- endbuild -->
+<script src="https://cdn.jsdelivr.net/retinajs/1.3.0/retina.min.js" async></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+  <meta charset="utf-8">
+  <title>HPCCloud</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://kitware.github.io/HPCCloud/docs/usage__simput.html">
+  <!-- Alternative links -->
+  
+    
+      <link rel="alternative" hreflang="en" href="https://kitware.github.io/HPCCloud/docs/usage__simput.html">
+    
+  
+  <!-- Icon -->
+  <link rel="apple-touch-icon" sizes="57x57" href="/HPCCloud/icon/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/HPCCloud/icon/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/HPCCloud/icon/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/HPCCloud/icon/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/HPCCloud/icon/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/HPCCloud/icon/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/HPCCloud/icon/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/HPCCloud/icon/apple-touch-icon-152x152.png">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-196x196.png" sizes="196x196">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-160x160.png" sizes="160x160">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/HPCCloud/icon/favicon-32x32.png" sizes="32x32">
+  <meta name="msapplication-TileColor" content="#2f83cd">
+  <meta name="msapplication-TileImage" content="/HPCCloud/icon/mstile-144x144.png">
+  <!-- CSS -->
+  <!-- build:css build/css/navy.css -->
+  <link rel="stylesheet" href="/HPCCloud/css/navy.css">
+  <!-- endbuild -->
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css">
+  <!-- RSS -->
+  <link rel="alternate" href="/HPCCloud/atom.xml" title="HPCCloud">
+  <!-- Open Graph -->
+  <meta name="description" content="SimputSimput is a tool for simplifying the process of writing and editing simulation input files. It can be a standalone tool but for HPCCloud we’ve integrated it to support input generation for simul">
+<meta property="og:type" content="website">
+<meta property="og:title" content="HPCCloud">
+<meta property="og:url" content="https://kitware.github.io/HPCCloud/docs/usage__simput.html">
+<meta property="og:site_name" content="HPCCloud">
+<meta property="og:description" content="SimputSimput is a tool for simplifying the process of writing and editing simulation input files. It can be a standalone tool but for HPCCloud we’ve integrated it to support input generation for simul">
+<meta property="og:image" content="https://kitware.github.io/HPCCloud/usage__images/custom-consts.png">
+<meta property="og:image" content="https://kitware.github.io/HPCCloud/usage__images/simput-complete.png">
+<meta property="og:updated_time" content="2017-01-02T22:51:11.376Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HPCCloud">
+<meta name="twitter:description" content="SimputSimput is a tool for simplifying the process of writing and editing simulation input files. It can be a standalone tool but for HPCCloud we’ve integrated it to support input generation for simul">
+<meta name="twitter:image" content="https://kitware.github.io/HPCCloud/usage__images/custom-consts.png">
+  <!-- Google Analytics -->
+  
+</head>
+
+<body>
+  <div id="container">
+    <header id="header" class="wrapper">
+  <div id="header-inner" class="inner">
+    <h1 id="logo-wrap">
+      <a href="/HPCCloud/" id="logo">ParaViewWeb</a>
+    </h1>
+    <nav id="main-nav">
+      <a href="/HPCCloud/docs/" class="main-nav-link">Docs</a>
+      <a href="https://github.com/kitware/HPCCloud" class="main-nav-link"><i class="fa fa-github-alt"></i></a>
+      <div id="search-input-wrap">
+        <div id="search-input-icon">
+          <i class="fa fa-search"></i>
+        </div>
+        <input type="search" id="search-input" placeholder="Search...">
+      </div>
+    </nav>
+    <a id="mobile-nav-toggle">
+      <span class="mobile-nav-toggle-bar"></span>
+      <span class="mobile-nav-toggle-bar"></span>
+      <span class="mobile-nav-toggle-bar"></span>
+    </a>
+  </div>
+</header>
+
+    <div id="content-wrap">
+  <div id="content" class="wrapper">
+    <div id="content-inner">
+      <article class="article-container" itemscope itemtype="http://schema.org/Article">
+        <div class="article-inner">
+          <div class="article">
+            <div class="inner">
+              <header class="article-header">
+                <h1 class="article-title" itemprop="name"></h1>
+              </header>
+              <div class="article-content" itemprop="articleBody">
+                <h1 id="Simput" class="article-heading"><a href="#Simput" class="headerlink" title="Simput"></a>Simput<a class="article-anchor" href="#Simput" aria-hidden="true"></a></h1><p>Simput is a tool for simplifying the process of writing and editing simulation input files. It can be a standalone tool but for HPCCloud we’ve integrated it to support input generation for simulations such as PyFR.</p>
+<h2 id="Usage-with-PyFR-euler-vortex-2d" class="article-heading"><a href="#Usage-with-PyFR-euler-vortex-2d" class="headerlink" title="Usage with PyFR - euler-vortex-2d"></a>Usage with PyFR - euler-vortex-2d<a class="article-anchor" href="#Usage-with-PyFR-euler-vortex-2d" aria-hidden="true"></a></h2><p>This example will lead you through the creation of an input file for PyFR using SimPut. You will create an input file that can be used with one of PyFR’s <a href="https://github.com/vincentlab/PyFR/blob/develop/examples/euler_vortex_2d/" target="_blank" rel="external">examples</a>.</p>
+<p>With the steps below you’ll create a similar input file to <a href="https://github.com/vincentlab/PyFR/blob/develop/examples/euler_vortex_2d/euler_vortex_2d.ini" target="_blank" rel="external">euler-vortex-2d.ini</a> in Simput, a few changes have been made to reduce the simulation runtime. Unless mentioned below do not change default values. To begin, create a plain PyFR project and a simulation, for the simulation you will need to uplaod a mesh. Inside the simulation, to the input step and enter the values for each attribute:</p>
+<h3 id="Constants" class="article-heading"><a href="#Constants" class="headerlink" title="Constants"></a>Constants<a class="article-anchor" href="#Constants" aria-hidden="true"></a></h3><ul>
+<li>Add three custom constants, the constants names are case-sensitive<ul>
+<li><code>S = 13.5</code></li>
+<li><code>M = 0.4</code></li>
+<li><code>R = 1.5</code></li>
+</ul>
+</li>
+</ul>
+<p><img src="usage__images/custom-consts.png" alt="custom constants fields"></p>
+<h3 id="Solver" class="article-heading"><a href="#Solver" class="headerlink" title="Solver"></a>Solver<a class="article-anchor" href="#Solver" aria-hidden="true"></a></h3><ul>
+<li><p><strong>Settings</strong></p>
+<ul>
+<li>Order = 3</li>
+<li>set <em>Viscosity Correction</em> to the empty option</li>
+<li>set <em>Shock Capturing</em> to the empty option</li>
+</ul>
+</li>
+<li><p><strong>Time Integrator</strong></p>
+<ul>
+<li>Initial time = <code>0.0</code></li>
+<li>Final time = <code>50.0</code></li>
+<li>Time step = <code>0.005</code></li>
+</ul>
+</li>
+<li><p>skip over <strong>Artificial Viscosity</strong> and <strong>Solver Source Terms</strong></p>
+</li>
+<li><p><strong>Interfaces</strong></p>
+<ul>
+<li>clear <em>LDG Beta</em> and leave it empty.</li>
+<li>clear <em>LDG Tau</em> and leave it empty.</li>
+</ul>
+</li>
+</ul>
+<h3 id="Solver-Interfaces" class="article-heading"><a href="#Solver-Interfaces" class="headerlink" title="Solver Interfaces"></a>Solver Interfaces<a class="article-anchor" href="#Solver-Interfaces" aria-hidden="true"></a></h3><ul>
+<li>change <em>Type</em> to <code>Linear</code></li>
+</ul>
+<h3 id="Solver-Elements" class="article-heading"><a href="#Solver-Elements" class="headerlink" title="Solver Elements"></a>Solver Elements<a class="article-anchor" href="#Solver-Elements" aria-hidden="true"></a></h3><ul>
+<li>Add one, change nothing</li>
+</ul>
+<p>###Solution</p>
+<p>For each of these sections add an item and change the <em>Type</em> to the section’s name.<br>Rename the property in the sidebar if desired.</p>
+<ul>
+<li><p>type: <strong>Plugin NaN check</strong></p>
+<ul>
+<li><em>nsteps</em> = <code>50</code></li>
+</ul>
+</li>
+<li><p>type: <strong>Plugin Writer</strong></p>
+<ul>
+<li><em>Disk write time interval</em> = <code>10.0</code></li>
+<li><em>Basedir</em> = <code>.</code></li>
+<li><em>Output name pattern</em> = <code>euler_vortex_2d-{t:.1f}</code></li>
+</ul>
+</li>
+<li><p>type: <strong>ics</strong></p>
+<ul>
+<li><em>Initial Density</em> = <code>pow(1 - S*S*M*M*(gamma - 1)*exp(2*%(f)s)/(8*pi*pi), 1/(gamma - 1))</code></li>
+<li><em>Initial X velocity</em> = <code>S*y*exp(%(f)s)/(2*pi*R)</code></li>
+<li><em>Initial Y velocity</em> = <code>1 - S*x*exp(%(f)s)/(2*pi*R)</code></li>
+<li><em>Initial static pressure dist</em> =<br><code>1/(gamma*M*M)*pow(1 - S*S*M*M*(gamma - 1)*exp(2*%(f)s)/(8*pi*pi), gamma/(gamma - 1))</code></li>
+<li>add the helper function: <code>f</code> and set it to <code>((1 - x*x - y*y)/(2*R*R))</code></li>
+</ul>
+</li>
+</ul>
+<p>If you’ve filled in each filed as instructed above go to the simulation step you’ll be able to run your simulation with the valid deck file generated by SimPut.</p>
+<p><img src="usage__images/simput-complete.png" alt="ics page of simput when complete"></p>
+<h2 id="Adding-simulation-types" class="article-heading"><a href="#Adding-simulation-types" class="headerlink" title="Adding simulation types"></a>Adding simulation types<a class="article-anchor" href="#Adding-simulation-types" aria-hidden="true"></a></h2><p>For instructions on adding simulation types follow <a href="https://github.com/Kitware/simput#creating-a-new-simulation-type" target="_blank" rel="external">these instructions on the Simput Github repository</a>. In Simput be sure to add your type to the <code>/dist</code> folder and commit the changes.</p>
+<p>In HPCCloud, you’ll want to have the latest Simput version installed and a new script command <code>package.json</code> which installs the new type:</p>
+<figure class="highlight"><table><tr><td class="code"><pre><div class="line">scripts: &#123;</div><div class="line">"install:mytype": "cp ./node_modules/simput/dist/types/mytype.js ./dist/simput-mytype.js",</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Add a script tag which includes the file in <code>dist/index.html</code> or else the HPCCloud will not detect your type.</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"simput-mytype.js"</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>For the workflow view which contains Simput, adapt the view from <code>src/workflows/pyfr/pyfr-simput/components/steps/Input/index.js</code>.</p>
+<h2 id="Repository" class="article-heading"><a href="#Repository" class="headerlink" title="Repository"></a>Repository<a class="article-anchor" href="#Repository" aria-hidden="true"></a></h2><p>Simput is fully open source and available at <a href="https://github.com/Kitware/simput" target="_blank" rel="external">github.com/Kitware/simput</a>.</p>
+
+              </div>
+              <footer class="article-footer">
+                <time class="article-footer-updated" datetime="2017-01-02T22:51:11.376Z" itemprop="dateModified">Last updated: 2017-01-02</time>
+                <a href="usage__creating.html" class="article-footer-prev" title="Projects and simulations"><i class="fa fa-chevron-left"></i><span>Prev</span></a><a href="usage__running.html" class="article-footer-next" title="Running workflows"><span>Next</span><i class="fa fa-chevron-right"></i></a>
+              </footer>
+              
+            </div>
+          </div>
+          <aside id="article-toc" role="navigation">
+            <div id="article-toc-inner">
+              <strong class="sidebar-title">Contents</strong>
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Simput"><span class="toc-text">Simput</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Usage-with-PyFR-euler-vortex-2d"><span class="toc-text">Usage with PyFR - euler-vortex-2d</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Constants"><span class="toc-text">Constants</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Solver"><span class="toc-text">Solver</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Solver-Interfaces"><span class="toc-text">Solver Interfaces</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Solver-Elements"><span class="toc-text">Solver Elements</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Adding-simulation-types"><span class="toc-text">Adding simulation types</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Repository"><span class="toc-text">Repository</span></a></li></ol></li></ol>
+              <a href="#" id="article-toc-top">Back to Top</a>
+            </div>
+          </aside>
+        </div>
+      </article>
+      <aside id="sidebar" role="navigation">
+  <div class="inner"><strong class="sidebar-title">Basics</strong><a href="index.html" class="sidebar-link">Introduction</a><a href="general__getting-started.html" class="sidebar-link">Getting Started</a><a href="general__glossary.html" class="sidebar-link">Glossary</a><strong class="sidebar-title">Usage</strong><a href="usage__create-account.html" class="sidebar-link">Signing up</a><a href="usage__trad-cluster.html" class="sidebar-link">Adding traditional clusters</a><a href="usage__aws-profiles.html" class="sidebar-link">Adding AWS profiles</a><a href="usage__creating.html" class="sidebar-link">Projects and simulations</a><a href="usage__simput.html" class="sidebar-link current">Simput</a><a href="usage__running.html" class="sidebar-link">Running workflows</a><strong class="sidebar-title">Development</strong><a href="development__dev-intro.html" class="sidebar-link">Introduction</a><a href="development__panels.html" class="sidebar-link">Panels</a><a href="development__workflows.html" class="sidebar-link">Adding new workflows</a><a href="development__redux.html" class="sidebar-link">Redux data model</a><a href="development__tools.html" class="sidebar-link">Available tools</a></div>
+</aside>
+    </div>
+  </div>
+</div>
+
+    <footer id="footer" class="wrapper">
+  <div class="inner">
+    <div id="footer-copyright">
+      &copy; 2017 <a href="http://www.kitware.com" target="_blank">Kitware Inc.</a>
+    </div>
+    <div id="footer-links">
+      <a href="https://github.com/kitware/HPCCloud" class="footer-link" target="_blank"><i class="fa fa-github-alt"></i></a>
+    </div>
+  </div>
+</footer>
+
+  </div>
+  <div id="mobile-nav-dimmer"></div>
+  <nav id="mobile-nav">
+  <div id="mobile-nav-inner">
+    <ul id="mobile-nav-list">
+      <a href="/HPCCloud/docs/" class="mobile-nav-link">Docs</a>
+      <li class="mobile-nav-item">
+        <a href="https://github.com/kitware/HPCCloud" class="mobile-nav-link" rel="external" target="_blank">GitHub</a>
+      </li>
+    </ul>
+    
+      <strong class="mobile-nav-title">Basics</strong><a href="index.html" class="mobile-nav-link">Introduction</a><a href="general__getting-started.html" class="mobile-nav-link">Getting Started</a><a href="general__glossary.html" class="mobile-nav-link">Glossary</a><strong class="mobile-nav-title">Usage</strong><a href="usage__create-account.html" class="mobile-nav-link">Signing up</a><a href="usage__trad-cluster.html" class="mobile-nav-link">Adding traditional clusters</a><a href="usage__aws-profiles.html" class="mobile-nav-link">Adding AWS profiles</a><a href="usage__creating.html" class="mobile-nav-link">Projects and simulations</a><a href="usage__simput.html" class="mobile-nav-link current">Simput</a><a href="usage__running.html" class="mobile-nav-link">Running workflows</a><strong class="mobile-nav-title">Development</strong><a href="development__dev-intro.html" class="mobile-nav-link">Introduction</a><a href="development__panels.html" class="mobile-nav-link">Panels</a><a href="development__workflows.html" class="mobile-nav-link">Adding new workflows</a><a href="development__redux.html" class="mobile-nav-link">Redux data model</a><a href="development__tools.html" class="mobile-nav-link">Available tools</a>
+    
+  </div>
+  <div id="mobile-lang-select-wrap">
+    <span id="mobile-lang-select-label"><i class="fa fa-globe"></i><span>English</span></span>
+    <select id="mobile-lang-select" data-canonical="docs/usage__simput.html">
+      
+        <option value="en" selected>English</option>
+      
+    </select>
+  </div>
+</nav>
+  <!-- Scripts -->
+<!-- build:js build/js/main.js -->
+<script src="/HPCCloud/js/lang_select.js"></script>
+<script src="/HPCCloud/js/toc.js"></script>
+<script src="/HPCCloud/js/mobile_nav.js"></script>
+<!-- endbuild -->
+<script src="https://cdn.jsdelivr.net/retinajs/1.3.0/retina.min.js" async></script>
+
+
+
+</body>
+</html>
