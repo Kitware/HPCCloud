@@ -16,3 +16,4 @@ docs:
     development__workflows: development__workflows.html
     development__redux: development__redux.html
     development__tools: development__tools.html
+    vagrant__introduction: vagrant__introduction.html
