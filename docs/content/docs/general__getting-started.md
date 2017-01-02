@@ -13,13 +13,13 @@ Once the prerequistes have been installed follow the following steps to set up t
 1: Clone the deployment repository.
 
 ```sh
-git clone git@github.com:Kitware/HPCCloud-deploy.git HPCCloud
+git clone git@github.com:Kitware/HPCCloud-deploy.git 
 ```
 
 2: Move into the repository directory.
 
 ```sh
-cd HPCCloud
+cd HPCCloud-deploy
 ```
 
 3: Execute the command:
