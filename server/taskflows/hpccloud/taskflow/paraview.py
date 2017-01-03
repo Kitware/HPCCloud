@@ -182,7 +182,7 @@ def upload_input(task, cluster, job, *args, **kwargs):
     if file_id:
         file_id = file_id[0].value
         task.logger.info('Visualizing file ID: %s' % file_id)
-        job['params']['dataDir'] = '.'
+        job['params']['dataDir'] = '$PWD'
 
         # Fetch the file
         girder_client = create_girder_client(
