@@ -164,8 +164,7 @@ def create_paraview_job(task, *args, **kwargs):
             'node_modules/pvw-visualizer/server/pvw-visualizer.py'))
 
     if not os.path.exists(viz_path):
-        print viz_path
-        task.logger.error('Unable to locate pvw-visualizer.py for upload.')
+        task.logger.error('Unable to locate pvw-visualizer.py for upload. (%s)' % viz_path)
         return
 
     target_dir = job_directory(cluster, job)
