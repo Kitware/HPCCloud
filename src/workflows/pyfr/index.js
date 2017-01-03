@@ -129,7 +129,7 @@ export default {
   },
   taskFlows: {
     Simulation: 'hpccloud.taskflow.pyfr.PyFrTaskFlow',
-    Visualization: 'hpccloud.taskflow.paraview.ParaViewTaskFlow',
+    Visualization: 'hpccloud.taskflow.paraview.visualizer.ParaViewTaskFlow',
   },
   primaryJobs: {
     Simulation: 'pyfr_run',
