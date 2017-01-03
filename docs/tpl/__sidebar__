@@ -1,0 +1,19 @@
+docs:
+  general:
+    general__introduction: index.html
+    general__getting-started: general__getting-started.html
+    general__glossary: general__glossary.html
+  usage:
+    usage__create-account: usage__create-account.html
+    usage__trad-cluster: usage__trad-cluster.html
+    usage__aws-profiles: usage__aws-profiles.html
+    usage__creating: usage__creating.html
+    usage__simput: usage__simput.html
+    usage__running: usage__running.html
+  development:
+    development__dev-intro: development__dev-intro.html
+    development__panels: development__panels.html
+    development__workflows: development__workflows.html
+    development__redux: development__redux.html
+    development__tools: development__tools.html
+    vagrant__introduction: vagrant__introduction.html

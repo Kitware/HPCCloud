@@ -1,0 +1,38 @@
+menu:
+  docs: Docs
+  api: API
+  examples: Examples
+  news: News
+  search: Search
+
+index:
+  get_started: Get started
+
+page:
+  contents: Contents
+  back_to_top: Back to Top
+  improve: Improve this doc
+  prev: Prev
+  next: Next
+  last_updated: "Last updated: %s"
+
+sidebar:
+  docs:
+    general: Basics
+    general__introduction: Introduction
+    general__getting-started: Getting Started
+    general__glossary: Glossary
+    usage: Usage
+    usage__create-account: Signing up
+    usage__trad-cluster: Adding traditional clusters
+    usage__aws-profiles: Adding AWS profiles
+    usage__creating: Projects and simulations
+    usage__simput: Simput
+    usage__running: Running workflows
+    development: Development
+    development__dev-intro: Introduction
+    development__panels: Panels
+    development__workflows: Adding new workflows
+    development__redux: Redux data model
+    development__tools: Available tools
+    vagrant__introduction: Vagrant - How to...

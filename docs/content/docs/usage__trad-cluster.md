@@ -6,7 +6,7 @@ Traditional clusters, or simply "clusters" in this document typically involve ph
 
 Click the "+" icon in the toolbar. You'll be presented a blank form in which you can fill out details of your cluster. A cluster name, username and hostname of the machine is required. When you have the necessary fields filled out click "Save." A "Test" button and a form field with an shell command containing an ssh key will soon appear.
 
-![traditional cluster page](images/prefs-trad.png)
+![traditional cluster page](usage__images/prefs-trad.png)
 
 ### Testing
 

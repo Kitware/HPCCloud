@@ -6,7 +6,7 @@ Panels are React components which are used in more than one place. These are as 
 
 With the reusability of panels they can get very nested. The image below illustrates panel nesting within a workflow step component.
 
-![form panels](images/form-panels.png)
+![form panels](development__images/form-panels.png)
 
 Each panel here is a form, the data in each subform is passed to it by the parent component and bubbles up on a change though an onChange function.
 
