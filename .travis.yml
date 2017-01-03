@@ -63,7 +63,7 @@ script:
     - if [ -n "${PY2}" ]; then git config --global user.name "Travis CI"; fi
     - if [ -n "${PY2}" ]; then git config --global user.email "sebastien.jourdain@kitware.com"; fi
     - if [ -n "${PY2}" ]; then export GIT_PUBLISH_URL=https://${GH_TOKEN}@github.com/Kitware/HPCCloud.git; fi
-    - if [ -n "${PY2}" && "$TRAVIS_BRANCH" == "master" ]; then npm run doc:publish; fi
+    - if [[ -n "${PY2}" && "$TRAVIS_BRANCH" == "master" ]]; then npm run doc:publish; fi
 
 after_success:
     - npm run semantic-release
