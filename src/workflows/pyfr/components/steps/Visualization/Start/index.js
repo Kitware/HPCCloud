@@ -52,7 +52,7 @@ const VisualizationStart = React.createClass({
     const sessionKey = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
     const dataDir = this.props.simulation.steps.Visualization.metadata.dataDir;
     const fileName = this.props.simulation.steps.Visualization.metadata.fileName;
-    const payload = {
+    var payload = {
       dataDir, // where the output for the sim will be
       fileName, // the file to load
       sessionKey, // for pvw, we use this later for connecting,
@@ -64,6 +64,7 @@ const VisualizationStart = React.createClass({
     };
 
     if (this.state.serverType === 'Traditional') {
+      payload = Object.assign(payload, this.state.Traditional.runtime || {});
       try {
         payload.cluster = ClusterPayloads.tradClusterPayload(this.state.Traditional.profile);
       } catch (error) {
