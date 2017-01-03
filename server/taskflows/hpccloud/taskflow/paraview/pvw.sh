@@ -47,7 +47,7 @@ export DISPLAY
 
 # First run pvpython
 ${PV_PYTHON} {{'--mesa-llvm' if not gpu else ''}} ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} \
-{{ '--data-dir %s' % dataDir if dataDir else ''}} \
+{{ '--data %s' % dataDir if dataDir else ''}} \
 {{ '--load-file %s' % fileName if fileName else '' }}
 
 {% if cluster.type == 'trad' -%}
