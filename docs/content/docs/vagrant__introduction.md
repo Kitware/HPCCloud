@@ -16,6 +16,8 @@ $ git clone https://github.com/Kitware/HPCCloud-deploy.git
 $ git clone https://github.com/Kitware/cumulus.git
 $ git clone https://github.com/Kitware/girder.git
 
+$ ln -s HPCCloud hpccloud
+
 $ virtualenv python
 $ source ./python/bin/activate
 $ pip install -r HPCCloud/requirements.txt
