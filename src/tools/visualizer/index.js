@@ -81,6 +81,9 @@ const visualizer = React.createClass({
       ImageProviders.setImageProvider(null);
     });
     dispatch(Actions.resetVisualizerState());
+
+    // Close ws without exiting server
+    network.exit(-1);
   },
 
   onAction(name) {
