@@ -498,7 +498,21 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
     # step.
     file_names = [f['name'] for f in solution_files]
     file_names.sort()
-    vtu_file = '%s.vtu' % file_names[0].rsplit('.', 1)[0]
+    if len(file_names) > 1:
+        vtu_file_first = '%s.vtu' % file_names[0].rsplit('.', 1)[0]
+        # find where to put the ...*...
+        head = tail = size = len(vtu_file_first)
+        for fileName in file_names[1:]:
+            vtu_name = '%s.vtu' % fileName.rsplit('.', 1)[0]
+            for i in range(size):
+                if vtu_file_first[i] != vtu_name[i] and head > i:
+                    head = i # not included in the cut
+                if vtu_file_first[-i] != vtu_name[-i] and tail >= i:
+                    tail = i - 1
+
+        vtu_file = '%s*%s' % (vtu_file_first[:head], vtu_file_first[-tail:])
+    else:
+        vtu_file = '%s.vtu' % file_names[0].rsplit('.', 1)[0]
     task.taskflow.set_metadata('vtuFile', vtu_file)
 
     number_files = len(solution_files)
