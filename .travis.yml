@@ -57,7 +57,7 @@ script:
     # Now run server tests
     - mkdir _girder_build
     - pushd _girder_build
-    - cmake -DBUILD_JAVASCRIPT_TESTS:BOOL=OFF -DPYTHON_COVERAGE:BOOL=OFF -DPYTHON_VERSION:STRING=${TRAVIS_PYTHON_VERSION} "${HOME}/build/girder"
+    - cmake -DBUILD_JAVASCRIPT_TESTS:BOOL=OFF -DJAVASCRIPT_STYLE_TESTS:BOOL=OFF -DPYTHON_COVERAGE:BOOL=OFF -DPYTHON_VERSION:STRING=${TRAVIS_PYTHON_VERSION} "${HOME}/build/girder"
     - ctest -R hpccloud -VV
     - ctest -R pvwproxy -VV
     - if [ -n "${PY2}" ]; then git config --global user.name "Travis CI"; fi
