@@ -46,7 +46,7 @@ export default {
     },
   },
   taskFlows: {
-    Visualization: 'hpccloud.taskflow.paraview.ParaViewTaskFlow',
+    Visualization: 'hpccloud.taskflow.paraview.visualizer.ParaViewTaskFlow',
   },
   primaryJobs: {
     Visualization: 'paraview',

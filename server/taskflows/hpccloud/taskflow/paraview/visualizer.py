@@ -160,11 +160,11 @@ def create_paraview_job(task, *args, **kwargs):
     # Upload the visualizer code
     task.logger.info('Uploading visualizer')
     viz_path = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '../',  '../', '../','../',
+        os.path.join(os.path.dirname(__file__), '../../../../../',
             'node_modules/pvw-visualizer/server/pvw-visualizer.py'))
 
     if not os.path.exists(viz_path):
-        task.logger.error('Unable to local pvw-visualizer.py for upload.')
+        task.logger.error('Unable to locate pvw-visualizer.py for upload. (%s)' % viz_path)
         return
 
     target_dir = job_directory(cluster, job)
@@ -182,7 +182,7 @@ def upload_input(task, cluster, job, *args, **kwargs):
     if file_id:
         file_id = file_id[0].value
         task.logger.info('Visualizing file ID: %s' % file_id)
-        job['params']['dataDir'] = '.'
+        job['params']['dataDir'] = '$PWD'
 
         # Fetch the file
         girder_client = create_girder_client(

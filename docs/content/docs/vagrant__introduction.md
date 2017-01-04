@@ -11,7 +11,7 @@ The very first time you may want to run the following commands.
 $ mkdir HPCCloud
 $ cd HPCCloud
 
-$ git clone https://github.com/Kitware/HPCCloud.git
+$ git clone https://github.com/Kitware/HPCCloud.git hpccloud
 $ git clone https://github.com/Kitware/HPCCloud-deploy.git
 $ git clone https://github.com/Kitware/cumulus.git
 $ git clone https://github.com/Kitware/girder.git
