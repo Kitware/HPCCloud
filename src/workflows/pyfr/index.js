@@ -15,7 +15,7 @@ export default {
   name: 'PyFR',
   logo: require('./logo.png'),
   requiredAttachments: {
-    project: ['mesh', 'ini'],
+    project: ['mesh'],
     simulation: [],
   },
   components: {
