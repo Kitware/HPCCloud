@@ -19,8 +19,10 @@
 
 from .projects import Projects
 from .simulations import Simulations
+from . import item
 
 
 def load(info):
     info['apiRoot'].projects = Projects()
     info['apiRoot'].simulations = Simulations()
+    item.load(info['apiRoot'])
