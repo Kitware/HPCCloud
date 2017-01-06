@@ -483,7 +483,7 @@ client.onEvent((resp) => {
     processStatusEvent(id, type, resp.data.status);
   } else if (resp.data.log) {
     processLogEvent(id, type, resp.data.log);
-  } else if (resp.progress) {
-    console.log(resp.data.title, `${resp.data.current}/${resp.data.total}`);
+  } else if (resp.type === 'progress') {
+    console.log(resp.data.message, `${resp.data.current}/${resp.data.total}`);
   }
 });

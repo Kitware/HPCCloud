@@ -13,6 +13,7 @@ import { getActions, getDisabledButtons }  from '../../../../../../utils/getDisa
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
+import * as fsActions     from '../../../../../../redux/actions/fs';
 import * as SimActions  from '../../../../../../redux/actions/projects';
 import * as ClusterActions  from '../../../../../../redux/actions/clusters';
 
@@ -32,6 +33,7 @@ const SimualtionView = React.createClass({
     onRerun: React.PropTypes.func,
     onVisualizeTaskflow: React.PropTypes.func,
     onTerminateInstance: React.PropTypes.func,
+    onMoveFilesOffline: React.PropTypes.func,
     onMount: React.PropTypes.func,
 
     taskflowId: React.PropTypes.string,
@@ -44,6 +46,10 @@ const SimualtionView = React.createClass({
 
   onAction(action) {
     this[action]();
+  },
+
+  moveOffline() {
+    this.props.onMoveFilesOffline(this.props.fileSelection);
   },
 
   visualizeTaskflow() {
@@ -153,6 +159,7 @@ export default connect(
       dispatch(SimActions.saveSimulation(sim, null, location));
     },
     onRerun: (id, stepName, stepData, location) => dispatch(SimActions.updateSimulationStep(id, stepName, stepData, location)),
+    onMoveFilesOffline: (files) => dispatch(fsActions.moveFilesOffline(files)),
     onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
     onTerminateInstance: (id) => dispatch(ClusterActions.terminateCluster(id)),
   })

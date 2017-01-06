@@ -26,17 +26,16 @@ from girder.api.rest import getBodyJson, getCurrentUser, ModelImporter
 def move_files_to_assetstore(files, totalsize):
     user, token = getCurrentUser(True)
     assetstore = ModelImporter.model('assetstore').getCurrent()
-    progress_context = ProgressContext(True, interval=1.0,
-                                       user=user, token=token,
-                                       total=totalsize, title=files[0]['name'])
     current_progress = 0
-    for file in files:
-        ModelImporter.model('upload').moveFileToAssetstore(
-            file=file, user=user, assetstore=assetstore)
-        progress_context.update(current=current_progress, title=file['name'])
-        current_progress += file['size']
-
-    return progress_context
+    with ProgressContext(True, interval=1.0, message=files[0]['name'],
+                         user=user, token=token,
+                         total=totalsize, title='Moving files') as ctx:
+        for file in files:
+            current_progress += file['size']
+            ModelImporter.model('upload').moveFileToAssetstore(
+                file=file, user=user, assetstore=assetstore)
+            ctx.update(current=current_progress, message=file['name'])
+        # ctx.update(current=totalsize, title=file['name'])
 
 
 @describeRoute(
@@ -53,7 +52,7 @@ def copy_files(params):
         files += ModelImporter.model('item').childFiles(item, limit=50)
 
     total_size = sum([file['size'] for file in files])
-    move_files_to_assetstore(files, total_size)
+    return move_files_to_assetstore(files, total_size)
 
 
 def load(apiRoot):

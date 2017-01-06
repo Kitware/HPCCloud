@@ -82,3 +82,13 @@ export function toggleFileSelection(fileId) {
 export function clearFileSelection(fileId) {
   return { type: CLEAR_FILE_SELECTION };
 }
+
+export function moveFilesOffline(files) {
+  return dispatch => {
+    client.moveFilesOffline(files)
+      .then((resp) => {
+        console.log('transfer initiated?');
+      });
+    return { type: 'NO_OP' };
+  };
+}
