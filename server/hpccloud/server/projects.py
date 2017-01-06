@@ -22,11 +22,10 @@ import cherrypy
 import jsonschema
 
 from girder.api import access
-from girder.api.describe import Description, describeRoute
+from girder.api.describe import Description, autoDescribeRoute
 from girder.constants import AccessType
 from girder.api.docs import addModel
-from girder.api.rest import RestException, getBodyJson, getCurrentUser
-from girder.api.rest import loadmodel
+from girder.api.rest import RestException, getCurrentUser
 from girder.api.rest import Resource
 
 from .models import schema
@@ -50,14 +49,14 @@ class Projects(Resource):
 
     addModel('ProjectProperties', schema.project, 'projects')
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Create a new project')
-        .param('body', 'The properies of the project.',
-               dataType='ProjectProperties', required=True, paramType='body')
+        .jsonParam('project', 'The properies of the project.',
+                   dataType='ProjectProperties', required=True,
+                   paramType='body')
     )
     @access.user
-    def create(self, params):
-        project = getBodyJson()
+    def create(self, project, params):
         project = self.model('project', 'hpccloud').create(getCurrentUser(),
                                                            project)
 
@@ -66,19 +65,17 @@ class Projects(Resource):
 
         return project
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Update a project')
-        .param('id', 'The project to update.',
-               dataType='string', required=True, paramType='path')
-        .param('body', 'The properies of the project to update.',
-               dataType='object', required=True, paramType='body')
+        .modelParam('id', 'The project to update.', model='project',
+                    plugin='hpccloud', level=AccessType.WRITE)
+        .jsonParam('body', 'The properies of the project to update.',
+                   required=True, paramType='body')
     )
     @access.user
-    @loadmodel(model='project', plugin='hpccloud', level=AccessType.WRITE)
-    def update(self, project, params):
+    def update(self, project, updates, params):
         immutable = ['type', 'steps', 'folderId', 'access', 'userId', '_id',
                      'created', 'updated']
-        updates = getBodyJson()
 
         for p in updates:
             if p in immutable:
@@ -92,86 +89,78 @@ class Projects(Resource):
         return self._model.update(user, project, name=name, metadata=metadata,
                                   description=description)
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Get all projects this user has access to project')
-        .param('limit', 'Result set size limit.',
-               dataType='integer', required=False, paramType='query')
-        .param('offset', 'Offset into result set.',
-               dataType='integer', required=False, paramType='query')
+        .pagingParams(defaultSort='created')
     )
     @access.user
-    def get_all(self, params):
+    def get_all(self, limit, offset, sort, params):
         user = getCurrentUser()
-        limit, offset, _ = self.getPagingParameters(params)
 
-        cursor = self._model.find(limit=limit, offset=offset)
+        cursor = self._model.find(limit=limit, offset=offset, sort=sort)
         return list(self._model.filterResultsByPermission(cursor=cursor,
                     user=user, level=AccessType.READ))
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Delete a project')
-        .param('id', 'The project to delete.',
-               dataType='string', required=True, paramType='path')
+        .modelParam('id', 'The project to delete.',
+                    model='project', plugin='hpccloud', level=AccessType.WRITE)
         .notes('Will clean up any files, items or folders associated with '
                'the project.')
     )
     @access.user
-    @loadmodel(model='project', plugin='hpccloud', level=AccessType.WRITE)
     def delete(self, project, params):
         user = getCurrentUser()
         self._model.delete(user, project)
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Get a particular project')
-        .param('id', 'The project to get.',
-               dataType='string', required=True, paramType='path')
+        .modelParam('id', 'The project to get.',
+                    model='project', plugin='hpccloud', level=AccessType.READ)
     )
     @access.user
-    @loadmodel(model='project', plugin='hpccloud', level=AccessType.READ)
     def get(self, project, params):
         return project
 
     addModel('ShareProperties', schema.project['definitions']['share'],
              'projects')
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Share a give project with a set of users or groups')
-        .param('id', 'The project to shared.',
-               dataType='string', required=True, paramType='path')
+        .modelParam('id', 'The project to shared.',
+                    model='project', plugin='hpccloud', level=AccessType.WRITE)
+        .jsonParam('share', 'The users and groups to share with.',
+                   dataType='SimProperties', required=True, paramType='body')
     )
     @access.user
-    @loadmodel(model='project', plugin='hpccloud', level=AccessType.WRITE)
-    def share(self, project, params):
-        body = getBodyJson()
+    def share(self, project, share, params):
         user = getCurrentUser()
 
         # Validate we have been given a value body
         try:
             ref_resolver = jsonschema.RefResolver.from_schema(
                 schema.definitions)
-            jsonschema.validate(body, schema.project['definitions']['share'],
+            jsonschema.validate(share, schema.project['definitions']['share'],
                                 resolver=ref_resolver)
         except jsonschema.ValidationError as ve:
             raise RestException(ve.message, 400)
 
-        users = body.get('users', [])
-        groups = body.get('groups', [])
+        users = share.get('users', [])
+        groups = share.get('groups', [])
 
         return self._model.share(user, project, users, groups)
 
     addModel('SimProperties', schema.simulation, 'projects')
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Create a simulation associated with a project.')
-        .param('id', 'The project the simulation will be created in.',
-               dataType='string', required=True, paramType='path')
-        .param('body', 'The properties of the simulation.',
-               dataType='SimProperties', required=True, paramType='body')
-    )
+        .modelParam('id', 'The project the simulation will be created in.',
+                    model='project', plugin='hpccloud', level=AccessType.READ)
+        .jsonParam('simulation', 'The properties of the simulation.',
+                   dataType='SimProperties', required=True, paramType='body')
+        )
     @access.user
-    @loadmodel(model='project', plugin='hpccloud', level=AccessType.READ)
-    def create_simulation(self, project, params):
-        simulation = getBodyJson()
+    def create_simulation(self, project, simulation, params):
         user = getCurrentUser()
 
         simulation = self.model('simulation', 'hpccloud').create(
@@ -183,19 +172,14 @@ class Projects(Resource):
 
         return simulation
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('List all the simulations associated with a project.')
-        .param('id', 'The project',
-               dataType='string', required=True, paramType='path')
-        .param('limit', 'Result set size limit.',
-               dataType='integer', required=False, paramType='query')
-        .param('offset', 'Offset into result set.',
-               dataType='integer', required=False, paramType='query')
+        .modelParam('id', 'The project',
+                    model='project', plugin='hpccloud', level=AccessType.READ)
+        .pagingParams(defaultSort='created')
     )
     @access.user
-    @loadmodel(model='project', plugin='hpccloud', level=AccessType.READ)
-    def simulations(self, project, params):
+    def simulations(self, project, limit, offset, sort, params):
         user = getCurrentUser()
-        limit, offset, _ = self.getPagingParameters(params)
         return self.model('project', 'hpccloud').simulations(user, project,
                                                              limit, offset)

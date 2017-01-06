@@ -21,9 +21,9 @@ import jsonschema
 from girder.utility import ziputil
 
 from girder.constants import AccessType
-from girder.api.rest import loadmodel, getCurrentUser, Resource, getBodyJson
+from girder.api.rest import getCurrentUser, Resource
 from girder.api.rest import RestException
-from girder.api.describe import Description, describeRoute
+from girder.api.describe import Description, autoDescribeRoute
 from girder.api import access
 from girder.api.docs import addModel
 
@@ -46,23 +46,21 @@ class Simulations(Resource):
 
         self._model = self.model('simulation', 'hpccloud')
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Get a simulation')
-        .param('id', 'The simulation to get.',
-               dataType='string', required=True, paramType='path')
+        .modelParam('id', 'The simulation to get.',
+                    model='simulation', plugin='hpccloud', level=AccessType.READ)
     )
     @access.user
-    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def get(self, simulation, params):
         return simulation
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Delete a simulation')
-        .param('id', 'The simulation to delete.',
-               dataType='string', required=True, paramType='path')
+        .modelParam('id', 'The simulation to delete.',
+                    model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     )
     @access.user
-    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def delete(self, simulation, params):
         user = getCurrentUser()
         self._model.delete(user, simulation)
@@ -96,19 +94,17 @@ class Simulations(Resource):
         }
     }, 'simulations')
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Update a simulation')
-        .param('id', 'The simulation to update.',
-               dataType='string', required=True, paramType='path')
-        .param('body', 'The properies of the simulation to update.',
-               dataType='UpdateProperties', required=True, paramType='body')
+        .modelParam('id', 'The simulation to update.',
+                    model='simulation', plugin='hpccloud', level=AccessType.WRITE)
+        .jsonParam('updates', 'The properies of the simulation to update.',
+                   dataType='UpdateProperties', required=True, paramType='body')
     )
     @access.user
-    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
-    def update(self, simulation, params):
+    def update(self, simulation, updates, params):
         immutable = ['projectId', 'folderId', 'access', 'userId', '_id',
                      'updated', 'created']
-        updates = getBodyJson()
 
         for p in updates:
             if p in immutable:
@@ -138,17 +134,15 @@ class Simulations(Resource):
         }
     }, 'simulations')
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Clone a simulation')
-        .param('id', 'The simulation to clone.',
-               dataType='string', required=True, paramType='path')
-        .param('body', 'The properies of the simulation to update.',
-               dataType='CloneParams', required=True, paramType='body')
+        .modelParam('id', 'The simulation to clone.',
+                    model='simulation', plugin='hpccloud', level=AccessType.READ)
+        .jsonParam('props', 'The properies of the simulation to update.',
+                   dataType='CloneParams', required=True, paramType='body')
     )
     @access.user
-    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
-    def clone(self, simulation, params):
-        props = getBodyJson()
+    def clone(self, simulation, props, params):
         self.requireParams(('name', ), props)
         user = getCurrentUser()
 
@@ -160,15 +154,14 @@ class Simulations(Resource):
 
         return cloned
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Get a particular step in a simulation')
-        .param('id', 'The simulation containing the step.',
-               dataType='string', required=True, paramType='path')
+        .modelParam('id', 'The simulation containing the step.',
+                    model='simulation', plugin='hpccloud', level=AccessType.READ)
         .param('stepName', 'The step name to gets.',
                dataType='string', required=True, paramType='path')
     )
     @access.user
-    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def get_step(self, simulation, stepName, params):
         if stepName not in simulation.get('steps', {}):
             raise RestException('Simulation %s doesn\'t contain step %s' %
@@ -178,21 +171,19 @@ class Simulations(Resource):
 
     addModel('Step', schema.definitions['stepUpdate'], 'simulations')
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Update a particular step in a simulation')
-        .param('id', 'The simulation containing the step.',
-               dataType='string', required=True, paramType='path')
+        .modelParam('id', 'The simulation containing the step.',
+                    model='simulation', plugin='hpccloud', level=AccessType.WRITE)
         .param('stepName', 'The step name to gets.',
                dataType='string', required=True, paramType='path')
-        .param('body', 'The properies of the step to update.',
-               dataType='Step', required=True, paramType='body')
+        .jsonParam('updates', 'The properies of the step to update.',
+                   dataType='Step', required=True, paramType='body')
     )
     @access.user
-    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
-    def update_step(self, simulation, stepName, params):
+    def update_step(self, simulation, stepName, updates, params):
         user = getCurrentUser()
         immutable = ['type', 'folderId']
-        updates = getBodyJson()
 
         if stepName not in simulation.get('steps', {}):
             raise RestException('Simulation %s doesn\'t contain step %s' %
@@ -219,13 +210,12 @@ class Simulations(Resource):
         return self._model.update_step(
             user, simulation, stepName, status, metadata, export, view)
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Download all the asset associated with a simulation')
-        .param('id', 'The simulation to download.',
-               dataType='string', required=True, paramType='path')
+        .modelParam('id', 'The simulation to download.',
+                    model='simulation', plugin='hpccloud', level=AccessType.READ)
     )
     @access.user
-    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.READ)
     def download(self, simulation, params):
         user = self.getCurrentUser()
         cherrypy.response.headers['Content-Type'] = 'application/zip'
@@ -241,15 +231,14 @@ class Simulations(Resource):
 
         return stream
 
-    @describeRoute(
+    @autoDescribeRoute(
         Description('Set particular step in the simulation as the active step')
-        .param('id', 'The simulation id.',
-               dataType='string', required=True, paramType='path')
+        .modelParam('id', 'The simulation id.',
+                    model='simulation', plugin='hpccloud', level=AccessType.WRITE)
         .param('stepName', 'The simulation step name.',
                dataType='string', required=True, paramType='path')
     )
     @access.user
-    @loadmodel(model='simulation', plugin='hpccloud', level=AccessType.WRITE)
     def set_active(self, simulation, stepName, params):
 
         if stepName not in simulation.get('steps', {}):
