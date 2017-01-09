@@ -95,3 +95,11 @@ This can be adjusted in the following file (replace: HOSTNAME_OR_VALID_IP by the
   }
 }
 ```
+
+## Running Celery by hand
+
+This can be usefull to follow any runtime error live or if the taskflow did properly load.
+
+```sh
+$ /usr/bin/python -m celery worker --app=cumulus --loglevel=INFO --config=cumulus.celery.commandconfig --concurrency=6 --logfile=/var/log/celery/command.log --pidfile=/var/run/celery/command.pid --hostname=command@vagrant-ubuntu-trusty-64
+```
