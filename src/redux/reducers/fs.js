@@ -22,6 +22,14 @@ export default function fsReducer(state = initialState, action) {
       return Object.assign({}, state, { folderMapById });
     }
 
+    case Actions.UPDATE_ITEMS: {
+      const newItemMap = Object.assign({}, state.itemMapById);
+      action.items.forEach((el) => {
+        newItemMap[el._id] = el;
+      });
+      return Object.assign({}, state, { itemMapById: newItemMap });
+    }
+
     case Actions.CHILDREN_ITEMS: {
       const { id, children } = action;
 

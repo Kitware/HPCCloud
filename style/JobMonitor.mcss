@@ -146,7 +146,7 @@ p.logEntry {
     composes: fw     from 'font-awesome/css/font-awesome.css';
     composes: fa-caret-right  from 'font-awesome/css/font-awesome.css';
     composes: foldIcon;
-    color: black;
+    color: #222;
 }
 
 .foldOpen {
@@ -154,7 +154,7 @@ p.logEntry {
     composes: fw     from 'font-awesome/css/font-awesome.css';
     composes: fa-caret-down from 'font-awesome/css/font-awesome.css';
     composes: foldIcon;
-    color: black;
+    color: #222;
 }
 
 .unchecked {
@@ -163,7 +163,7 @@ p.logEntry {
     composes: fa-square-o  from 'font-awesome/css/font-awesome.css';
     cursor: pointer;
     padding-right: 10px;
-    color: black;
+    color: #222;
 }
 
 .checked {
@@ -172,5 +172,13 @@ p.logEntry {
     composes: fa-check-square-o  from 'font-awesome/css/font-awesome.css';
     cursor: pointer;
     padding-right: 8px;
-    color: black;
+    color: #222;
+}
+
+.offline {
+    composes: fa     from 'font-awesome/css/font-awesome.css';
+    composes: fw     from 'font-awesome/css/font-awesome.css';
+    composes: fa-minus-square-o from 'font-awesome/css/font-awesome.css';
+    padding-right: 8px;
+    color: #222;
 }

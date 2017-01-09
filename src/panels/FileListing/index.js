@@ -118,7 +118,9 @@ const FileListing = React.createClass({
     }
 
     let checkbox = null;
-    if (!this.props.actionsDisabled && this.props.selection.indexOf(file._id) !== -1) {
+    if (file.meta && file.meta.offline) {
+      checkbox = <i className={style.offline} data-file-id={file._id}></i>;
+    } else if (!this.props.actionsDisabled && this.props.selection.indexOf(file._id) !== -1) {
       checkbox = <i className={style.checked} onClick={this.toggleSelection} data-file-id={file._id}></i>;
     } else if (!this.props.actionsDisabled && this.props.selection.indexOf(file._id) === -1) {
       checkbox = <i className={style.unchecked} onClick={this.toggleSelection} data-file-id={file._id}></i>;

@@ -2,6 +2,7 @@ import client           from '../../network';
 import * as netActions  from './network';
 
 export const UPDATE_FOLDER = 'UPDATE_FOLDER';
+export const UPDATE_ITEMS = 'UPDATE_ITEMS';
 export const CHILDREN_FOLDERS = 'CHILDREN_FOLDERS';
 export const CHILDREN_ITEMS = 'CHILDREN_ITEMS';
 export const TOGGLE_OPEN_FOLDER = 'TOGGLE_OPEN_FOLDER';
@@ -10,6 +11,10 @@ export const CLEAR_FILE_SELECTION = 'CLEAR_FILE_SELECTION';
 
 export function updateFolder(folder) {
   return { type: UPDATE_FOLDER, folder, id: folder._id };
+}
+
+export function updateItems(items) {
+  return { type: UPDATE_ITEMS, items };
 }
 
 export function fetchFolder(id, fetchFolderMeta = true, openedFolders = []) {
@@ -79,17 +84,25 @@ export function toggleFileSelection(fileId) {
   return { type: TOGGLE_FILE_SELECTION, fileId };
 }
 
-export function clearFileSelection(fileId) {
+export function clearFileSelection() {
   return { type: CLEAR_FILE_SELECTION };
 }
 
 export function moveFilesOffline(items) {
-  const promises = items.map((el) => client.listFiles(el));
+  const promises = items.map((id) => client.listFiles(id));
   return dispatch => {
     Promise.all(promises) // get files for each item
       .then((files) => client.moveFilesOffline(files.reduce((prev, cur) => prev.concat(cur.data), [])))
       .then((resp) => {
-        console.log('transfer complete');
+        if (process.env.NODE_ENV !== 'production') console.log('transfer complete');
+        // update item meta
+        return Promise.all(items.map((id) => client.updateItemMetadata(id, { offline: true })));
+      })
+      .then((newItems) => {
+        // update local items
+        console.log(newItems);
+        dispatch(updateItems(newItems.map(el => el.data)));
+        dispatch(clearFileSelection());
       });
     return { type: 'NO_OP' };
   };

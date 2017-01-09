@@ -1,5 +1,3 @@
-import { transformRequest } from './utils';
-
 export default function ({ client, filterQuery, mustContain, busy, encodeQueryAsString }) {
   return {
     downloadItem(id, offset, endByte, contentDisposition) {
@@ -13,7 +11,7 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
     },
 
     updateItemMetadata(id, metadata = {}) {
-      return busy(client._.put(`/item/${id}/metadata`, metadata, { transformRequest }));
+      return busy(client._.put(`/item/${id}/metadata`, metadata));
     },
 
     // query = { folderId, text, limit, name, offset, sort, sortdir }
