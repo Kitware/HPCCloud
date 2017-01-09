@@ -70,9 +70,5 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
 
       return missingKeys ? promise : busy(client._.post(`/item/${id}/copy${encodeQueryAsString(params)}`));
     },
-
-    moveFilesOffline(files) {
-      return busy(client._.post('/item/copy', files));
-    },
   };
 }

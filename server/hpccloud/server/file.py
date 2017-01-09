@@ -35,25 +35,22 @@ def move_files_to_assetstore(files, totalsize):
             ModelImporter.model('upload').moveFileToAssetstore(
                 file=file, user=user, assetstore=assetstore)
             ctx.update(current=current_progress, message=file['name'])
-        # ctx.update(current=totalsize, title=file['name'])
 
 
 @describeRoute(
     Description('Copy a set of files')
-    .param('body', 'An array of file id\'s',
+    .param('body', 'An array of file objects',
            dataType='json', required=True, paramType='body')
 )
 @access.user
-def copy_files(params):
-    itemIds = getBodyJson()
-    files = []
-    for _id in itemIds:
-        item = ModelImporter.model('item').load(_id, user=getCurrentUser())
-        files += ModelImporter.model('item').childFiles(item, limit=50)
-
+def move_files(params):
+    def load_file(file):
+        return ModelImporter.model('file').load(file['_id'],
+                                                user=getCurrentUser())
+    files = map(load_file, getBodyJson())
     total_size = sum([file['size'] for file in files])
-    return move_files_to_assetstore(files, total_size)
+    move_files_to_assetstore(files, total_size)
 
 
 def load(apiRoot):
-    apiRoot.item.route('POST', ('copy',), copy_files)
+    apiRoot.file.route('PUT', ('move',), move_files)

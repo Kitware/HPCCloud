@@ -83,11 +83,13 @@ export function clearFileSelection(fileId) {
   return { type: CLEAR_FILE_SELECTION };
 }
 
-export function moveFilesOffline(files) {
+export function moveFilesOffline(items) {
+  const promises = items.map((el) => client.listFiles(el));
   return dispatch => {
-    client.moveFilesOffline(files)
+    Promise.all(promises) // get files for each item
+      .then((files) => client.moveFilesOffline(files.reduce((prev, cur) => prev.concat(cur.data), [])))
       .then((resp) => {
-        console.log('transfer initiated?');
+        console.log('transfer complete');
       });
     return { type: 'NO_OP' };
   };
