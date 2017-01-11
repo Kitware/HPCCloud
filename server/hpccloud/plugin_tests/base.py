@@ -22,15 +22,18 @@ from tests import base
 
 class TestCase(base.TestCase):
 
-    def create_file(self, user, item, name, contents):
+    def create_file(self, user, item, name, contents, assetstoreId=None):
+        params = {
+            'parentType': 'item',
+            'parentId': item['_id'],
+            'name': name,
+            'size': len(contents),
+            'mimeType': 'application/octet-stream',
+        }
+        if (assetstoreId is not None):
+            params['assetstoreId'] = assetstoreId
         r = self.request(
-            path='/file', method='POST', user=user, params={
-                'parentType': 'item',
-                'parentId': item['_id'],
-                'name': name,
-                'size': len(contents),
-                'mimeType': 'application/octet-stream'
-            })
+            path='/file', method='POST', user=user, params=params)
         self.assertStatusOk(r)
         upload = r.json
 
@@ -38,8 +41,9 @@ class TestCase(base.TestCase):
         fields = [('offset', 0), ('uploadId', upload['_id'])]
         files = [('chunk', name, contents)]
         r = self.multipartRequest(
-            path='/file/chunk', user=self._another_user, fields=fields, files=files)
+            path='/file/chunk', user=user, fields=fields, files=files)
         self.assertStatusOk(r)
 
         return r.json
+
 
