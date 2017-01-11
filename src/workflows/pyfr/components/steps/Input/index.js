@@ -77,7 +77,7 @@ const SimputPanel = React.createClass({
                 boundaryNames[name] = name;
               });
             }
-            jsonData = jsonData = {
+            jsonData = {
               data: parsedIni,
               type: 'pyfr',
               external: { 'boundary-names': boundaryNames },
