@@ -18,7 +18,7 @@ $ git clone https://github.com/Kitware/girder.git
 
 $ virtualenv python
 $ source ./python/bin/activate
-$ pip install -r HPCCloud/requirements.txt
+$ pip install -r hpccloud/requirements.txt
 $ pip install -r HPCCloud-deploy/requirements.txt
 
 $ cd HPCCloud-deploy
