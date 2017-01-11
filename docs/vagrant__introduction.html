@@ -45,7 +45,7 @@
 <meta property="og:url" content="https://kitware.github.io/HPCCloud/docs/vagrant__introduction.html">
 <meta property="og:site_name" content="HPCCloud">
 <meta property="og:description" content="Relying on Vagrant for deploying the HPCCloud infrastructure’s is great but we can’t assuming that it will always work and additional interaction with the infrastructure may be required. Therefore, th">
-<meta property="og:updated_time" content="2017-01-11T23:39:38.337Z">
+<meta property="og:updated_time" content="2017-01-11T23:43:21.710Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Vagrant">
 <meta name="twitter:description" content="Relying on Vagrant for deploying the HPCCloud infrastructure’s is great but we can’t assuming that it will always work and additional interaction with the infrastructure may be required. Therefore, th">
@@ -102,10 +102,12 @@
 <h2 id="Fixing-invalid-Hostname" class="article-heading"><a href="#Fixing-invalid-Hostname" class="headerlink" title="Fixing invalid Hostname"></a>Fixing invalid Hostname<a class="article-anchor" href="#Fixing-invalid-Hostname" aria-hidden="true"></a></h2><p>When HPCCloud run jobs on a remote cluster, that cluster needs to contact back the HPCCloud server and therefore the proper information needs to be given to those cluster.</p>
 <p>This can be adjusted in the following file (replace: HOSTNAME_OR_VALID_IP by the proper value):</p>
 <figure class="highlight js"><figcaption><span>/opt/hpccloud/cumulus/cumulus/conf/config.json</span></figcaption><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="string">"girder"</span>: &#123;</div><div class="line">    <span class="string">"baseUrl"</span>: <span class="string">"http://HOSTNAME_OR_VALID_IP:8080/api/v1"</span>,</div><div class="line">    <span class="string">"user"</span>: <span class="string">"cumulus"</span>,</div><div class="line">    <span class="string">"group"</span>: <span class="string">"cumulus"</span></div><div class="line">  &#125;,</div><div class="line">  <span class="string">"moabReader"</span>: &#123;</div><div class="line">    <span class="string">"pluginPath"</span>: <span class="string">"/opt/hpccloud/moabreader/build/libvtkCmbMoabReaderPlugin.so"</span></div><div class="line">  &#125;,</div><div class="line">    <span class="string">"ssh"</span>: &#123;</div><div class="line">    <span class="string">"keyStore"</span>: <span class="string">"/opt/hpccloud/keys"</span></div><div class="line">  &#125;,</div><div class="line"></div><div class="line">  <span class="string">"amis"</span>: &#123;</div><div class="line">  &#125;,</div><div class="line">  <span class="string">"taskflow"</span>: &#123;</div><div class="line">    <span class="string">"path"</span>: [<span class="string">"/opt/hpccloud/hpccloud/server/taskflows"</span>]</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="Running-Celery-by-hand" class="article-heading"><a href="#Running-Celery-by-hand" class="headerlink" title="Running Celery by hand"></a>Running Celery by hand<a class="article-anchor" href="#Running-Celery-by-hand" aria-hidden="true"></a></h2><p>This can be usefull to follow any runtime error live or if the taskflow did properly load.</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line">$ /usr/bin/python -m celery worker --app=cumulus --loglevel=INFO --config=cumulus.celery.commandconfig --concurrency=6 --logfile=/var/<span class="built_in">log</span>/celery/command.log --pidfile=/var/run/celery/command.pid --hostname=<span class="built_in">command</span>@vagrant-ubuntu-trusty-64</div></pre></td></tr></table></figure>
 
               </div>
               <footer class="article-footer">
-                <time class="article-footer-updated" datetime="2017-01-11T23:39:38.337Z" itemprop="dateModified">Last updated: 2017-01-11</time>
+                <time class="article-footer-updated" datetime="2017-01-11T23:43:21.710Z" itemprop="dateModified">Last updated: 2017-01-11</time>
                 <a href="development__tools.html" class="article-footer-prev" title="Available tools"><i class="fa fa-chevron-left"></i><span>Prev</span></a>
               </footer>
               
@@ -114,7 +116,7 @@
           <aside id="article-toc" role="navigation">
             <div id="article-toc-inner">
               <strong class="sidebar-title">Contents</strong>
-              <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Setting-up-HPCCloud-for-development"><span class="toc-text">Setting-up HPCCloud for development</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SSH-to-Virtual-Machine"><span class="toc-text">SSH to Virtual Machine</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fixing-invalid-Hostname"><span class="toc-text">Fixing invalid Hostname</span></a></li></ol>
+              <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Setting-up-HPCCloud-for-development"><span class="toc-text">Setting-up HPCCloud for development</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SSH-to-Virtual-Machine"><span class="toc-text">SSH to Virtual Machine</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fixing-invalid-Hostname"><span class="toc-text">Fixing invalid Hostname</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Running-Celery-by-hand"><span class="toc-text">Running Celery by hand</span></a></li></ol>
               <a href="#" id="article-toc-top">Back to Top</a>
             </div>
           </aside>
