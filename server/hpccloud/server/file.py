@@ -46,7 +46,7 @@ def move_files(params):
     def load_file(file):
         return ModelImporter.model('file').load(file['_id'],
                                                 user=getCurrentUser())
-    files = map(load_file, getBodyJson())
+    files = list(map(load_file, getBodyJson()))
     total_size = sum([file['size'] for file in files])
     move_files_to_assetstore(files, total_size)
 

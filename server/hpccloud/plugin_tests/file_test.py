@@ -31,6 +31,7 @@ def setUpModule():
     global get_hpccloud_folder
     from girder.plugins.hpccloud.utility import get_hpccloud_folder
 
+
 def tearDownModule():
     base.stopServer()
 
@@ -56,7 +57,7 @@ class FileTestCase(TestCase):
             'type': AssetstoreType.FILESYSTEM,
             'root': tempfile.gettempdir()
         }
-        print tempfile.gettempdir()
+
         # create target assetstore we're going to move files too
         r = self.request('/assetstore', method='POST',
                          params=body, user=self._user)
@@ -100,7 +101,8 @@ class FileTestCase(TestCase):
         self.assertEqual(str(file_1['assetstoreId']), target_store['_id'])
 
         # sse tests
-        stream_r = self.request('/notification/stream', method='GET', user=self._user,
+        stream_r = self.request('/notification/stream', method='GET',
+                                user=self._user,
                                 isJson=False, params={'timeout': 0})
         self.assertStatusOk(stream_r)
         notifications = self.getSseMessages(stream_r)
