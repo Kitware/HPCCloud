@@ -93,14 +93,14 @@ const SimualtionView = React.createClass({
 
     const { taskflow, taskflowId, cluster, error, simulation, disabledButtons } = this.props;
     const actions = [].concat(taskflow.actions ? taskflow.actions : []);
-    const fileActionsDisabled = cluster ? cluster.status !== 'running' : true;
+    let fileActionsDisabled = false;
+
+    if (cluster && cluster.status !== 'running') {
+      fileActionsDisabled = true;
+    }
 
     if (taskflow.allComplete) {
       actions.push('visualize');
-    }
-
-    if (this.props.fileSelection.length) {
-      actions.push('moveOffline');
     }
 
     return (
@@ -147,6 +147,11 @@ export default connect(
       cluster = state.preferences.clusters.mapById[clusterId];
     }
 
+    if (fileSelection.length > 0 && taskflow.actions && taskflow.actions.indexOf('moveOffline') === -1) {
+      taskflow.actions.push('moveOffline');
+    } else if (!fileSelection.length && taskflow.actions) {
+      taskflow.actions.splice(taskflow.actions.indexOf('moveOffline'), 1);
+    }
 
     return {
       taskflowId, cluster, taskflow, fileSelection,

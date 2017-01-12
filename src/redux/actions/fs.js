@@ -1,6 +1,7 @@
 import client           from '../../network';
 import * as netActions  from './network';
 import * as progressActions  from './progress';
+import { store } from '..';
 
 export const UPDATE_FOLDER = 'UPDATE_FOLDER';
 export const UPDATE_ITEMS = 'UPDATE_ITEMS';
@@ -82,6 +83,9 @@ export function toggleOpenFolder(folderId, opening) {
 }
 
 export function toggleFileSelection(fileId) {
+  if (store.getState().network.pending.move_offline) {
+    return { type: 'NO_OP' };
+  }
   return { type: TOGGLE_FILE_SELECTION, fileId };
 }
 
@@ -92,8 +96,10 @@ export function clearFileSelection() {
 export function moveFilesOffline(items) {
   const promises = items.map((id) => client.listFiles(id));
   return dispatch => {
+    const action = netActions.addNetworkCall('move_offline', `Moving ${items.length} offline`);
     Promise.all(promises) // get files for each item
       .then((files) => {
+        // get the size from the list of list of files
         dispatch(progressActions.setupProgress(files.reduce((prev, cur) => {
           var curSize = cur.data.reduce((p, c) => p + c.size, 0);
           return prev + curSize;
@@ -103,13 +109,17 @@ export function moveFilesOffline(items) {
       .then((resp) => {
         if (process.env.NODE_ENV !== 'production') console.log('transfer complete');
         // update item meta
+        dispatch(netActions.successNetworkCall(action.id, resp));
         return Promise.all(items.map((id) => client.updateItemMetadata(id, { offline: true })));
       })
       .then((newItems) => {
         // update local items
         dispatch(updateItems(newItems.map(el => el.data)));
         dispatch(clearFileSelection());
+      })
+      .catch((err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err));
       });
-    return { type: 'NO_OP' };
+    return action;
   };
 }

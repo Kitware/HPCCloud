@@ -35,6 +35,9 @@ export function getDisabledButtons(network, taskflow = {}) {
           !!get(network, `pending.terminate_cluster_${clusterId}`) ||
           !!get(network, `success.terminate_cluster_${clusterId}`);
         break;
+      case 'moveOffline':
+        disabledButtons.moveOffline = !!get(network, 'pending.move_offline');
+        break;
       default:
         break;
     }

@@ -117,13 +117,12 @@ const FileListing = React.createClass({
       </span>);
     }
 
-    let checkbox = null;
+    let checkbox = null; // only allow file selection if actions are available
     if (file.meta && file.meta.offline) {
       checkbox = <i className={style.offline} data-file-id={file._id}></i>;
-    } else if (!this.props.actionsDisabled && this.props.selection.indexOf(file._id) !== -1) {
-      checkbox = <i className={style.checked} onClick={this.toggleSelection} data-file-id={file._id}></i>;
-    } else if (!this.props.actionsDisabled && this.props.selection.indexOf(file._id) === -1) {
-      checkbox = <i className={style.unchecked} onClick={this.toggleSelection} data-file-id={file._id}></i>;
+    } else if (!this.props.actionsDisabled) {
+      checkbox = (<i className={this.props.selection.indexOf(file._id) !== -1 ? style.checked : style.unchecked}
+        onClick={this.toggleSelection} data-file-id={file._id}></i>);
     }
 
     return (<section key={`${file._id}_${index}`} className={ style.listItem }>
