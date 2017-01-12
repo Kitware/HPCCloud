@@ -1,5 +1,6 @@
 import client           from '../../network';
 import * as netActions  from './network';
+import * as progressActions  from './progress';
 
 export const UPDATE_FOLDER = 'UPDATE_FOLDER';
 export const UPDATE_ITEMS = 'UPDATE_ITEMS';
@@ -92,7 +93,13 @@ export function moveFilesOffline(items) {
   const promises = items.map((id) => client.listFiles(id));
   return dispatch => {
     Promise.all(promises) // get files for each item
-      .then((files) => client.moveFilesOffline(files.reduce((prev, cur) => prev.concat(cur.data), [])))
+      .then((files) => {
+        dispatch(progressActions.setupProgress(files.reduce((prev, cur) => {
+          var curSize = cur.data.reduce((p, c) => p + c.size, 0);
+          return prev + curSize;
+        }, 0)));
+        return client.moveFilesOffline(files.reduce((prev, cur) => prev.concat(cur.data), []));
+      })
       .then((resp) => {
         if (process.env.NODE_ENV !== 'production') console.log('transfer complete');
         // update item meta
@@ -100,7 +107,6 @@ export function moveFilesOffline(items) {
       })
       .then((newItems) => {
         // update local items
-        console.log(newItems);
         dispatch(updateItems(newItems.map(el => el.data)));
         dispatch(clearFileSelection());
       });

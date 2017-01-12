@@ -10,6 +10,7 @@ import get                from 'mout/src/object/get';
 import { connect }        from 'react-redux';
 import { dispatch }       from '../../redux';
 import * as NetActions    from '../../redux/actions/network';
+import * as ProgressActions    from '../../redux/actions/progress';
 
 const TopBar = React.createClass({
 
@@ -102,19 +103,27 @@ export default connect(
     const lastName = get(state, 'auth.user.lastName');
     const pendingRequests = get(state, 'network.pending') || {};
     const numberOfPendingRequest = Object.keys(pendingRequests).length;
-    const progress = Object.keys(state.network.progress).reduce((prev, key) => {
-      var file = state.network.progress[key];
-      return prev + ((file.current / file.total) * 100) / Object.keys(state.network.progress).length;
-    }, 0);
-    const progressReset = get(state, 'network.progressReset');
+    let progress;
+    let progressReset;
+    let resetProgress;
+    if (state.progress.total === null) {
+      progress = Object.keys(state.network.progress).reduce((prev, key) => {
+        var file = state.network.progress[key];
+        return prev + ((file.current / file.total) * 100) / Object.keys(state.network.progress).length;
+      }, 0);
+      progressReset = get(state, 'network.progressReset');
+      resetProgress = (val) => dispatch(NetActions.resetProgress(val));
+    } else {
+      progress = (state.progress.current / state.progress.total) * 100;
+      progressReset = state.progress.progressReset;
+      resetProgress = (val) => dispatch(ProgressActions.resetProgress(val));
+    }
     return {
       userName: firstName ? `${firstName} ${lastName}` : null,
       isBusy: !!numberOfPendingRequest,
       progress: progress || 0,
       progressReset,
+      resetProgress,
     };
-  },
-  () => ({
-    resetProgress: (packet) => dispatch(NetActions.resetProgress(packet)),
-  })
+  }
 )(TopBar);

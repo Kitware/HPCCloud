@@ -1,6 +1,7 @@
 import * as netActions     from './network';
 import * as projActions    from './projects';
 import * as clusterActions from './clusters';
+import * as progressActions from './progress';
 import client              from '../../network';
 import { store, dispatch } from '..';
 
@@ -484,6 +485,9 @@ client.onEvent((resp) => {
   } else if (resp.data.log) {
     processLogEvent(id, type, resp.data.log);
   } else if (resp.type === 'progress') {
-    console.log(resp.data.message, `${resp.data.current}/${resp.data.total}`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(resp.data.message, `${resp.data.current}/${resp.data.total}`);
+    }
+    dispatch(progressActions.onProgress(resp.data.current));
   }
 });
