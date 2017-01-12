@@ -50,5 +50,32 @@
         "cblas-type": ""
       }
     ]
+  },
+  "ComputeNode": {
+    "config.host": "192.168.100.100",
+    "config.ssh.user": "demo",
+    "config.jobOutputDir": "/home/demo",
+    "config.scheduler": {
+      "type": "sge",
+      "maxWallTime": { "hours": 0, "minutes": 0, "seconds": 0 },
+      "defaultQueue": "",
+      "sge": {
+        "numberOfGpusPerNode": 0,
+        "numberOfSlots": 1
+      }
+    },
+    "config.paraview.installDir": "/opt/paraview",
+    "config.pyfr.cuda": false,
+    "config.pyfr.opencl": [],
+    "config.pyfr.openmp": [
+      {
+        "name": "Default",
+        "cc": "",
+        "cflags": "",
+        "cblas": "/usr/lib/libblas/libblas.so",
+        "cblas-type": ""
+      }
+    ],
+    "config.openfoam.enable": true
   }
 }

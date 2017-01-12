@@ -53,13 +53,15 @@ export default React.createClass({
           clusters = clusters.filter(this.props.clusterFilter);
         }
 
-        this.setState({
+        const newState = {
           profiles: clusters,
-          profile: clusters[0] ? clusters.length > 0 : null,
+          profile: clusters.length > 0 ? clusters[0] : null,
           busy: false,
-        });
-        if (this.props.onChange) {
-          this.props.onChange('profile', resp.data[0]._id, 'Traditional');
+        };
+
+        this.setState(newState);
+        if (this.props.onChange && newState.profile) {
+          this.props.onChange('profile', newState.profile._id, 'Traditional');
         }
       })
       .catch((err) => {
