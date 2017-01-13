@@ -4,231 +4,231 @@
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/components.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.591Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://kitware.github.io/HPCCloud/api/nwchem-neb.html</loc>
-    
-    <lastmod>2017-01-12T23:00:18.575Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.177Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/nwchem-simput.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.575Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.169Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://kitware.github.io/HPCCloud/api/nwchem-neb.html</loc>
+    
+    <lastmod>2017-01-13T21:58:06.165Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/nwchem-exec.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.571Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.161Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/common.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.567Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.161Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/View.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.547Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.141Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/New.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.543Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.137Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/Edit.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.539Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.133Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/All.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.527Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.121Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/User.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.523Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.117Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/ServerStatus.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.515Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.113Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/OpenStack.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.511Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.109Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/Network.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.507Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.105Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/Cluster.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.507Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.101Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/AWS.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.503Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.097Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/docs/vagrant__introduction.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.427Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.021Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/index.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.427Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://kitware.github.io/HPCCloud/docs/index.html</loc>
-    
-    <lastmod>2017-01-12T23:00:18.423Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://kitware.github.io/HPCCloud/docs/development__workflows.html</loc>
-    
-    <lastmod>2017-01-12T23:00:18.423Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://kitware.github.io/HPCCloud/docs/general__getting-started.html</loc>
-    
-    <lastmod>2017-01-12T23:00:18.423Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://kitware.github.io/HPCCloud/docs/general__glossary.html</loc>
-    
-    <lastmod>2017-01-12T23:00:18.423Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://kitware.github.io/HPCCloud/docs/usage__aws-profiles.html</loc>
-    
-    <lastmod>2017-01-12T23:00:18.423Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://kitware.github.io/HPCCloud/docs/usage__create-account.html</loc>
-    
-    <lastmod>2017-01-12T23:00:18.423Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://kitware.github.io/HPCCloud/docs/usage__creating.html</loc>
-    
-    <lastmod>2017-01-12T23:00:18.423Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://kitware.github.io/HPCCloud/docs/usage__running.html</loc>
-    
-    <lastmod>2017-01-12T23:00:18.423Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.021Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/docs/usage__simput.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.423Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.021Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/docs/usage__trad-cluster.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.423Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.021Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://kitware.github.io/HPCCloud/docs/development__tools.html</loc>
+    <loc>https://kitware.github.io/HPCCloud/docs/usage__running.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.419Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.021Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://kitware.github.io/HPCCloud/docs/usage__aws-profiles.html</loc>
+    
+    <lastmod>2017-01-13T21:58:06.017Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/docs/development__redux.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.419Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.017Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://kitware.github.io/HPCCloud/docs/development__workflows.html</loc>
+    
+    <lastmod>2017-01-13T21:58:06.017Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://kitware.github.io/HPCCloud/docs/general__glossary.html</loc>
+    
+    <lastmod>2017-01-13T21:58:06.017Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://kitware.github.io/HPCCloud/docs/general__getting-started.html</loc>
+    
+    <lastmod>2017-01-13T21:58:06.017Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://kitware.github.io/HPCCloud/docs/index.html</loc>
+    
+    <lastmod>2017-01-13T21:58:06.017Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://kitware.github.io/HPCCloud/docs/development__tools.html</loc>
+    
+    <lastmod>2017-01-13T21:58:06.017Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://kitware.github.io/HPCCloud/docs/usage__create-account.html</loc>
+    
+    <lastmod>2017-01-13T21:58:06.017Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://kitware.github.io/HPCCloud/docs/usage__creating.html</loc>
+    
+    <lastmod>2017-01-13T21:58:06.017Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/docs/development__panels.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.419Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.017Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/docs/development__dev-intro.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.419Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.017Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/api/index.html</loc>
     
-    <lastmod>2017-01-12T23:00:18.419Z</lastmod>
+    <lastmod>2017-01-13T21:58:06.013Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://kitware.github.io/HPCCloud/HPCCloud/2016/04/29/kw-doc/</loc>
     
-    <lastmod>2017-01-12T23:00:18.395Z</lastmod>
+    <lastmod>2017-01-13T21:58:05.981Z</lastmod>
     
   </url>
   
