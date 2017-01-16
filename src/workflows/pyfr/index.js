@@ -2,7 +2,7 @@ import rootNewProject         from './components/root/NewProject';
 import rootEditProject        from './components/root/EditProject';
 import rootNewSimulation      from './components/root/NewSimulation';
 import rootEditSimulation     from './components/root/EditSimulation';
-import rootViewSimulation     from './components/root/ViewSimulation';
+import rootViewSimulation     from '../generic/components/root/ViewSimulation';
 
 import stepIntroduction       from './components/steps/Introduction';
 import stepInput              from './components/steps/Input';
