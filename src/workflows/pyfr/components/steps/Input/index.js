@@ -62,7 +62,7 @@ const SimputPanel = React.createClass({
   componentWillMount() {
     var iniFile = this.props.simulation.metadata.inputFolder.files.ini;
     var jsonData = this.props.simulation.steps[this.props.step].metadata.model;
-
+    console.log(iniFile, '\n', jsonData);
     // Create ini file from the project level ini if not already here
     if (!iniFile) {
       // download ini file contents of project ini
@@ -77,7 +77,7 @@ const SimputPanel = React.createClass({
                 boundaryNames[name] = name;
               });
             }
-            jsonData = jsonData = {
+            jsonData = {
               data: parsedIni,
               type: 'pyfr',
               external: { 'boundary-names': boundaryNames },
@@ -149,10 +149,14 @@ const SimputPanel = React.createClass({
         });
     } else {
       if (typeof jsonData === 'string') {
-        jsonData = JSON.parse(jsonData);
-      } else {
-        console.log('Can not convert jsonData (?)', jsonData);
+        try {
+          jsonData = JSON.parse(jsonData);
+        } catch (err) {
+          console.error('Cannot convert jsonData:', jsonData, '\n', err);
+          return;
+        }
       }
+      this.setState({ jsonData });
     }
   },
 
@@ -178,12 +182,12 @@ const SimputPanel = React.createClass({
 
     // Update ini file content
     try {
+      delete jsonData.data.backend; // we want to use the backend configured from the cluster
+      const convertedData = this.props.convert(jsonData);
+      console.log(convertedData);
+      const content = convertedData.results['pyfr.ini'];
+      console.log('try to save content', content.length);
       if (this.state.iniFile) {
-        delete jsonData.data.backend; // we want to use the backend configured from the cluster
-        const convertedData = this.props.convert(jsonData);
-        console.log(convertedData);
-        const content = convertedData.results['pyfr.ini'];
-        console.log('try to save content', content.length);
         const blob = new Blob([content], { type: 'text/plain' });
         client.updateFileContent(this.state.iniFile, content.length)
           .then(upload => {
@@ -199,7 +203,24 @@ const SimputPanel = React.createClass({
           dispatch(Actions.patchSimulation(newSim));
         }
       } else {
-        console.log('no .ini file');
+        console.log('no .ini file, creating one');
+        simulationsHelper.addFileForSimulationWithContents(this.props.simulation, 'pyfr.ini', content)
+          .then((resp) => {
+            const _id = resp._id; // file Id, custom response
+            const newSim = deepClone(this.props.simulation);
+            newSim.metadata.inputFolder.files.ini = _id;
+            newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
+            this.setState({ iniFile: _id });
+            this.props.patchSimulation(newSim);
+            console.log(`created file: ${_id}`);
+            // Update step metadata
+            return client.updateSimulationStep(this.props.simulation._id, this.props.step, {
+              metadata: { model: JSON.stringify(jsonData) },
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       }
     } catch (e) {
       console.error('Error when generating ini file: ', e);
@@ -218,10 +239,12 @@ const SimputPanel = React.createClass({
     const data = this.state.viewData,
       keypath = newData.id.split('.'),
       attrName = keypath.shift();
-    console.log(attrName, keypath, newData);
     data[attrName][keypath.join('.')].value = newData.value;
-    console.log(data, data[attrName][keypath.join('.')].value);
     this.setState({ viewData: data });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(attrName, keypath, newData);
+      console.log(data, data[attrName][keypath.join('.')].value);
+    }
   },
 
   render() {
