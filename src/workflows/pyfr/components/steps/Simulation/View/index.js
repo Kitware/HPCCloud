@@ -149,7 +149,7 @@ export default connect(
 
     if (fileSelection.length > 0 && taskflow.actions && taskflow.actions.indexOf('moveOffline') === -1) {
       taskflow.actions.push('moveOffline');
-    } else if (!fileSelection.length && taskflow.actions) {
+    } else if (!fileSelection.length && taskflow && taskflow.actions) {
       taskflow.actions.splice(taskflow.actions.indexOf('moveOffline'), 1);
     }
 

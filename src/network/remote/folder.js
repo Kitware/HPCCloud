@@ -7,7 +7,7 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
       const allowed = ['parentType', 'parentId', 'text', 'limit', 'offset', 'sort', 'sortdir'],
         params = filterQuery(query, ...allowed);
 
-      return busy(client._.get('/folder', { params }));
+      return busy(client._.get(`/folder${encodeQueryAsString(params)}`));
     },
 
     createFolder(folder) {

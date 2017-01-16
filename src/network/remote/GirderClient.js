@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { CancelToken } from 'axios';
 import Monologue from 'monologue.js';
 
 // ----------------------------------------------------------------------------
@@ -120,8 +120,32 @@ export function build(config = location, ...extensions) {
           headers['Girder-Token'] = token;
         }
 
-        client._ = axios.create({
+        client._ = {};
+
+        const methods = axios.create({
           baseURL, timeout, headers,
+        });
+
+        // wrap xhr requests so we can give a cancel to each,
+        // we need to make a new cancel token for each request.
+        ['get', 'delete', 'head'].forEach(req => {
+          client._[req] = (url, conf) => {
+            const cSource = CancelToken.source();
+            client.cancel = cSource.cancel;
+            return methods[req](url, Object.assign({}, conf, {
+              cancelToken: cSource.token,
+            }));
+          };
+        });
+
+        ['post', 'put', 'patch'].forEach(req => {
+          client._[req] = (url, data, conf) => {
+            const cSource = CancelToken.source();
+            client.cancel = cSource.cancel;
+            return methods[req](url, data, Object.assign({}, conf, {
+              cancelToken: cSource.token,
+            }));
+          };
         });
       },
       updateAuthenticationState(state) {
@@ -228,6 +252,12 @@ export function build(config = location, ...extensions) {
     destroy() {
       notification.off();
     },
+
+    cancel() {
+      if (client.cancel) {
+        client.cancel('request was canceled');
+      }
+    },
   };
 
   // Try to extract token from
@@ -261,6 +291,7 @@ export function build(config = location, ...extensions) {
 
   // Expend client
   client.baseURL = baseURL;
+  client.cancel = null;
 
   // Add extensions
   const spec = {

@@ -33,6 +33,7 @@ export default React.createClass({
   },
 
   componentWillUnmount() {
+    client.cancel();
     document.removeEventListener('keyup', this.keyPressed);
   },
 
