@@ -46,6 +46,9 @@ module.exports = {
             workflows: path.resolve('./src/workflows')
         },
     },
+    externals: {
+      Simput: 'Simput',
+    },
     postcss: [
         require('autoprefixer')({ browsers: ['last 2 versions'] }),
     ],
