@@ -1,5 +1,5 @@
 import rootNewProject         from './components/root/NewProject';
-import rootViewSimulation     from '../common/root/ViewSimulation';
+import rootViewSimulation     from '../../generic/components/root/ViewSimulation';
 
 import stepInput              from './components/steps/Input';
 

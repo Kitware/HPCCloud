@@ -11,9 +11,9 @@ export default React.createClass({
 
   render() {
     return (
-        <div>
-          <FileUploadEntry name="startGeometry" label="Starting Geometry file" accept=".xyz" owner={ this.props.owner } />
-          <FileUploadEntry name="endGeometry" label="Final Geometry file" accept=".xyz" owner={ this.props.owner } />
-        </div>);
+      <div>
+        <FileUploadEntry name="startGeometry" label="Starting Geometry file" accept=".xyz" owner={ this.props.owner } />
+        <FileUploadEntry name="endGeometry" label="Final Geometry file" accept=".xyz" owner={ this.props.owner } />
+      </div>);
   },
 });
