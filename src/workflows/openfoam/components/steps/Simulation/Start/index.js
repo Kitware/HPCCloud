@@ -48,7 +48,7 @@ const SimulationStart = React.createClass({
     var shFile = this.props.simulation.metadata.inputFolder.files.sh;
     // use the ini file from the project
     if (!shFile) {
-      client.createItem(this.props.simulation.metadata.inputFolder._id, 'shFile')
+      client.createItem(this.props.simulation.metadata.inputFolder._id, 'sh')
         .then(resp =>
           client.copyFile(this.props.project.metadata.inputFolder.files.sh, resp.data._id)
         )

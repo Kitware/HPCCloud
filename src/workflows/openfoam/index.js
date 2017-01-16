@@ -1,4 +1,4 @@
-import rootViewSimulation   from './components/root/ViewSimulation';
+import rootViewSimulation     from '../generic/components/root/ViewSimulation';
 
 import stepIntroduction       from './components/steps/Introduction';
 import stepInput              from './components/steps/Input';
