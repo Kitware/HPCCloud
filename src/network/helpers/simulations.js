@@ -24,15 +24,15 @@ function createItemForSimulation(simulation, name, file) {
     });
 }
 
-export function addFileForSimulationWithContents(simulation, name, contents) {
+export function addFileForSimulationWithContents(simulation, itemName, fileName, contents) {
   let fileId;
-  return girder.createItem(simulation.metadata.inputFolder._id, name)
+  return girder.createItem(simulation.metadata.inputFolder._id, itemName)
     .then(resp => {
       const parentId = resp.data._id;
       return girder.newFile({
         parentType: 'item',
         parentId,
-        name,
+        name: fileName,
         size: 0,
       });
     })
@@ -50,14 +50,14 @@ export function addFileForSimulationWithContents(simulation, name, contents) {
     });
 }
 
-export function addEmptyFileForSimulation(simulation, name) {
-  return girder.createItem(simulation.metadata.inputFolder._id, name)
+export function addEmptyFileForSimulation(simulation, itemName, fileName) {
+  return girder.createItem(simulation.metadata.inputFolder._id, itemName)
     .then(resp => {
       const parentId = resp.data._id;
       return girder.newFile({
         parentType: 'item',
         parentId,
-        name,
+        name: fileName,
         size: 0,
       });
     });
