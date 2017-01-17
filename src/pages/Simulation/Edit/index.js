@@ -108,9 +108,12 @@ const SimulationEdit = React.createClass({
 
 export default connect(
   (state, props) => {
-    const project = state.projects.mapById[state.projects.active];
-    const simulations = state.projects.simulations[state.projects.active];
-    const simulation = state.simulations.mapById[simulations.active];
+    const simId = props.params.id;
+    const simulation = state.simulations.mapById[simId];
+    let project = {};
+    if (simulation && simulation.projectId) {
+      project = state.projects.mapById[simulation.projectId];
+    }
     return {
       error: getNetworkError(state, ['save_simulation', `delete_simulation_${props.params.id}`]),
       project,
