@@ -7,7 +7,7 @@ import * as Actions from '../../../../../redux/actions/projects';
 export default connect(
   state => ({
     simputType: 'openfoam_tutorials',
-    inputFileKeys: [{ key: 'sh', name: 'run.sh' }],
+    inputFileKeys: [{ key: 'sh', name: 'run.sh', parse: false }],
     initialDataModel: {
       data: {},
       type: 'openfoam_tutorials',
