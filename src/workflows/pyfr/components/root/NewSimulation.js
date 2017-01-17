@@ -24,7 +24,7 @@ const NewSimulation = React.createClass({
           reject();
         }
         try {
-          Simput.types.pyfr.parse('pyfr', reader.result);
+          Simput.types.pyfr.parse('pyfr', { 'pyfr.ini': reader.result });
         } catch (e) {
           this.props.onParseError(`Error parsing file:\n${e}`);
           this.props.owner().removeMetadata('ini');
