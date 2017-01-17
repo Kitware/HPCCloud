@@ -21,7 +21,7 @@ export default class SimputReact extends React.Component {
     this.fileNameToKeyMap = {};
     this.state = {
       // Simput root data
-      jsonData: props.initialDataModel,
+      jsonData: props.simputModelDecorator(props.initialDataModel, props),
 
       // Language support
       labels: new SimputLabels(Simput.types[props.simputType], 'en'),
@@ -48,7 +48,7 @@ export default class SimputReact extends React.Component {
           .then((resp) => {
             // Capture file content in case we need to parse it
             this.fileContent[key] = resp.data;
-            return simulationsHelper.addFileForSimulationWithContents(this.props.simulation, name, resp.data);
+            return simulationsHelper.addFileForSimulationWithContents(this.props.simulation, key, name, resp.data);
           })
           // update file id in simulation metadata
           .then(resp => {
@@ -59,13 +59,14 @@ export default class SimputReact extends React.Component {
             return simulationsHelper.saveSimulation(newSim);
           }));
       }
+    });
 
+    props.inputFileKeys.forEach(({ key, name }) => {
       // Process simulation file if any
       Promise.all(promises).then(() => {
         const inputFile = this.props.simulation.metadata.inputFolder.files[key];
         if (!inputFile) {
-          console.log('no inputFolder.files', key);
-          promises.push(simulationsHelper.addEmptyFileForSimulation(this.props.simulation, name)
+          promises.push(simulationsHelper.addEmptyFileForSimulation(this.props.simulation, key, name)
             .then(resp => {
               const _id = resp.data._id; // itemId
               this.props.simulation.metadata.inputFolder.files[key] = _id;
@@ -75,7 +76,6 @@ export default class SimputReact extends React.Component {
               return internalPromise;
             }));
         } else {
-          console.log('Got inputFolder.files', key, inputFile);
           this.setState({ [key]: inputFile });
         }
       });
@@ -85,17 +85,19 @@ export default class SimputReact extends React.Component {
     let jsonData = this.props.simulation.steps[this.props.step].metadata.model;
     if (jsonData) {
       if (typeof jsonData === 'string') {
-        this.state.jsonData = JSON.parse(jsonData);
+        this.state.jsonData = props.simputModelDecorator(JSON.parse(jsonData), props);
       } else {
         console.log('Can not convert jsonData (?)', jsonData);
       }
     } else {
       // Generic empty value
-      jsonData = props.initialDataModel;
+      jsonData = props.simputModelDecorator(props.initialDataModel, props);
 
       // Make sure all previous network calls are done
       Promise.all(promises).then(() => {
         const updateSimulationStep = () => {
+          jsonData = props.simputModelDecorator(jsonData, props);
+          this.setState({ jsonData });
           // Update step metadata
           client.updateSimulationStep(this.props.simulation._id, this.props.step, {
             metadata: { model: JSON.stringify(jsonData) },
@@ -125,7 +127,7 @@ export default class SimputReact extends React.Component {
               fileNameToContentMap[name] = this.fileContent[key];
             });
             try {
-              jsonData = simputModule.parse(props.simputType, fileNameToContentMap);
+              jsonData = Object.assign({}, jsonData, { data: simputModule.parse(props.simputType, fileNameToContentMap) });
               updateSimulationStep();
             } catch (parseError) {
               jsonData = props.initialDataModel;
@@ -181,7 +183,7 @@ export default class SimputReact extends React.Component {
                 client.uploadChunk(upload.data._id, 0, blob);
               })
               .catch(err => {
-                console.log('Error update ini content', err);
+                console.log('Error update content', fileKey, fileName, err);
               });
 
             const simulationStepIndex = this.props.simulation.disabled.indexOf(this.props.nextStep);
@@ -258,6 +260,7 @@ SimputReact.propTypes = {
   inputFileKeys: React.PropTypes.array, // [{ key: 'sh', name: 'run.sh', parse: false }, ...]
   initialDataModel: React.PropTypes.object,
   nextStep: React.PropTypes.string,
+  simputModelDecorator: React.PropTypes.func,
 
   project: React.PropTypes.object,
   simulation: React.PropTypes.object,
@@ -272,4 +275,5 @@ SimputReact.defaultProps = {
   inputFileKeys: [],
   initialDataModel: null,
   nextStep: 'Simulation',
+  simputModelDecorator: (m, props) => m,
 };
