@@ -16,12 +16,18 @@ export default class SimputReact extends React.Component {
   constructor(props) {
     super(props);
 
+    // Manually bind this method to the component instance...
+    this.saveModel = this.saveModel.bind(this);
+    this.updateActive = this.updateActive.bind(this);
+    this.updateViewData = this.updateViewData.bind(this);
+
+    // Manage internal state
     const simputModule = Simput.types[this.props.simputType];
     const promises = [];
     this.fileNameToKeyMap = {};
     this.state = {
       // Simput root data
-      jsonData: props.simputModelDecorator(props.initialDataModel, props),
+      jsonData: props.simputModelDecorator(props.initialDataModel, props, this.saveModel),
 
       // Language support
       labels: new SimputLabels(Simput.types[props.simputType], 'en'),
@@ -141,11 +147,6 @@ export default class SimputReact extends React.Component {
         }
       });
     }
-
-    // Manually bind this method to the component instance...
-    this.saveModel = this.saveModel.bind(this);
-    this.updateActive = this.updateActive.bind(this);
-    this.updateViewData = this.updateViewData.bind(this);
   }
 
   componentWillUnmount() {
@@ -154,7 +155,8 @@ export default class SimputReact extends React.Component {
 
   saveModel() {
     // Update step metadata with the latest json data model
-    const model = JSON.stringify(this.state.jsonData);
+    const jsonData = this.props.simputModelDecorator(this.state.jsonData, this.props);
+    const model = JSON.stringify(jsonData);
     client.updateSimulationStep(this.props.simulation._id, this.props.step, {
       metadata: { model },
     })
@@ -169,8 +171,8 @@ export default class SimputReact extends React.Component {
 
     // Generate new input files and update content on server
     try {
-      const convertedData = Simput.types[this.props.simputType].convert(this.state.jsonData);
-      if (!convertedData.error) {
+      const convertedData = Simput.types[this.props.simputType].convert(jsonData);
+      if (!convertedData.errors || convertedData.errors.length === 0) {
         // No error in convertion
         Object.keys(convertedData.results).forEach((fileName) => {
           const fileKey = this.fileNameToKeyMap[fileName];
@@ -198,7 +200,8 @@ export default class SimputReact extends React.Component {
           }
         });
       } else {
-        console.error('Got errors when generating files from simput model: ', convertedData.error);
+        console.error('Got errors when generating files from simput model: ');
+        convertedData.errors.forEach(error => console.error(error));
       }
     } catch (e) {
       console.error('Error when generating files from simput model: ', e);
@@ -275,5 +278,5 @@ SimputReact.defaultProps = {
   inputFileKeys: [],
   initialDataModel: null,
   nextStep: 'Simulation',
-  simputModelDecorator: (m, props) => m,
+  simputModelDecorator: (m, props, asynReady) => m,
 };
