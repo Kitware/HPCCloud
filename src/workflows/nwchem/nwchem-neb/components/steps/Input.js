@@ -1,9 +1,9 @@
 import { connect }  from 'react-redux';
 
-import SimputReact  from '../../../../../generic/components/steps/SimputReact';
-import { dispatch } from '../../../../../../redux';
-import * as Actions from '../../../../../../redux/actions/projects';
-import client       from '../../../../../../network';
+import SimputReact  from '../../../../generic/components/steps/SimputReact';
+import { dispatch } from '../../../../../redux';
+import * as Actions from '../../../../../redux/actions/projects';
+import client       from '../../../../../network';
 
 // {
 //    [projectID]: {

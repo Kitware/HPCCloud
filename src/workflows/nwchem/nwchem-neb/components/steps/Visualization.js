@@ -1,6 +1,6 @@
-import React from 'react';
+import React   from 'react';
 import candela from 'candela';
-import client from '../../../../../../../network';
+import client  from '../../../../../network';
 
 const auToEv = 27.2116;
 const evToKcal = 23.06;

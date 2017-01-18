@@ -1,12 +1,11 @@
 import rootNewProject         from './components/root/NewProject';
 import rootViewSimulation     from '../../generic/components/root/ViewSimulation';
 
-import stepInput              from './components/steps/Input';
-
 import stepIntroduction       from '../common/steps/Introduction';
+import stepInput              from './components/steps/Input';
 import stepSimulationStart    from '../common/steps/Simulation/Start';
 import stepSimulationView     from '../common/steps/Simulation/View';
-import stepVisualization from './components/steps/Visualization/View';
+import stepVisualization      from './components/steps/Visualization';
 
 export default {
   name: 'NWChem - Nudged Elastic Band (NEB) method',
@@ -62,7 +61,6 @@ export default {
   },
   primaryJobs: {
     Simulation: 'pyfr_run',
-    Visualization: 'paraview',
   },
   labels: {
     Introduction: {
@@ -77,7 +75,6 @@ export default {
     },
     Visualization: {
       default: 'Visualization',
-      run: 'Visualization (running)',
     },
   },
 };
