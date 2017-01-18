@@ -49,26 +49,26 @@ const SimulationStart = React.createClass({
 
   runSimulation() {
     const nwFile = this.props.simulation.metadata.inputFolder.files.nw || this.props.project.metadata.inputFolder.files.nw;
-    var sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96),
-      payload = {
-        backend: this.state.backend,
-        input: {
-          folder: {
-            id: this.props.simulation.metadata.inputFolder._id,
-          },
-          geometryFile: {
-            id: this.props.simulation.metadata.inputFolder.files.geometry,
-          },
-          nwFile: {
-            id: nwFile,
-          },
+    const sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
+    let payload = {
+      backend: this.state.backend,
+      input: {
+        folder: {
+          id: this.props.simulation.metadata.inputFolder._id,
         },
-        output: {
-          folder: {
-            id: this.props.simulation.metadata.outputFolder._id,
-          },
+        geometryFile: {
+          id: this.props.simulation.metadata.inputFolder.files.geometry,
         },
-      };
+        nwFile: {
+          id: nwFile,
+        },
+      },
+      output: {
+        folder: {
+          id: this.props.simulation.metadata.outputFolder._id,
+        },
+      },
+    };
 
     if (this.state.serverType === 'Traditional') {
       payload = Object.assign(payload,

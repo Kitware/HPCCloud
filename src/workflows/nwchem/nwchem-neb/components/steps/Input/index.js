@@ -12,42 +12,62 @@ import client       from '../../../../../../network';
 //    }
 // }
 const fileContainer = {};
+const pendingDownload = [];
+const callbacks = {};
 
 export default connect(
   (state, properties) => {
     // Trigger download
-    console.log('init nwchem', properties);
     if (!fileContainer[properties.project._id]) {
       fileContainer[properties.project._id] = {};
     }
-    const fileContentContainer = fileContainer[properties.project._id];
 
     // Download startGeometry
-    if (properties.project.metadata.inputFolder.files.startGeometry) {
-      client.downloadFile(
-        properties.project.metadata.inputFolder.files.startGeometry, null, null, null)
-        .then((resp) => {
-          fileContentContainer.startGeometry = resp.data;
-        })
-        .catch((error) => {
-          console.error('Unable to fetch starting geometry.');
-        });
-    } else {
-      console.error('No start geometry in project.metadata.inputFolder.files', properties);
+    try {
+      const startGeometry = properties.project.metadata.inputFolder.files.startGeometry;
+      if (startGeometry && pendingDownload.indexOf(startGeometry) === -1) {
+        pendingDownload.push(properties.project.metadata.inputFolder.files.startGeometry);
+        client.downloadFile(
+          properties.project.metadata.inputFolder.files.startGeometry, null, null, null)
+          .then((resp) => {
+            fileContainer[properties.project._id].startGeometry = resp.data;
+            if (callbacks[properties.simulation._id]) {
+              callbacks[properties.simulation._id]();
+            }
+          })
+          .catch((error) => {
+            console.error('Unable to fetch starting geometry.', error);
+          });
+      } else if (pendingDownload.indexOf(startGeometry) === -1) {
+        console.error('No start geometry in project.metadata.inputFolder.files', properties);
+      }
+    } catch (startGeometryError) {
+      console.error('Error when dealing with startGeometry', startGeometryError);
     }
+
     // Download endGeometry
-    if (properties.project.metadata.inputFolder.files.endGeometry) {
-      client.downloadFile(
-        properties.project.metadata.inputFolder.files.endGeometry, null, null, null)
-        .then((resp) => {
-          fileContentContainer.endGeometry = resp.data;
-        })
-        .catch((error) => {
-          console.error('Unable to fetch starting geometry.');
-        });
-    } else {
-      console.error('No start geometry in project.metadata.inputFolder.files', properties);
+    try {
+      const endGeometry = properties.project.metadata.inputFolder.files.endGeometry;
+      if (endGeometry && pendingDownload.indexOf(endGeometry) === -1) {
+        pendingDownload.push(properties.project.metadata.inputFolder.files.endGeometry);
+        client.downloadFile(
+          properties.project.metadata.inputFolder.files.endGeometry, null, null, null)
+          .then((resp) => {
+            fileContainer[properties.project._id].endGeometry = resp.data;
+            if (callbacks[properties.simulation._id]) {
+              callbacks[properties.simulation._id]();
+            }
+          })
+          .catch((error) => {
+            console.error('Unable to fetch starting geometry.', error);
+          });
+      } else if (pendingDownload.indexOf(endGeometry) === -1) {
+        console.error('No start geometry in project.metadata.inputFolder.files', properties);
+      }
+    } catch (endGeometryError) {
+      console.error('Error when dealing with endGeometry', endGeometryError);
     }
+
     // ------------------------------------------------------------------------
 
     // Return new props
@@ -60,8 +80,10 @@ export default connect(
         hideViews: [],
       },
       nextStep: 'Simulation',
-      simputModelDecorator(model, props) {
-        let errorCount = 0;
+      simputModelDecorator(model, props, asyncReady) {
+        if (asyncReady) {
+          callbacks[props.simulation._id] = asyncReady;
+        }
 
         // Add external data from project mesh
         if (!model.external) {
@@ -69,31 +91,29 @@ export default connect(
         }
 
         // Add external
-        if (props.simulation.metadata.inputFolder.geometry) {
-          model.external.input = props.simulation.metadata.inputFolder.geometry;
-        } else {
-          console.error('No simulation geometry');
-          errorCount++;
-        }
+        // --------------------------------------------------------------------
+        // FIXME: Chris
+        // ===> Does not seems to make sens for NWChem-neg
+        // --------------------------------------------------------------------
+        // if (props.simulation.metadata.inputFolder.geometry) {
+        //   model.external.input = props.simulation.metadata.inputFolder.geometry;
+        // } else {
+        //   console.error('No simulation geometry');
+        // }
+        // --------------------------------------------------------------------
 
         // Add start geometry
-        if (!model.external.startGeometry && fileContainer[props.project._id].startGeometry) {
-          model.external.startGeometry = { value: [fileContainer[props.project._id].startGeometry] };
+        if (fileContainer[props.project._id].startGeometry) {
+          model.external.startGeometry = fileContainer[props.project._id].startGeometry;
         } else if (!fileContainer[props.project._id].startGeometry) {
-          console.log('no start geometry yet');
-          errorCount++;
+          model.external.startGeometry = '';
         }
 
         // Add end geometry
-        if (!model.external.endGeometry && fileContainer[props.project._id].endGeometry) {
-          model.external.endGeometry = { value: [fileContainer[props.project._id].endGeometry] };
+        if (fileContainer[props.project._id].endGeometry) {
+          model.external.endGeometry = fileContainer[props.project._id].endGeometry;
         } else if (!fileContainer[props.project._id].endGeometry) {
-          console.log('no end geometry yet');
-          errorCount++;
-        }
-
-        if (errorCount === 0) {
-          console.log('The model is all set... GOOD');
+          model.external.endGeometry = '';
         }
 
         return model;
