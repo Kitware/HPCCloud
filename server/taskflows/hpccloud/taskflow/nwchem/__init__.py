@@ -130,6 +130,7 @@ def create_job(task, upstream_result):
     task.logger.info('Taskflow %s' % task.taskflow.id)
     task.taskflow.logger.info('Create NWChem job.')
     input_folder_id = upstream_result['input']['folder']['id']
+    project_input_folder_id = upstream_result['input']['project']['folder']['id']
 
     # TODO: setup command to run with mpi
     body = {
@@ -142,6 +143,9 @@ def create_job(task, upstream_result):
         'input': [
             {
               'folderId': input_folder_id,
+              'path': 'input'
+            }, {
+              'folderId': project_input_folder_id,
               'path': 'input'
             }
         ],

@@ -6,7 +6,7 @@ import ClusterPayloads         from '../../../../../../utils/ClusterPayload';
 
 import merge                   from 'mout/src/object/merge';
 
-import { connect } from 'react-redux';
+import { connect }  from 'react-redux';
 import get          from 'mout/src/object/get';
 import { dispatch } from '../../../../../../redux';
 import * as Actions from '../../../../../../redux/actions/taskflows';
@@ -55,6 +55,11 @@ const SimulationStart = React.createClass({
       input: {
         folder: {
           id: this.props.simulation.metadata.inputFolder._id,
+        },
+        project: {
+          folder: {
+            id: this.props.project.metadata.inputFolder._id,
+          },
         },
         geometryFile: {
           id: this.props.simulation.metadata.inputFolder.files.geometry,
