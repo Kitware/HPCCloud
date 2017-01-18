@@ -1,9 +1,9 @@
 import { connect }  from 'react-redux';
 
-import SimputReact  from '../../../../generic/components/steps/SimputReact';
-import { dispatch } from '../../../../../redux';
-import * as Actions from '../../../../../redux/actions/projects';
-// import client       from '../../../../../../network';
+import SimputReact  from '../../../../../generic/components/steps/SimputReact';
+import { dispatch } from '../../../../../../redux';
+import * as Actions from '../../../../../../redux/actions/projects';
+import client       from '../../../../../../network';
 
 // {
 //    [projectID]: {
@@ -11,56 +11,52 @@ import * as Actions from '../../../../../redux/actions/projects';
 //       endGeometry: 'content...',
 //    }
 // }
-// const fileContainer = {};
+const fileContainer = {};
 
 export default connect(
   (state, properties) => {
-    console.log('stupid me...');
-    // ------------------------------------------------------------------------
-    // Useless code
-    // ------------------------------------------------------------------------
-    // // Trigger download
-    // console.log('init nwchem', properties);
-    // if (!fileContainer[properties.project._id]) {
-    //   fileContainer[properties.project._id] = {};
-    // }
-    // const fileContentContainer = fileContainer[properties.project._id];
+    // Trigger download
+    console.log('init nwchem', properties);
+    if (!fileContainer[properties.project._id]) {
+      fileContainer[properties.project._id] = {};
+    }
+    const fileContentContainer = fileContainer[properties.project._id];
 
-    // // Download startGeometry
-    // if (properties.project.metadata.inputFolder.files.startGeometry) {
-    //   client.downloadFile(
-    //     properties.project.metadata.inputFolder.files.startGeometry, null, null, null)
-    //     .then((resp) => {
-    //       fileContentContainer.startGeometry = resp.data;
-    //     })
-    //     .catch((error) => {
-    //       console.error('Unable to fetch starting geometry.');
-    //     });
-    // } else {
-    //   console.error('No start geometry in project.metadata.inputFolder.files', properties);
-    // }
-    // // Download endGeometry
-    // if (properties.project.metadata.inputFolder.files.endGeometry) {
-    //   client.downloadFile(
-    //     properties.project.metadata.inputFolder.files.endGeometry, null, null, null)
-    //     .then((resp) => {
-    //       fileContentContainer.endGeometry = resp.data;
-    //     })
-    //     .catch((error) => {
-    //       console.error('Unable to fetch starting geometry.');
-    //     });
-    // } else {
-    //   console.error('No start geometry in project.metadata.inputFolder.files', properties);
-    // }
+    // Download startGeometry
+    if (properties.project.metadata.inputFolder.files.startGeometry) {
+      client.downloadFile(
+        properties.project.metadata.inputFolder.files.startGeometry, null, null, null)
+        .then((resp) => {
+          fileContentContainer.startGeometry = resp.data;
+        })
+        .catch((error) => {
+          console.error('Unable to fetch starting geometry.');
+        });
+    } else {
+      console.error('No start geometry in project.metadata.inputFolder.files', properties);
+    }
+    // Download endGeometry
+    if (properties.project.metadata.inputFolder.files.endGeometry) {
+      client.downloadFile(
+        properties.project.metadata.inputFolder.files.endGeometry, null, null, null)
+        .then((resp) => {
+          fileContentContainer.endGeometry = resp.data;
+        })
+        .catch((error) => {
+          console.error('Unable to fetch starting geometry.');
+        });
+    } else {
+      console.error('No start geometry in project.metadata.inputFolder.files', properties);
+    }
     // ------------------------------------------------------------------------
 
     // Return new props
     return {
-      simputType: 'nwchem_neb',
+      simputType: 'nwchem-neb',
       inputFileKeys: [{ key: 'nw', name: 'job.nw', parse: false }],
       initialDataModel: {
         data: {},
-        type: 'nwchem_neb',
+        type: 'nwchem-neb',
         hideViews: [],
       },
       nextStep: 'Simulation',
@@ -80,23 +76,21 @@ export default connect(
           errorCount++;
         }
 
-        // ------------------------------------------------------------------------
-        // Useless code
-        // ------------------------------------------------------------------------
-        // // Add start/end geometry
-        // if (!model.data.startGeometry && fileContainer[props.project._id].startGeometry) {
-        //   model.data.startGeometry = { value: [fileContainer[props.project._id].startGeometry] };
-        // } else if (!fileContainer[props.project._id].startGeometry) {
-        //   console.log('no start geometry yet');
-        //   errorCount++;
-        // }
-        // if (!model.data.endGeometry && fileContainer[props.project._id].endGeometry) {
-        //   model.data.endGeometry = { value: [fileContainer[props.project._id].endGeometry] };
-        // } else if (!fileContainer[props.project._id].endGeometry) {
-        //   console.log('no end geometry yet');
-        //   errorCount++;
-        // }
-        // ------------------------------------------------------------------------
+        // Add start geometry
+        if (!model.external.startGeometry && fileContainer[props.project._id].startGeometry) {
+          model.external.startGeometry = { value: [fileContainer[props.project._id].startGeometry] };
+        } else if (!fileContainer[props.project._id].startGeometry) {
+          console.log('no start geometry yet');
+          errorCount++;
+        }
+
+        // Add end geometry
+        if (!model.external.endGeometry && fileContainer[props.project._id].endGeometry) {
+          model.external.endGeometry = { value: [fileContainer[props.project._id].endGeometry] };
+        } else if (!fileContainer[props.project._id].endGeometry) {
+          console.log('no end geometry yet');
+          errorCount++;
+        }
 
         if (errorCount === 0) {
           console.log('The model is all set... GOOD');
