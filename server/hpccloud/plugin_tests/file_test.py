@@ -100,14 +100,20 @@ class FileTestCase(TestCase):
         self.assertEqual(file_1['assetstoreId'], file_2['assetstoreId'])
         self.assertEqual(str(file_1['assetstoreId']), target_store['_id'])
 
+        # ensure we can read the files after transfer
+        params = {'contentDisposition': 'inline'}
+        fetched_file = self.request(path='/item/%s/download' % item_1['_id'],
+                                    method='GET', user=self._user, isJson=False,
+                                    params=params)
+        self.assertEqual(self.getBody(fetched_file), 'contents of file 1')
+
         # sse tests
         stream_r = self.request('/notification/stream', method='GET',
                                 user=self._user,
                                 isJson=False, params={'timeout': 0})
         self.assertStatusOk(stream_r)
         notifications = self.getSseMessages(stream_r)
-        # the contents of the fils are small
+        # the contents of the fils are small so there's only 1 notification
         self.assertEqual(len(notifications), 1)
         self.assertEqual(notifications[0]['type'], 'progress')
         self.assertEqual(notifications[0]['data']['message'], 'Done')
-
