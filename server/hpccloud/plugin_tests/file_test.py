@@ -105,6 +105,7 @@ class FileTestCase(TestCase):
         fetched_file = self.request(path='/item/%s/download' % item_1['_id'],
                                     method='GET', user=self._user, isJson=False,
                                     params=params)
+        self.assertStatusOk(fetched_file)
         self.assertEqual(self.getBody(fetched_file), 'contents of file 1')
 
         # sse tests
