@@ -13,6 +13,7 @@ import { getActions, getDisabledButtons }  from '../../../../../../utils/getDisa
 import { connect }      from 'react-redux';
 import { dispatch }     from '../../../../../../redux';
 import * as Actions     from '../../../../../../redux/actions/taskflows';
+import * as fsActions     from '../../../../../../redux/actions/fs';
 import * as SimActions  from '../../../../../../redux/actions/projects';
 import * as ClusterActions  from '../../../../../../redux/actions/clusters';
 
@@ -32,17 +33,23 @@ const SimualtionView = React.createClass({
     onRerun: React.PropTypes.func,
     onVisualizeTaskflow: React.PropTypes.func,
     onTerminateInstance: React.PropTypes.func,
+    onMoveFilesOffline: React.PropTypes.func,
     onMount: React.PropTypes.func,
 
     taskflowId: React.PropTypes.string,
     taskflow: React.PropTypes.object,
     cluster: React.PropTypes.object,
     disabledButtons: React.PropTypes.object,
+    fileSelection: React.PropTypes.array,
     error: React.PropTypes.string,
   },
 
   onAction(action) {
     this[action]();
+  },
+
+  moveOffline() {
+    this.props.onMoveFilesOffline(this.props.fileSelection);
   },
 
   visualizeTaskflow() {
@@ -86,7 +93,11 @@ const SimualtionView = React.createClass({
 
     const { taskflow, taskflowId, cluster, error, simulation, disabledButtons } = this.props;
     const actions = [].concat(taskflow.actions ? taskflow.actions : []);
-    const fileActionsDisabled = cluster ? cluster.status !== 'running' : true;
+    let fileActionsDisabled = false;
+
+    if (cluster && cluster.status !== 'running') {
+      fileActionsDisabled = true;
+    }
 
     if (taskflow.allComplete) {
       actions.push('visualize');
@@ -118,6 +129,7 @@ export default connect(
     var taskflowId = null;
     const activeProject = state.projects.active;
     const activeSimulation = activeProject ? state.projects.simulations[activeProject].active : null;
+    const fileSelection = get(state, 'fs.selection') ? state.fs.selection : [];
 
     if (activeSimulation) {
       const simulation = state.simulations.mapById[activeSimulation];
@@ -135,8 +147,14 @@ export default connect(
       cluster = state.preferences.clusters.mapById[clusterId];
     }
 
+    if (fileSelection.length > 0 && taskflow.actions && taskflow.actions.indexOf('moveOffline') === -1) {
+      taskflow.actions.push('moveOffline');
+    } else if (!fileSelection.length && taskflow && taskflow.actions) {
+      taskflow.actions.splice(taskflow.actions.indexOf('moveOffline'), 1);
+    }
+
     return {
-      taskflowId, cluster, taskflow,
+      taskflowId, cluster, taskflow, fileSelection,
       disabledButtons: getDisabledButtons(state.network, taskflow),
       error: getNetworkError(state, ['terminate_taskflow', 'delete_taskflow']),
     };
@@ -146,6 +164,7 @@ export default connect(
       dispatch(SimActions.saveSimulation(sim, null, location));
     },
     onRerun: (id, stepName, stepData, location) => dispatch(SimActions.updateSimulationStep(id, stepName, stepData, location)),
+    onMoveFilesOffline: (files) => dispatch(fsActions.moveFilesOffline(files)),
     onTerminateTaskflow: (id) => dispatch(Actions.terminateTaskflow(id)),
     onTerminateInstance: (id) => dispatch(ClusterActions.terminateCluster(id)),
   })

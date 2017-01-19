@@ -141,6 +141,10 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
       return busy(client._.post(`/file/${fileId}/copy?itemId=${itemId}`));
     },
 
+    moveFilesOffline(files) {
+      return busy(client._.put('/file/move', files));
+    },
+
     newFile(file) {
       const expected = ['parentType', 'parentId', 'name', 'size', 'mimeType', 'linkUrl'],
         params = filterQuery(file, ...expected),

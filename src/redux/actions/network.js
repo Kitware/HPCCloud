@@ -7,8 +7,8 @@ export const ERROR_NETWORK_CALL = 'ERROR_NETWORK_CALL';
 export const INVALIDATE_ERROR = 'INVALIDATE_ERROR';
 export const INVALIDATE_ERRORS = 'INVALIDATE_ERRORS';
 export const PREPARE_UPLOAD = 'PREPARE_UPLOAD';
-export const RESET_PROGRESS = 'RESET_PROGRESS';
-export const ON_PROGRESS = 'ON_PROGRESS';
+export const RESET_UPLOAD_PROGRESS = 'RESET_UPLOAD_PROGRESS';
+export const ON_UPLOAD_PROGRESS = 'ON_UPLOAD_PROGRESS';
 
 /* eslint-disable no-shadow */
 
@@ -44,12 +44,12 @@ export function prepareUpload(files) {
 }
 
 export function resetProgress(val) {
-  return { type: RESET_PROGRESS, val };
+  return { type: RESET_UPLOAD_PROGRESS, val };
 }
 
 export function onProgress(progressPacket) {
   dispatch({
-    type: ON_PROGRESS,
+    type: ON_UPLOAD_PROGRESS,
     progressPacket,
   });
 }

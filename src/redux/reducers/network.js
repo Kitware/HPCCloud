@@ -116,11 +116,11 @@ export default function networkReducer(state = initialState, action) {
       return Object.assign({}, state, { progress });
     }
 
-    case Actions.RESET_PROGRESS: {
+    case Actions.RESET_UPLOAD_PROGRESS: {
       return Object.assign({}, state, { progress: {}, progressReset: action.val });
     }
 
-    case Actions.ON_PROGRESS: {
+    case Actions.ON_UPLOAD_PROGRESS: {
       const progress = Object.assign({}, state.progress);
       const progressItem = Object.assign({}, progress[action.progressPacket.id]);
       progressItem.current = action.progressPacket.current;

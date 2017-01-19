@@ -11,6 +11,7 @@ export const taskflowActions = {
   visualize: { name: 'visualizeTaskflow', label: 'Visualize', icon: '' },
   rerun: { name: 'rerun', label: 'Rerun', icon: '' },
   terminateInstance: { name: 'terminateInstance', label: 'Terminate EC2 Instance', icon: '' },
+  moveOffline: { name: 'moveOffline', label: 'Move Files Offline', icon: '' },
 };
 
 export function primaryBreadCrumbs(projectId = null, simulationId = null) {

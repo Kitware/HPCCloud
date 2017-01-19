@@ -1,3 +1,4 @@
+add_python_test(file PLUGIN hpccloud)
 add_python_test(projects PLUGIN hpccloud)
 add_python_test(simulations PLUGIN hpccloud)
 add_python_test(utility PLUGIN hpccloud)

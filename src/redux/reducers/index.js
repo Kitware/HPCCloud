@@ -5,6 +5,7 @@ import auth         from './auth';
 import fs           from './fs';
 import network      from './network';
 import preferences  from './preferences';
+import progress     from './progress';
 import projects     from './projects';
 import simulations  from './simulations';
 import taskflows    from './taskflows';
@@ -16,6 +17,7 @@ export default combineReducers({
   fs,
   network,
   preferences,
+  progress,
   projects,
   simulations,
   taskflows,
