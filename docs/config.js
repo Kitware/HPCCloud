@@ -13,6 +13,7 @@ module.exports = {
     url: 'https://kitware.github.io/HPCCloud',
     root: '/HPCCloud/',
     github: 'kitware/HPCCloud',
+    google_analytics: 'UA-90338862-3',
   },
   copy: [],
 };
