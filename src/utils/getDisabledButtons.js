@@ -6,6 +6,7 @@ import Theme               from 'HPCCloudStyle/Theme.mcss';
 // disabled is an object for each action either undefined or with a boolean
 export function getActions(actionsList, disabled) {
   return actionsList.map((action) => Object.assign(
+    {},
     taskflowActions[action],
     {
       disabled: !!disabled[action],
