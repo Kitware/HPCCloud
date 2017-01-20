@@ -75,10 +75,11 @@ export default class SimputReact extends React.Component {
           promises.push(simulationsHelper.addEmptyFileForSimulation(this.props.simulation, key, name)
             .then(resp => {
               const _id = resp.data._id; // itemId
-              this.props.simulation.metadata.inputFolder.files[key] = _id;
+              const newSim = deepClone(this.props.simulation);
+              newSim.metadata.inputFolder.files[key] = _id;
               this.setState({ [key]: _id });
-              const internalPromise = simulationsHelper.saveSimulation(this.props.simulation);
-              internalPromise.then(() => this.props.updateSimulation(this.props.simulation));
+              const internalPromise = simulationsHelper.saveSimulation(newSim);
+              internalPromise.then(() => this.props.updateSimulation(newSim));
               return internalPromise;
             }));
         } else {
