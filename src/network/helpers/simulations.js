@@ -90,7 +90,7 @@ export function saveSimulation(simulation_, attachments) {
       // update sim metadata
       .then((resp) => {
         const inputFolder = resp.data._id;
-        simulation.metadata = {
+        simulation.metadata = Object.assign({}, simulation.metadata, {
           status: 'created',
           inputFolder: {
             _id: inputFolder,
@@ -100,7 +100,7 @@ export function saveSimulation(simulation_, attachments) {
             _id: outputFolder,
             files: {},
           },
-        };
+        });
         return girder.editSimulation(simulation);
       })
       // upload files to inputfolder if there are any,

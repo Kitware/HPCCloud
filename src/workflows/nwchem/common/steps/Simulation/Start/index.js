@@ -48,11 +48,7 @@ const SimulationStart = React.createClass({
   },
 
   runSimulation() {
-    console.log('.metadata.inputFolder.files.nw');
-    console.log('simulation', this.props.simulation);
-    console.log('project', this.props.project);
     const nwFile = this.props.simulation.metadata.inputFolder.files.nw || this.props.project.metadata.inputFolder.files.nw;
-    console.log('nwFile', nwFile);
     const sessionId = btoa(new Float64Array(3).map(Math.random)).substring(0, 96);
     let payload = {
       backend: this.state.backend,

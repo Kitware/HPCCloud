@@ -14,14 +14,14 @@ export default function newProject(props) {
           name="startGeometry"
           label="Starting Geometry file"
           accept=".xyz"
-          owner={ this.props.owner }
+          owner={ props.owner }
           postProcess={ extractFileName('startGeometry') }
         />
         <FileUploadEntry
           name="endGeometry"
           label="Final Geometry file"
           accept=".xyz"
-          owner={ this.props.owner }
+          owner={ props.owner }
           postProcess={ extractFileName('endGeometry') }
         />
     </div>);
