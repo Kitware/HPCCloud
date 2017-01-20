@@ -1,19 +1,32 @@
 import React                from 'react';
 import { FileUploadEntry }  from '../../../../../panels/ItemEditor';
 
-export default React.createClass({
+function extractFileName(name) {
+  return file => new Promise((accept, reject) => {
+    accept({ [name]: file.name });
+  });
+}
 
-  displayName: 'Project/New/NWChem NEB',
+export default function newProject(props) {
+  return (
+    <div>
+        <FileUploadEntry
+          name="startGeometry"
+          label="Starting Geometry file"
+          accept=".xyz"
+          owner={ this.props.owner }
+          postProcess={ extractFileName('startGeometry') }
+        />
+        <FileUploadEntry
+          name="endGeometry"
+          label="Final Geometry file"
+          accept=".xyz"
+          owner={ this.props.owner }
+          postProcess={ extractFileName('endGeometry') }
+        />
+    </div>);
+}
 
-  propTypes: {
-    owner: React.PropTypes.func,
-  },
-
-  render() {
-    return (
-      <div>
-        <FileUploadEntry name="startGeometry" label="Starting Geometry file" accept=".xyz" owner={ this.props.owner } />
-        <FileUploadEntry name="endGeometry" label="Final Geometry file" accept=".xyz" owner={ this.props.owner } />
-      </div>);
-  },
-});
+newProject.propTypes = {
+  owner: React.PropTypes.func,
+};
