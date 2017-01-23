@@ -11,6 +11,7 @@ import * as Actions         from '../../../../../redux/actions/taskflows';
 import * as ClusterActions  from '../../../../../redux/actions/clusters';
 import * as SimActions      from '../../../../../redux/actions/projects';
 
+// ----------------------------------------------------------------------------
 
 function getActions(props) {
   const { taskflow } = props;
@@ -20,6 +21,8 @@ function getActions(props) {
   }
   return actions;
 }
+
+// ----------------------------------------------------------------------------
 
 function onVisualize(props) {
   const location = {
@@ -35,6 +38,8 @@ function onVisualize(props) {
 
   dispatch(SimActions.saveSimulation(newSimState, null, location));
 }
+
+// ----------------------------------------------------------------------------
 
 export default connect(
   (state, props) => {

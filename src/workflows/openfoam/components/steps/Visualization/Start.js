@@ -5,6 +5,8 @@ import { dispatch }    from '../../../../../redux';
 import * as Actions    from '../../../../../redux/actions/taskflows';
 import * as NetActions from '../../../../../redux/actions/network';
 
+// ----------------------------------------------------------------------------
+
 export default connect(
   state => ({
     actionList: [{ name: 'prepareJob', label: 'Start Visualization', icon: '' }],

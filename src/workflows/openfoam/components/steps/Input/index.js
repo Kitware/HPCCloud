@@ -4,6 +4,8 @@ import SimputReact   from '../../../../generic/components/steps/SimputReact';
 import { dispatch } from '../../../../../redux';
 import * as Actions from '../../../../../redux/actions/projects';
 
+// ----------------------------------------------------------------------------
+
 export default connect(
   state => ({
     simputType: 'openfoam_tutorials',

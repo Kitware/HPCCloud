@@ -1,6 +1,8 @@
 import React                from 'react';
 import { FileUploadEntry }  from '../../../../../panels/ItemEditor';
 
+// ----------------------------------------------------------------------------
+
 export default function newSimulation(props) {
   return (
     <div>
@@ -18,6 +20,8 @@ export default function newSimulation(props) {
         />
     </div>);
 }
+
+// ----------------------------------------------------------------------------
 
 newSimulation.propTypes = {
   owner: React.PropTypes.func,

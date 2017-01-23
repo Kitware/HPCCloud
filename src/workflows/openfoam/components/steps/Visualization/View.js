@@ -10,6 +10,8 @@ import * as Actions         from '../../../../../redux/actions/taskflows';
 import * as ClusterActions  from '../../../../../redux/actions/clusters';
 import * as SimActions      from '../../../../../redux/actions/projects';
 
+// ----------------------------------------------------------------------------
+
 function getActions(props) {
   const { taskflow } = props;
   const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
@@ -29,6 +31,8 @@ function getActions(props) {
   return actions;
 }
 
+// ----------------------------------------------------------------------------
+
 function onRerun(props) {
   const stepData = {
     view: 'default',
@@ -45,6 +49,8 @@ function onRerun(props) {
   dispatch(SimActions.updateSimulationStep(props.simulation._id, props.step, stepData, location));
 }
 
+// ----------------------------------------------------------------------------
+
 function onVisualize(props) {
   const location = {
     pathname: props.location.pathname,
@@ -53,6 +59,8 @@ function onVisualize(props) {
   };
   dispatch(SimActions.saveSimulation(props.simulation, null, location));
 }
+
+// ----------------------------------------------------------------------------
 
 export default connect(
   (state, props) => {
