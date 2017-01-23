@@ -1,7 +1,7 @@
 import rootNewProject         from './components/root/NewProject';
-import rootEditProject        from './components/root/EditProject';
+import rootEditProject        from '../generic/components/root/EditProjectWithFileListing';
 import rootNewSimulation      from './components/root/NewSimulation';
-import rootEditSimulation     from './components/root/EditSimulation';
+import rootEditSimulation     from '../generic/components/root/EditSimulationWithFileListing';
 import rootViewSimulation     from '../generic/components/root/ViewSimulation';
 
 import stepIntroduction       from './components/steps/Introduction';
