@@ -53,7 +53,7 @@ const FileUploadEntry = React.createClass({
 
     // Let's post process it
     if (this.props.owner && this.props.postProcess) {
-      this.props.postProcess(file)
+      this.props.postProcess(file, this.props.owner)
         .then(metadata => {
           Object.keys(metadata).forEach(key => {
             this.props.owner().addMetadata(key, metadata[key]);
