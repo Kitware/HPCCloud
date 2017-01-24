@@ -76,6 +76,11 @@ export default class JobSubmission extends React.Component {
   }
 
   render() {
+    // Add add-on UI if provided
+    const workflowAddOn = this.props.addOn
+      ? React.createElement(this.props.addOn, { owner: () => this, parentProps: this.props, parentState: this.state })
+      : null;
+
     return (
       <div>
         <RunClusterFrom
@@ -85,6 +90,7 @@ export default class JobSubmission extends React.Component {
           dataChange={this.dataChange}
           clusterFilter={this.clusterFilter}
         />
+        { workflowAddOn }
         <ButtonBar
           visible={this.state[this.state.serverType].profile !== ''}
           onAction={this.buttonAction}
@@ -104,6 +110,7 @@ JobSubmission.propTypes = {
   getSimulationStep: React.PropTypes.func,
   nextView: React.PropTypes.string,
 
+  addOn: React.PropTypes.func,
   primaryJob: React.PropTypes.string,
   location: React.PropTypes.object,
   project: React.PropTypes.object,
