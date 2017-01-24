@@ -28,7 +28,6 @@ describe('fs', () => {
   Object.freeze(fsState);
 
   describe('simple actions', () => {
-
     it('should update folder', (done) => {
       const expectedAction = { type: Actions.UPDATE_FOLDER, folder, id: folder._id };
       expect(Actions.updateFolder(folder))

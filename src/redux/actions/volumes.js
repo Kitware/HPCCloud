@@ -30,7 +30,7 @@ export function updateVolumes(volumes) {
 }
 
 export function updateVolumeStatus(volumeId, status) {
-  return { type: UPDATE_VOLUME_STATUS, status };
+  return { type: UPDATE_VOLUME_STATUS, volumeId, status };
 }
 
 export function fetchVolumes() {

@@ -9,6 +9,7 @@ import progress     from './progress';
 import projects     from './projects';
 import simulations  from './simulations';
 import taskflows    from './taskflows';
+import volumes      from './volumes';
 
 import visualizer   from 'pvw-visualizer/src/redux/reducers';
 
@@ -21,6 +22,7 @@ export default combineReducers({
   projects,
   simulations,
   taskflows,
+  volumes,
 
   routing: routerReducer,
   visualizer,
