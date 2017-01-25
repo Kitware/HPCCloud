@@ -99,23 +99,23 @@ export function updateVolume(index, volume, pushToServer = false) {
   };
 }
 
-export function attachVolume(volumeId, clusterId) {
-  return dispatch => {
-    const action = netActions.addNetworkCall('attach_volume', 'attach volume');
-    dispatch(pendingNetworkCall(true));
-    client.attachVolume(volumeId, clusterId)
-      .then(
-        resp => {
-          dispatch(pendingNetworkCall(false));
-          dispatch(netActions.successNetworkCall(action.id, resp));
-        },
-        err => {
-          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-          dispatch(pendingNetworkCall(false));
-        });
-    return action;
-  };
-}
+// export function attachVolume(volumeId, clusterId) {
+//   return dispatch => {
+//     const action = netActions.addNetworkCall('attach_volume', 'attach volume');
+//     dispatch(pendingNetworkCall(true));
+//     client.attachVolume(volumeId, clusterId)
+//       .then(
+//         resp => {
+//           dispatch(pendingNetworkCall(false));
+//           dispatch(netActions.successNetworkCall(action.id, resp));
+//         },
+//         err => {
+//           dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+//           dispatch(pendingNetworkCall(false));
+//         });
+//     return action;
+//   };
+// }
 
 // Auto trigger actions on authentication change...
 client.onAuthChange(authenticated => {

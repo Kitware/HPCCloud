@@ -14,7 +14,7 @@ registerMiddlewares([thunk]);
 registerAssertions();
 
 function setSpy(target, method, data) {
-  expect.spyOn(target, method)
+  return expect.spyOn(target, method)
     .andReturn(Promise.resolve({ data }));
 }
 
@@ -44,7 +44,16 @@ describe('volumes', () => {
     });
 
     it('updates volume list', (done) => {
-      done();
+      const volumes = [{ _id: 'a', name: 'vol_a' }, { _id: 'b', name: 'vol_b' }];
+      const expectedAction = { type: Actions.UPDATE_VOLUMES, volumes };
+      expect(Actions.updateVolumes(volumes))
+        .toDispatchActions(expectedAction, complete(done));
+
+      const expectedState = deepClone(initialState);
+      expectedState.list = volumes;
+      expectedState.mapById = { a: { _id: 'a', name: 'vol_a' }, b: { _id: 'b', name: 'vol_b' } };
+      expect(volumeReducer(initialState, expectedAction))
+        .toEqual(expectedState);
     });
 
     it('updates volume status', (done) => {
@@ -54,11 +63,62 @@ describe('volumes', () => {
       expect(Actions.updateVolumeStatus(volumeId, status))
         .toDispatchActions(expectedAction, complete(done));
     });
+
+    it('removes offline volume', (done) => {
+      const index = 0;
+      const expectedActions = [{ type: Actions.REMOVE_VOLUME, index }];
+      expect(Actions.removeVolume(index, { name: 'someVol' }))
+        .toDispatchActions(expectedActions, complete(done));
+    });
+
+    it('updates volume', (done) => {
+      const index = 0;
+      const volume = { _id: 'a', name: 'vol_a' };
+      const expectedActions = [{ type: Actions.SAVE_VOLUME, index, volume }];
+
+      expect(Actions.updateVolume(index, volume, false))
+        .toDispatchActions(expectedActions, complete(done));
+    });
   });
 
   describe('async action', () => {
     afterEach(() => {
       expect.restoreSpies();
+    });
+
+    it('fetches volumes', (done) => {
+      const volumes = [{ _id: 'a', name: 'vol_a' }, { _id: 'b', name: 'vol_b' }];
+      const expectedActions = [
+        { type: Actions.UPDATE_VOLUMES, volumes },
+      ];
+
+      setSpy(client, 'listVolumes', volumes);
+      expect(Actions.fetchVolumes())
+        .toDispatchActions(expectedActions, complete(done));
+    });
+
+    it('deletes volumes', (done) => {
+      const volumes = [{ _id: 'b', name: 'vol_b' }];
+      const expectedActions = [
+        { type: Actions.UPDATE_VOLUMES, volumes },
+      ];
+
+      setSpy(client, 'deleteVolume', {});
+      setSpy(client, 'listVolumes', volumes);
+      expect(Actions.removeVolume(0, { _id: 'a', name: 'vol_a' }))
+        .toDispatchActions(expectedActions, complete(done));
+    });
+
+    it('upates volumes', (done) => {
+      const volumes = [{ _id: 'a', name: 'vol_a' }, { _id: 'b', name: 'vol_b' }];
+      const expectedActions = [
+        { type: Actions.UPDATE_VOLUMES, volumes },
+      ];
+
+      setSpy(client, 'createVolume', { _id: 'a', name: 'vol_a' });
+      setSpy(client, 'listVolumes', volumes);
+      return expect(Actions.updateVolume(0, { _id: 'a', name: 'vol_a' }, true))
+        .toDispatchActions(expectedActions, complete(done));
     });
   });
 });
