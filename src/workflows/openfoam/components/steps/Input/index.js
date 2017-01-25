@@ -1,25 +1,17 @@
-import { connect }  from 'react-redux';
-
-import SimputReact   from '../../../../generic/components/steps/SimputReact';
-import { dispatch } from '../../../../../redux';
-import * as Actions from '../../../../../redux/actions/projects';
+import React       from 'react';
+import SimputReact from '../../../../generic/components/steps/SimputReact';
 
 // ----------------------------------------------------------------------------
 
-export default connect(
-  state => ({
-    simputType: 'openfoam_tutorials',
-    inputFileKeys: [{ key: 'sh', name: 'run.sh', parse: false }],
-    initialDataModel: {
+export default props => (
+  <SimputReact
+    {...props}
+
+    simputType="openfoam_tutorials"
+    inputFileKeys={[{ key: 'sh', name: 'run.sh', parse: false }]}
+    initialDataModel={{
       data: {},
       type: 'openfoam_tutorials',
       hideViews: [],
-    },
-    nextStep: 'Simulation',
-  }),
-  () => ({
-    saveSimulation: (simulation) => dispatch(Actions.saveSimulation(simulation)),
-    updateSimulation: (simulation) => dispatch(Actions.updateSimulation(simulation)),
-    patchSimulation: (simulation) => dispatch(Actions.patchSimulation(simulation)),
-  })
-)(SimputReact);
+    }}
+  />);

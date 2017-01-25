@@ -7,8 +7,6 @@ import deepClone              from 'mout/src/lang/deepClone';
 
 import { connect }          from 'react-redux';
 import { dispatch }         from '../../../../../redux';
-import * as Actions         from '../../../../../redux/actions/taskflows';
-import * as ClusterActions  from '../../../../../redux/actions/clusters';
 import * as SimActions      from '../../../../../redux/actions/projects';
 
 // ----------------------------------------------------------------------------
@@ -70,9 +68,5 @@ export default connect(
       error: getNetworkError(state, ['terminate_taskflow', 'delete_taskflow']),
       actionFunctions: { onVisualize },
     };
-  },
-  () => ({
-    onTerminate: (id) => dispatch(Actions.terminateTaskflow(id)),
-    onTerminateInstance: (id) => dispatch(ClusterActions.terminateCluster(id)),
-  })
+  }
 )(JobMonitoring);

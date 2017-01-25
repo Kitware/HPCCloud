@@ -1,41 +1,45 @@
-import { connect }  from 'react-redux';
-
+import React           from 'react';
 import JobSubmission   from '../../../../generic/components/steps/JobSubmission';
-import { dispatch }    from '../../../../../redux';
-import * as Actions    from '../../../../../redux/actions/taskflows';
-import * as NetActions from '../../../../../redux/actions/network';
 
 // ----------------------------------------------------------------------------
 
-export default connect(
-  state => ({
-    actionList: [{ name: 'prepareJob', label: 'Start Simulation', icon: '' }],
-    clusterFilter(cluster) {
-      return 'config' in cluster
-        && 'openfoam' in cluster.config
-        && (cluster.config.openfoam && cluster.config.openfoam.enable);
+const actionList = [{ name: 'prepareJob', label: 'Start Simulation', icon: '' }];
+
+// ----------------------------------------------------------------------------
+
+function clusterFilter(cluster) {
+  return 'config' in cluster
+    && 'openfoam' in cluster.config
+    && (cluster.config.openfoam && cluster.config.openfoam.enable);
+}
+
+// ----------------------------------------------------------------------------
+
+function getPayload(props) {
+  return {
+    input: {
+      folder: {
+        id: props.simulation.metadata.inputFolder._id,
+      },
+      shFile: {
+        id: props.simulation.metadata.inputFolder.files.sh,
+      },
     },
-    getPayload(props) {
-      return {
-        input: {
-          folder: {
-            id: props.simulation.metadata.inputFolder._id,
-          },
-          shFile: {
-            id: props.simulation.metadata.inputFolder.files.sh,
-          },
-        },
-        output: {
-          folder: {
-            id: props.simulation.metadata.outputFolder._id,
-          },
-        },
-      };
+    output: {
+      folder: {
+        id: props.simulation.metadata.outputFolder._id,
+      },
     },
-  }),
-  () => ({
-    onJobSubmition: (taskflowName, primaryJob, payload, simulationStep, location) =>
-        dispatch(Actions.createTaskflow(taskflowName, primaryJob, payload, simulationStep, location)),
-    onError: (message) => dispatch(NetActions.errorNetworkCall('create_taskflow', { data: { message } }, 'form')),
-  })
-)(JobSubmission);
+  };
+}
+
+// ----------------------------------------------------------------------------
+
+export default props => (
+  <JobSubmission
+    {...props}
+
+    actionList={actionList}
+    clusterFilter={clusterFilter}
+    getPayload={getPayload}
+  />);
