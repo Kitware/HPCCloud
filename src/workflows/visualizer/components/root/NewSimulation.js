@@ -1,15 +1,10 @@
 import React                from 'react';
 import { FileUploadEntry }  from '../../../../panels/ItemEditor';
 
-export default React.createClass({
+const newSim = props => <FileUploadEntry name="dataset" label="Result file" owner={props.owner} />;
 
-  displayName: 'Simulation/New/Visualizer',
+newSim.propTypes = {
+  owner: React.PropTypes.func,
+};
 
-  propTypes: {
-    owner: React.PropTypes.func,
-  },
-
-  render() {
-    return <FileUploadEntry name="dataset" label="Result file" owner={ this.props.owner } />;
-  },
-});
+export default newSim;
