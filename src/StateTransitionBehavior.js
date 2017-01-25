@@ -46,7 +46,7 @@ export function handleTaskflowChange(state, taskflow) {
     simulationStatus.push('running');
 
     // Only allow termination if the cluster is not launching/provisioning ( we can't currently terminate a cluster in launching or provisioning )
-    if (taskflow.flow.meta) {
+    if (taskflow.flow.meta && taskflow.flow.meta.cluster) {
       const tfClusterId = taskflow.flow.meta.cluster._id,
         tfCluster = state.preferences.clusters.mapById[tfClusterId];
       if (tfCluster && ['launching', 'provisioning'].indexOf(tfCluster.status) === -1) {
