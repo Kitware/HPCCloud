@@ -7,6 +7,13 @@ const actionList = [{ name: 'prepareJob', label: 'Start Visualization', icon: ''
 
 // ----------------------------------------------------------------------------
 
+function clusterFilter(cluster) {
+  return 'config' in cluster && 'paraview' in cluster.config &&
+    'installDir' in cluster.config.paraview && cluster.config.paraview.installDir;
+}
+
+// ----------------------------------------------------------------------------
+
 function getTaskflowMetaData(props) {
   const dataDir = props.simulation.steps.Visualization.metadata.dataDir;
   const fileName = props.simulation.steps.Visualization.metadata.fileName;
@@ -44,6 +51,7 @@ export default function openFoamStart(props) {
       {...props}
 
       actionList={actionList}
+      clusterFilter={clusterFilter}
       getTaskflowMetaData={getTaskflowMetaData}
       getPayload={getPayload}
     />);
