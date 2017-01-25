@@ -10,7 +10,30 @@ import deepClone              from 'mout/src/lang/deepClone';
 
 import PropertyPanelBlock     from 'paraviewweb/src/React/Properties/PropertyPanel';
 
+import { dispatch }           from '../../../../redux';
+import * as Actions           from '../../../../redux/actions/projects';
+
 import style                  from 'HPCCloudStyle/PageWithMenu.mcss';
+
+// ----------------------------------------------------------------------------
+
+function saveSimulation(simulation) {
+  dispatch(Actions.saveSimulation(simulation));
+}
+
+// ----------------------------------------------------------------------------
+
+function updateSimulation(simulation) {
+  dispatch(Actions.updateSimulation(simulation));
+}
+
+// ----------------------------------------------------------------------------
+
+function patchSimulation(simulation) {
+  dispatch(Actions.patchSimulation(simulation));
+}
+
+// ----------------------------------------------------------------------------
 
 export default class SimputReact extends React.Component {
   constructor(props) {
@@ -280,4 +303,7 @@ SimputReact.defaultProps = {
   initialDataModel: null,
   nextStep: 'Simulation',
   simputModelDecorator: (m, props, asynReady) => m,
+  saveSimulation,
+  updateSimulation,
+  patchSimulation,
 };

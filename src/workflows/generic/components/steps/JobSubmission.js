@@ -4,6 +4,12 @@ import defaultServerParameters from '../../../../panels/run/defaults';
 import RunClusterFrom          from '../../../../panels/run';
 import getClusterPayload       from '../../../../utils/ClusterPayload';
 
+import { dispatch }    from '../../../../redux';
+import * as Actions    from '../../../../redux/actions/taskflows';
+import * as NetActions from '../../../../redux/actions/network';
+
+// ----------------------------------------------------------------------------
+
 function getServerProfiles(state) {
   const profiles = {};
   ['EC2', 'Traditional'].forEach(name => {
@@ -11,6 +17,20 @@ function getServerProfiles(state) {
   });
   return profiles;
 }
+
+// ----------------------------------------------------------------------------
+
+function onJobSubmition(taskflowName, primaryJob, payload, simulationStep, location) {
+  dispatch(Actions.createTaskflow(taskflowName, primaryJob, payload, simulationStep, location));
+}
+
+// ----------------------------------------------------------------------------
+
+function onError(message) {
+  dispatch(NetActions.errorNetworkCall('create_taskflow', { data: { message } }, 'form'));
+}
+
+// ----------------------------------------------------------------------------
 
 export default class JobSubmission extends React.Component {
   constructor(props) {
@@ -88,7 +108,7 @@ export default class JobSubmission extends React.Component {
           serverTypeChange={this.updateServerType}
           profiles={getServerProfiles(this.state)}
           dataChange={this.dataChange}
-          clusterFilter={this.clusterFilter}
+          clusterFilter={this.props.clusterFilter}
         />
         { workflowAddOn }
         <ButtonBar
@@ -153,4 +173,6 @@ JobSubmission.defaultProps = {
       metadata: props.getTaskflowMetaData(props, state),
     },
   }),
+  onJobSubmition,
+  onError,
 };

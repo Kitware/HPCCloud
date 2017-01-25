@@ -7,6 +7,24 @@ import LoadingPanel   from '../../../../panels/LoadingPanel';
 import get            from '../../../../utils/get';
 import { getActions } from '../../../../utils/getDisabledButtons';
 
+import { dispatch }         from '../../../../redux';
+import * as Actions         from '../../../../redux/actions/taskflows';
+import * as ClusterActions  from '../../../../redux/actions/clusters';
+
+// ----------------------------------------------------------------------------
+
+function onTerminate(id) {
+  dispatch(Actions.terminateTaskflow(id));
+}
+
+// ----------------------------------------------------------------------------
+
+function onTerminateInstance(id) {
+  dispatch(ClusterActions.terminateCluster(id));
+}
+
+// ----------------------------------------------------------------------------
+
 export default class JobMonitoring extends React.Component {
   constructor(props) {
     super(props);
@@ -98,4 +116,6 @@ JobMonitoring.propTypes = {
 JobMonitoring.defaultProps = {
   actionFunctions: {},
   getActions: (props) => {},
+  onTerminate,
+  onTerminateInstance,
 };
