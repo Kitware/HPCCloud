@@ -18,7 +18,15 @@ export default {
     NewProject: rootNewProject,
     ViewSimulation: rootViewSimulation,
   },
-  config: {},
+  config: {
+    cluster: {
+      'config.nwchem.enable': {
+        type: 'bool',
+        label: 'NWChem enabled',
+        description: 'Check if the cluster is able to run NWChem simulation',
+      },
+    },
+  },
   steps: {
     _order: ['Introduction', 'Input', 'Simulation', 'Visualization'],
     _disabled: ['Simulation', 'Visualization'],

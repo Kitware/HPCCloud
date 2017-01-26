@@ -7,14 +7,11 @@ const actionList = [{ name: 'prepareJob', label: 'Start Simulation', icon: '' }]
 
 // ----------------------------------------------------------------------------
 
-// ----------------------------------------
-// We should make sure NWChem is installed
-// ----------------------------------------
-// function clusterFilter(cluster) {
-//   return 'config' in cluster
-//     && 'openfoam' in cluster.config
-//     && (cluster.config.openfoam && cluster.config.openfoam.enable);
-// }
+function clusterFilter(cluster) {
+  return 'config' in cluster
+    && 'nwchem' in cluster.config
+    && (cluster.config.nwchem && cluster.config.nwchem.enable);
+}
 
 // ----------------------------------------------------------------------------
 
@@ -50,5 +47,6 @@ export default props => (
     {...props}
 
     actionList={actionList}
+    clusterFilter={clusterFilter}
     getPayload={getPayload}
   />);
