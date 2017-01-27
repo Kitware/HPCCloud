@@ -1,12 +1,11 @@
 import rootNewProject         from './components/root/NewProject';
-import rootViewSimulation     from '../common/root/ViewSimulation';
-
-import stepInput              from './components/steps/Input';
+import rootViewSimulation     from '../../generic/components/root/ViewSimulation';
 
 import stepIntroduction       from '../common/steps/Introduction';
+import stepInput              from './components/steps/Input';
 import stepSimulationStart    from '../common/steps/Simulation/Start';
-import stepSimulationView     from '../common/steps/Simulation/View';
-import stepVisualization from './components/steps/Visualization/View';
+import stepSimulationView     from './components/steps/SimulationView';
+import stepVisualization      from './components/steps/Visualization';
 
 export default {
   name: 'NWChem - Nudged Elastic Band (NEB) method',
@@ -19,7 +18,15 @@ export default {
     NewProject: rootNewProject,
     ViewSimulation: rootViewSimulation,
   },
-  config: {},
+  config: {
+    cluster: {
+      'config.nwchem.enable': {
+        type: 'bool',
+        label: 'NWChem enabled',
+        description: 'Check if the cluster is able to run NWChem simulation',
+      },
+    },
+  },
   steps: {
     _order: ['Introduction', 'Input', 'Simulation', 'Visualization'],
     _disabled: ['Simulation', 'Visualization'],
@@ -62,7 +69,6 @@ export default {
   },
   primaryJobs: {
     Simulation: 'pyfr_run',
-    Visualization: 'paraview',
   },
   labels: {
     Introduction: {
@@ -77,7 +83,6 @@ export default {
     },
     Visualization: {
       default: 'Visualization',
-      run: 'Visualization (running)',
     },
   },
 };

@@ -48,7 +48,7 @@ export function saveProject(project_, attachments) {
       // update proj metadata
       .then((resp) => {
         const inputFolder = resp.data._id;
-        project.metadata = {
+        project.metadata = Object.assign({}, project.metadata, {
           inputFolder: {
             _id: inputFolder,
             files: {},
@@ -57,7 +57,7 @@ export function saveProject(project_, attachments) {
             _id: outputFolder,
             files: {},
           },
-        };
+        });
         return girder.updateProject(project);
       })
       // upload files to inputfolder if there are any,

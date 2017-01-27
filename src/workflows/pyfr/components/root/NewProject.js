@@ -2,9 +2,16 @@
 import React                from 'react';
 import { FileUploadEntry }  from '../../../../panels/ItemEditor';
 
-import { connect }  from 'react-redux';
 import { dispatch } from '../../../../redux';
 import * as NetActions from '../../../../redux/actions/network';
+
+// ----------------------------------------------------------------------------
+
+function onParseError(message) {
+  dispatch(NetActions.errorNetworkCall('New Project', { message }));
+}
+
+// ----------------------------------------------------------------------------
 
 function extractPhysicalNames(file) {
   return new Promise((accept, reject) => {
@@ -35,49 +42,42 @@ function extractPhysicalNames(file) {
   });
 }
 
-const NewProject = React.createClass({
+// ----------------------------------------------------------------------------
 
-  displayName: 'Project/New/PyFR',
+function parseAndValidate(file, owner) {
+  return new Promise((accept, reject) => {
+    var reader = new FileReader();
+    reader.onloadend = () => {
+      if (reader.readyState !== FileReader.DONE) {
+        this.props.onParseError('Ini file is invalid');
+        reject();
+      }
+      try {
+        Simput.types.pyfr.parse('pyfr', { 'pyfr.ini': reader.result });
+      } catch (e) {
+        onParseError(`Error parsing file:\n${e}`);
+        owner().removeMetadata('ini');
+        reject();
+      }
+      accept({});
+    };
 
-  propTypes: {
-    owner: React.PropTypes.func,
-    onParseError: React.PropTypes.func,
-  },
+    reader.readAsText(file);
+  });
+}
 
-  parseAndValidate(file) {
-    return new Promise((accept, reject) => {
-      var reader = new FileReader();
-      reader.onloadend = () => {
-        if (reader.readyState !== FileReader.DONE) {
-          this.props.onParseError('Ini file is invalid');
-          reject();
-        }
-        try {
-          Simput.types.pyfr.parse('pyfr', reader.result);
-        } catch (e) {
-          this.props.onParseError(`Error parsing file:\n${e}`);
-          this.props.owner().removeMetadata('ini');
-          reject();
-        }
-        accept({});
-      };
+// ----------------------------------------------------------------------------
 
-      reader.readAsText(file);
-    });
-  },
-
-  render() {
-    return (<div>
-      <FileUploadEntry name="mesh" label="Mesh (msh, pyfrm)" accept=".msh,.pyfrm" owner={ this.props.owner } postProcess={ extractPhysicalNames } />
-      <FileUploadEntry name="ini" label="Ini file" accept=".ini" owner={ this.props.owner } postProcess={ this.parseAndValidate } />
+export default function pyFrNewProject(props) {
+  return (
+    <div>
+      <FileUploadEntry name="mesh" label="Mesh (msh, pyfrm)" accept=".msh,.pyfrm" owner={props.owner} postProcess={extractPhysicalNames} />
+      <FileUploadEntry name="ini" label="Ini file" accept=".ini" owner={props.owner} postProcess={parseAndValidate} />
     </div>);
-  },
-});
+}
 
-export default connect(
-  (state, props) => ({ props }),
-  () => ({
-    onParseError: (message) => dispatch(NetActions.errorNetworkCall('New Project', { message })),
-  })
-)(NewProject);
+// ----------------------------------------------------------------------------
 
+pyFrNewProject.propTypes = {
+  owner: React.PropTypes.func,
+};

@@ -24,15 +24,15 @@ function createItemForSimulation(simulation, name, file) {
     });
 }
 
-export function addFileForSimulationWithContents(simulation, name, contents) {
+export function addFileForSimulationWithContents(simulation, itemName, fileName, contents) {
   let fileId;
-  return girder.createItem(simulation.metadata.inputFolder._id, name)
+  return girder.createItem(simulation.metadata.inputFolder._id, itemName)
     .then(resp => {
       const parentId = resp.data._id;
       return girder.newFile({
         parentType: 'item',
         parentId,
-        name,
+        name: fileName,
         size: 0,
       });
     })
@@ -50,14 +50,14 @@ export function addFileForSimulationWithContents(simulation, name, contents) {
     });
 }
 
-export function addEmptyFileForSimulation(simulation, name) {
-  return girder.createItem(simulation.metadata.inputFolder._id, name)
+export function addEmptyFileForSimulation(simulation, itemName, fileName) {
+  return girder.createItem(simulation.metadata.inputFolder._id, itemName)
     .then(resp => {
       const parentId = resp.data._id;
       return girder.newFile({
         parentType: 'item',
         parentId,
-        name,
+        name: fileName,
         size: 0,
       });
     });
@@ -90,7 +90,7 @@ export function saveSimulation(simulation_, attachments) {
       // update sim metadata
       .then((resp) => {
         const inputFolder = resp.data._id;
-        simulation.metadata = {
+        simulation.metadata = Object.assign({}, simulation.metadata, {
           status: 'created',
           inputFolder: {
             _id: inputFolder,
@@ -100,7 +100,7 @@ export function saveSimulation(simulation_, attachments) {
             _id: outputFolder,
             files: {},
           },
-        };
+        });
         return girder.editSimulation(simulation);
       })
       // upload files to inputfolder if there are any,

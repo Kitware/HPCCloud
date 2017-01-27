@@ -1,13 +1,10 @@
 import rootNewProject         from './components/root/NewProject';
-import rootViewSimulation     from '../common/root/ViewSimulation';
-
-import stepInput              from './components/steps/Input';
+import rootViewSimulation     from '../../generic/components/root/ViewSimulation';
 
 import stepIntroduction       from '../common/steps/Introduction';
+import stepInput              from './components/steps/Input';
 import stepSimulationStart    from '../common/steps/Simulation/Start';
 import stepSimulationView     from '../common/steps/Simulation/View';
-import stepVisualizationStart from '../common/steps/Visualization/Start';
-import stepVisualizationView  from '../common/steps/Visualization/View';
 
 export default {
   name: 'NWChem',
@@ -20,10 +17,18 @@ export default {
     NewProject: rootNewProject,
     ViewSimulation: rootViewSimulation,
   },
-  config: {},
+  config: {
+    cluster: {
+      'config.nwchem.enable': {
+        type: 'bool',
+        label: 'NWChem enabled',
+        description: 'Check if the cluster is able to run NWChem simulation',
+      },
+    },
+  },
   steps: {
-    _order: ['Introduction', 'Input', 'Simulation', 'Visualization'],
-    _disabled: ['Simulation', 'Visualization'],
+    _order: ['Introduction', 'Input', 'Simulation'],
+    _disabled: ['Simulation'],
     _initial_state: {
       Introduction: {
         type: 'input',
@@ -39,10 +44,6 @@ export default {
         type: 'output',
         metadata: {},
       },
-      Visualization: {
-        type: 'output',
-        metadata: {},
-      },
     },
     Introduction: {
       default: stepIntroduction,
@@ -54,18 +55,12 @@ export default {
       default: stepSimulationStart,
       run: stepSimulationView,
     },
-    Visualization: {
-      default: stepVisualizationStart,
-      run: stepVisualizationView,
-    },
   },
   taskFlows: {
     Simulation: 'hpccloud.taskflow.nwchem.NWChemTaskFlow',
-    Visualization: 'hpccloud.taskflow.paraview.visualizer.ParaViewTaskFlow',
   },
   primaryJobs: {
     Simulation: 'pyfr_run',
-    Visualization: 'paraview',
   },
   labels: {
     Introduction: {
@@ -77,10 +72,6 @@ export default {
     Simulation: {
       default: 'Simulation',
       run: 'Simulation (running)',
-    },
-    Visualization: {
-      default: 'Visualization',
-      run: 'Visualization (running)',
     },
   },
 };

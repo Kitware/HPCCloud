@@ -53,7 +53,7 @@ const FileUploadEntry = React.createClass({
 
     // Let's post process it
     if (this.props.owner && this.props.postProcess) {
-      this.props.postProcess(file)
+      this.props.postProcess(file, this.props.owner)
         .then(metadata => {
           Object.keys(metadata).forEach(key => {
             this.props.owner().addMetadata(key, metadata[key]);
@@ -176,7 +176,7 @@ export default React.createClass({
   },
 
   addMetadata(name, value) {
-    const metadata = this.state.metadata || {};
+    const metadata = Object.assign({}, this.state.metadata);
     metadata[name] = value;
     this.setState({ metadata });
   },
@@ -187,7 +187,7 @@ export default React.createClass({
 
   removeMetadata(key = null) {
     if (key) {
-      const metadata = Object.assign({}, this.state.metadata || {});
+      const metadata = Object.assign({}, this.state.metadata);
       delete metadata[key];
       if (this.attachment[key]) {
         delete this.attachment[key];
@@ -196,7 +196,7 @@ export default React.createClass({
       return;
     }
 
-    const metadata = Object.assign({}, this.state.metadata || {});
+    const metadata = Object.assign({}, this.state.metadata);
     if (this.attachment) {
       Object.keys(this.attachment).forEach((el) => {
         delete metadata[el];

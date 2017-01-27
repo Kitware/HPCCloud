@@ -1,4 +1,4 @@
-export function tradClusterPayload(id) {
+function tradClusterPayload(id) {
   if (!id) {
     throw Error('missing id in traditional cluster payload');
   }
@@ -7,7 +7,7 @@ export function tradClusterPayload(id) {
   };
 }
 
-export function ec2ClusterPayload(name, machine, clusterSize = 1, profileId) {
+function ec2ClusterPayload(name, machine, clusterSize = 1, profileId) {
   if (typeof name === 'undefined') {
     throw Error('Missing required field: "name"');
   } else if (typeof machine === 'undefined') {
@@ -32,7 +32,17 @@ export function ec2ClusterPayload(name, machine, clusterSize = 1, profileId) {
   };
 }
 
-export default {
-  tradClusterPayload,
-  ec2ClusterPayload,
-};
+export default function getClusterPayload(type, options) {
+  if (type === 'EC2') {
+    const { name, machine, clusterSize, profile, cluster } = options;
+    if (cluster) {
+      return { _id: cluster };
+    }
+    return ec2ClusterPayload(name, machine, clusterSize, profile);
+  }
+  if (type === 'Traditional') {
+    const { profile } = options;
+    return tradClusterPayload(profile);
+  }
+  return null;
+}

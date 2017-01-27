@@ -6,11 +6,11 @@ export const baseURL = '/api/v1';
 // label: the button's label
 // icon: an fa icon, import styles here and include them if desired.
 export const taskflowActions = {
-  deleteCluster: { name: 'deleteCluster', label: 'Delete Cluster', icon: '' },
-  terminate: { name: 'terminateTaskflow', label: 'Terminate', icon: '' },
-  visualize: { name: 'visualizeTaskflow', label: 'Visualize', icon: '' },
-  rerun: { name: 'rerun', label: 'Rerun', icon: '' },
-  terminateInstance: { name: 'terminateInstance', label: 'Terminate EC2 Instance', icon: '' },
+  deleteCluster: { name: 'onDeleteCluster', label: 'Delete Cluster', icon: '' },
+  terminate: { name: 'onTerminate', label: 'Terminate', icon: '' },
+  visualize: { name: 'onVisualize', label: 'Visualize', icon: '' },
+  rerun: { name: 'onRerun', label: 'Rerun', icon: '' },
+  terminateInstance: { name: 'onTerminateInstance', label: 'Terminate EC2 Instance', icon: '' },
   moveOffline: { name: 'moveOffline', label: 'Move Files Offline', icon: '' },
 };
 
