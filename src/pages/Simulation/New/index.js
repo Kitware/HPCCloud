@@ -112,7 +112,7 @@ const SimulationNew = React.createClass({
 export default connect(
   (state, props) => {
     return {
-      project: state.projects.mapById[state.projects.active || props.params.id],
+      project: state.projects.mapById[props.params.projectId],
       buttonsDisabled: !!get(state, 'network.pending.save_simulation'),
       error: getNetworkError(state, 'save_simulation'),
     };

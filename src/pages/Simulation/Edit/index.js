@@ -1,6 +1,7 @@
 import ItemEditor from '../../../panels/ItemEditor';
 import React      from 'react';
 import Workflows  from '../../../workflows';
+import client     from '../../../network';
 
 import breadCrumbStyle  from 'HPCCloudStyle/Theme.mcss';
 import getNetworkError  from '../../../utils/getNetworkError';
@@ -34,6 +35,20 @@ const SimulationEdit = React.createClass({
     this.props.onSave(Object.assign({}, this.props.simulation, data));
   },
 
+  downloadSimulation() {
+    client.downloadSimulation(this.props.simulation._id)
+      .then((resp) => {
+        const blob = new Blob([resp.data], { type: 'application/zip' });
+        const url = window.URL.createObjectURL(blob);
+        this.refs.downloadLink.href = url;
+        this.refs.downloadLink.click();
+        window.URL.revokeObjectURL(url);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  },
+
   cancel() {
     this.props.onCancel(`/View/Project/${this.props.simulation.projectId}`);
   },
@@ -57,28 +72,34 @@ const SimulationEdit = React.createClass({
       parentProps: this.props }) : null;
 
     return (
-      <ItemEditor
-        breadcrumb={{
-          paths: ['/', `/View/Project/${projectId}`, `/View/Simulation/${simulation._id}`],
-          icons: [
-            breadCrumbStyle.breadCrumbRootIcon,
-            breadCrumbStyle.breadCrumbProjectIcon,
-            breadCrumbStyle.breadCrumbSimulationIcon,
-          ],
-        }}
-        name={simulation.name}
-        description={simulation.description}
-        error={error}
-        ref="container"
-        title="Edit Simulation"
-        actions={[
-          { name: 'cancel', label: 'Cancel' },
-          { name: 'delete', label: 'Delete simulation', disabled: this.props.simulation.metadata.status === 'running' },
-          { name: 'editSimulation', label: 'Save simulation' }]}
-        onAction={ this.onAction }
-      >
-      { workflowAddOn }
-      </ItemEditor>);
+      <div>
+        <a style={{ display: 'none' }} ref="downloadLink"
+          download={`${this.props.simulation.name}.zip`} target="_blank" href></a>
+        <ItemEditor
+          breadcrumb={{
+            paths: ['/', `/View/Project/${projectId}`, `/View/Simulation/${simulation._id}`],
+            icons: [
+              breadCrumbStyle.breadCrumbRootIcon,
+              breadCrumbStyle.breadCrumbProjectIcon,
+              breadCrumbStyle.breadCrumbSimulationIcon,
+            ],
+          }}
+          name={simulation.name}
+          description={simulation.description}
+          error={error}
+          ref="container"
+          title="Edit Simulation"
+          actions={[
+            { name: 'cancel', label: 'Cancel' },
+            { name: 'downloadSimulation', label: 'Download Simulation' },
+            { name: 'delete', label: 'Delete simulation', disabled: this.props.simulation.metadata.status === 'running' },
+            { name: 'editSimulation', label: 'Save simulation' },
+          ]}
+          onAction={ this.onAction }
+        >
+        { workflowAddOn }
+        </ItemEditor>
+      </div>);
   },
 });
 
@@ -87,9 +108,12 @@ const SimulationEdit = React.createClass({
 
 export default connect(
   (state, props) => {
-    const project = state.projects.mapById[state.projects.active];
-    const simulations = state.projects.simulations[state.projects.active];
-    const simulation = state.simulations.mapById[simulations.active];
+    const simId = props.params.id;
+    const simulation = state.simulations.mapById[simId];
+    let project = {};
+    if (simulation && simulation.projectId) {
+      project = state.projects.mapById[simulation.projectId];
+    }
     return {
       error: getNetworkError(state, ['save_simulation', `delete_simulation_${props.params.id}`]),
       project,
