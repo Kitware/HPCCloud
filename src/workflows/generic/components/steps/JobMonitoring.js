@@ -10,6 +10,7 @@ import { getActions } from '../../../../utils/getDisabledButtons';
 import { dispatch }         from '../../../../redux';
 import * as Actions         from '../../../../redux/actions/taskflows';
 import * as ClusterActions  from '../../../../redux/actions/clusters';
+import * as SimActions      from '../../../../redux/actions/projects';
 
 // ----------------------------------------------------------------------------
 
@@ -25,17 +26,40 @@ function onTerminateInstance(id) {
 
 // ----------------------------------------------------------------------------
 
+export function onRerun(props) {
+  const stepData = {
+    view: 'default',
+    metadata: Object.assign({}, props.simulation.steps[props.step].metadata),
+  };
+  // we want to preserve some metadata objects
+  delete stepData.metadata.taskflowId;
+  delete stepData.metadata.sessionKey;
+  const location = {
+    pathname: props.location.pathname,
+    query: { view: 'default' },
+    state: props.location.state,
+  };
+  dispatch(SimActions.updateSimulationStep(props.simulation._id, props.step, stepData, location));
+}
+
+// ----------------------------------------------------------------------------
+
 export default class JobMonitoring extends React.Component {
   constructor(props) {
     super(props);
 
     // Manually bind this method to the component instance...
     this.buttonAction = this.buttonAction.bind(this);
+    this.onRerun = this.onRerun.bind(this);
     this.onTerminateInstance = this.onTerminateInstance.bind(this);
     this.onTerminate = this.onTerminate.bind(this);
 
     // Manage internal state
     this.state = {};
+  }
+
+  onRerun() {
+    this.props.onRerun(this.props);
   }
 
   onTerminateInstance() {
@@ -103,6 +127,7 @@ JobMonitoring.propTypes = {
   primaryJob: React.PropTypes.string,
   view: React.PropTypes.string,
 
+  onRerun: React.PropTypes.func,
   onTerminate: React.PropTypes.func,
   onTerminateInstance: React.PropTypes.func,
 
@@ -116,6 +141,7 @@ JobMonitoring.propTypes = {
 JobMonitoring.defaultProps = {
   actionFunctions: {},
   getActions: (props) => {},
+  onRerun,
   onTerminate,
   onTerminateInstance,
 };

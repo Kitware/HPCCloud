@@ -25,17 +25,17 @@ export default React.createClass({
     return { disabledButtons: {} };
   },
 
-  barAction(action) {
-    this[action]();
-  },
-
-  terminateInstance() {
+  onTerminateInstance() {
     this.props.terminateCluster(this.props.clusterId);
   },
 
-  deleteCluster() {
+  onDeleteCluster() {
     this.props.logToggle(false);
     this.props.deleteCluster(this.props.clusterId);
+  },
+
+  barAction(action) {
+    this[action]();
   },
 
   render() {

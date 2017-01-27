@@ -8,7 +8,6 @@ import { breadcrumb } from '..';
 
 import style from 'HPCCloudStyle/JobMonitor.mcss';
 
-
 // import get          from 'mout/src/object/get';
 import { connect }  from 'react-redux';
 import { dispatch }   from '../../../redux';

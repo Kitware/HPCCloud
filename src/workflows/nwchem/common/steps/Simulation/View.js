@@ -17,29 +17,11 @@ function getActions(props) {
   if (taskflow.allComplete) {
     if (props.actionFunctions.onVisualize) {
       actions.push('visualize');
-    } else if (props.actionFunctions.onRerun) {
+    } else {
       actions.push('rerun');
     }
   }
   return actions;
-}
-
-// ----------------------------------------------------------------------------
-
-export function onRerun(props) {
-  const stepData = {
-    view: 'default',
-    metadata: Object.assign({}, props.simulation.steps.Simulation.metadata),
-  };
-  // we want to preserve some metadata objects
-  delete stepData.metadata.taskflowId;
-  delete stepData.metadata.sessionKey;
-  const location = {
-    pathname: props.location.pathname,
-    query: { view: 'default' },
-    state: props.location.state,
-  };
-  dispatch(SimActions.updateSimulationStep(props.simulation._id, props.step, stepData, location));
 }
 
 // ----------------------------------------------------------------------------
@@ -83,15 +65,12 @@ export default connect(
       cluster = state.preferences.clusters.mapById[clusterId];
     }
 
-    // Do not override something given as props
-    const actionFunctions = props.actionFunctions || { onRerun };
-
     return {
       getActions,
       taskflowId, cluster, taskflow,
       disabledButtons: getDisabledButtons(state.network, taskflow),
       error: getNetworkError(state, ['terminate_taskflow', 'delete_taskflow']),
-      actionFunctions,
+      actionFunctions: props.actionFunctions,
     };
   }
 )(JobMonitoring);
