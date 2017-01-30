@@ -23,17 +23,17 @@ export function fetchServers() {
 
     dispatch(pendingNetworkCall(true));
     client.listClusters()
-      .then(resp => {
+      .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateClusterList(resp.data));
         return client.listAWSProfiles();
       })
-      .then(resp => {
+      .then((resp) => {
         dispatch(updateEC2List(resp.data));
         dispatch(pendingNetworkCall(false));
         dispatch(netActions.successNetworkCall(action.id, resp));
       })
-      .catch(err => {
+      .catch((err) => {
         dispatch(netActions.errorNetworkCall(action.id, err));
         dispatch(pendingNetworkCall(false));
       });

@@ -90,7 +90,7 @@ export default React.createClass({
     const { config, style } = this.props;
     return (
       <div>
-        { Object.keys(config).map(key => {
+        { Object.keys(config).map((key) => {
           const item = config[key];
           const id = key;
           const value = getValue(data, id, item.type);

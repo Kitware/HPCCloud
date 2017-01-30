@@ -51,7 +51,7 @@ export default function awsReducer(state = initialState, action) {
       const list = action.profiles;
       const active = (state.active < list.length) ? state.active : (list.length - 1);
       const mapById = {};
-      list.forEach(aws => {
+      list.forEach((aws) => {
         if (aws._id) {
           mapById[aws._id] = aws;
         }

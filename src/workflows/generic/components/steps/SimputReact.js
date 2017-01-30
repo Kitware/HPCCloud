@@ -1,6 +1,8 @@
 import React                  from 'react';
 
+/* eslint-disable import/extensions */
 import Simput                 from 'Simput';
+/* eslint-enable import/extensions */
 import SimputLabels           from 'simput/src/Labels';
 import ViewMenu               from 'simput/src/ViewMenu';
 import modelGenerator         from 'simput/src/modelGenerator';
@@ -80,7 +82,7 @@ export default class SimputReact extends React.Component {
             return simulationsHelper.addFileForSimulationWithContents(this.props.simulation, key, name, resp.data);
           })
           // update file id in simulation metadata
-          .then(resp => {
+          .then((resp) => {
             const _id = resp._id; // file Id, custom response
             const newSim = deepClone(this.props.simulation);
             newSim.metadata.inputFolder.files[key] = _id;
@@ -96,7 +98,7 @@ export default class SimputReact extends React.Component {
         const inputFile = this.props.simulation.metadata.inputFolder.files[key];
         if (!inputFile) {
           promises.push(simulationsHelper.addEmptyFileForSimulation(this.props.simulation, key, name)
-            .then(resp => {
+            .then((resp) => {
               const _id = resp.data._id; // itemId
               const newSim = deepClone(this.props.simulation);
               newSim.metadata.inputFolder.files[key] = _id;
@@ -140,9 +142,9 @@ export default class SimputReact extends React.Component {
 
         // We don't have any data model but we might be able to generate one
         // by parsing data
-        if (simputModule.parse && props.inputFileKeys.filter(i => i.parse).length) {
+        if (simputModule.parse && props.inputFileKeys.filter((i) => i.parse).length) {
           // Ensure we have content for all the file we need to parse
-          props.inputFileKeys.filter(i => i.parse).forEach(({ key, name }) => {
+          props.inputFileKeys.filter((i) => i.parse).forEach(({ key, name }) => {
             if (!this.fileContent[key] && this.props.simulation.metadata.inputFolder.files[key]) {
               const internalPromise = client.downloadFile(this.props.simulation.metadata.inputFolder.files[key], 0, null, 'inline');
               promises.push(internalPromise);
@@ -153,7 +155,7 @@ export default class SimputReact extends React.Component {
           });
           Promise.all(promises).then(() => {
             const fileNameToContentMap = {};
-            props.inputFileKeys.filter(i => i.parse).forEach(({ key, name }) => {
+            props.inputFileKeys.filter((i) => i.parse).forEach(({ key, name }) => {
               fileNameToContentMap[name] = this.fileContent[key];
             });
             try {
@@ -205,10 +207,10 @@ export default class SimputReact extends React.Component {
             const content = convertedData.results[fileName];
             const blob = new Blob([content], { type: 'text/plain' });
             client.updateFileContent(fileId, content.length)
-              .then(upload => {
+              .then((upload) => {
                 client.uploadChunk(upload.data._id, 0, blob);
               })
-              .catch(err => {
+              .catch((err) => {
                 console.log('Error update content', fileKey, fileName, err);
               });
 
@@ -225,7 +227,7 @@ export default class SimputReact extends React.Component {
         });
       } else {
         console.error('Got errors when generating files from simput model: ');
-        convertedData.errors.forEach(error => console.error(error));
+        convertedData.errors.forEach((error) => console.error(error));
       }
     } catch (e) {
       console.error('Error when generating files from simput model: ', e);

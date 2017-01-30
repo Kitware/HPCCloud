@@ -3,9 +3,9 @@ import React from 'react';
 import TestUtils from 'react/lib/ReactTestUtils';
 import ExecutionUnit from '../../src/panels/JobMonitor/ExecutionUnit';
 import LogFold from '../../src/panels/JobMonitor/LogFold';
-import deepClone    from 'mout/src/lang/deepClone';
+import deepClone from 'mout/src/lang/deepClone';
 
-import style             from 'HPCCloudStyle/JobMonitor.mcss';
+import style from 'HPCCloudStyle/JobMonitor.mcss';
 
 /* global describe it */
 

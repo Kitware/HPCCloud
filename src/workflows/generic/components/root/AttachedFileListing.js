@@ -18,13 +18,13 @@ export default class AttachedFileListing extends React.Component {
       const files = [];
       fileKeys.forEach((fileKey) => {
         client.getFile(fileKeyIdMap[fileKey])
-          .then(resp => {
+          .then((resp) => {
             files.push({ name: fileKey, fileName: resp.data.name });
             if (files.length === fileKeys.length) {
               this.setState({ files });
             }
           })
-          .catch(err => {
+          .catch((err) => {
             console.log(err);
           });
       });
@@ -53,7 +53,6 @@ export default class AttachedFileListing extends React.Component {
 // ----------------------------------------------------------------------------
 
 AttachedFileListing.propTypes = {
-  owner: React.PropTypes.func,
   parentProps: React.PropTypes.object,
   containerName: React.PropTypes.string,
 };

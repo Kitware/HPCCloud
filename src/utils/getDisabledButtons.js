@@ -10,7 +10,7 @@ export function getActions(actionsList, disabled) {
     taskflowActions[action],
     {
       disabled: !!disabled[action],
-      icon: !!disabled[action] ? Theme.loadingIcon : null,
+      icon: disabled[action] ? Theme.loadingIcon : null,
     }));
 }
 

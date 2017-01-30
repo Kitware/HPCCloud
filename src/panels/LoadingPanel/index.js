@@ -29,7 +29,7 @@ export default React.createClass({
     return (
       <div className={layoutClasses.join(' ')} style={{ marginTop: this.props.large ? '2em' : 'auto' }}>
         <span style={{ margin: '15px' }}>
-          <i className={Theme.loadingIcon}></i>&nbsp;
+          <i className={Theme.loadingIcon} />&nbsp;
           Loading...
         </span>
       </div>

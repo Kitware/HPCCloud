@@ -159,8 +159,8 @@ export default React.createClass({
         <span onClick={this.sortBy} data-title={title}>
           { title }
           { index === fnIndex ?
-            this.state.sortReverse ? <i className={style.sortedAsc}></i> : <i className={style.sortedDesc}></i>
-            : <i className={[style.sortedAsc, style.visHidden].join(' ')}></i>
+            this.state.sortReverse ? <i className={style.sortedAsc} /> : <i className={style.sortedDesc} />
+            : <i className={[style.sortedAsc, style.visHidden].join(' ')} />
           }
         </span>);
     };

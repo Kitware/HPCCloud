@@ -1,8 +1,8 @@
 import client           from '../../network';
 import React            from 'react';
-import { Link }         from 'react-router';
 import deepClone        from 'mout/src/lang/deepClone';
 import SchedulerConfig  from '../SchedulerConfig';
+import { Link }         from 'react-router';
 
 import style    from 'HPCCloudStyle/ItemEditor.mcss';
 import theme    from 'HPCCloudStyle/Theme.mcss';
@@ -12,7 +12,7 @@ function isEmptyWallTime(walltime) {
     return true;
   }
 
-  const undefinedKeys = ['hours', 'minutes', 'seconds'].filter(k =>
+  const undefinedKeys = ['hours', 'minutes', 'seconds'].filter((k) =>
     walltime[k] === '' ||
     walltime[k] === '0' ||
     walltime[k] === 0 ||
@@ -81,7 +81,7 @@ export default React.createClass({
     Object.assign(runtime, runtime[runtime.type]);
     runtime.queue = runtime.defaultQueue;
 
-    ['sge', 'slurm', 'pbs', 'type', 'defaultQueue'].forEach(keyToDelete => {
+    ['sge', 'slurm', 'pbs', 'type', 'defaultQueue'].forEach((keyToDelete) => {
       delete runtime[keyToDelete];
     });
     if (isEmptyWallTime(runtime.maxWallTime)) {
@@ -107,7 +107,7 @@ export default React.createClass({
         </div>;
     }
 
-    const clusterData = this.state.profiles.filter(item => item._id === this.props.contents.profile)[0];
+    const clusterData = this.state.profiles.filter((item) => item._id === this.props.contents.profile)[0];
     const maxData = clusterData && clusterData.config && clusterData.config.scheduler ? clusterData.config.scheduler : {};
     const configData = deepClone(maxData);
 

@@ -19,7 +19,7 @@ function simputModelDecorator(model, props) {
 
 // ----------------------------------------------------------------------------
 
-export default props => (
+export default (props) => (
   <SimputReact
     {...props}
 

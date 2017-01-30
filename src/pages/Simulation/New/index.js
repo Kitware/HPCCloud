@@ -63,7 +63,7 @@ const SimulationNew = React.createClass({
       const reqAttachments = Workflows[this.props.project.type].requiredAttachments.simulation;
       if (!attachments || !reqAttachments.every((el) => attachments.hasOwnProperty(el))) {
         // ['this', 'that', 'other'] => '"this", "that" and "other"'
-        const reqAttachmentsStr = reqAttachments.map(el => `"${el}"`).join(', ').replace(/(, )(?!.* )/, ' and ');
+        const reqAttachmentsStr = reqAttachments.map((el) => `"${el}"`).join(', ').replace(/(, )(?!.* )/, ' and ');
         this.setState({ _error: `The simulation requires file${reqAttachments.length === 1 ? '' : 's'} ${reqAttachmentsStr}` });
         return;
       }
@@ -83,7 +83,7 @@ const SimulationNew = React.createClass({
 
     const type = this.props.project.type;
     const childComponent = type ? Workflows[type].components.NewSimulation : null;
-    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container,
+    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.container,
       parentProps: this.props }) : null;
 
     return (
@@ -96,7 +96,7 @@ const SimulationNew = React.createClass({
           ],
         }}
         error={ this.state._error || this.props.error }
-        ref="container"
+        ref={(c) => {this.container = c;}}
         title="New Simulation"
         actions={ getActions(this.props.buttonsDisabled) }
         onAction={ this.onAction }

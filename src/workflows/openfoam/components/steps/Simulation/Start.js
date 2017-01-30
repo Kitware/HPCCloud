@@ -35,7 +35,7 @@ function getPayload(props) {
 
 // ----------------------------------------------------------------------------
 
-export default props => (
+export default (props) => (
   <JobSubmission
     {...props}
 

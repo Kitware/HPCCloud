@@ -5,7 +5,7 @@ import * as netActions       from './network';
 import * as taskflowActions  from './taskflows';
 import * as router           from './router';
 import get                   from '../../utils/get';
-import { store, dispatch }   from '../index.js';
+import { store, dispatch }   from '../';
 
 export const FETCH_PROJECT_LIST = 'FETCH_PROJECT_LIST';
 export const UPDATE_PROJECT_LIST = 'UPDATE_PROJECT_LIST';
@@ -33,7 +33,7 @@ export function updateProjectSimulations(id, simulations) {
 }
 
 export function fetchProjectSimulations(id) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall(`fetch_project_simulations_${id}`, 'Retreive project simulations');
 
     client.listSimulations(id)
@@ -51,14 +51,14 @@ export function fetchProjectSimulations(id) {
 }
 
 export function fetchProjectList() {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('fetch_project_list', 'Retreive projects');
 
     client.listProjects()
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateProjectList(resp.data));
-        resp.data.forEach(project => {
+        resp.data.forEach((project) => {
           dispatch(fetchProjectSimulations(project._id));
         });
       })
@@ -71,17 +71,17 @@ export function fetchProjectList() {
 }
 
 export function deleteProject(project) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('delete_project', `Delete project ${project.name}`);
 
     client.deleteProject(project._id)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch({ type: REMOVE_PROJECT, project });
           dispatch(router.push('/'));
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error));
         });
 
@@ -90,7 +90,7 @@ export function deleteProject(project) {
 }
 
 export function setActiveProject(id, location) {
-  return dispatch => {
+  return (dispatch) => {
     const updateActive = { type: UPDATE_ACTIVE_PROJECT, id };
 
     if (location) {
@@ -106,7 +106,7 @@ export function updateProject(project) {
 }
 
 export function saveProject(project, attachments) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('save_project', `Save project ${project.name}`);
 
     if (attachments && Object.keys(attachments).length) {
@@ -115,9 +115,9 @@ export function saveProject(project, attachments) {
 
     ProjectHelper.saveProject(project, attachments)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-          const respWithProj = Array.isArray(resp) ? resp[resp.length - 1] : resp;
+          const respWithProj = Array.isArrayresp ? resp[resp.length - 1] : resp;
           dispatch(updateProject(respWithProj.data));
           if (attachments && Object.keys(attachments).length) {
             setTimeout(() => { dispatch(router.push(`/View/Project/${respWithProj.data._id}`)); }, 1500);
@@ -125,7 +125,7 @@ export function saveProject(project, attachments) {
             dispatch(router.push(`/View/Project/${respWithProj.data._id}`));
           }
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
 
@@ -142,7 +142,7 @@ export function updateSimulation(simulation) {
 }
 
 export function saveSimulation(simulation, attachments, location) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('save_simulation', `Save simulation ${simulation.name}`);
 
     if (attachments && Object.keys(attachments).length) {
@@ -151,9 +151,9 @@ export function saveSimulation(simulation, attachments, location) {
 
     SimulationHelper.saveSimulation(simulation, attachments)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-          const respWithSim = Array.isArray(resp) ? resp[resp.length - 1] : resp;
+          const respWithSim = Array.isArrayresp ? resp[resp.length - 1] : resp;
           dispatch(updateSimulation(respWithSim.data));
           if (location && attachments && Object.keys(attachments).length) {
             // in this 1.5s gap the progressBar will appear complete, and fade on the new page
@@ -163,7 +163,7 @@ export function saveSimulation(simulation, attachments, location) {
             dispatch(router.push(location));
           }
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
     return action;
@@ -181,12 +181,12 @@ function getTaskflowsFromSimulation(simulation) {
 }
 
 export function deleteSimulation(simulation, location) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall(`delete_simulation_${simulation._id}`, `Delete simulation ${simulation.name}`);
     const simStepTaskflows = getTaskflowsFromSimulation(simulation);
     client.deleteSimulation(simulation._id)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch({ type: REMOVE_SIMULATION, simulation });
           if (location) {
@@ -198,7 +198,7 @@ export function deleteSimulation(simulation, location) {
             });
           }
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
 
@@ -207,7 +207,7 @@ export function deleteSimulation(simulation, location) {
 }
 
 export function patchSimulation(simulation) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall(`update_simulation_${simulation._id}`, `update simulation ${simulation.name}`);
     client.editSimulation(simulation)
       .then((resp) => {
@@ -222,7 +222,7 @@ export function patchSimulation(simulation) {
 }
 
 export function setActiveSimulation(id, location) {
-  return dispatch => {
+  return (dispatch) => {
     const updateActive = { type: UPDATE_ACTIVE_SIMULATION, id };
 
     if (location) {
@@ -234,7 +234,7 @@ export function setActiveSimulation(id, location) {
 }
 
 export function updateSimulationStep(id, stepName, data, location) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall(`update_simulation_step_${id}`, 'Update simulation step');
     const state = store.getState().simulations.mapById[id];
     const stateTaskflowId = get(state, `steps.${stepName}.metadata.taskflowId`);
@@ -260,7 +260,7 @@ export function updateSimulationStep(id, stepName, data, location) {
 }
 
 // Auto trigger actions on authentication change...
-client.onAuthChange(authenticated => {
+client.onAuthChange((authenticated) => {
   if (authenticated) {
     dispatch(fetchProjectList());
   } else {

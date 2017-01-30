@@ -2,7 +2,8 @@ import React            from 'react';
 import Toolbar          from '../../panels/Toolbar';
 import LoadingPanel     from '../../panels/LoadingPanel';
 import network          from 'pvw-visualizer/src/network';
-import ControlPanel     from 'pvw-visualizer/src/panels/ControlPanel';
+// ControlPanel is also an exported component from this file, we want the default though
+import ControlPanelDef     from 'pvw-visualizer/src/panels/ControlPanel';
 import VtkRenderer      from 'paraviewweb/src/React/Renderers/VtkRenderer';
 import client           from '../../network';
 import { projectFunctions }   from '../../utils/AccessHelper';
@@ -30,14 +31,11 @@ const visualizer = React.createClass({
     project: React.PropTypes.object,
     simulation: React.PropTypes.object,
     step: React.PropTypes.string,
-    view: React.PropTypes.string,
 
     index: React.PropTypes.number,
     playing: React.PropTypes.bool,
     values: React.PropTypes.array,
     setTimeStep: React.PropTypes.func,
-    playTime: React.PropTypes.func,
-    stopTime: React.PropTypes.func,
   },
 
   contextTypes: {
@@ -65,7 +63,7 @@ const visualizer = React.createClass({
     client.getSimulationStep(this.props.simulation._id, this.props.step)
       .then((resp) => {
         const config = {
-          sessionURL: `ws://${location.hostname}:8888/proxy?sessionId=${resp.data.metadata.sessionId}&path=ws`,
+          sessionURL: `ws://${this.props.location.hostname}:8888/proxy?sessionId=${resp.data.metadata.sessionId}&path=ws`,
           retry: true,
         };
         network.connect(config);
@@ -108,7 +106,7 @@ const visualizer = React.createClass({
   },
 
   previousTimeStep() {
-    const timeStep = (this.props.index - 1 + this.props.values.length) % this.props.values.length;
+    const timeStep = (this.props.index - (1 + this.props.values.length)) % this.props.values.length;
     this.props.setTimeStep(timeStep);
   },
 
@@ -134,9 +132,9 @@ const visualizer = React.createClass({
               &nbsp;{this.props.project.name} / {this.props.simulation.name}
               </span> }
           />
-          <ControlPanel className={ this.state.menuVisible ? vizStyle.menu : vizStyle.hiddenMenu } />
+          <ControlPanelDef className={ this.state.menuVisible ? vizStyle.menu : vizStyle.hiddenMenu } />
           <VtkRenderer
-            ref={c => { if (!ImageProviders.getImageProvider()) ImageProviders.setImageProvider(c.binaryImageStream); }}
+            ref={(c) => { if (!ImageProviders.getImageProvider()) ImageProviders.setImageProvider(c.binaryImageStream); }}
             className={ vizStyle.viewport }
             client={this.client}
             connection={this.connection}
@@ -147,7 +145,7 @@ const visualizer = React.createClass({
 });
 
 export default connect(
-  state => ({
+  (state) => ({
     setTimeStep(index) {
       dispatch(Actions.time.applyTimeStep(index, state.visualizer.active.source));
     },

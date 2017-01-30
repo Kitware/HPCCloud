@@ -55,7 +55,7 @@ export default React.createClass({
           <Link to={path} className={this.props.className}
             title={this.props.titles ? this.props.titles[index] : null}
           >
-            <i className={ iconClasses(index).join(' ') }></i>
+            <i className={ iconClasses(index).join(' ') } />
             <span className={index === this.props.active ? style.activeBreadCrumb : null}>
               &nbsp;{ this.props.labels[index] }
             </span>

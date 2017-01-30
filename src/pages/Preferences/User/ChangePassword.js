@@ -136,7 +136,7 @@ const ChangePassword = React.createClass({
 /* eslint-disable arrow-body-style */
 
 export default connect(
-  state => {
+  (state) => {
     const error = getNetworkError(state, 'user_updatePassword');
     const success = !!get(state, 'network.success.user_updatePassword');
     return {

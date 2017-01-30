@@ -21,7 +21,6 @@ const StatusPage = React.createClass({
   displayName: 'Preferences/Status',
 
   propTypes: {
-    simulations: React.PropTypes.object,
     ec2: React.PropTypes.array,
     ec2Clusters: React.PropTypes.array,
     tradClusters: React.PropTypes.array,
@@ -95,7 +94,7 @@ const StatusPage = React.createClass({
 
           <div className={ style.toolbar }>
             <div className={ style.title }> EC2 Clusters </div>
-            <div className={ style.buttons }></div>
+            <div className={ style.buttons } />
           </div>
           <div className={ style.taskflowContent }>
             { this.props.ec2Clusters.map(this.ec2Mapper) }
@@ -103,7 +102,7 @@ const StatusPage = React.createClass({
 
           <div className={ style.toolbar }>
             <div className={ style.title }> Traditional Clusters </div>
-            <div className={ style.buttons }></div>
+            <div className={ style.buttons } />
           </div>
           <div className={ style.taskflowContent }>
             { this.props.tradClusters.map(this.tradClusterMapper) }
@@ -115,7 +114,7 @@ const StatusPage = React.createClass({
 
 // Binding
 export default connect(
-  state => {
+  (state) => {
     const localState = state.preferences;
     var ec2Clusters = [],
       tradClusters = [];

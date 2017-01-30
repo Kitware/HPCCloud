@@ -21,7 +21,7 @@ export default function taskflowsReducer(state = initialState, action) {
       const jobMapById = {};
       const log = action.taskflow.log || [];
       if (action.taskflow.meta && action.taskflow.meta.jobs) {
-        action.taskflow.meta.jobs.forEach(job => {
+        action.taskflow.meta.jobs.forEach((job) => {
           jobMapById[job._id] = job;
           // Keep the previous status if available
           if (state.mapById[action.taskflow._id] && state.mapById[action.taskflow._id].jobMapById && state.mapById[action.taskflow._id].jobMapById[job._id]) {
@@ -163,7 +163,7 @@ export default function taskflowsReducer(state = initialState, action) {
       const { taskflowId, tasks } = action;
       const taskMapById = {};
       const taskflowMapByTaskId = Object.assign({}, state.taskflowMapByTaskId);
-      tasks.forEach(task => {
+      tasks.forEach((task) => {
         taskMapById[task._id] = task;
         taskflowMapByTaskId[task._id] = taskflowId;
       });

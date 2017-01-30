@@ -11,8 +11,8 @@ export default React.createClass({
 
   componentDidMount() {
     client.logout()
-      .then(_ => this.context.router.replace('/'))
-      .catch(_ => this.context.router.replace('/'));
+      .then((_) => this.context.router.replace('/'))
+      .catch((_) => this.context.router.replace('/'));
   },
 
   render() {

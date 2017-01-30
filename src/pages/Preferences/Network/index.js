@@ -26,7 +26,7 @@ const StatusPage = React.createClass({
 
   networkMapper(el, index) {
     return {
-      name: <span title={JSON.stringify(el, null, '  ')}><i className={iconMap[el.state]}></i> {el.label ? el.label : '__'}</span>,
+      name: <span title={JSON.stringify(el, null, '  ')}><i className={iconMap[el.state]} /> {el.label ? el.label : '__'}</span>,
       value: (<span>{el.state}</span>),
     };
   },
@@ -47,7 +47,7 @@ const StatusPage = React.createClass({
 // Binding
 
 export default connect(
-  state => {
+  (state) => {
     const localState = state.network;
     const log = [].concat(localState.backlog,
       Object.keys(localState.pending).map((id) => Object.assign({ state: 'pending' }, localState.pending[id])),

@@ -115,6 +115,8 @@ export default class JobMonitoring extends React.Component {
   }
 }
 
+/* eslint-disable react/no-unused-prop-types */
+
 JobMonitoring.propTypes = {
   getActions: React.PropTypes.func,
   actionFunctions: React.PropTypes.object, // onDeleteCluster, onVisualize, onRerun

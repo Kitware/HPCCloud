@@ -15,14 +15,12 @@ const ProjectEdit = React.createClass({
   displayName: 'Project/Edit',
 
   propTypes: {
-    params: React.PropTypes.object,
     error: React.PropTypes.string,
     project: React.PropTypes.object,
 
     onSave: React.PropTypes.func,
     onDelete: React.PropTypes.func,
     onCancel: React.PropTypes.func,
-    invalidateError: React.PropTypes.func,
   },
 
   onAction(action, data, attachment) {
@@ -51,7 +49,7 @@ const ProjectEdit = React.createClass({
     }
 
     const childComponent = project.type ? Workflows[project.type].components.EditProject : null;
-    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container,
+    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.container,
       parentProps: this.props }) : null;
 
     return (
@@ -59,7 +57,7 @@ const ProjectEdit = React.createClass({
         name={ project.name }
         description={ project.description }
         error={ error }
-        ref="container"
+        ref={(c) => {this.container = c;}}
         title="Edit Project"
         actions={[
           { name: 'cancel', label: 'Cancel' },

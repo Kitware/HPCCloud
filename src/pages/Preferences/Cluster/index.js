@@ -179,7 +179,7 @@ const ClusterPrefs = React.createClass({
       content = (<EmptyPlaceholder phrase={
         <span>
           There are no Clusters available <br />
-          You can create some with the <i className={theme.addIcon}></i> above
+          You can create some with the <i className={theme.addIcon} /> above
         </span> }
       />);
     }
@@ -208,7 +208,7 @@ const ClusterPrefs = React.createClass({
 /* eslint-disable arrow-body-style */
 
 export default connect(
-  state => {
+  (state) => {
     const localState = state.preferences.clusters;
     const simulations = state.simulations.mapById;
     const taskflows = Object.keys(state.taskflows.mapById).map((tf) => state.taskflows.mapById[tf]);

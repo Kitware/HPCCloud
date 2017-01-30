@@ -12,15 +12,15 @@ import * as SimActions      from '../../../../../redux/actions/projects';
 
 function getActions(props) {
   const { taskflow } = props;
-  const jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
+  const jobs = Object.keys(taskflow.jobMapById).map((id) => taskflow.jobMapById[id]);
   const actions = [];
 
-  taskflow.actions.forEach(action => {
+  taskflow.actions.forEach((action) => {
     actions.push(action);
   });
 
   // name is paraview and status is running -> visualize
-  if (jobs.some(job => job.name === props.primaryJob && job.status === 'running')) {
+  if (jobs.some((job) => job.name === props.primaryJob && job.status === 'running')) {
     actions.push('visualize');
   } else if (taskflow.allComplete) {
     actions.push('rerun');
@@ -66,7 +66,9 @@ export default connect(
 
     return {
       getActions,
-      taskflowId, cluster, taskflow,
+      taskflow,
+      taskflowId,
+      cluster,
       disabledButtons: getDisabledButtons(state.network, taskflow),
       error: getNetworkError(state, ['terminate_taskflow', 'delete_taskflow']),
       actionFunctions: { onVisualize },

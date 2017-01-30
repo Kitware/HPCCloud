@@ -57,7 +57,7 @@ export default React.createClass({
               onClick={this.onAction}
               disabled={action.disabled}
             >
-              { action.label } <i className={ action.icon }></i>
+              { action.label } <i className={ action.icon } />
             </button>
           )}
         </div>

@@ -84,8 +84,8 @@ export default React.createClass({
 
   componentDidUpdate(prevProps, prevState) {
     // the <pre> needs to be rendered open to have scrollHeight, then it scrolls
-    if (this.state.open && this.refs.log) {
-      this.refs.log.scrollTop = this.refs.log.scrollHeight;
+    if (this.state.open && this.log) {
+      this.log.scrollTop = this.log.scrollHeight;
     }
   },
 
@@ -109,7 +109,7 @@ export default React.createClass({
       );
     }
 
-    const log = (<pre className={ style.log } ref="log">
+    const log = (<pre className={ style.log } ref={(c) => {this.log = c;}}>
       { // reduce log array to a string with formatted entries
         this.props.unit.log.map(logMapper)
       }

@@ -96,7 +96,7 @@ const SimulationView = React.createClass({
 /* eslint-disable arrow-body-style */
 
 export default connect(
-  state => {
+  (state) => {
     const project = state.projects.mapById[state.projects.active];
     const simulations = state.projects.simulations[state.projects.active];
     const simulation = simulations ? state.simulations.mapById[simulations.active] : null;

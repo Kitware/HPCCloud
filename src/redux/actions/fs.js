@@ -20,19 +20,19 @@ export function updateItems(items) {
 }
 
 export function fetchFolder(id, fetchFolderMeta = true, openedFolders = []) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall(`fetch_folder_${id}`, 'Fetch folder');
 
     // Update folder
     if (fetchFolderMeta) {
       client.getFolder(id)
         .then(
-          resp => {
+          (resp) => {
             const folder = resp.data;
             dispatch(netActions.successNetworkCall(action.id, resp));
             dispatch(updateFolder(folder));
           },
-          error => {
+          (error) => {
             dispatch(netActions.errorNetworkCall(action.id, error));
           });
     }
@@ -42,15 +42,15 @@ export function fetchFolder(id, fetchFolderMeta = true, openedFolders = []) {
     dispatch(folderChildrenAction);
     client.listFolders({ parentId: id, parentType: 'folder' })
       .then(
-        resp => {
+        (resp) => {
           const children = resp.data;
           dispatch(netActions.successNetworkCall(folderChildrenAction.id, resp));
           dispatch({ type: CHILDREN_FOLDERS, children, id });
-          children.forEach(folder => {
+          children.forEach((folder) => {
             dispatch(updateFolder(folder));
           });
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(folderChildrenAction.id, error));
         });
 
@@ -60,12 +60,12 @@ export function fetchFolder(id, fetchFolderMeta = true, openedFolders = []) {
     dispatch(itemChildrenAction);
     client.listItems({ folderId: id })
       .then(
-        resp => {
+        (resp) => {
           const children = resp.data;
           dispatch(netActions.successNetworkCall(itemChildrenAction.id, resp));
           dispatch({ type: CHILDREN_ITEMS, children, id });
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(itemChildrenAction.id, error));
         });
 
@@ -74,7 +74,7 @@ export function fetchFolder(id, fetchFolderMeta = true, openedFolders = []) {
 }
 
 export function toggleOpenFolder(folderId, opening) {
-  return dispatch => {
+  return (dispatch) => {
     if (opening) {
       dispatch(fetchFolder(folderId));
     }
@@ -95,7 +95,7 @@ export function clearFileSelection() {
 
 export function moveFilesOffline(items) {
   const promises = items.map((id) => client.listFiles(id));
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('move_offline', `Moving ${items.length} offline`);
     Promise.all(promises) // get files for each item
       .then((files) => {
@@ -114,7 +114,7 @@ export function moveFilesOffline(items) {
       })
       .then((newItems) => {
         // update local items
-        dispatch(updateItems(newItems.map(el => el.data)));
+        dispatch(updateItems(newItems.map((el) => el.data)));
         dispatch(clearFileSelection());
       })
       .catch((err) => {

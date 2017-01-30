@@ -65,7 +65,7 @@ export function saveProject(project_, attachments) {
       .then((resp) => {
         if (attachments) {
           const promises = [];
-          Object.keys(attachments).forEach(file => {
+          Object.keys(attachments).forEach((file) => {
             promises.push(createItemForProject(project, file, attachments[file]));
           });
           promises.push(new Promise((a, r) => { a({ data: project }); }));

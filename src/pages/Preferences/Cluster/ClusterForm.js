@@ -14,12 +14,12 @@ const preventDefault = (e) => { e.preventDefault(); };
 const allConfigs = {};
 const wfNames = [];
 
-Object.keys(Workflows).forEach(wfName => {
+Object.keys(Workflows).forEach((wfName) => {
   const wf = Workflows[wfName];
   allConfigs[wfName] = {};
   let foundConfig = false;
   if (wf.config && wf.config.cluster) {
-    Object.keys(wf.config.cluster).forEach(propKey => {
+    Object.keys(wf.config.cluster).forEach((propKey) => {
       allConfigs[wfName][propKey] = wf.config.cluster[propKey];
       foundConfig = true;
     });
@@ -39,8 +39,8 @@ export default React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    if (this.refs.nameInput && nextProps.data && !nextProps.data._id) {
-      this.refs.nameInput.focus();
+    if (this.nameInput && nextProps.data && !nextProps.data._id) {
+      this.nameInput.focus();
     }
   },
 
@@ -87,7 +87,7 @@ export default React.createClass({
                 data-key="name"
                 onChange={this.formChange}
                 autoFocus required
-                ref="nameInput"
+                ref={(c) => {this.nameInput = c;}}
               />
           </section>
           <section className={style.group}>

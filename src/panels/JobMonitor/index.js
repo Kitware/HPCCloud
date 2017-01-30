@@ -1,5 +1,5 @@
 import React                from 'react';
-import ExecutionUnit        from './ExecutionUnit.js';
+import ExecutionUnit        from './ExecutionUnit';
 import style                from 'HPCCloudStyle/JobMonitor.mcss';
 
 import { connect }  from 'react-redux';
@@ -10,7 +10,6 @@ const JobMonitor = React.createClass({
   displayName: 'JobMonitor',
 
   propTypes: {
-    taskflowId: React.PropTypes.string,
     clusterId: React.PropTypes.string,
     tasks: React.PropTypes.array,
     jobs: React.PropTypes.array,
@@ -60,12 +59,12 @@ const JobMonitor = React.createClass({
                   <i
                     className={ this.state.advanced ? style.advancedIconOn : style.advancedIconOff}
                     onClick={ this.toggleAdvanced }
-                  ></i>
+                   />
               </div>
           </div>
           <div className={ style.jobContent }>
             {
-              this.props.jobs.map(job =>
+              this.props.jobs.map((job) =>
                 <ExecutionUnit key={job._id} unit={job} />
               )
             }
@@ -75,12 +74,11 @@ const JobMonitor = React.createClass({
                   <div className={ style.title }>
                       Workflow tasks
                   </div>
-                  <div className={ style.buttons }>
-                  </div>
+                  <div className={ style.buttons } />
               </div>
               <div className={ style.taskflowContent }>
                 {
-                  this.props.tasks.map(task =>
+                  this.props.tasks.map((task) =>
                     <ExecutionUnit key={task._id} unit={task} />
                   )
                 }
@@ -89,7 +87,7 @@ const JobMonitor = React.createClass({
                   <div className={ style.title }>
                       Workflow log
                   </div>
-                  <div className={ style.buttons }></div>
+                  <div className={ style.buttons } />
               </div>
               <div className={ style.taskflowContent }>
                 {
@@ -102,7 +100,7 @@ const JobMonitor = React.createClass({
                     <div className={ style.title }>
                         Cluster log
                     </div>
-                    <div className={ style.buttons }></div>
+                    <div className={ style.buttons } />
                   </div>
                   <div className={ style.taskflowContent }>
                     {
@@ -120,7 +118,7 @@ const JobMonitor = React.createClass({
 
 // manipulates target's status count
 function statusCounter(source, target) {
-  Object.keys(source).forEach(id => {
+  Object.keys(source).forEach((id) => {
     const status = source[id].status;
     if (target[status]) {
       target[status] += 1;

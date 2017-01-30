@@ -18,7 +18,6 @@ const TopBar = React.createClass({
 
   propTypes: {
     children: React.PropTypes.oneOfType([React.PropTypes.object, React.PropTypes.array]),
-    location: React.PropTypes.object,
     userName: React.PropTypes.string,
     isBusy: React.PropTypes.bool,
     progress: React.PropTypes.number,
@@ -73,12 +72,12 @@ const TopBar = React.createClass({
                 </Link>
             </div>
 
-            <div className={ theme.progressBar } style={{ width, opacity, display }}></div>
+            <div className={ theme.progressBar } style={{ width, opacity, display }} />
 
             { this.props.userName ? (
                 <div className={ theme.capitalizeRightText }>
                     <Link className={ theme.topBarText } to="/Preferences">{ this.props.userName }</Link>
-                    <Link to="/Logout" className={ theme.logout }><i className={ theme.logoutIcon }></i></Link>
+                    <Link to="/Logout" className={ theme.logout }><i className={ theme.logoutIcon } /></Link>
                 </div>
             ) : (
                 <div className={ theme.capitalizeRightText }>
@@ -98,7 +97,7 @@ const TopBar = React.createClass({
 /* eslint-disable arrow-body-style */
 
 export default connect(
-  state => {
+  (state) => {
     const firstName = get(state, 'auth.user.firstName');
     const lastName = get(state, 'auth.user.lastName');
     const pendingRequests = get(state, 'network.pending') || {};
@@ -109,7 +108,7 @@ export default connect(
     if (state.progress.total === null) {
       progress = Object.keys(state.network.progress).reduce((prev, key) => {
         var file = state.network.progress[key];
-        return prev + ((file.current / file.total) * 100) / Object.keys(state.network.progress).length;
+        return prev + (((file.current / file.total) * 100) / Object.keys(state.network.progress).length);
       }, 0);
       progressReset = get(state, 'network.progressReset');
       resetProgress = (val) => dispatch(NetActions.resetProgress(val));

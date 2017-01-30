@@ -30,7 +30,7 @@ const ToastComponent = React.createClass({
     return (<div className={[style.ToastContainer, (this.props.errorId ? '' : style.isHidden)].join(' ')}>
         { this.props.message }
         <button className={style.ToastClearButton} onClick={ this.close }>
-          <span className={style.CloseIcon}></span>
+          <span className={style.CloseIcon} />
         </button>
       </div>);
   },
@@ -38,7 +38,7 @@ const ToastComponent = React.createClass({
 
 
 export default connect(
-  state => {
+  (state) => {
     const localState = state.network;
     let id = null;
     let message = '';

@@ -20,7 +20,7 @@ export default React.createClass({
     }
 
     if (this.props.data && this.props.data.icon) {
-      return (<i className={this.props.data.icon}></i>);
+      return (<i className={this.props.data.icon} />);
     }
 
     return null;

@@ -51,8 +51,8 @@ export default React.createClass({
     return (<div className={`${style.modalContainer} ${this.state.fullscreen ? style.fullscreen : ''}`}>
       <div className={style.header}>
         <span className={style.title}>{this.props.title}</span>
-        <i className={style.fullscreenIcon} onClick={this.toggleFullscreen}></i>
-        <i className={style.closeIcon} onClick={this.props.closer}></i>
+        <i className={style.fullscreenIcon} onClick={this.toggleFullscreen} />
+        <i className={style.closeIcon} onClick={this.props.closer} />
       </div>
       <div className={`${style.modal} ${theme.fixedWidth}`}>
         { this.state.loading ? <LoadingPanel /> : this.state.contents}

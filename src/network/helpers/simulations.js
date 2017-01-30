@@ -27,7 +27,7 @@ function createItemForSimulation(simulation, name, file) {
 export function addFileForSimulationWithContents(simulation, itemName, fileName, contents) {
   let fileId;
   return girder.createItem(simulation.metadata.inputFolder._id, itemName)
-    .then(resp => {
+    .then((resp) => {
       const parentId = resp.data._id;
       return girder.newFile({
         parentType: 'item',
@@ -36,23 +36,23 @@ export function addFileForSimulationWithContents(simulation, itemName, fileName,
         size: 0,
       });
     })
-    .then(resp => {
+    .then((resp) => {
       fileId = resp.data._id;
       const blob = new Blob([contents], { type: 'text/plain' });
       return girder.updateFileContent(resp.data._id, contents.length)
-        .then(upload => {
+        .then((upload) => {
           girder.uploadChunk(fileId, 0, blob);
         });
     })
-    .then(resp => ({ _id: fileId }))
-    .catch(err => {
+    .then((resp) => ({ _id: fileId }))
+    .catch((err) => {
       console.log('Error adding ini content', err);
     });
 }
 
 export function addEmptyFileForSimulation(simulation, itemName, fileName) {
   return girder.createItem(simulation.metadata.inputFolder._id, itemName)
-    .then(resp => {
+    .then((resp) => {
       const parentId = resp.data._id;
       return girder.newFile({
         parentType: 'item',
@@ -108,7 +108,7 @@ export function saveSimulation(simulation_, attachments) {
       .then((resp) => {
         if (attachments) {
           const promises = [];
-          Object.keys(attachments).forEach(file => {
+          Object.keys(attachments).forEach((file) => {
             promises.push(createItemForSimulation(simulation, file, attachments[file]));
           });
           promises.push(new Promise((a, r) => { a({ data: simulation }); }));

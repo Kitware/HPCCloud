@@ -14,7 +14,6 @@ const Login = React.createClass({
   displayName: 'Login',
 
   propTypes: {
-    location: React.PropTypes.object,
     error: React.PropTypes.bool,
     onLogin: React.PropTypes.func,
   },
@@ -32,21 +31,21 @@ const Login = React.createClass({
 
   handleSubmit(event) {
     event.preventDefault();
-    this.props.onLogin(this.refs.login.value, this.refs.pass.value);
+    this.props.onLogin(this.login.value, this.pass.value);
   },
 
   render() {
     return (
         <div className={layout.textCenter}>
             <div className={style.header}>
-                <i className={style.topIcon}></i>
+                <i className={style.topIcon} />
                 <p className={style.subtitle}> Login to HPCCloud</p>
             </div>
             <form className={style.loginForm} onSubmit={this.handleSubmit}>
-                <input ref="login" className={style.loginInput} type="login" placeholder="login" required />
-                <input ref="pass" className={style.loginInput} type="password" placeholder="password" required />
+                <input ref={(c) => {this.login = c;}} className={style.loginInput} type="login" placeholder="login" required />
+                <input ref={(c) => {this.pass = c;}} className={style.loginInput} type="password" placeholder="password" required />
                 <div>
-                    <button className={style.loginButton}>Login <i className={ style.sendIcon }></i></button>
+                    <button className={style.loginButton}>Login <i className={ style.sendIcon } /></button>
                     <div className={style.forgotPassword}>
                         <Link to={'/Forgot'}>Forget password?</Link>
                     </div>
@@ -63,7 +62,7 @@ const Login = React.createClass({
 /* eslint-disable arrow-body-style */
 
 export default connect(
-  state => {
+  (state) => {
     return {
       error: !!get(state, 'network.error.user_login') && !get(state, 'network.error.user_login.invalid'),
     };

@@ -17,7 +17,6 @@ const ChangeInfo = React.createClass({
     buttons: React.PropTypes.array,
     className: React.PropTypes.string,
     error: React.PropTypes.string,
-    success: React.PropTypes.bool,
     user: React.PropTypes.object,
     onUpdateUser: React.PropTypes.func,
   },
@@ -101,7 +100,7 @@ const ChangeInfo = React.createClass({
 /* eslint-disable arrow-body-style */
 
 export default connect(
-  state => {
+  (state) => {
     const error = getNetworkError(state, 'user_update');
     const success = !!get(state, 'network.success.user_update');
     return {

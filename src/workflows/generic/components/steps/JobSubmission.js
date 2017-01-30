@@ -12,7 +12,7 @@ import * as NetActions from '../../../../redux/actions/network';
 
 function getServerProfiles(state) {
   const profiles = {};
-  ['EC2', 'Traditional'].forEach(name => {
+  ['EC2', 'Traditional'].forEach((name) => {
     profiles[name] = state[name];
   });
   return profiles;
@@ -121,6 +121,7 @@ export default class JobSubmission extends React.Component {
   }
 }
 
+/* eslint-disable react/no-unused-prop-types */
 JobSubmission.propTypes = {
   actionList: React.PropTypes.array,
   actionFunctions: React.PropTypes.object,
@@ -144,6 +145,7 @@ JobSubmission.propTypes = {
   onJobSubmition: React.PropTypes.func,
   onError: React.PropTypes.func,
 };
+/* eslint-enable react/no-unused-prop-types */
 
 JobSubmission.defaultProps = {
   actionList: [{ name: 'prepareJob', label: 'Run Job', icon: '' }],

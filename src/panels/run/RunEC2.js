@@ -146,7 +146,7 @@ export default React.createClass({
             <select className={style.input}
               onChange={this.dataChange} data-key="cluster"
             >
-              <option value={null}></option>
+              <option value={null} />
               { runningClusters.map((el, index) => <option key={el._id} value={el._id}>{el.name}</option>)}
             </select>
           </section> : null
