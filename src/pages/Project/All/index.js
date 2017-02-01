@@ -42,7 +42,7 @@ const ProjectAll = React.createClass({
     if (!confirm(`Are you sure you want to delete ${items.length === 1 ? 'this' : 'these'} ${items.length} project${items.length === 1 ? '' : 's'}?`)) {
       return;
     }
-    items.forEach(project => this.props.onDeleteItem(project));
+    items.forEach((project) => this.props.onDeleteItem(project));
   },
 
   edit(id) {
@@ -66,8 +66,8 @@ const ProjectAll = React.createClass({
           <EmptyPlaceholder phrase={
             <div>
               <h3>Welcome to HPCCloud</h3>
-              <span>You haven't created any projects yet<br />
-                Add one with the <i className={ theme.addIcon }></i> above.
+              <span>You haven&apos;t created any projects yet<br />
+                Add one with the <i className={ theme.addIcon } /> above.
               </span>
             </div>}
           />
@@ -81,16 +81,16 @@ const ProjectAll = React.createClass({
 /* eslint-disable arrow-body-style */
 
 export default connect(
-  state => {
+  (state) => {
     return {
-      projects: state.projects.list.map(id => state.projects.mapById[id]),
+      projects: state.projects.list.map((id) => state.projects.mapById[id]),
     };
   },
   () => {
     return {
       onActivate: (id, location) => dispatch(Actions.setActiveProject(id, location)),
       onDeleteItem: (project) => dispatch(Actions.deleteProject(project)),
-      onLocationChange: location => dispatch(Router.push(location)),
+      onLocationChange: (location) => dispatch(Router.push(location)),
     };
   }
 )(ProjectAll);

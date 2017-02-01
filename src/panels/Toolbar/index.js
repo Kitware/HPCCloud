@@ -78,7 +78,7 @@ export default React.createClass({
                 data-action={action.name}
                 onClick={this.onAction}
                 className={ [style.actionButton, action.icon].join(' ') }
-              ></i>
+               />
             )}
             { this.props.filter ?
                 <input

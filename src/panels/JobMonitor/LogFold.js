@@ -26,8 +26,8 @@ export default React.createClass({
   render() {
     return (<div className={`${style.logEntry} ${this.props.color}`}>
         {this.state.open ?
-          <i className={style.foldOpen} onClick={this.toggleOpen}></i> :
-          <i className={style.foldClosed} onClick={this.toggleOpen}></i>
+          <i className={style.foldOpen} onClick={this.toggleOpen} /> :
+          <i className={style.foldClosed} onClick={this.toggleOpen} />
         }
         { this.props.header }
         <div className={this.state.open ? '' : state.isHidden}>

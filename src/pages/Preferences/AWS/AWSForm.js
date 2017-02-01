@@ -43,8 +43,8 @@ export default React.createClass({
     const data = nextProps.data,
       oldData = this.props.data;
 
-    if (this.refs.nameInput && nextProps.data && !nextProps.data._id) {
-      this.refs.nameInput.focus();
+    if (this.nameInput && nextProps.data && !nextProps.data._id) {
+      this.nameInput.focus();
     }
 
     if (!deepEquals(data, oldData)) {
@@ -94,7 +94,7 @@ export default React.createClass({
               onChange={this.formChange}
               disabled={this.state.data._id}
               autoFocus required
-              ref="nameInput"
+              ref={(c) => {this.nameInput = c;}}
             />
           </section>
           <section className={style.group}>

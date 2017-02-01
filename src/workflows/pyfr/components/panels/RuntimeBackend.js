@@ -14,8 +14,10 @@ export default React.createClass({
 
   propTypes: {
     owner: React.PropTypes.func,
-    parentProps: React.PropTypes.object,
     parentState: React.PropTypes.object,
+    /* eslint-disable react/no-unused-prop-types */
+    parentProps: React.PropTypes.object,
+    /* eslint-emable react/no-unused-prop-types */
   },
 
   getInitialState() {
@@ -39,7 +41,7 @@ export default React.createClass({
     if (active === 'cuda') {
       backend['device-id'] = value;
     } else if (this.state.bakendProfile && this.state.bakendProfile[active]) {
-      const addOn = this.state.bakendProfile[active].find(item => item.name === this.state[active]);
+      const addOn = this.state.bakendProfile[active].find((item) => item.name === this.state[active]);
       Object.assign(backend, addOn);
     }
 

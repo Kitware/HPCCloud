@@ -33,7 +33,7 @@ export default React.createClass({
         <i
           className={ this.state.open ? style.advancedIconOn : style.advancedIconOff}
           onClick={ this.toggleAdvanced }
-        ></i>
+         />
       </div>);
     }
     return (

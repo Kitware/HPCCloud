@@ -19,7 +19,7 @@ const _LOGOUT_PROMISE = () => new Promise((resolve, reject) => {
 // ----------------------------------------------------------------------------
 
 function encodeQueryAsString(query = {}) {
-  const params = Object.keys(query).map(name => [encodeURIComponent(name), encodeURIComponent(query[name])].join('='));
+  const params = Object.keys(query).map((name) => [encodeURIComponent(name), encodeURIComponent(query[name])].join('='));
   return params.length ? `?${params.join('&')}` : '';
 }
 
@@ -27,7 +27,7 @@ function encodeQueryAsString(query = {}) {
 
 function filterQuery(query = {}, ...keys) {
   const out = {};
-  keys.forEach(key => {
+  keys.forEach((key) => {
     if (query[key] !== undefined && query[key] !== null) {
       out[key] = query[key];
     }
@@ -40,7 +40,7 @@ function filterQuery(query = {}, ...keys) {
 function mustContain(object = {}, ...keys) {
   var missingKeys = [],
     promise;
-  keys.forEach(key => {
+  keys.forEach((key) => {
     if (object[key] === undefined) {
       missingKeys.push(key);
     }
@@ -71,10 +71,12 @@ export function build(config = location, ...extensions) {
     client = {}, // Must be const otherwise the created closure will fail
     notification = new Observable(),
     idle = () => {
-      notification.emit(BUSY_TOPIC, --busyCounter);
+      busyCounter -= 1;
+      notification.emit(BUSY_TOPIC, busyCounter);
     },
     busy = (promise) => {
-      notification.emit(BUSY_TOPIC, ++busyCounter);
+      busyCounter += 1;
+      notification.emit(BUSY_TOPIC, busyCounter);
       promise.then(idle);
       return promise;
     },
@@ -128,7 +130,7 @@ export function build(config = location, ...extensions) {
 
         // wrap xhr requests so we can give a cancel to each,
         // we need to make a new cancel token for each request.
-        ['get', 'delete', 'head'].forEach(req => {
+        ['get', 'delete', 'head'].forEach((req) => {
           client._[req] = (url, conf) => {
             const cSource = CancelToken.source();
             client.cancel = cSource.cancel;
@@ -138,7 +140,7 @@ export function build(config = location, ...extensions) {
           };
         });
 
-        ['post', 'put', 'patch'].forEach(req => {
+        ['post', 'put', 'patch'].forEach((req) => {
           client._[req] = (url, data, conf) => {
             const cSource = CancelToken.source();
             client.cancel = cSource.cancel;
@@ -188,7 +190,7 @@ export function build(config = location, ...extensions) {
       };
       return new Promise((accept, reject) => {
         busy(client._.get('/user/authentication', { auth })
-          .then(resp => {
+          .then((resp) => {
             token = resp.data.authToken.token;
             userData = resp.data.user;
 
@@ -209,13 +211,13 @@ export function build(config = location, ...extensions) {
     logout() {
       return busy(client._.delete('/user/authentication')
         .then(
-          ok => {
+          (ok) => {
             updateAuthenticationState(false);
             if (document && document.cookie) {
               document.cookie = 'Girder-Token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             }
           },
-          ko => {
+          (ko) => {
             console.log('loggout error', ko);
           })
       );
@@ -309,7 +311,7 @@ export function build(config = location, ...extensions) {
       ext.forEach(processExtension);
     } else {
       const obj = ext(spec);
-      Object.keys(obj).forEach(key => {
+      Object.keys(obj).forEach((key) => {
         publicObject[key] = obj[key];
       });
     }

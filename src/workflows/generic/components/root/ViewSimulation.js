@@ -15,7 +15,6 @@ export default React.createClass({
 
   propTypes: {
     module: React.PropTypes.object,
-    project: React.PropTypes.object,
     simulation: React.PropTypes.object,
     step: React.PropTypes.string,
     view: React.PropTypes.string,
@@ -28,8 +27,8 @@ export default React.createClass({
   updateActiveStep(idx, item) {
     const stepName = this.props.module.steps._order[idx];
     activateSimulationStep(this.props.simulation, stepName)
-      .then(resp => this.context.router.replace(['/View/Simulation', this.props.simulation._id, stepName].join('/')))
-      .catch(err => {
+      .then((resp) => this.context.router.replace(['/View/Simulation', this.props.simulation._id, stepName].join('/')))
+      .catch((err) => {
         console.log('Update active error for', stepName);
         console.log(err);
       });
@@ -42,7 +41,7 @@ export default React.createClass({
     const stepIdx = module.steps._order.indexOf(this.props.step);
 
     const menuList = [];
-    module.steps._order.forEach(name => {
+    module.steps._order.forEach((name) => {
       menuList.push({
         name,
         label: module.labels[name].default,

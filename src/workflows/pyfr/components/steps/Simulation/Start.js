@@ -60,7 +60,7 @@ function pyfrStart(props) {
 // ----------------------------------------------------------------------------
 
 export default connect(
-  state => ({
+  (state) => ({
     error: getNetworkError(state, ['create_taskflow', 'start_taskflow']),
     clusters: state.preferences.clusters.mapById,
   })

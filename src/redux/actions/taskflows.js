@@ -49,14 +49,14 @@ export function triggerUpdate(taskflowId) {
 }
 
 export function getTaskflowLog(taskflowId) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall(`taskflow_log_${taskflowId}`, 'Check taskflow log');
     client.getTaskflowLog(taskflowId)
-      .then(resp => {
+      .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch({ type: UPDATE_TASKFLOW_LOG, taskflowId, log: resp.data.log });
       })
-      .catch(error => {
+      .catch((error) => {
         dispatch(netActions.errorNetworkCall(action.id, error));
       });
     return action;
@@ -68,16 +68,16 @@ export function updateTaskflowJobLog(taskflowId, jobId, logEntry) {
 }
 
 export function getTaskflowJobLog(taskflowId, jobId) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall(`taskflow_job_log_${jobId}`, 'Check job log');
 
     client.getJobLog(jobId)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch({ type: GET_TASKFLOW_JOB_LOG, taskflowId, jobId, log: resp.data.log });
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error));
         });
 
@@ -95,16 +95,16 @@ export function updateTaskflowJobStatus(taskflowId, jobId, status) {
   if (status) {
     return { type: UPDATE_TASKFLOW_JOB_STATUS, taskflowId, jobId, status };
   }
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall(`taskflow_job_status_${jobId}`, 'Check job status');
 
     client.getJobStatus(jobId)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch({ type: UPDATE_TASKFLOW_JOB_STATUS, taskflowId, jobId, status: resp.data.status });
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error));
         });
 
@@ -137,12 +137,12 @@ export function updateTaskflowMetadata(id, metadata) {
 }
 
 export function startTaskflow(id, payload, simulationStep, location) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('start_taskflow', 'Start taskflow');
 
     client.startTaskflow(id, payload)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           if (simulationStep) {
             const data = Object.assign({}, simulationStep.data,
@@ -151,7 +151,7 @@ export function startTaskflow(id, payload, simulationStep, location) {
             dispatch(projActions.updateSimulationStep(simulationStep.id, simulationStep.step, data, location));
           }
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
 
@@ -163,12 +163,12 @@ export function deleteTaskflow(taskflowId, simulationStep, location) {
   if (store.getState().taskflows.pending.indexOf(`${taskflowId}_delete`) !== -1) {
     return { type: 'NOOP' };
   }
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('delete_taskflow', 'Delete taskflow');
     dispatch(pendingNetworkCall(`${taskflowId}_delete`, true));
     client.deleteTaskflow(taskflowId)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch({ type: DELETE_TASKFLOW, id: taskflowId });
           if (simulationStep) {
@@ -176,7 +176,7 @@ export function deleteTaskflow(taskflowId, simulationStep, location) {
           }
           dispatch(pendingNetworkCall(`${taskflowId}_delete`, false));
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error));
         });
 
@@ -185,18 +185,18 @@ export function deleteTaskflow(taskflowId, simulationStep, location) {
 }
 
 export function createTaskflow(taskFlowName, primaryJob, payload, simulationStep, location) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('create_taskflow', 'Create taskflow');
 
     client.createTaskflow(taskFlowName)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(addTaskflow(resp.data, primaryJob));
           dispatch(attachSimulationToTaskflow(simulationStep.id, resp.data._id, simulationStep.step));
           dispatch(startTaskflow(resp.data._id, payload, simulationStep, location));
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
 
@@ -208,18 +208,18 @@ export function fetchTaskflowTasks(taskflowId) {
   if (store.getState().taskflows.pending.indexOf(taskflowId) !== -1) {
     return { type: 'NOOP' };
   }
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('taskflow_tasks', 'Check tasks');
     dispatch(pendingNetworkCall(taskflowId, true));
     client.getTaskflowTasks(taskflowId)
       .then(
-        resp => {
+        (resp) => {
           const tasks = resp.data;
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch({ type: UPDATE_TASKFLOW_TASKS, taskflowId, tasks });
           dispatch(pendingNetworkCall(taskflowId, false));
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error));
           dispatch(pendingNetworkCall(taskflowId, false));
           dispatch({ type: DELETE_TASKFLOW, id: taskflowId });
@@ -230,18 +230,18 @@ export function fetchTaskflowTasks(taskflowId) {
 }
 
 export function fetchTaskflow(id) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('taskflow_tasks', 'Check tasks');
 
     client.getTaskflow(id)
-      .then(resp => {
+      .then((resp) => {
         const taskflow = resp.data;
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(addTaskflow(taskflow));
 
         if (taskflow.meta) {
           if (taskflow.meta.jobs) {
-            taskflow.meta.jobs.forEach(job => {
+            taskflow.meta.jobs.forEach((job) => {
               if (job.status !== 'complete' && job.status !== 'terminated') {
                 dispatch(updateTaskflowJobStatus(id, job._id));
                 dispatch(getTaskflowJobLog(id, job._id));
@@ -253,7 +253,7 @@ export function fetchTaskflow(id) {
           }
         }
       })
-      .catch(error => {
+      .catch((error) => {
         dispatch(netActions.errorNetworkCall(action.id, error));
         dispatch({ type: DELETE_TASKFLOW, id });
       });
@@ -265,8 +265,8 @@ export function fetchTaskflow(id) {
 }
 
 export function updateTaskflowFromSimulation(simulation) {
-  return dispatch => {
-    Object.keys(simulation.steps).forEach(name => {
+  return (dispatch) => {
+    Object.keys(simulation.steps).forEach((name) => {
       const taskflowId = simulation.steps[name].metadata.taskflowId;
       if (taskflowId) {
         dispatch(fetchTaskflow(taskflowId));
@@ -279,15 +279,15 @@ export function updateTaskflowFromSimulation(simulation) {
 }
 
 export function terminateTaskflow(id) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall(`terminate_taskflow_${id}`, 'Terminate taskflow');
 
     client.endTaskflow(id)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
 
@@ -301,9 +301,9 @@ export function terminateTaskflow(id) {
 
 // find a discrete job and only update that one
 function findJob(jobId, updateLog = false) {
-  return dispatch => {
+  return (dispatch) => {
     const state = store.getState();
-    Object.keys(state.taskflows.mapById).forEach(id => {
+    Object.keys(state.taskflows.mapById).forEach((id) => {
       if (state.taskflows.mapById[id].status !== 'complete' &&
           state.taskflows.mapById[id].status !== 'terminated') {
         const action = netActions.addNetworkCall('taskflow_tasks', 'Check tasks');
@@ -314,7 +314,7 @@ function findJob(jobId, updateLog = false) {
             dispatch(addTaskflow(taskflow));
 
             if (taskflow.meta && taskflow.meta.jobs) {
-              taskflow.meta.jobs.forEach(job => {
+              taskflow.meta.jobs.forEach((job) => {
                 // only update the status if the jobId is the one we're looking for
                 if (job._id === jobId) {
                   dispatch(updateTaskflowJobStatus(id, job._id));
@@ -337,9 +337,9 @@ function findJob(jobId, updateLog = false) {
 
 // fetch tasks for each taskflow, the task objects which come back have log and status.
 function findTask() {
-  return dispatch => {
+  return (dispatch) => {
     const taskflows = store.getState().taskflows;
-    Object.keys(taskflows.mapById).forEach(id => {
+    Object.keys(taskflows.mapById).forEach((id) => {
       if (taskflows.mapById[id].status !== 'complete' &&
           taskflows.mapById[id].status !== 'terminated') {
         dispatch(fetchTaskflowTasks(id));

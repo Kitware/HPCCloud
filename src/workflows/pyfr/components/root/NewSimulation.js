@@ -1,5 +1,7 @@
 import React                from 'react';
+/* eslint-disable import/extensions */
 import Simput               from 'Simput';
+/* eslint-enable import/extensions */
 
 import { FileUploadEntry }  from '../../../../panels/ItemEditor';
 import { dispatch }         from '../../../../redux';

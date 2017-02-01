@@ -3,7 +3,7 @@ import SimputReact from '../../../../generic/components/steps/SimputReact';
 
 // ----------------------------------------------------------------------------
 
-export default props => (
+export default (props) => (
   <SimputReact
     {...props}
 

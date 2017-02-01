@@ -2,7 +2,9 @@ import * as ProjectActions  from './redux/actions/projects';
 import * as TaskflowActions from './redux/actions/taskflows';
 import * as ClusterActions from './redux/actions/clusters';
 import * as FSActions       from './redux/actions/fs';
+/* eslint-disable import/extensions */
 import Workflows            from 'workflows';
+/* eslint-enable import/extensions */
 
 import equals from 'mout/src/array/equals';
 import { dispatch } from './redux';
@@ -29,20 +31,20 @@ export function handleTaskflowChange(state, taskflow) {
   const outputDirectory = [];
   const actions = [];
   try {
-    jobs = Object.keys(taskflow.jobMapById).map(id => taskflow.jobMapById[id]);
-    tasks = Object.keys(taskflow.taskMapById).map(id => taskflow.taskMapById[id]);
+    jobs = Object.keys(taskflow.jobMapById).map((id) => taskflow.jobMapById[id]);
+    tasks = Object.keys(taskflow.taskMapById).map((id) => taskflow.taskMapById[id]);
   } catch (e) {
     return;
   }
-  const allComplete = jobs.every(job => job.status === 'complete') && tasks.every(task => task.status === 'complete');
+  const allComplete = jobs.every((job) => job.status === 'complete') && tasks.every((task) => task.status === 'complete');
   const simulationStatus = [];
 
   // Figure out possible actions and simulation state
-  if ((jobs.length && jobs.every(job => job.status === 'terminated')) ||
-    (tasks.some(task => task.status === 'error') && (jobs.length === 0 || !jobs.some(job => job.status === 'running')))) {
+  if ((jobs.length && jobs.every((job) => job.status === 'terminated')) ||
+    (tasks.some((task) => task.status === 'error') && (jobs.length === 0 || !jobs.some((job) => job.status === 'running')))) {
     simulationStatus.push('terminated');
     actions.push('rerun');
-  } else if (!allComplete && (jobs.length + tasks.length) > 0 && !jobs.some(job => job.status === 'terminating')) {
+  } else if (!allComplete && (jobs.length + tasks.length) > 0 && !jobs.some((job) => job.status === 'terminating')) {
     simulationStatus.push('running');
 
     // Only allow termination if the cluster is not launching/provisioning ( we can't currently terminate a cluster in launching or provisioning )

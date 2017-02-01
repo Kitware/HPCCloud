@@ -13,14 +13,14 @@ export function getJSON(url) {
       };
     }
 
-    xhr.addEventListener('load', event => {
+    xhr.addEventListener('load', (event) => {
       resolve(extractResponse('load'));
     });
-    xhr.addEventListener('error', event => {
+    xhr.addEventListener('error', (event) => {
       console.log('Get JSON request failed', event);
       reject(extractResponse('error'));
     });
-    xhr.addEventListener('abort', event => {
+    xhr.addEventListener('abort', (event) => {
       console.log('Get JSON request has been canceled', event);
       reject(extractResponse('abort'));
     });

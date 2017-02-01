@@ -15,28 +15,29 @@
   "dependencies": {
     "commander": "2.9.0",
     "open": "0.0.5",
-    "shelljs": "0.5.3"
+    "shelljs": "0.7.6",
+    "react": "15.4.2",
+    "react-dom": "15.4.2",
+    "react-router": "2.0.1",
+
+    "redux": "3.3.1",
+    "react-redux": "4.4.6",
+    "react-router-redux": "4.0.7",
+    "reselect": "2.5.3",
+    "mout": "0.11.1"
   },
   "devDependencies": {
     "ws": "0.8.1",
     "axios": "0.15.3",
-    "font-awesome": "4.5.0",
     "gl-matrix": "2.3.1",
     "hammerjs": "2.0.6",
-    "monologue.js": "0.3.4",
-    "mout": "0.11.1",
-    "normalize.css": "3.0.3",
-    "react": "15.3.0",
-    "react-dom": "15.3.0",
+    "monologue.js": "0.3.5",
 
-    "redux": "3.3.1",
-    "react-redux": "4.4.1",
-    "react-router-redux": "4.0.0",
-    "reselect": "2.5.3",
+    "normalize.css": "5.0.0",
+    "font-awesome": "4.7.0",
+    "bootstrap": "3.3.7",
 
-    "bootstrap": "3.3.6",
-    "react-router": "2.0.1",
-
+    "react-addons-test-utils": "15.4.2",
     "karma": "0.13.22",
     "karma-jasmine": "1.0.2",
     "karma-spec-reporter": "0.0.26",

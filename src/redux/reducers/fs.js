@@ -34,11 +34,11 @@ export default function fsReducer(state = initialState, action) {
       const { id, children } = action;
 
       const itemMapById = Object.assign({}, state.itemMapById);
-      children.forEach(item => {
+      children.forEach((item) => {
         itemMapById[item._id] = item;
       });
 
-      const itemChildren = children.map(item => item._id);
+      const itemChildren = children.map((item) => item._id);
 
       const folderMapById = Object.assign({}, state.folderMapById);
       folderMapById[id] = Object.assign({}, folderInitialState, state.folderMapById[id], { itemChildren });
@@ -47,7 +47,7 @@ export default function fsReducer(state = initialState, action) {
 
     case Actions.CHILDREN_FOLDERS: {
       const { id, children } = action;
-      const folderChildren = children.map(item => item._id);
+      const folderChildren = children.map((item) => item._id);
       const folderMapById = Object.assign({}, state.folderMapById);
       folderMapById[id] = Object.assign({}, folderInitialState, state.folderMapById[id], { folderChildren });
       return Object.assign({}, state, { folderMapById });

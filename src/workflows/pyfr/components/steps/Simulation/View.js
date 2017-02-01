@@ -32,7 +32,7 @@ function onVisualize(props) {
   newSimState.steps.Visualization.metadata.dataDir = props.taskflow.outputDirectory;
   newSimState.steps.Visualization.metadata.fileName = props.taskflow.flow.meta.vtuFile;
   newSimState.active = 'Visualization';
-  newSimState.disabled = newSimState.disabled.filter(step => step !== 'Visualization');
+  newSimState.disabled = newSimState.disabled.filter((step) => step !== 'Visualization');
 
   dispatch(SimActions.saveSimulation(newSimState, null, location));
 }
@@ -63,7 +63,9 @@ export default connect(
 
     return {
       getActions,
-      taskflowId, cluster, taskflow,
+      taskflow,
+      taskflowId,
+      cluster,
       disabledButtons: getDisabledButtons(state.network, taskflow),
       error: getNetworkError(state, ['terminate_taskflow', 'delete_taskflow']),
       actionFunctions: { onVisualize },

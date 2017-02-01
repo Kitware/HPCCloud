@@ -22,7 +22,7 @@ export default function networkReducer(state = initialState, action) {
       const pending = Object.assign({}, state.pending, { [id]: { id, label, ts } });
       const success = Object.assign({}, state.success);
       const error = Object.assign({}, state.error);
-      const backlog = [].concat(state.backlog, success[id], error[id]).filter(el => !!el);
+      const backlog = [].concat(state.backlog, success[id], error[id]).filter((el) => !!el);
       delete success[id];
       delete error[id];
 

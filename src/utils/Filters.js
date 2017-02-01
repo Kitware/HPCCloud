@@ -8,7 +8,7 @@ const filterKeys = {
 
 function findActiveKey(token) {
   var key = null;
-  Object.keys(filterKeys).forEach(k => {
+  Object.keys(filterKeys).forEach((k) => {
     if (token.indexOf(k) === 0) {
       key = k;
     }
@@ -50,8 +50,8 @@ export function updateQuery(queryStr = '') {
 export function itemFilter(item, index, array) {
   var keep = true;
 
-  Object.keys(query).forEach(key => {
-    query[key].forEach(token => {
+  Object.keys(query).forEach((key) => {
+    query[key].forEach((token) => {
       keep = keep && (item[key].toLowerCase().indexOf(token) !== -1);
     });
   });

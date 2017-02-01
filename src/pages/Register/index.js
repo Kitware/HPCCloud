@@ -62,8 +62,8 @@ const Register = React.createClass({
   handleSubmit(event) {
     event.preventDefault();
     const user = {};
-    ['login', 'firstName', 'lastName', 'email', 'password'].forEach(key => {
-      user[key] = this.refs[key].value;
+    ['login', 'firstName', 'lastName', 'email', 'password'].forEach((key) => {
+      user[key] = this[key].value;
     });
     this.props.onRegister(user);
   },
@@ -74,21 +74,21 @@ const Register = React.createClass({
         <form className={style.loginForm} onSubmit={this.handleSubmit}>
           <input
             className={style.loginInput}
-            ref="firstName"
+            ref={(c) => { this.firstName = c;}}
             type="text"
             placeholder="firstName"
             required
           />
           <input
             className={style.loginInput}
-            ref="lastName"
+            ref={(c) => { this.lastName = c;}}
             type="text"
             placeholder="lastName"
             required
           />
           <input
             className={style.loginInput}
-            ref="email"
+            ref={(c) => { this.email = c;}}
             type="email"
             placeholder="email"
             onChange={this.resetError}
@@ -96,7 +96,7 @@ const Register = React.createClass({
           />
           <input
             className={style.loginInput}
-            ref="login"
+            ref={(c) => { this.login = c;}}
             type="text"
             placeholder="login"
             onChange={this.resetError}
@@ -104,7 +104,7 @@ const Register = React.createClass({
           />
           <input
             className={style.loginInput}
-            ref="password"
+            ref={(c) => { this.password = c;}}
             type="password"
             value={this.state.password}
             onChange={this.passwordChange}
@@ -113,7 +113,7 @@ const Register = React.createClass({
           />
           <input
             className={style.loginInput}
-            ref="confirm"
+            ref={(c) => { this.confirm = c;}}
             type="password"
             value={this.state.confirm}
             onChange={this.confirmChange}
@@ -125,7 +125,7 @@ const Register = React.createClass({
                 className={style.loginButton}
               >Register</button>
           </div>
-          {(!!this.state.error ? (
+          {(this.state.error ? (
               <p className={style.warningBox}>{this.state.error}</p>
           ) : null)}
         </form>
@@ -137,7 +137,7 @@ const Register = React.createClass({
 /* eslint-disable arrow-body-style */
 
 export default connect(
-  state => {
+  (state) => {
     return {
       error: getNetworkError(state, 'user_register'),
     };

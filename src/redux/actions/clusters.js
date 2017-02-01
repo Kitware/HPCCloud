@@ -93,10 +93,10 @@ export function updateClusterStatus(id, status) {
 }
 
 export function getClusterLog(id, offset) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall(`cluster_log_${id}`, 'Check cluster log');
     client.getClusterLog(id, offset)
-      .then(resp => {
+      .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         if (!offset) { // offset is 0 or undefined
           dispatch(updateClusterLog(id, resp.data.log));
@@ -104,7 +104,7 @@ export function getClusterLog(id, offset) {
           dispatch(appendToClusterLog(id, resp.data.log));
         }
       })
-      .catch(error => {
+      .catch((error) => {
         dispatch(netActions.errorNetworkCall(action.id, error));
       });
     return action;
@@ -112,18 +112,18 @@ export function getClusterLog(id, offset) {
 }
 
 export function fetchCluster(id, taskflowIdToUpdate = '') {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('fetch_cluster', 'Retreive cluster');
     client.getCluster(id)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(addExistingCluster(resp.data));
           if (taskflowIdToUpdate.length) {
             dispatch(TaskflowActions.triggerUpdate(taskflowIdToUpdate));
           }
         },
-        err => {
+        (err) => {
           dispatch(netActions.errorNetworkCall(action.id, err));
         });
 
@@ -136,17 +136,17 @@ export function fetchClusters(type) {
   if (store.getState().preferences.clusters.pending) {
     return { type: 'NOOP' };
   }
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
     dispatch(pendingNetworkCall(true));
     client.listClusters(type)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(updateClusters(resp.data));
           dispatch(pendingNetworkCall(false));
         },
-        err => {
+        (err) => {
           dispatch(netActions.errorNetworkCall(action.id, err));
           dispatch(pendingNetworkCall(false));
         });
@@ -156,15 +156,15 @@ export function fetchClusters(type) {
 }
 
 export function fetchClusterPresets() {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('fetch_cluster_presets', 'Retreive cluster presets');
     client.getClusterPresets()
       .then(
-        presets => {
+        (presets) => {
           dispatch(netActions.successNetworkCall(action.id, presets));
           dispatch(updateClusterPresets(presets.data));
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error));
         });
 
@@ -178,16 +178,16 @@ export function removeCluster(index, cluster) {
     return { type: REMOVE_CLUSTER, index };
   }
 
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('remove_cluster', 'Remove cluster');
 
     client.deleteCluster(cluster._id)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(fetchClusters());
         },
-        err => {
+        (err) => {
           dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
         });
 
@@ -197,16 +197,16 @@ export function removeCluster(index, cluster) {
 
 // deletes a cluster by id, different from removeCluster(index, cluster) above
 export function deleteCluster(id) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('delete_cluster', 'Delete cluster');
 
     client.deleteCluster(id)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(removeClusterById(id));
         },
-        err => {
+        (err) => {
           dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
         });
 
@@ -220,10 +220,10 @@ export function saveCluster(index, cluster, pushToServer = false) {
     const action = netActions.addNetworkCall('save_cluster', 'Save cluster');
     ClusterHelper.saveCluster(cluster)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
         },
-        err => {
+        (err) => {
           dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
         });
   }
@@ -231,7 +231,7 @@ export function saveCluster(index, cluster, pushToServer = false) {
 }
 
 export function updateCluster(cluster) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('save_cluster', 'Save cluster');
     client.updateCluster(cluster)
       .then((resp) => {
@@ -250,15 +250,15 @@ export function testCluster(index, cluster) {
   if (!cluster._id) {
     return { type: 'NOOP', message: 'Cluster is not available on server yet' };
   }
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('test_cluster', 'Test cluster');
     dispatch({ type: TESTING_CLUSTER, index });
     client.testCluster(cluster._id)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
     return action;
@@ -266,7 +266,7 @@ export function testCluster(index, cluster) {
 }
 
 export function terminateCluster(id) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall(`terminate_cluster_${id}`, 'terminate cluster');
     client.terminateCluster(id)
       .then((resp) => {
@@ -280,7 +280,7 @@ export function terminateCluster(id) {
 }
 
 // Auto trigger actions on authentication change...
-client.onAuthChange(authenticated => {
+client.onAuthChange((authenticated) => {
   if (!authenticated) {
     dispatch(updateClusters([]));
     dispatch(updateClusterPresets({}));

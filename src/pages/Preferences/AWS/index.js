@@ -148,7 +148,7 @@ const AWSPrefs = React.createClass({
       content = (<EmptyPlaceholder phrase={
         <span>
           There are no EC2 Profiles available <br />
-          You can create some with the <i className={theme.addIcon}></i> above
+          You can create some with the <i className={theme.addIcon} /> above
         </span> }
       />);
     }
@@ -177,7 +177,7 @@ const AWSPrefs = React.createClass({
 /* eslint-disable arrow-body-style */
 
 export default connect(
-  state => {
+  (state) => {
     const localState = state.preferences.aws;
 
     return {

@@ -2,7 +2,7 @@ import React                from 'react';
 import { FileUploadEntry }  from '../../../../../panels/ItemEditor';
 
 function extractFileName(name) {
-  return file => new Promise((accept, reject) => {
+  return (file) => new Promise((accept, reject) => {
     accept({ [name]: file.name });
   });
 }

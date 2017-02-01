@@ -47,9 +47,9 @@ export default React.createClass({
           data-index={index}
           onClick={this.changeActive}
         >
-          <i className={el.classPrefix}></i>
-            {el.name}
-            <i className={el.classSufix}></i>
+          <i className={el.classPrefix} />
+          {el.name}
+          <i className={el.classSufix} />
         </li>;
 
     return (<ul className={[this.props.className, style.list].join(' ')}>{this.props.list.map(mapper)}</ul>);

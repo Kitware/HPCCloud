@@ -38,7 +38,7 @@ export const clusterTemplate = {
 
 function applyPreset(obj, preset = null) {
   if (preset) {
-    Object.keys(preset).forEach(key => {
+    Object.keys(preset).forEach((key) => {
       set(obj, key, preset[key]);
     });
   }
@@ -59,7 +59,7 @@ const STATUS_TO_ICON = {
 const tradFilter = (el) => el.type === 'trad';
 
 function updateIcon(clusters) {
-  clusters.forEach(cluster => {
+  clusters.forEach((cluster) => {
     // Debug
     if (!STATUS_TO_ICON[cluster.status]) {
       console.log('missing icon for:', cluster.status);
@@ -144,7 +144,7 @@ export default function clustersReducer(state = initialState, action) {
       const active = (state.active < list.length) ? state.active : (list.length - 1);
       const mapById = Object.assign({}, state.mapById);
       updateIcon(list);
-      action.clusters.forEach(cluster => {
+      action.clusters.forEach((cluster) => {
         if (cluster._id && !mapById[cluster._id]) {
           mapById[cluster._id] = cluster;
         }

@@ -27,7 +27,7 @@ function extractEnergies(energyData) {
   const minimumEnergy = Math.min(...energies.map((point) => Number.parseFloat(point[y])));
 
   // Convert energies to kcal and make positive
-  energies = energies.map(point => {
+  energies = energies.map((point) => {
     point[y] = (point[y] + Math.abs(minimumEnergy)) * auToKcal;
 
     return point;
@@ -55,7 +55,8 @@ export default class VisualizationView extends React.Component {
       this.setState({
         energies: extractEnergies(resp.data),
       });
-    }).catch((error) => {
+    })
+    .catch((error) => {
       console.error('Unable to neb.neb_final_epath.');
       // throw error;
     });
@@ -90,7 +91,7 @@ export default class VisualizationView extends React.Component {
     if (this.state.energies.length === 0) {
       return <LoadingPanel />;
     }
-    return (<div style={{ width: '100%', height: '100%', padding: 10 }}ref={c => (this.container = c)}></div>);
+    return (<div style={{ width: '100%', height: '100%', padding: 10 }} ref={(c) => (this.container = c)} />);
   }
 }
 

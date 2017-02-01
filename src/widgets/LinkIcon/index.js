@@ -20,7 +20,7 @@ export default React.createClass({
 
   render() {
     return (<Link to={this.props.to} title={this.props.title}>
-      <i className={ [this.props.icon, this.props.className].join(' ') }></i>
+      <i className={ [this.props.icon, this.props.className].join(' ') } />
     </Link>);
   },
 });

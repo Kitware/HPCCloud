@@ -28,7 +28,7 @@ export function updateAWSProfiles(profiles) {
 }
 
 export function fetchAWSProfiles() {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('fetch_aws_profiles', 'Retreive AWS profiles');
     dispatch(pendingNetworkCall(true));
     client.listAWSProfiles()
@@ -51,18 +51,18 @@ export function removeAWSProfile(index, profile) {
     return { type: REMOVE_AWS_PROFILE, index };
   }
 
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('remove_aws_profile', 'Remove cluster');
 
     dispatch(pendingNetworkCall(true));
     client.deleteAWSProfile(profile._id)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(pendingNetworkCall(false));
           dispatch(fetchAWSProfiles());
         },
-        err => {
+        (err) => {
           dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
           dispatch(pendingNetworkCall(false));
         });
@@ -75,17 +75,17 @@ export function updateAWSProfile(index, profile, pushToServer = false) {
   if (!pushToServer) {
     return { type: SAVE_AWS_PROFILE, index, profile };
   }
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('save_aws_profile', 'Save cluster');
     dispatch(pendingNetworkCall(true));
     client.createAWSProfile(profile)
       .then(
-        resp => {
+        (resp) => {
           dispatch(pendingNetworkCall(false));
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(fetchAWSProfiles());
         },
-        err => {
+        (err) => {
           dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
           dispatch(pendingNetworkCall(false));
         });
@@ -94,7 +94,7 @@ export function updateAWSProfile(index, profile, pushToServer = false) {
 }
 
 // Auto trigger actions on authentication change...
-client.onAuthChange(authenticated => {
+client.onAuthChange((authenticated) => {
   if (!authenticated) {
     dispatch(updateAWSProfiles([]));
   }

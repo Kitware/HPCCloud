@@ -54,13 +54,13 @@ const FileUploadEntry = React.createClass({
     // Let's post process it
     if (this.props.owner && this.props.postProcess) {
       this.props.postProcess(file, this.props.owner)
-        .then(metadata => {
-          Object.keys(metadata).forEach(key => {
+        .then((metadata) => {
+          Object.keys(metadata).forEach((key) => {
             this.props.owner().addMetadata(key, metadata[key]);
           });
         })
-        .catch(err => {
-          this.refs.input.value = '';
+        .catch((err) => {
+          this.input.value = '';
         });
     }
   },
@@ -70,7 +70,7 @@ const FileUploadEntry = React.createClass({
       <div className={style.group}>
         <label className={style.label}>{this.props.label}</label>
         <input
-          ref="input"
+          ref={(c) => {this.input = c;}}
           className={style.input}
           data-name={this.props.name}
           accept={this.props.accept}

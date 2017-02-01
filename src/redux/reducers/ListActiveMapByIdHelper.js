@@ -7,7 +7,7 @@ export const initialState = {
 export function updateList(state, itemList, idKey = '_id') {
   const list = [];
   const mapById = {};
-  itemList.forEach(item => {
+  itemList.forEach((item) => {
     list.push(item[idKey]);
     mapById[item[idKey]] = item;
   });
@@ -23,7 +23,7 @@ export function removeItem(state, id) {
     delete mapById[id];
   }
   if (state.list.indexOf(id) !== -1) {
-    const list = state.list.filter(item => item !== id);
+    const list = state.list.filter((item) => item !== id);
     const active = (state.active === id) ? null : state.active;
     if (mapById) {
       return Object.assign({}, state, { list, active, mapById });

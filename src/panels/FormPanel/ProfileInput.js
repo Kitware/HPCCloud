@@ -90,8 +90,8 @@ export default React.createClass({
             title={ item.description }
           >{ item.label }</label>
           <div className={ style.buttons }>
-            <i className={ style.addIcon } onClick={ this.addProfile }></i>
-            <i className={ style.removeIcon } onClick={ this.removeProfile }></i>
+            <i className={ style.addIcon } onClick={ this.addProfile } />
+            <i className={ style.removeIcon } onClick={ this.removeProfile } />
           </div>
         </div>
         <div className={ style.content }>

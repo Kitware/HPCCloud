@@ -15,7 +15,6 @@ const ProjectNew = React.createClass({
   displayName: 'Project/New',
 
   propTypes: {
-    location: React.PropTypes.object,
     workflowNames: React.PropTypes.array,
     error: React.PropTypes.string,
     onSave: React.PropTypes.func,
@@ -75,7 +74,7 @@ const ProjectNew = React.createClass({
       const reqAttachments = Workflows[this.state.type].requiredAttachments.project;
       if (!attachments || !reqAttachments.every((el) => attachments.hasOwnProperty(el))) {
         // ['this', 'that', 'other'] => '"this", "that" and "other"'
-        const reqAttachmentsStr = reqAttachments.map(el => `"${el}"`).join(', ').replace(/(, )(?!.* )/, ' and ');
+        const reqAttachmentsStr = reqAttachments.map((el) => `"${el}"`).join(', ').replace(/(, )(?!.* )/, ' and ');
         this.setState({ _error: `The project requires file${reqAttachments.length === 1 ? '' : 's'} ${reqAttachmentsStr}` });
         return;
       }
@@ -90,13 +89,13 @@ const ProjectNew = React.createClass({
 
   render() {
     const childComponent = this.state.type ? Workflows[this.state.type].components.NewProject : null;
-    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container,
+    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.container,
       parentProps: this.props }) : null;
 
     return (
       <ItemEditor
         error={ this.state._error || this.props.error }
-        ref="container"
+        ref={(c) => {this.container = c;}}
         title="New Project"
         actions={[
           { name: 'cancel', label: 'Cancel' },
@@ -126,7 +125,7 @@ const ProjectNew = React.createClass({
 /* eslint-disable arrow-body-style */
 
 export default connect(
-  state => {
+  (state) => {
     return {
       workflowNames: state.projects.workflowNames,
       error: getNetworkError(state, 'save_project'),

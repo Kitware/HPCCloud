@@ -33,20 +33,20 @@ const ForgotPassword = React.createClass({
 
   handleSubmit(event) {
     event.preventDefault();
-    this.props.onResetPassword(this.refs.email.value);
+    this.props.onResetPassword(this.email.value);
   },
 
   render() {
     return (
       <div className={layout.textCenter}>
           <div className={style.header}>
-              <i className={ style.forgetCloudIcon }></i>
+              <i className={ style.forgetCloudIcon } />
               <p className={style.subtitle}> Forget your password</p>
           </div>
           <form className={style.loginForm} onSubmit={this.handleSubmit}>
-              <input ref="email" className={style.loginInput} type="email" placeholder="email" required />
+              <input ref={(c) => {this.email = c;}} className={style.loginInput} type="email" placeholder="email" required />
               <div>
-                  <button className={style.loginButton}>Send <i className={ style.sendIcon }></i></button>
+                  <button className={style.loginButton}>Send <i className={ style.sendIcon } /></button>
               </div>
               {this.props.error && (
                   <p className={style.errorBox}>{this.props.error}</p>
@@ -63,7 +63,7 @@ const ForgotPassword = React.createClass({
 /* eslint-disable arrow-body-style */
 
 export default connect(
-  state => {
+  (state) => {
     return {
       error: getNetworkError(state, 'user_forget'),
       success: get(state, 'network.success.user_forget.resp.data.message'),

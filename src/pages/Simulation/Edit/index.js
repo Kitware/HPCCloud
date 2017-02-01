@@ -16,7 +16,6 @@ const SimulationEdit = React.createClass({
   displayName: 'Simulation/Edit',
 
   propTypes: {
-    params: React.PropTypes.object,
     error: React.PropTypes.string,
     project: React.PropTypes.object,
     simulation: React.PropTypes.object,
@@ -53,7 +52,7 @@ const SimulationEdit = React.createClass({
     const { simulation, project, error } = this.props;
     const projectId = simulation.projectId;
     const childComponent = project.type ? Workflows[project.type].components.EditSimulation : null;
-    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.refs.container,
+    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.container,
       parentProps: this.props }) : null;
 
     return (
@@ -69,7 +68,7 @@ const SimulationEdit = React.createClass({
         name={simulation.name}
         description={simulation.description}
         error={error}
-        ref="container"
+        ref={(c) => {this.container = c;}}
         title="Edit Simulation"
         actions={[
           { name: 'cancel', label: 'Cancel' },

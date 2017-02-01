@@ -17,7 +17,7 @@ export function loggedIn(user) {
 }
 
 export function login(username, password) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch(authenticationPending(true));
     const action = netActions.addNetworkCall('user_login', 'Authenticate');
 
@@ -38,16 +38,16 @@ export function login(username, password) {
 }
 
 export function register(firstName, lastName, login, email, password) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('user_register', 'Register user');
 
     client.createUser({ firstName, lastName, login, email, password, admin: false })
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(routingActions.replace('/Login'));
         },
-        error => {
+        (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
         });
 
@@ -56,17 +56,17 @@ export function register(firstName, lastName, login, email, password) {
 }
 
 export function logout() {
-  return dispatch => {
+  return (dispatch) => {
     dispatch(authenticationPending(false));
     const action = netActions.addNetworkCall('user_logout', 'Logout');
 
     client.logout()
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(routingActions.replace('/'));
         },
-        err => {
+        (err) => {
           dispatch(netActions.errorNetworkCall(action.id, err));
           dispatch(routingActions.replace('/'));
         });
@@ -77,15 +77,15 @@ export function logout() {
 
 
 export function forgetPassword(email) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('user_forget', 'Forget password');
 
     client.resetPassword(email)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
         },
-        err => {
+        (err) => {
           dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
         });
 
@@ -94,15 +94,15 @@ export function forgetPassword(email) {
 }
 
 export function changePassword(oldPassword, newPassword) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('user_updatePassword', 'Update password');
 
     client.changePassword(oldPassword, newPassword)
       .then(
-        resp => {
+        (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
         },
-        err => {
+        (err) => {
           dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
         });
 
@@ -111,18 +111,18 @@ export function changePassword(oldPassword, newPassword) {
 }
 
 export function updateUser(user, pushOnServer = false) {
-  return dispatch => {
+  return (dispatch) => {
     if (pushOnServer) {
       const action = netActions.addNetworkCall('user_update', 'Update user informations');
       const { _id, firstName, lastName, email } = user;
 
       client.updateUser({ _id, firstName, lastName, email })
         .then(
-          resp => {
+          (resp) => {
             dispatch(netActions.successNetworkCall(action.id, resp));
             dispatch(loggedIn(resp.data));
           },
-          err => {
+          (err) => {
             dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
           });
 
@@ -133,7 +133,7 @@ export function updateUser(user, pushOnServer = false) {
 }
 
 // Auto trigger actions on authentication change...
-client.onAuthChange(authenticated => {
+client.onAuthChange((authenticated) => {
   if (authenticated) {
     dispatch(loggedIn(client.getLoggedInUser()));
   } else {

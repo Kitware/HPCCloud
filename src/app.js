@@ -1,6 +1,6 @@
 import 'normalize.css';
 import 'HPCCloudStyle/global.mcss';
-import { baseURL }  from './utils/Constants.js';
+import { baseURL }  from './utils/Constants';
 
 import React        from 'react';
 import { render }   from 'react-dom';
@@ -19,7 +19,7 @@ import { updateVisualizerStateAccessor } from 'pvw-visualizer/src/redux/selector
 
 // Setup application and pages
 const container = document.querySelector('.react-container');
-updateVisualizerStateAccessor(state => state.visualizer);
+updateVisualizerStateAccessor((state) => state.visualizer);
 
 export function configure(config = { girderAPI: baseURL }) {
   render(
@@ -51,7 +51,7 @@ store.subscribe(() => {
 });
 
 if (history) {
-  history.listen(location => {
+  history.listen((location) => {
     var path = location.pathname.split('/');
 
     // Remove any nested path => [ 'View|Edit', 'Project|Simulation', '${ID}']

@@ -13,7 +13,7 @@ function simputModelDecorator(model, props) {
   }
   if (props.project.metadata.boundaries) {
     model.external['boundary-names'] = {};
-    props.project.metadata.boundaries.forEach(name => {
+    props.project.metadata.boundaries.forEach((name) => {
       model.external['boundary-names'][name] = name;
     });
   }
@@ -30,7 +30,7 @@ function simputModelDecorator(model, props) {
 
 // ----------------------------------------------------------------------------
 
-export default props => (
+export default (props) => (
   <SimputReact
     {...props}
 

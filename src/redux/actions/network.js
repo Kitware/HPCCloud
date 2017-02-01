@@ -1,5 +1,5 @@
 import client           from '../../network';
-import { dispatch }     from '../index.js';
+import { dispatch }     from '../';
 
 export const ADD_NETWORK_CALL = 'ADD_NETWORK_CALL';
 export const SUCCESS_NETWORK_CALL = 'SUCCESS_NETWORK_CALL';
@@ -17,7 +17,9 @@ export function addNetworkCall(id, label = '') {
 
   return {
     type: ADD_NETWORK_CALL,
-    id, label, ts,
+    id,
+    label,
+    ts,
   };
 }
 

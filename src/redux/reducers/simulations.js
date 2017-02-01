@@ -20,7 +20,7 @@ export default function simulationsReducer(state = simInitialState, action) {
 
     case Actions.UPDATE_PROJECT_SIMULATIONS: {
       const mapById = Object.assign({}, state.mapById);
-      action.simulations.forEach(simulation => {
+      action.simulations.forEach((simulation) => {
         mapById[simulation._id] = simulation;
       });
       return Object.assign({}, state, { mapById });

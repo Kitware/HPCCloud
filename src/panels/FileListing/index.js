@@ -20,7 +20,7 @@ function buildFolders(fs, id, container = {}, depth = -1) {
   if (folder) {
     container[id].open = folder.open;
     // - folders first
-    folder.folderChildren.forEach(folderId => {
+    folder.folderChildren.forEach((folderId) => {
       if (fs.folderMapById[folderId]) {
         const childFolder = fs.folderMapById[folderId].folder;
         if (childFolder) {
@@ -31,7 +31,7 @@ function buildFolders(fs, id, container = {}, depth = -1) {
     });
 
     // - items after
-    folder.itemChildren.forEach(itemId => {
+    folder.itemChildren.forEach((itemId) => {
       const item = fs.itemMapById[itemId];
       if (item) {
         children.push(item);
@@ -80,7 +80,7 @@ const FileListing = React.createClass({
   togglePreview(e) {
     const previewId = e.currentTarget.dataset.id;
     const previewTitle = e.currentTarget.dataset.name;
-    this.setState({ previewOpen: open, previewTitle, previewId });
+    this.setState({ previewOpen: this.state.open, previewTitle, previewId });
   },
 
   closePreview() {
@@ -106,29 +106,27 @@ const FileListing = React.createClass({
     } else {
       value = (<span key={file._id}>
         <em>{formatFileSize(file.size)} </em>
-        <a href={`api/v1/item/${file._id}/download?contentDisposition=inline`} target="_blank">
-          <i className={style.downloadIcon}></i>
+        <a href={`api/v1/item/${file._id}/download?contentDisposition=inline`} target="_blank" rel="noopener noreferrer">
+          <i className={style.downloadIcon} />
         </a>
         {/* 500,000B (500KB) maximum preview-able size */}
-        { file.size <= 500000 ? (<i className={style.previewIcon}
-          data-name={file.name} data-id={file._id}
-          onClick={this.togglePreview}>
-          </i>) : null }
+        { file.size <= 500000 ? (<i className={style.previewIcon} data-name={file.name}
+          data-id={file._id} onClick={this.togglePreview} />) : null }
       </span>);
     }
 
     let checkbox = null; // only allow file selection if actions are available
     if (file.meta && file.meta.offline) {
-      checkbox = <i className={style.offline} data-file-id={file._id}></i>;
+      checkbox = <i className={style.offline} data-file-id={file._id} />;
     } else if (!this.props.actionsDisabled) {
       checkbox = (<i className={this.props.selection.indexOf(file._id) !== -1 ? style.checked : style.unchecked}
-        onClick={this.toggleSelection} data-file-id={file._id}></i>);
+        onClick={this.toggleSelection} data-file-id={file._id} />);
     }
 
     return (<section key={`${file._id}_${index}`} className={ style.listItem }>
       <strong className={ style.itemContent } style={{ paddingLeft: depth * indentWidth }}>
         { checkbox }
-        <i className={style.fileIcon}></i> {file.name}
+        <i className={style.fileIcon} /> {file.name}
       </strong>
       <span>{value}</span>
     </section>);
@@ -138,7 +136,7 @@ const FileListing = React.createClass({
     var depth = this.props.folders[folder._id].depth;
     return (<section key={`${folder._id}_${index}`} className={ style.listItem } onClick={this.openFolder} data-folder-id={folder._id}>
       <strong className={ style.itemContent } style={{ paddingLeft: depth * indentWidth }}>
-        <i className={style.folderIcon}></i> {folder.name}
+        <i className={style.folderIcon} /> {folder.name}
       </strong>
       <span>...</span>
     </section>);
@@ -149,7 +147,7 @@ const FileListing = React.createClass({
     return (<div key={`${folder._id}_${index}`}>
       <section className={ style.listItem } onClick={this.openFolder} data-folder-id={folder._id}>
         <strong className={ style.itemContent } style={{ paddingLeft: depth * indentWidth }}>
-          <i className={style.folderOpenIcon}></i> {folder.name}
+          <i className={style.folderOpenIcon} /> {folder.name}
         </strong>
         <span>...</span>
       </section>
@@ -197,7 +195,7 @@ const FileListing = React.createClass({
           <i
             className={ this.state.open ? style.advancedIconOn : style.advancedIconOff}
             onClick={ this.toggleAdvanced }
-          ></i>
+          />
         </div>
       </div>);
     }
@@ -209,7 +207,7 @@ const FileListing = React.createClass({
           <i
             className={ this.state.open ? style.advancedIconOn : style.advancedIconOff}
             onClick={ this.toggleAdvanced }
-          ></i>
+          />
         </div>
       </div>
       <div className={ this.state.open ? style.taskflowContainer : style.hidden }>
