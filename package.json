@@ -37,6 +37,7 @@
     "font-awesome": "4.7.0",
     "bootstrap": "3.3.7",
 
+    "react-addons-test-utils": "15.4.2",
     "karma": "0.13.22",
     "karma-jasmine": "1.0.2",
     "karma-spec-reporter": "0.0.26",

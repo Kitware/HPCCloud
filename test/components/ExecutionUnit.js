@@ -1,16 +1,15 @@
 import expect from 'expect';
 import React from 'react';
-import TestUtils from 'react/lib/ReactTestUtils';
+import TestUtils from 'react-addons-test-utils';
 import ExecutionUnit from '../../src/panels/JobMonitor/ExecutionUnit';
 import LogFold from '../../src/panels/JobMonitor/LogFold';
-import deepClone from 'mout/src/lang/deepClone';
 
 import style from 'HPCCloudStyle/JobMonitor.mcss';
 
 /* global describe it */
 
 describe('ExecutionUnit', () => {
-  const baseUnit = { name: 'my.super.log', status: 'created', log: []};
+  const baseUnit = { name: 'my.super.log', status: 'created', log: [] };
   it('only render a title and subtitle', () => {
     const el = TestUtils.renderIntoDocument(<ExecutionUnit unit={baseUnit} />);
     const titles = TestUtils.scryRenderedDOMComponentsWithClass(el, style.itemContent);
@@ -20,7 +19,7 @@ describe('ExecutionUnit', () => {
   });
 
   it('render an empty log', () => {
-    const el = TestUtils.renderIntoDocument(<ExecutionUnit unit={baseUnit} open alwaysShowLogToggle/>);
+    const el = TestUtils.renderIntoDocument(<ExecutionUnit unit={baseUnit} open alwaysShowLogToggle />);
     const log = TestUtils.findRenderedDOMComponentWithTag(el, 'pre');
     expect(log.textContent).toEqual('');
   });
@@ -28,9 +27,9 @@ describe('ExecutionUnit', () => {
   it('render a log with several plain entries', () => {
     const myUnit = Object.assign({}, baseUnit);
     myUnit.log = [
-      { msg: 'some message', status:'test', levelname: 'INFO', created: Date.now() },
+      { msg: 'some message', status: 'test', levelname: 'INFO', created: Date.now() },
       { msg: 'some warning', levelname: 'WARN', created: Date.now() + 20 },
-      { msg: { info: 'here is info' }, levelname: 'INFO', created: Date.now() + 50 }
+      { msg: { info: 'here is info' }, levelname: 'INFO', created: Date.now() + 50 },
     ];
     const el = TestUtils.renderIntoDocument(<ExecutionUnit unit={myUnit} open />);
     const logEntries = TestUtils.scryRenderedDOMComponentsWithTag(el, 'p');
@@ -43,7 +42,7 @@ describe('ExecutionUnit', () => {
   it('render a log with a complex entry (LogFold)', () => {
     const myUnit = Object.assign({}, baseUnit);
     myUnit.log = [
-      { msg: 'some message', levelname: 'INFO', created: Date.now(), data: { cmd:'ls -la', failed: false } }
+      { msg: 'some message', levelname: 'INFO', created: Date.now(), data: { cmd: 'ls -la', failed: false } },
     ];
     const el = TestUtils.renderIntoDocument(<ExecutionUnit unit={myUnit} open />);
     const log = TestUtils.findRenderedComponentWithType(el, LogFold);
@@ -55,12 +54,12 @@ describe('ExecutionUnit', () => {
   describe('updates', () => {
     const myUnit = Object.assign({}, baseUnit);
     myUnit.log = [
-      { msg: 'some message', status:'test', levelname: 'INFO', created: Date.now() },
+      { msg: 'some message', status: 'test', levelname: 'INFO', created: Date.now() },
     ];
-    let el = TestUtils.renderIntoDocument(<ExecutionUnit unit={myUnit} open />);
+    const el = TestUtils.renderIntoDocument(<ExecutionUnit unit={myUnit} open />);
 
     it('has a log', () => {
-      let logEntries = TestUtils.scryRenderedDOMComponentsWithTag(el, 'p');
+      const logEntries = TestUtils.scryRenderedDOMComponentsWithTag(el, 'p');
       expect(logEntries.length).toEqual(1);
     });
 
