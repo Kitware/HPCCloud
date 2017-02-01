@@ -3,7 +3,6 @@ module.exports = {
   env: { browser: true },
   rules: {
     // ESLint ----------------------------------
-    'arrow-parens': ['error', 'always'],
     'block-spacing': 0,
     'global-require': 0,
     'max-len': [1, 160, 4, {"ignoreUrls": true}],
