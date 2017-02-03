@@ -1,31 +1,22 @@
-import JobMonitoring   from '../../../../generic/components/steps/JobMonitoring';
+import JobMonitoring   from '../../../../../generic/components/steps/JobMonitoring';
 
-import getNetworkError        from '../../../../../utils/getNetworkError';
-import { getDisabledButtons } from '../../../../../utils/getDisabledButtons';
-import get                    from '../../../../../utils/get';
+import getNetworkError        from '../../../../../../utils/getNetworkError';
+import { getDisabledButtons } from '../../../../../../utils/getDisabledButtons';
+import get                    from '../../../../../../utils/get';
+import deepClone              from 'mout/src/lang/deepClone';
 
 import { connect }          from 'react-redux';
-import { dispatch }         from '../../../../../redux';
-import * as SimActions      from '../../../../../redux/actions/projects';
+import { dispatch }         from '../../../../../../redux';
+import * as SimActions      from '../../../../../../redux/actions/projects';
 
 // ----------------------------------------------------------------------------
 
 function getActions(props) {
   const { taskflow } = props;
-  const jobs = Object.keys(taskflow.jobMapById).map((id) => taskflow.jobMapById[id]);
-  const actions = [];
-
-  taskflow.actions.forEach((action) => {
-    actions.push(action);
-  });
-
-  // name is paraview and status is running -> visualize
-  if (jobs.some((job) => job.name === props.primaryJob && job.status === 'running')) {
+  const actions = [].concat(taskflow.actions ? taskflow.actions : []);
+  if (taskflow.allComplete) {
     actions.push('visualize');
-  } else if (taskflow.allComplete) {
-    actions.push('rerun');
   }
-
   return actions;
 }
 
@@ -33,11 +24,17 @@ function getActions(props) {
 
 function onVisualize(props) {
   const location = {
-    pathname: props.location.pathname,
-    query: Object.assign({}, props.location.query, { view: 'visualizer' }),
+    pathname: `View/Simulation/${props.simulation._id}/Visualization`,
+    query: Object.assign({}, props.location.query, { view: 'default' }),
     state: props.location.state,
   };
-  dispatch(SimActions.saveSimulation(props.simulation, null, location));
+  const newSimState = deepClone(props.simulation);
+  newSimState.steps.Visualization.metadata.dataDir = props.taskflow.flow.meta.dataDir;
+  // newSimState.steps.Visualization.metadata.fileName = 'simulation/dataset.foam';
+  newSimState.active = 'Visualization';
+  newSimState.disabled = newSimState.disabled.filter((step) => step !== 'Visualization');
+
+  dispatch(SimActions.saveSimulation(newSimState, null, location));
 }
 
 // ----------------------------------------------------------------------------
@@ -50,7 +47,7 @@ export default connect(
 
     if (activeSimulation) {
       const simulation = state.simulations.mapById[activeSimulation];
-      taskflowId = simulation.steps.Visualization.metadata.taskflowId;
+      taskflowId = simulation.steps.Simulation.metadata.taskflowId;
     }
 
     let taskflow = null;

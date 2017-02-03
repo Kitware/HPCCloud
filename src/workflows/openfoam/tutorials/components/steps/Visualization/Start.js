@@ -1,5 +1,5 @@
 import React           from 'react';
-import JobSubmission   from '../../../../generic/components/steps/JobSubmission';
+import JobSubmission   from '../../../../../generic/components/steps/JobSubmission';
 
 // ----------------------------------------------------------------------------
 

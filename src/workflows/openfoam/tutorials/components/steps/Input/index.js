@@ -1,5 +1,5 @@
 import React       from 'react';
-import SimputReact from '../../../../generic/components/steps/SimputReact';
+import SimputReact from '../../../../../generic/components/steps/SimputReact';
 
 // ----------------------------------------------------------------------------
 

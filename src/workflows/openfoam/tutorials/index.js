@@ -1,4 +1,4 @@
-import rootViewSimulation     from '../generic/components/root/ViewSimulation';
+import rootViewSimulation     from '../../generic/components/root/ViewSimulation';
 
 import stepIntroduction       from './components/steps/Introduction';
 import stepInput              from './components/steps/Input';
@@ -8,7 +8,7 @@ import stepVisualizationStart from './components/steps/Visualization/Start';
 import stepVisualizationView  from './components/steps/Visualization/View';
 
 export default {
-  name: 'OpenFoam',
+  name: 'OpenFoam - Tutorial examples',
   logo: require('./logo.png'),
   requiredAttachments: {
     project: [],

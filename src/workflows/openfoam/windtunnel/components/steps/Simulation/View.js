@@ -1,13 +1,13 @@
-import JobMonitoring   from '../../../../generic/components/steps/JobMonitoring';
+import JobMonitoring   from '../../../../../generic/components/steps/JobMonitoring';
 
-import getNetworkError        from '../../../../../utils/getNetworkError';
-import { getDisabledButtons } from '../../../../../utils/getDisabledButtons';
-import get                    from '../../../../../utils/get';
+import getNetworkError        from '../../../../../../utils/getNetworkError';
+import { getDisabledButtons } from '../../../../../../utils/getDisabledButtons';
+import get                    from '../../../../../../utils/get';
 import deepClone              from 'mout/src/lang/deepClone';
 
 import { connect }          from 'react-redux';
-import { dispatch }         from '../../../../../redux';
-import * as SimActions      from '../../../../../redux/actions/projects';
+import { dispatch }         from '../../../../../../redux';
+import * as SimActions      from '../../../../../../redux/actions/projects';
 
 // ----------------------------------------------------------------------------
 
