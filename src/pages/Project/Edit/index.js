@@ -80,7 +80,7 @@ export default connect(
   (state, props) => {
     return {
       project: state.projects.mapById[props.params.id],
-      error: getNetworkError(state, ['save_project', 'delete_project']),
+      error: getNetworkError(state, ['save_project', 'delete_project', 'share_project', 'unshare_project']),
     };
   },
   () => {

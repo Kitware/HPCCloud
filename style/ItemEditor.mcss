@@ -45,8 +45,14 @@ textarea.input {
 .button {
     composes: btn from 'bootstrap/dist/css/bootstrap.css';
     composes: btn-default from 'bootstrap/dist/css/bootstrap.css';
-
     margin-left: 10px;
+}
+
+.shareButton {
+    composes: btn from 'bootstrap/dist/css/bootstrap.css';
+    composes: btn-default from 'bootstrap/dist/css/bootstrap.css';
+    max-width: 250px;
+    margin-top: 3px;
 }
 
 .errorBox {
