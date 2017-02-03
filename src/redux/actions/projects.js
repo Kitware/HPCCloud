@@ -133,6 +133,22 @@ export function saveProject(project, attachments) {
   };
 }
 
+export function shareProject(userId) {
+  return (dispatch) => {
+    const action = netActions.addNetworkCall('share_project', `Share project ${userId}`);
+    client.shareProject(userId)
+      .then(
+        (resp) => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(updateProject(resp.data));
+        },
+        (error) => {
+          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
+        });
+    return action;
+  };
+}
+
 // ----------------------------------------------------------------------------
 // SIMULATIONS
 // ----------------------------------------------------------------------------
