@@ -149,6 +149,22 @@ export function shareProject(userId) {
   };
 }
 
+export function unShareProject(userId) {
+  return (dispatch) => {
+    const action = netActions.addNetworkCall('share_project', `Share project ${userId}`);
+    client.unshareProject(userId)
+      .then(
+        (resp) => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(updateProject(resp.data));
+        },
+        (error) => {
+          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
+        });
+    return action;
+  };
+}
+
 // ----------------------------------------------------------------------------
 // SIMULATIONS
 // ----------------------------------------------------------------------------

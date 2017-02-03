@@ -159,7 +159,7 @@ class Projects(Resource):
                     model='project', plugin='hpccloud', level=AccessType.READ)
         .jsonParam('simulation', 'The properties of the simulation.',
                    dataType='SimProperties', required=True, paramType='body')
-        )
+    )
     @access.user
     def create_simulation(self, project, simulation, params):
         user = getCurrentUser()
