@@ -117,7 +117,7 @@ export function saveProject(project, attachments) {
       .then(
         (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-          const respWithProj = Array.isArrayresp ? resp[resp.length - 1] : resp;
+          const respWithProj = Array.isArray(resp) ? resp[resp.length - 1] : resp;
           dispatch(updateProject(respWithProj.data));
           if (attachments && Object.keys(attachments).length) {
             setTimeout(() => { dispatch(router.push(`/View/Project/${respWithProj.data._id}`)); }, 1500);
@@ -153,7 +153,7 @@ export function saveSimulation(simulation, attachments, location) {
       .then(
         (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-          const respWithSim = Array.isArrayresp ? resp[resp.length - 1] : resp;
+          const respWithSim = Array.isArray(resp) ? resp[resp.length - 1] : resp;
           dispatch(updateSimulation(respWithSim.data));
           if (location && attachments && Object.keys(attachments).length) {
             // in this 1.5s gap the progressBar will appear complete, and fade on the new page
