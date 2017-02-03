@@ -67,7 +67,7 @@ const ProjectEdit = React.createClass({
         onAction={ this.onAction }
       >
         { workflowAddOn }
-        <SharePanel />
+        <SharePanel project={this.props.project} />
       </ItemEditor>);
   },
 });
