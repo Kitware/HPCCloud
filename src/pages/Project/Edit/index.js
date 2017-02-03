@@ -1,4 +1,5 @@
 import ItemEditor   from '../../../panels/ItemEditor';
+import SharePanel   from '../../../panels/SharePanel';
 import React        from 'react';
 
 import Workflows    from '../../../workflows';
@@ -66,6 +67,7 @@ const ProjectEdit = React.createClass({
         onAction={ this.onAction }
       >
         { workflowAddOn }
+        <SharePanel />
       </ItemEditor>);
   },
 });
