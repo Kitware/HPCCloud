@@ -68,8 +68,11 @@ export function saveProject(project_, attachments) {
           Object.keys(attachments).forEach((file) => {
             promises.push(createItemForProject(project, file, attachments[file]));
           });
-          promises.push(new Promise((a, r) => { a({ data: project }); }));
-          return Promise.all(promises);
+          return new Promise((a, r) => {
+            Promise.all(promises).then(() => {
+              a({ data: project });
+            });
+          });
         }
         return new Promise((a, r) => { a({ data: project }); });
       })
