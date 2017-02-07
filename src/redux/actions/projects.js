@@ -133,10 +133,10 @@ export function saveProject(project, attachments) {
   };
 }
 
-export function shareProject(userId) {
+export function shareProject(users) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('share_project', `Share project ${userId}`);
-    client.shareProject(userId)
+    const action = netActions.addNetworkCall('share_project', `Share project ${users}`);
+    client.shareProject(users)
       .then(
         (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -149,10 +149,10 @@ export function shareProject(userId) {
   };
 }
 
-export function unShareProject(userId) {
+export function unShareProject(users) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('share_project', `Share project ${userId}`);
-    client.unshareProject(userId)
+    const action = netActions.addNetworkCall('unshare_project', `Unshare project ${users}`);
+    client.unshareProject(users)
       .then(
         (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -287,6 +287,38 @@ export function updateSimulationStep(id, stepName, data, location) {
         dispatch(netActions.errorNetworkCall(action.id, error));
       });
 
+    return action;
+  };
+}
+
+export function shareSimulation(users) {
+  return (dispatch) => {
+    const action = netActions.addNetworkCall('share_simulation', `Share simulation ${users}`);
+    client.shareProject(users)
+      .then(
+        (resp) => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(updateSimulation(resp.data));
+        },
+        (error) => {
+          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
+        });
+    return action;
+  };
+}
+
+export function unShareSimulation(users) {
+  return (dispatch) => {
+    const action = netActions.addNetworkCall('unshare_simulation', `Share simulation ${users}`);
+    client.unshareProject(users)
+      .then(
+        (resp) => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(updateSimulation(resp.data));
+        },
+        (error) => {
+          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
+        });
     return action;
   };
 }
