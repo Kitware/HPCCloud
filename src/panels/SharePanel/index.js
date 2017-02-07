@@ -15,9 +15,12 @@ const SharePanel = React.createClass({
   propTypes: {
     currentUser: React.PropTypes.object,
     userMap: React.PropTypes.object,
-    project: React.PropTypes.object,
+    shareItem: React.PropTypes.object,
     onMount: React.PropTypes.func,
     shareProject: React.PropTypes.func,
+    shareSimulation: React.PropTypes.func,
+    unShareProject: React.PropTypes.func,
+    unShareSimulation: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -44,12 +47,16 @@ const SharePanel = React.createClass({
     this.setState({ [which]: values });
   },
 
-  shareProject(e) {
-    console.log('share unimplemented', this.state.shareUsers);
+  shareAction(e) {
+    if (this.props.shareItem.projectId) {
+      this.props.shareSimulation(this.state.shareUsers);
+    } else {
+      this.props.shareProject(this.state.shareUsers);
+    }
   },
 
-  unShareProject(e) {
-    if (this.state.unShareUsers.indexOf(this.props.project.userId) !== -1) {
+  unShareAction(e) {
+    if (this.state.unShareUsers.indexOf(this.props.shareItem.userId) !== -1) {
       console.log('Cannot remove the owner from their own project.');
       return;
     }
@@ -59,12 +66,16 @@ const SharePanel = React.createClass({
       return;
     }
 
-    console.log('unshare unimplemented', this.unShareUsers);
+    if (this.props.shareItem.projectId) {
+      this.props.unShareSimulation(this.state.unShareUsers);
+    } else {
+      this.props.unShareProject(this.state.unShareUsers);
+    }
   },
 
   render() {
     const hasUsers = Object.keys(this.props.userMap).length;
-    const projectUsers = this.props.project.access.users.reduce((prev, cur) => prev.concat([cur.id]), []);
+    const projectUsers = this.props.shareItem.access.users.reduce((prev, cur) => prev.concat([cur.id]), []);
     return (<div>
         <div className={style.group}>
           <label className={style.label}>User Access</label>
@@ -92,7 +103,7 @@ const SharePanel = React.createClass({
                 .map((userId, i) => <option key={`${userId}_${i}`} value={userId}>{ hasUsers ? this.props.userMap[userId].login : '' }</option>)
               }
             </select>
-            <button onClick={this.shareProject}
+            <button onClick={this.shareAction}
               disabled={!this.state.shareUsers.length}
               className={style.shareButton}>
               Add
@@ -111,6 +122,9 @@ export default connect(
   }),
   () => ({
     onMount: () => dispatch(AuthActions.getUsers()),
-    shareProject: (userId) => dispatch(ProjActions.shareProject(userId)),
+    shareProject: (users) => dispatch(ProjActions.shareProject(users)),
+    shareSimulation: (users) => dispatch(ProjActions.shareSimulation(users)),
+    unShareProject: (users) => dispatch(ProjActions.shareProject(users)),
+    unShareSimulation: (users) => dispatch(ProjActions.shareSimulation(users)),
   })
 )(SharePanel);

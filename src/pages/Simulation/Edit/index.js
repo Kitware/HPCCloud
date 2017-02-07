@@ -1,4 +1,5 @@
 import ItemEditor from '../../../panels/ItemEditor';
+import SharePanel   from '../../../panels/SharePanel';
 import React      from 'react';
 import Workflows  from '../../../workflows';
 
@@ -76,7 +77,8 @@ const SimulationEdit = React.createClass({
           { name: 'editSimulation', label: 'Save simulation' }]}
         onAction={ this.onAction }
       >
-      { workflowAddOn }
+        { workflowAddOn }
+        <SharePanel shareItem={this.props.simulation} />
       </ItemEditor>);
   },
 });
