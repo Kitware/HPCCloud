@@ -26,8 +26,8 @@ from girder.constants import AccessType
 from girder.api.rest import getCurrentUser
 from . import schema
 
-from ..utility import get_hpccloud_folder, share_folder, to_object_id, \
-    get_simulations_folder
+from ..utility import get_hpccloud_folder, to_object_id, \
+    get_simulations_folder, share_folder, unshare_folder
 
 from ..constants import SIMULATIONS_FOLDER
 
@@ -196,6 +196,55 @@ class Project(AccessControlledModel):
 
         share_folder(sharer, simulations_folder, users, groups,
                      level=AccessType.ADMIN)
+
+        # Now share any simulation associated with this project
+        query = {
+            'projectId': project['_id']
+        }
+        sims = self.model('simulation', 'hpccloud').find(query=query)
+        for sim in sims:
+            self.model('simulation', 'hpccloud').share(
+                sharer, sim, users, groups)
+
+        project['updated'] = datetime.datetime.utcnow()
+
+        return self.save(project)
+
+    def unshare(self, sharer, project, users, groups):
+        access_list = project['access']
+        access_list['users'] \
+            = [user for user in access_list['users'] if user != sharer['_id']]
+        access_list['groups'] = []
+
+        for user_id in users:
+            access_object = {
+                'id': to_object_id(user_id),
+                'level': AccessType.READ
+            }
+            ind = access_list['users'].index(access_object)
+            del access_list['users'][ind]
+
+        for group_id in groups:
+            access_object = {
+                'id': to_object_id(group_id),
+                'level': AccessType.READ
+            }
+            ind = access_list['groups'].index(access_object)
+            del access_list['groups'][ind]
+
+        project_folder = self.model('folder').load(
+            project['folderId'], user=sharer)
+
+        # Share the project folder
+        unshare_folder(
+            sharer, project_folder, users, groups, level=AccessType.READ,
+            recurse=True)
+
+        # We need to revoke the _simulations folder
+        simulations_folder = get_simulations_folder(sharer, project)
+
+        unshare_folder(sharer, simulations_folder, users, groups,
+                       level=AccessType.ADMIN)
 
         # Now share any simulation associated with this project
         query = {

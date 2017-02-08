@@ -28,7 +28,11 @@ const SharePanel = React.createClass({
   },
 
   getInitialState() {
-    return { shareUsers: [], unShareUsers: [] };
+    return {
+      shareUsers: [],
+      unShareUsers: [],
+      shareGroups: [],
+      unShareGroups: [] };
   },
 
   componentDidMount() {
@@ -49,9 +53,11 @@ const SharePanel = React.createClass({
 
   shareAction(e) {
     if (this.props.shareItem.projectId) {
-      this.props.shareSimulation(this.state.shareUsers);
+      this.props.shareSimulation(this.props.shareItem._id,
+        this.state.shareUsers, this.state.shareGroups);
     } else {
-      this.props.shareProject(this.state.shareUsers);
+      this.props.shareProject(this.props.shareItem._id,
+        this.state.shareUsers, this.state.shareGroups);
     }
   },
 
@@ -67,9 +73,11 @@ const SharePanel = React.createClass({
     }
 
     if (this.props.shareItem.projectId) {
-      this.props.unShareSimulation(this.state.unShareUsers);
+      this.props.unShareSimulation(this.props.shareItem._id,
+        this.state.unShareUsers, this.state.unShareGroups);
     } else {
-      this.props.unShareProject(this.state.unShareUsers);
+      this.props.unShareProject(this.props.shareItem._id,
+        this.state.unShareUsers, this.state.unShareGroups);
     }
   },
 
@@ -122,9 +130,9 @@ export default connect(
   }),
   () => ({
     onMount: () => dispatch(AuthActions.getUsers()),
-    shareProject: (users) => dispatch(ProjActions.shareProject(users)),
-    shareSimulation: (users) => dispatch(ProjActions.shareSimulation(users)),
-    unShareProject: (users) => dispatch(ProjActions.shareProject(users)),
-    unShareSimulation: (users) => dispatch(ProjActions.shareSimulation(users)),
+    shareProject: (_id, users, groups) => dispatch(ProjActions.shareProject(_id, users, groups)),
+    shareSimulation: (_id, users, groups) => dispatch(ProjActions.shareSimulation(_id, users, groups)),
+    unShareProject: (_id, users, groups) => dispatch(ProjActions.unShareProject(_id, users, groups)),
+    unShareSimulation: (_id, users, groups) => dispatch(ProjActions.unShareSimulation(_id, users, groups)),
   })
 )(SharePanel);

@@ -133,10 +133,10 @@ export function saveProject(project, attachments) {
   };
 }
 
-export function shareProject(users) {
+export function shareProject(_id, users, groups) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('share_project', `Share project ${users}`);
-    client.shareProject(users)
+    const action = netActions.addNetworkCall('share_project', `Share project users: ${users}\ngroups: ${groups}`);
+    client.shareProject(_id, users, groups)
       .then(
         (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -149,10 +149,10 @@ export function shareProject(users) {
   };
 }
 
-export function unShareProject(users) {
+export function unShareProject(_id, users, groups) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('unshare_project', `Unshare project ${users}`);
-    client.unshareProject(users)
+    const action = netActions.addNetworkCall('unshare_project', `Unshare project users: ${users}\ngroups: ${groups}`);
+    client.unShareProject(_id, users, groups)
       .then(
         (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -291,10 +291,10 @@ export function updateSimulationStep(id, stepName, data, location) {
   };
 }
 
-export function shareSimulation(users) {
+export function shareSimulation(_id, users, groups) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('share_simulation', `Share simulation ${users}`);
-    client.shareProject(users)
+    const action = netActions.addNetworkCall('share_simulation', `Share simulation users: ${users}\ngroups: ${groups}`);
+    client.shareSimulation(_id, users, groups)
       .then(
         (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -307,10 +307,10 @@ export function shareSimulation(users) {
   };
 }
 
-export function unShareSimulation(users) {
+export function unShareSimulation(_id, users, groups) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('unshare_simulation', `Share simulation ${users}`);
-    client.unshareProject(users)
+    const action = netActions.addNetworkCall('unshare_simulation', `Share simulation users: ${users}\ngroups: ${groups}`);
+    client.unshareSimulation(_id, users, groups)
       .then(
         (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));

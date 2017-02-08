@@ -36,13 +36,12 @@ export default function ({ client, filterQuery, mustContain, busy }) {
       return busy(client._.delete(`/projects/${id}`));
     },
 
-    shareProject(projectId, userId) {
-      return busy(client._.put(`/projects/${projectId}/share`, { id: userId }));
+    shareProject(_id, users, groups) {
+      return busy(client._.put(`/projects/${_id}/share`, { users, groups }));
     },
 
-    unshareProject(projectId, userId) {
-      console.log('unShareProject unimplemented');
-      // return busy(client._.put(`/projects/${projectId}/unshare`, { id: userId }));
+    unshareProject(_id, users, groups) {
+      return busy(client._.put(`/projects/${_id}/unshare`, { users, groups }));
     },
 
     // List all the simulations associated with a project

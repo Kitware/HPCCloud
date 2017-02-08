@@ -41,6 +41,7 @@ class Projects(Resource):
         self.route('GET', (), self.get_all)
         self.route('DELETE', (':id', ), self.delete)
         self.route('PUT', (':id', 'share'), self.share)
+        self.route('PUT', (':id', 'unshare'), self.unshare)
         self.route('POST', (':id', 'simulations'), self.create_simulation)
         self.route('GET', (':id', 'simulations'), self.simulations)
         self.route('GET', (':id',), self.get)
@@ -150,6 +151,33 @@ class Projects(Resource):
         groups = share.get('groups', [])
 
         return self._model.share(user, project, users, groups)
+
+    @describeRoute(
+        Description('Share a give project with a set of users or groups')
+        .param('id', 'The project to shared.',
+               dataType='string', required=True, paramType='path')
+        .param('body', 'Array of users to share the project with.',
+               dataType='object', required=True, paramType='body')
+    )
+    @access.user
+    @loadmodel(model='project', plugin='hpccloud', level=AccessType.WRITE)
+    def unshare(self, project, params):
+        body = getBodyJson()
+        user = getCurrentUser()
+
+        # Validate we have been given a value body
+        try:
+            ref_resolver = jsonschema.RefResolver.from_schema(
+                schema.definitions)
+            jsonschema.validate(body, schema.project['definitions']['share'],
+                                resolver=ref_resolver)
+        except jsonschema.ValidationError as ve:
+            raise RestException(ve.message, 400)
+
+        users = body.get('users', [])
+        groups = body.get('groups', [])
+
+        return self._model.unshare(user, project, users, groups)
 
     addModel('SimProperties', schema.simulation, 'projects')
 
