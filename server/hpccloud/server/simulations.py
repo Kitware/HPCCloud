@@ -43,6 +43,8 @@ class Simulations(Resource):
         self.route('GET', (':id', 'steps', ':stepName'), self.get_step)
         self.route('PATCH', (':id', 'steps', ':stepName'), self.update_step)
         self.route('GET', (':id', 'download'), self.download)
+        self.route('PUT', (':id', 'share'), self.share)
+        self.route('PUT', (':id', 'unshare'), self.unshare)
 
         self._model = self.model('simulation', 'hpccloud')
 
@@ -210,6 +212,29 @@ class Simulations(Resource):
             user, simulation, stepName, status, metadata, export, view)
 
     @autoDescribeRoute(
+        Description('Share a simulation with a set of users or groups')
+        .modelParam('id', 'The simulation to be shared.',
+               dataType='string', required=True, paramType='path')
+        .jsonParam('share', 'Array of users to share the project with.',
+               dataType='object', required=True, paramType='body')
+    )
+    @access.user
+    def share(self, project, share, params):
+        return 1
+
+    @autoDescribeRoute(
+        Description('Revoke permissions for asimulation given a set of users \
+                    or groups')
+        .modelParam('id', 'The simulation to be unshared.',
+               dataType='string', required=True, paramType='path')
+        .jsonParam('share', 'Array of users to share the project with.',
+               dataType='object', required=True, paramType='body')
+    )
+    @access.user
+    def unshare(self, project, params):
+        return 1
+
+   @autoDescribeRoute(
         Description('Download all the asset associated with a simulation')
         .modelParam('id', 'The simulation to download.',
                     model='simulation', plugin='hpccloud', level=AccessType.READ)
