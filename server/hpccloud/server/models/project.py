@@ -195,7 +195,7 @@ class Project(AccessControlledModel):
         simulations_folder = get_simulations_folder(sharer, project)
 
         share_folder(sharer, simulations_folder, users, groups,
-                     level=AccessType.ADMIN)
+                     level=AccessType.ADMIN, recurse=True)
 
         # Now share any simulation associated with this project
         query = {
@@ -212,9 +212,7 @@ class Project(AccessControlledModel):
 
     def unshare(self, sharer, project, users, groups):
         access_list = project['access']
-        access_list['users'] \
-            = [user for user in access_list['users'] if user != sharer['_id']]
-        access_list['groups'] = []
+        users = [user for user in users if user != sharer['_id']]
 
         for user_id in users:
             access_object = {
@@ -235,16 +233,12 @@ class Project(AccessControlledModel):
         project_folder = self.model('folder').load(
             project['folderId'], user=sharer)
 
-        # Share the project folder
-        unshare_folder(
-            sharer, project_folder, users, groups, level=AccessType.READ,
-            recurse=True)
+        # unshare the project folder
+        unshare_folder(sharer, project_folder, users, groups, recurse=True)
 
         # We need to revoke the _simulations folder
         simulations_folder = get_simulations_folder(sharer, project)
-
-        unshare_folder(sharer, simulations_folder, users, groups,
-                       level=AccessType.ADMIN)
+        unshare_folder(sharer, simulations_folder, users, groups)
 
         # Now share any simulation associated with this project
         query = {
@@ -252,7 +246,7 @@ class Project(AccessControlledModel):
         }
         sims = self.model('simulation', 'hpccloud').find(query=query)
         for sim in sims:
-            self.model('simulation', 'hpccloud').share(
+            self.model('simulation', 'hpccloud').unshare(
                 sharer, sim, users, groups)
 
         project['updated'] = datetime.datetime.utcnow()

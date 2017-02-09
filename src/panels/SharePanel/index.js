@@ -95,7 +95,7 @@ const SharePanel = React.createClass({
                 return <option key={`${_id}_${i}`} value={_id}>{ name }</option>;
               }) }
             </select>
-            <button onClick={this.unShareProject}
+            <button onClick={this.unShareAction}
               disabled={!this.state.unShareUsers.length}
               className={style.shareButton}>
               Remove

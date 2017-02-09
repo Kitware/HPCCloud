@@ -25,7 +25,8 @@ import six
 from girder.models.model_base import AccessControlledModel, ValidationException
 from girder.constants import AccessType
 
-from ..utility import share_folder, to_object_id, get_simulations_folder
+from ..utility import to_object_id, get_simulations_folder, share_folder, \
+    unshare_folder
 from . import schema
 
 
@@ -268,6 +269,34 @@ class Simulation(AccessControlledModel):
             simulation['folderId'], user=sharer)
 
         share_folder(sharer, simulation_folder, users, groups)
+
+        return self.save(simulation)
+
+    def unshare(self, sharer, simulation, users, groups):
+        access_list = simulation.get('access', {})
+        users = [user for user in users if user != sharer['_id']]
+
+        # revoke users
+        for user_id in users:
+            access_object = {
+                'id': to_object_id(user_id),
+                'level': AccessType.READ
+            }
+            ind = access_list['users'].index(access_object)
+            del access_list['users'][ind]
+
+        for group_id in groups:
+            access_object = {
+                'id': to_object_id(group_id),
+                'level': AccessType.READ
+            }
+            ind = access_list['groups'].index(access_object)
+            del access_list['groups'][ind]
+
+        # revoke the simulation folder
+        simulation_folder = self.model('folder').load(
+            simulation['folderId'], user=sharer)
+        unshare_folder(sharer, simulation_folder, users, groups)
 
         return self.save(simulation)
 

@@ -152,7 +152,7 @@ export function shareProject(_id, users, groups) {
 export function unShareProject(_id, users, groups) {
   return (dispatch) => {
     const action = netActions.addNetworkCall('unshare_project', `Unshare project users: ${users}\ngroups: ${groups}`);
-    client.unShareProject(_id, users, groups)
+    client.unshareProject(_id, users, groups)
       .then(
         (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));

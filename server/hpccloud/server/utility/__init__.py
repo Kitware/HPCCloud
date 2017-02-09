@@ -132,32 +132,22 @@ def share_folder(owner, folder, users, groups, level=AccessType.READ,
 
 def unshare_folder(owner, folder, users, groups, recurse=False):
     folder_access_list = folder['access']
-    folder_access_list['users'] \
-        = [user for user in folder_access_list['users']
-           if user != owner['_id']]
-    folder_access_list['groups'] = []
 
     for user_id in users:
-        access_object = {
-            'id': to_object_id(user_id),
-            'level': AccessType.READ
-        }
-        ind = folder_access_list['users'].index(access_object)
+        ind = 0
+        for user in folder_access_list['users']:
+            if user_id == user['id']:
+                break
+            ind += 0
         del folder_access_list['users'][ind]
 
-        # Give read access to the project folder
-        folder_access_list['users'].append(access_object)
-
     for group_id in groups:
-        access_object = {
-            'id': to_object_id(group_id),
-            'level': AccessType.READ
-        }
-        ind = folder_access_list['groups'].index(access_object)
+        ind = 0
+        for group in folder_access_list['groups']:
+            if group_id == group['id']:
+                break
+            ind += 0
         del folder_access_list['groups'][ind]
-
-        # Give read access to the project folder
-        folder_access_list['groups'].append(access_object)
 
     return ModelImporter.model('folder').setAccessList(
         folder, folder_access_list, save=True, recurse=recurse, user=owner)
