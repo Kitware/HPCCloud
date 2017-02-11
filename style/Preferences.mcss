@@ -28,6 +28,11 @@
     composes: fa-user from 'font-awesome/css/font-awesome.css';
 }
 
+.groupsIcon {
+    composes: preferenceIcon;
+    composes: fa-users from 'font-awesome/css/font-awesome.css';
+}
+
 .clusterIcon {
     composes: preferenceIcon;
     composes: fa-share-alt from 'font-awesome/css/font-awesome.css';
