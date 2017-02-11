@@ -1,34 +1,24 @@
 import React from 'react';
 import style from 'HPCCloudStyle/Preferences.mcss';
 
-export const breadcrumb = {
-  paths: [
-    '/Preferences/User',
-    '/Preferences/Cluster',
-    '/Preferences/AWS',
-    '/Preferences/Status',
-    //'/Preferences/Network',
-  ],
-  icons: [
-    style.userIcon,
-    style.clusterIcon,
-    style.ec2Icon,
-    style.statusIcon,
-    // style.networkIcon,
-  ],
-  titles: [
-    'User preferences',
-    'Cluster',
-    'EC2',
-    'Server status',
-  ],
-  labels: [
-    'User',
-    'Cluster',
-    'EC2',
-    'Status',
-  ],
-  active: -1,
+export const breadcrumb = (user) => {
+  const paths = ['/Preferences/User', '/Preferences/Cluster', '/Preferences/AWS', '/Preferences/Status']; // '/Preferences/Network', ];
+  const icons = [style.userIcon, style.clusterIcon, style.ec2Icon, style.statusIcon]; // style.networkIcon, ],;
+  const titles = ['User preferences', 'Cluster', 'EC2', 'Server status'];
+  const labels = ['User', 'Cluster', 'EC2', 'Status'];
+  if (user && user.admin) {
+    paths.splice(1, 0, '/Preferences/Groups');
+    icons.splice(1, 0, style.groupIcon);
+    titles.splice(1, 0, 'Groups');
+    labels.splice(1, 0, 'Groups');
+  }
+  return {
+    paths,
+    icons,
+    titles,
+    labels,
+    active: -1,
+  };
 };
 
 export default React.createClass({

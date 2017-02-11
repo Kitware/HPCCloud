@@ -6,15 +6,15 @@ import React            from 'react';
 import { breadcrumb }   from '..';
 
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
+import { connect }  from 'react-redux';
 
-const userBreadCrumb = Object.assign({}, breadcrumb, { active: 0 });
-
-export default React.createClass({
+const UserPref = React.createClass({
 
   displayName: 'Preferences/User',
 
   propTypes: {
     menu: React.PropTypes.array,
+    user: React.PropTypes.object,
   },
 
   getDefaultProps() {
@@ -46,6 +46,7 @@ export default React.createClass({
   },
 
   render() {
+    const userBreadCrumb = Object.assign({}, breadcrumb(this.props.user), { active: 0 });
     return (
       <div className={ style.rootContainer }>
         <Toolbar title="User" breadcrumb={userBreadCrumb} hasTabs />
@@ -61,3 +62,10 @@ export default React.createClass({
       </div>);
   },
 });
+
+export default connect(
+  (state) => ({
+    user: state.auth.user,
+  }),
+  () => ({})
+)(UserPref);
