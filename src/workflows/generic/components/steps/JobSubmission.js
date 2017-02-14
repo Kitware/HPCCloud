@@ -83,6 +83,17 @@ export default class JobSubmission extends React.Component {
       return;
     }
 
+    if (this.state.serverType === 'EC2') {
+      if (this.state.EC2.volume) {
+        payload.volume = { _id: this.state.EC2.volume };
+      } else if (this.state.EC2.volumeName && this.state.EC2.volumeSize) {
+        payload.volume = {
+          name: this.state.EC2.volumeName,
+          size: this.state.EC2.volumeSize,
+        };
+      }
+    }
+
     this.props.onJobSubmition(
       this.props.taskFlowName,
       this.props.primaryJob,
