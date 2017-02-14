@@ -18,6 +18,15 @@ import { fetchServers } from '../../../redux/actions/statuses';
 const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 4 });
 const noSimulation = { name: 'no simulation on this cluster.', step: '' };
 
+function findEC2ClusterName(_id, arr) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i]._id === _id) {
+      return arr[i].name;
+    }
+  }
+  return '';
+}
+
 const StatusPage = React.createClass({
   displayName: 'Preferences/Status',
 
@@ -66,7 +75,7 @@ const StatusPage = React.createClass({
       <td>{el.name}</td>
       <td>{el.size}</td>
       <td>{el.status}</td>
-      <td></td>
+      <td>{findEC2ClusterName(el.clusterId, this.props.ec2Clusters)}</td>
     </tr>);
   },
 

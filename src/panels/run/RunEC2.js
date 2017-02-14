@@ -6,6 +6,22 @@ import { Link } from 'react-router';
 import theme    from 'HPCCloudStyle/Theme.mcss';
 import style    from 'HPCCloudStyle/ItemEditor.mcss';
 
+// render mappers
+const optionMapper = (el, index) =>
+  <option key={ `${el.name}_${index}` } value={index}>
+    {el.name}
+  </option>;
+const machineFamilyMapper = (family, index) =>
+  <option key={family} value={family}>
+    { family }
+  </option>;
+const machineMapper = (machine, index) =>
+  <option key={machine.id} value={ index } >
+    { `${machine.id} - ${machine.cpu} core${machine.cpu > 1 ? 's' : ''} - ` +
+      `${machine.memory} ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` +
+      ` - $${Number(machine.price).toPrecision(3)} est. per hour per node` }
+  </option>;
+
 export default React.createClass({
   displayName: 'panels/run/RunEC2',
 
@@ -130,20 +146,6 @@ export default React.createClass({
     }
 
     const runningClusters = this.state.clusters.filter((el) => el.status === 'running');
-    const optionMapper = (el, index) =>
-      <option key={ `${el.name}_${index}` } value={index}>
-        {el.name}
-      </option>;
-    const machineFamilyMapper = (family, index) =>
-      <option key={family} value={family}>
-        { family }
-      </option>;
-    const machineMapper = (machine, index) =>
-      <option key={machine.id} value={ index } >
-        { `${machine.id} - ${machine.cpu} core${machine.cpu > 1 ? 's' : ''} - ` +
-          `${machine.memory} ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` +
-          ` - $${Number(machine.price).toPrecision(3)} est. per hour per node` }
-      </option>;
     return (
       <div className={style.container}>
         { runningClusters.length ?
@@ -214,7 +216,7 @@ export default React.createClass({
             data-key="volume" disabled={this.props.contents.cluster}
           >
             <option value={null}></option>
-            {this.state.volumes.filter(el => el.status === 'created')
+            {this.state.volumes.filter(el => (el.status === 'created' || el.status === 'detached'))
               .map((el, index) => <option key={el._id} value={el._id}>{el.name}</option>)}
           </select>
         </section>
