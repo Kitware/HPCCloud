@@ -32,8 +32,8 @@ module.exports = {
         }],
         loaders: [
             { test: require.resolve("./src/app.js"), loader: "expose?HPCCloud" },
-            { test: /\.js$/, include: /node_modules\/simput\//, loader: 'babel?presets[]=es2015,presets[]=react' },
-            { test: /\.js$/, include: /node_modules\/pvw-visualizer\//, loader: 'babel?presets[]=es2015,presets[]=react'},
+            { test: /\.js$/, include: /node_modules[\\\/]simput[\\\/]/, loader: 'babel?presets[]=es2015,presets[]=react' },
+            { test: /\.js$/, include: /node_modules[\\\/]pvw-visualizer[\\\/]/, loader: 'babel?presets[]=es2015,presets[]=react'},
         ].concat(loaders),
     },
     resolve: {
