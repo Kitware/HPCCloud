@@ -1,4 +1,5 @@
 import rootViewSimulation     from '../../generic/components/root/ViewSimulation';
+import rootEditProject        from '../../generic/components/root/EditProjectWithFileListing';
 import rootNewProject         from './components/root/NewProject';
 
 import stepIntroduction       from './components/steps/Introduction';
@@ -17,6 +18,7 @@ export default {
   },
   components: {
     NewProject: rootNewProject,
+    EditProject: rootEditProject,
     ViewSimulation: rootViewSimulation,
   },
   config: {
@@ -67,7 +69,7 @@ export default {
     },
   },
   taskFlows: {
-    Simulation: 'hpccloud.taskflow.openfoam.tutorial.OpenFOAMTaskFlow',
+    Simulation: 'hpccloud.taskflow.openfoam.windtunnel.OpenFOAMTaskFlow',
     Visualization: 'hpccloud.taskflow.paraview.visualizer.ParaViewTaskFlow',
   },
   primaryJobs: {

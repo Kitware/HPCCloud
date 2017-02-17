@@ -89,25 +89,21 @@ def create_openfoam_job(task, *args, **kwargs):
     body = {
         'name': 'openfoam_run',
         'commands': [
-            'chmod +x $PWD/run.sh',
-            'xhost +local:of_v1612_plus',
+            'python $PWD/simput-unpack.py $PWD/input-deck.json $PWD',
             'docker start of_v1612_plus',
-            'docker exec -t of_v1612_plus $PWD/run.sh $PWD'
+            'docker exec -t of_v1612_plus $PWD/DockerRun $PWD'
         ],
         'input': [
             {
               'folderId': kwargs['input']['folder']['id'],
               'path': '.'
+            },
+            {
+              'folderId': kwargs['input']['project']['folder']['id'],
+              'path': '.'
             }
         ],
         'output': [
-            { 'path': 'simulation/log.blockMesh' },
-            { 'path': 'simulation/log.patchSummary' },
-            { 'path': 'simulation/log.potentialFoam' },
-            { 'path': 'simulation/log.reconstructParMesh' },
-            { 'path': 'simulation/log.surfaceFeatureExtract' },
-            { 'path': 'simulation/log.snappyHexMesh' },
-            { 'path': 'simulation/log.simpleFoam' }
         ]
     }
 
@@ -120,6 +116,17 @@ def create_openfoam_job(task, *args, **kwargs):
     # Capture job working directory
     target_dir = job_directory(cluster, job)
     task.taskflow.set_metadata('dataDir', target_dir)
+
+    source_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '../../../../../',
+            'node_modules/simput/bin/unpack/simput-unpack.py'))
+    target_path = os.path.join(target_dir, 'simput-unpack.py')
+
+    # Upload unpack script
+    with get_connection(task.taskflow.girder_token, cluster) as conn:
+        conn.makedirs(target_dir)
+        with open(source_path, 'r') as fp:
+            conn.put(fp, target_path)
 
     # Move to the next task
     submit_open_foam_job.delay(cluster, job,  *args, **kwargs)
