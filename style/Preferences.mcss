@@ -28,7 +28,7 @@
     composes: fa-user from 'font-awesome/css/font-awesome.css';
 }
 
-.groupsIcon {
+.groupIcon {
     composes: preferenceIcon;
     composes: fa-users from 'font-awesome/css/font-awesome.css';
 }

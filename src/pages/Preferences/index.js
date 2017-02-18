@@ -1,7 +1,7 @@
 import React from 'react';
 import style from 'HPCCloudStyle/Preferences.mcss';
 
-export const breadcrumb = (user) => {
+export const breadcrumb = (user, page) => {
   const paths = ['/Preferences/User', '/Preferences/Cluster', '/Preferences/AWS', '/Preferences/Status']; // '/Preferences/Network', ];
   const icons = [style.userIcon, style.clusterIcon, style.ec2Icon, style.statusIcon]; // style.networkIcon, ],;
   const titles = ['User preferences', 'Cluster', 'EC2', 'Server status'];
@@ -17,7 +17,7 @@ export const breadcrumb = (user) => {
     icons,
     titles,
     labels,
-    active: -1,
+    active: labels.indexOf(page),
   };
 };
 

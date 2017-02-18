@@ -84,7 +84,7 @@ const StatusPage = React.createClass({
   },
 
   render() {
-    const clusterBreadCrumb = Object.assign({}, breadcrumb(this.props.user), { active: 3 });
+    const clusterBreadCrumb = breadcrumb(this.props.user, 'Status');
     return (
       <div className={ style.rootContainer }>
         <Toolbar breadcrumb={ clusterBreadCrumb } title="Status"

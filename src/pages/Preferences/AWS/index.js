@@ -129,7 +129,7 @@ const AWSPrefs = React.createClass({
   render() {
     const { active, list, error, buttonsDisabled } = this.props;
     const activeData = active < list.length ? list[active] : null;
-    const awsBreadCrumb = Object.assign({}, breadcrumb(this.props.user), { active: 2 });
+    const awsBreadCrumb = breadcrumb(this.props.user, 'EC2');
 
     let content = null;
     if (list.length) {

@@ -23,6 +23,20 @@
     composes: form-control from 'bootstrap/dist/css/bootstrap.css';
 }
 
+.splitView {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex: 1;
+}
+
+.splitViewItem {
+  flex: 0.5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
 textarea.input {
     resize: none;
 }
@@ -52,6 +66,7 @@ textarea.input {
     composes: btn from 'bootstrap/dist/css/bootstrap.css';
     composes: btn-default from 'bootstrap/dist/css/bootstrap.css';
     max-width: 250px;
+    min-width: 100px;
     margin-top: 3px;
 }
 
