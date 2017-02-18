@@ -4,7 +4,6 @@ export const initialState = {
   pending: false,
   user: null,
   userMap: {},
-  groupMap: {},
 };
 
 export default function authReducer(state = initialState, action) {
@@ -27,14 +26,6 @@ export default function authReducer(state = initialState, action) {
         users[u._id] = u;
       });
       return Object.assign({}, state, { userMap: users });
-    }
-
-    case Actions.GET_GROUPS: {
-      const groups = {};
-      action.groups.forEach((u) => {
-        groups[u._id] = u;
-      });
-      return Object.assign({}, state, { groupMap: groups });
     }
 
     default:

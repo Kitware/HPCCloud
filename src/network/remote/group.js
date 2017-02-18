@@ -18,12 +18,16 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
       return missingKeys ? promise : busy(client._.post(`/group${encodeQueryAsString(params)}`));
     },
 
-    deleteGroup(id) {
-      return busy(client._.delete(`/group/${id}`));
+    getGroups() {
+      return busy(client._.get('/group'));
     },
 
     getGroup(id) {
       return busy(client._.get(`/group/${id}`));
+    },
+
+    deleteGroup(id) {
+      return busy(client._.delete(`/group/${id}`));
     },
 
     editGroup(group = {}) {
@@ -42,7 +46,7 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
     },
 
     addGroupInvitation(id, options = {}) {
-      const allowed = ['userId', 'level', 'quiet'],
+      const allowed = ['userId', 'level', 'quiet', 'force'],
         params = filterQuery(options, ...allowed),
         { missingKeys, promise } = mustContain(params, 'userId');
 

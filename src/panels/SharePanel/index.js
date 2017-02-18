@@ -89,7 +89,8 @@ const SharePanel = React.createClass({
           <label className={style.label}>User Access</label>
           <div className={[layout.verticalFlexContainer, layout.flexGrow].join(' ')}>
             <select multiple data-which="unShareUsers" className={style.input}
-              onChange={this.handleChange} value={this.state.unShareUsers}>
+              onChange={this.handleChange} value={this.state.unShareUsers}
+            >
               { projectUsers.map((_id, i) => {
                 const name = hasUsers ? this.props.userMap[_id].login : '';
                 return <option key={`${_id}_${i}`} value={_id}>{ name }</option>;
@@ -106,7 +107,8 @@ const SharePanel = React.createClass({
           <label className={style.label}>Share with Users</label>
           <div className={[layout.verticalFlexContainer, layout.flexGrow].join(' ')}>
             <select multiple data-which="shareUsers" className={style.input}
-              onChange={this.handleChange} value={this.state.shareUsers}>
+              onChange={this.handleChange} value={this.state.shareUsers}
+            >
               { Object.keys(this.props.userMap).filter((userId) => projectUsers.indexOf(userId) === -1)
                 .map((userId, i) => <option key={`${userId}_${i}`} value={userId}>{ hasUsers ? this.props.userMap[userId].login : '' }</option>)
               }

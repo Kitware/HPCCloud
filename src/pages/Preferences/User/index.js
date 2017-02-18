@@ -46,7 +46,7 @@ const UserPref = React.createClass({
   },
 
   render() {
-    const userBreadCrumb = Object.assign({}, breadcrumb(this.props.user), { active: 0 });
+    const userBreadCrumb = breadcrumb(this.props.user, 'User');
     return (
       <div className={ style.rootContainer }>
         <Toolbar title="User" breadcrumb={userBreadCrumb} hasTabs />

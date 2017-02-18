@@ -154,7 +154,7 @@ const ClusterPrefs = React.createClass({
     const { active, list, error, buttonsDisabled, presetNames } = this.props;
     const activeData = active < list.length ? list[active] : null;
 
-    const clusterBreadCrumb = Object.assign({}, breadcrumb(this.props.user), { active: 1 });
+    const clusterBreadCrumb = breadcrumb(this.props.user, 'Cluster');
 
     let content = null;
     if (list && list.length) {
