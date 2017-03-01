@@ -15,6 +15,28 @@ function simputModelDecorator(model, props) {
     model.external.groupName = `${model.external.geometryName}Group`;
   }
 
+  // Push Geometry step data to simput...
+  if (props.simulation.steps.Geometry.metadata.assign) {
+    const assign = JSON.parse(props.simulation.steps.Geometry.metadata.assign);
+    while (assign.length) {
+      const item = assign.pop();
+      let container = model.data;
+      item.path.forEach((key, idx, array) => {
+        if (!container[key]) {
+          if (Number.isInteger(array[idx + 1])) {
+            container[key] = [];
+          } else {
+            container[key] = {};
+          }
+        }
+        container = container[key];
+      });
+      container.value = item.value;
+    }
+  }
+
+  console.log(JSON.stringify(model, null, 2));
+
   return model;
 }
 

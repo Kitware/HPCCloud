@@ -3,6 +3,7 @@ import rootEditProject        from '../../generic/components/root/EditProjectWit
 import rootNewProject         from './components/root/NewProject';
 
 import stepIntroduction       from './components/steps/Introduction';
+import stepGeometry           from './components/steps/Geometry';
 import stepInput              from './components/steps/Input';
 import stepSimulationStart    from './components/steps/Simulation/Start';
 import stepSimulationView     from './components/steps/Simulation/View';
@@ -31,7 +32,7 @@ export default {
     },
   },
   steps: {
-    _order: ['Introduction', 'Input', 'Simulation', 'Visualization'],
+    _order: ['Introduction', 'Geometry', 'Input', 'Simulation', 'Visualization'],
     _disabled: ['Visualization'],
     _initial_state: {
       Introduction: {
@@ -39,6 +40,10 @@ export default {
         metadata: {
           alwaysAvailable: true,
         },
+      },
+      Geometry: {
+        type: 'input',
+        metadata: {},
       },
       Input: {
         type: 'input',
@@ -55,6 +60,9 @@ export default {
     },
     Introduction: {
       default: stepIntroduction,
+    },
+    Geometry: {
+      default: stepGeometry,
     },
     Input: {
       default: stepInput,
@@ -80,8 +88,11 @@ export default {
     Introduction: {
       default: 'Introduction',
     },
-    Input: {
+    Geometry: {
       default: 'Wind tunnel',
+    },
+    Input: {
+      default: 'Advance settings',
     },
     Simulation: {
       default: 'Simulation',
