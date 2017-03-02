@@ -3,7 +3,8 @@
 module.exports = {
   basePath: '..',
   client: {
-    captureConsole: true
+    // set to true if you're trying to read some console.log statement
+    captureConsole: false
   },
   singleRun: true,
   frameworks: ['jasmine'],
@@ -19,6 +20,12 @@ module.exports = {
   ],
   preprocessors: {
     'tests.webpack.js': ['webpack', 'sourcemap'],
+  },
+  webpackMiddleware: {
+      noInfo: true,
+      stats: {
+          chunks: false
+      }
   },
   coverageReporter: {
     reporters: [
