@@ -34,6 +34,7 @@ const GroupPrefs = React.createClass({
     onRemoveItem: React.PropTypes.func,
     onUpdateRemoteItem: React.PropTypes.func,
     onActiveChange: React.PropTypes.func,
+    onGetGroupUsers: React.PropTypes.func,
     getGroups: React.PropTypes.func,
     getUsers: React.PropTypes.func,
     addToGroup: React.PropTypes.func,
@@ -70,6 +71,9 @@ const GroupPrefs = React.createClass({
 
   activeChange(active) {
     this.props.onActiveChange(active);
+    if (this.props.list[active]._id) {
+      this.props.onGetGroupUsers(this.props.list[active]._id);
+    }
   },
 
   addUsers(users) {
@@ -166,6 +170,7 @@ export default connect(
 
     onAddItem: () => dispatch(Actions.addGroup()),
     onActiveChange: (index) => dispatch(Actions.updateActiveGroup(index)),
+    onGetGroupUsers: (id) => dispatch(Actions.getGroupUsers(id)),
     onSaveItem: (index, group) => dispatch(Actions.saveGroup(index, group)),
     onUpdateItem: (index, group) => dispatch(Actions.updateGroup(index, group)),
     onRemoveItem: (index, group) => dispatch(Actions.deleteGroup(index, group)),
