@@ -30,12 +30,14 @@ export default React.createClass({
   userAdd() {
     if (this.props.onUserAdd) {
       this.props.onUserAdd(this.state.shareUsers);
+      this.setState({ shareUsers: [] });
     }
   },
 
   userRemove() {
     if (this.props.onUserRemove) {
       this.props.onUserRemove(this.state.unShareUsers);
+      this.setState({ unShareUsers: [] });
     }
   },
 
@@ -98,7 +100,7 @@ export default React.createClass({
                   { this.props.users[id].login }
                 </option>) }
             </select>
-            <button className={style.shareButton} onClick={this.userAdd}>Add</button>
+            <button className={style.shareButton} onClick={this.userAdd} disabled={!this.state.shareUsers.length}>Add</button>
           </div>
           <div className={style.splitViewItem}>
             <select className={ style.input } data-which="unShareUsers" multiple
@@ -109,7 +111,7 @@ export default React.createClass({
                 { el.login }
               </option>) }
             </select>
-            <button className={style.shareButton} onClick={this.userRemove}>Remove</button>
+            <button className={style.shareButton} onClick={this.userRemove} disabled={!this.state.unShareUsers.length}>Remove</button>
           </div>
         </section>
       </section>
