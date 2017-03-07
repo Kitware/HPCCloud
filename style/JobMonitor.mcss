@@ -81,6 +81,11 @@ p.logEntry {
     composes: container;
 }
 
+.tableContainer {
+  composes: container;
+  padding: 0 18px;
+}
+
 .count {
   font-size: 10px;
   font-style: italic;

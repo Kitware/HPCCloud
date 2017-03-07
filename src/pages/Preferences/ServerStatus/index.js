@@ -18,10 +18,10 @@ import { fetchServers } from '../../../redux/actions/statuses';
 const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 4 });
 const noSimulation = { name: 'no simulation on this cluster.', step: '' };
 
-function findEC2ClusterName(_id, arr) {
+function matchIdInArray(_id, arr, key = 'name') {
   for (let i = 0; i < arr.length; i++) {
     if (arr[i]._id === _id) {
-      return arr[i].name;
+      return arr[i][key];
     }
   }
   return '';
@@ -67,16 +67,18 @@ const StatusPage = React.createClass({
   },
 
   profileMapper(el, index) {
-    return { name: el.name, value: el.status };
+    return { _id: el._id, Name: el.name, Region: el.regionName, Status: el.status };
   },
 
   volumesMapper(el, index) {
-    return (<tr key={el._id}>
-      <td>{el.name}</td>
-      <td>{el.size}</td>
-      <td>{el.status}</td>
-      <td>{findEC2ClusterName(el.clusterId, this.props.ec2Clusters)}</td>
-    </tr>);
+    return {
+      _id: el._id,
+      Name: el.name,
+      Size: el.size,
+      Status: el.status,
+      Cluster: matchIdInArray(el.clusterId, this.props.ec2Clusters),
+      Profile: matchIdInArray(el.profileId, this.props.ec2),
+    };
   },
 
   ec2Mapper(el, index) {
@@ -113,7 +115,9 @@ const StatusPage = React.createClass({
         />
         <div className={ style.container }>
         {/* AWS Profiles */}
-          <OutputPanel items={ this.props.ec2.map(this.profileMapper) } title="AWS Profiles" />
+          <OutputPanel table title="AWS Profiles"
+            headers={['Name', 'Region', 'Status']}
+            items={ this.props.ec2.map(this.profileMapper) } />
 
         {/* EC2 Clusters */}
           <div className={ style.toolbar }>
@@ -125,25 +129,9 @@ const StatusPage = React.createClass({
           </div>
 
         {/* Volumes */}
-          <div className={ style.toolbar }>
-            <div className={ style.title }> EBS Volumes </div>
-            <div className={ style.buttons }></div>
-          </div>
-          <div className={ style.taskflowContent } style={{ padding: '0 18px' }}>
-            <table className={ style.table }>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Size</th>
-                  <th>Status</th>
-                  <th>Cluster</th>
-                </tr>
-              </thead>
-              <tbody>
-                { this.props.volumes.map(this.volumesMapper) }
-              </tbody>
-            </table>
-          </div>
+          <OutputPanel table title="EBS Volumes"
+            headers={['Name', 'Size', 'Status', 'Cluster', 'Profile']}
+            items={this.props.volumes.map(this.volumesMapper)} />
 
         {/* Trad Clusters */}
           <div className={ style.toolbar }>
