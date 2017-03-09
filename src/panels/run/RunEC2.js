@@ -29,6 +29,9 @@ export default React.createClass({
     contents: React.PropTypes.object,
     onChange: React.PropTypes.func,
     clusterFilter: React.PropTypes.func,
+    clusterNames: React.PropTypes.array,
+    volumeNames: React.PropTypes.array,
+    onFormError: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -108,25 +111,31 @@ export default React.createClass({
   dataChange(event) {
     var key = event.currentTarget.dataset.key,
       value = event.target.value;
-    if (key === 'profile') {
-      value = this.state.profiles[value];
-      this.setState({
-        machineFamilies: Object.keys(this.state.machines[value.regionName]),
-        profile: value,
-      });
-      // Only want to propagate the id
-      value = value._id;
-    } else if (key === 'machineFamily') {
-      this.setState({
-        machinesInFamily: this.state.machines[this.state.profile.regionName][value],
-      });
+    switch (key) {
+      case 'profile':
+        value = this.state.profiles[value];
+        this.setState({
+          machineFamilies: Object.keys(this.state.machines[value.regionName]),
+          profile: value,
+        });
+        // Only want to propagate the id
+        value = value._id;
+        break;
+      case 'machineFamily':
+        this.setState({
+          machinesInFamily: this.state.machines[this.state.profile.regionName][value],
+        });
 
-      if (this.props.onChange) {
-        this.props.onChange('machine', this.state.machines[this.state.profile.regionName][value][0], 'EC2');
-      }
-    } else if (key === 'machine') {
-      // Convert from index into machine object
-      value = this.state.machinesInFamily[value];
+        if (this.props.onChange) {
+          this.props.onChange('machine', this.state.machines[this.state.profile.regionName][value][0], 'EC2');
+        }
+        break;
+      case 'machine':
+        // Convert from index into machine object
+        value = this.state.machinesInFamily[value];
+        break;
+      default:
+        break;
     }
 
     if (this.props.onChange) {
