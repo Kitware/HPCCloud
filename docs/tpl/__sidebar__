@@ -2,6 +2,7 @@ docs:
   general:
     general__introduction: index.html
     general__getting-started: general__getting-started.html
+    general__glossary: general__troubleshooting.html
     general__glossary: general__glossary.html
   usage:
     usage__create-account: usage__create-account.html
