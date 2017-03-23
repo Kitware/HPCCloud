@@ -14,7 +14,7 @@ const SharePanel = React.createClass({
   propTypes: {
     currentUser: React.PropTypes.object,
     userMap: React.PropTypes.object,
-    shareItem: React.PropTypes.object,
+    shareItem: React.PropTypes.object, // project or simulation object
     onMount: React.PropTypes.func,
     shareProject: React.PropTypes.func,
     shareSimulation: React.PropTypes.func,
@@ -52,10 +52,10 @@ const SharePanel = React.createClass({
 
   shareAction(e) {
     if (this.props.shareItem.projectId) {
-      this.props.shareSimulation(this.props.shareItem._id,
+      this.props.shareSimulation(this.props.shareItem,
         this.state.shareUsers, this.state.shareGroups);
     } else {
-      this.props.shareProject(this.props.shareItem._id,
+      this.props.shareProject(this.props.shareItem,
         this.state.shareUsers, this.state.shareGroups);
     }
     this.setState({ shareUsers: [], shareGroups: [] });
@@ -73,10 +73,10 @@ const SharePanel = React.createClass({
     }
 
     if (this.props.shareItem.projectId) {
-      this.props.unShareSimulation(this.props.shareItem._id,
+      this.props.unShareSimulation(this.props.shareItem,
         this.state.unShareUsers, this.state.unShareGroups);
     } else {
-      this.props.unShareProject(this.props.shareItem._id,
+      this.props.unShareProject(this.props.shareItem,
         this.state.unShareUsers, this.state.unShareGroups);
     }
     this.setState({ unShareUsers: [], unShareGroups: [] });
@@ -132,9 +132,9 @@ export default connect(
   }),
   () => ({
     onMount: () => dispatch(AuthActions.getUsers()),
-    shareProject: (_id, users, groups) => dispatch(ProjActions.shareProject(_id, users, groups)),
-    shareSimulation: (_id, users, groups) => dispatch(ProjActions.shareSimulation(_id, users, groups)),
-    unShareProject: (_id, users, groups) => dispatch(ProjActions.unShareProject(_id, users, groups)),
-    unShareSimulation: (_id, users, groups) => dispatch(ProjActions.unShareSimulation(_id, users, groups)),
+    shareProject: (simulation, users, groups) => dispatch(ProjActions.shareProject(simulation, users, groups)),
+    shareSimulation: (simulation, users, groups) => dispatch(ProjActions.shareSimulation(simulation, users, groups)),
+    unShareProject: (project, users, groups) => dispatch(ProjActions.unShareProject(project, users, groups)),
+    unShareSimulation: (project, users, groups) => dispatch(ProjActions.unShareSimulation(project, users, groups)),
   })
 )(SharePanel);
