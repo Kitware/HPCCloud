@@ -56,5 +56,13 @@ export default function ({ client, filterQuery, mustContain, busy }) {
     endTaskflow(id) {
       return busy(client._.put(`/taskflows/${id}/terminate`));
     },
+
+    shareTaskflow(id, users = [], groups = []) {
+      return busy(client._.put(`/taskflows/${id}/share`, { users, groups }));
+    },
+
+    unshareTaskflow(id, users = [], groups = []) {
+      return busy(client._.put(`/taskflows/${id}/unshare`, { users, groups }));
+    },
   };
 }
