@@ -56,6 +56,7 @@
     "babel-polyfill": "6.9.1",
     "paraviewweb": "2.2.84",
     "pvw-visualizer": "2.0.18",
+    "vtk.js": "2.15.0",
     "simput": "1.3.24",
     "candela": "0.9.1",
 
@@ -66,8 +67,9 @@
     "install:pyfr"       : "cp ./node_modules/simput/dist/types/pyfr.js ./dist/simput-pyfr.js",
     "install:nwchem"     : "cp ./node_modules/simput/dist/types/nwchem.js ./dist/simput-nwchem.js",
     "install:nwchem-neb" : "cp ./node_modules/simput/dist/types/nwchem-neb.js ./dist/simput-nwchem-neb.js",
-    "install:openfoam"   : "cp ./node_modules/simput/dist/types/openfoam_tutorials.js ./dist/simput-openfoam_tutorials.js",
-    "postinstall"   : "npm run install:pyfr && npm run install:nwchem && npm run install:nwchem-neb && npm run install:openfoam && fix-kw-web-suite || true",
+    "install:openfoam"   : "cp ./node_modules/simput/dist/types/openfoam_tutorials.js ./dist/simput-openfoam-tutorials.js",
+    "install:openfoamw"   : "cp ./node_modules/simput/dist/types/openfoam-windtunnel.js ./dist/simput-openfoam-windtunnel.js",
+    "postinstall"   : "npm run install:pyfr && npm run install:nwchem && npm run install:nwchem-neb && npm run install:openfoam && npm run install:openfoamw && fix-kw-web-suite || true",
     "check"         : "node bin/version-check.js",
 
     "doc"           : "kw-doc -c ./docs/config.js",

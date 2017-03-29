@@ -62,8 +62,9 @@ const visualizer = React.createClass({
     // props.simulation is not necessarily updated with latest metadata, so we fetch it.
     client.getSimulationStep(this.props.simulation._id, this.props.step)
       .then((resp) => {
+        const hostname = this.props.location.hostname ? this.props.location.hostname : window.location.hostname;
         const config = {
-          sessionURL: `ws://${this.props.location.hostname}:8888/proxy?sessionId=${resp.data.metadata.sessionId}&path=ws`,
+          sessionURL: `ws://${hostname}:8888/proxy?sessionId=${resp.data.metadata.sessionId}&path=ws`,
           retry: true,
         };
         network.connect(config);

@@ -111,8 +111,11 @@ export function saveSimulation(simulation_, attachments) {
           Object.keys(attachments).forEach((file) => {
             promises.push(createItemForSimulation(simulation, file, attachments[file]));
           });
-          promises.push(new Promise((a, r) => { a({ data: simulation }); }));
-          return Promise.all(promises);
+          return new Promise((a, r) => {
+            Promise.all(promises).then(() => {
+              a({ data: simulation });
+            });
+          });
         }
         return new Promise((a, r) => { a({ data: simulation }); });
       })

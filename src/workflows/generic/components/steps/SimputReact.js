@@ -200,31 +200,51 @@ export default class SimputReact extends React.Component {
       const convertedData = Simput.types[this.props.simputType].convert(jsonData);
       if (!convertedData.errors || convertedData.errors.length === 0) {
         // No error in convertion
-        Object.keys(convertedData.results).forEach((fileName) => {
-          const fileKey = this.fileNameToKeyMap[fileName];
-          if (this.state[fileKey]) {
-            const fileId = this.state[fileKey];
-            const content = convertedData.results[fileName];
-            const blob = new Blob([content], { type: 'text/plain' });
-            client.updateFileContent(fileId, content.length)
-              .then((upload) => {
-                client.uploadChunk(upload.data._id, 0, blob);
-              })
-              .catch((err) => {
-                console.log('Error update content', fileKey, fileName, err);
-              });
+        if (this.state.__export__) {
+          const fileId = this.state.__export__;
+          const content = JSON.stringify(convertedData);
+          const blob = new Blob([content], { type: 'text/plain' });
+          client.updateFileContent(fileId, content.length)
+            .then((upload) => {
+              client.uploadChunk(upload.data._id, 0, blob);
+            })
+            .catch((err) => {
+              console.log('Error update content __export__', err);
+            });
 
-            const simulationStepIndex = this.props.simulation.disabled.indexOf(this.props.nextStep);
-            if (simulationStepIndex !== -1) {
-              const newSim = deepClone(this.props.simulation);
-              newSim.disabled.splice(simulationStepIndex, 1);
-              this.props.patchSimulation(newSim);
-            }
-          } else {
-            console.log(`No file id associated with generated file name: ${fileName}`);
-            console.log(fileName, this.fileNameToKeyMap, this.state);
+          const simulationStepIndex = this.props.simulation.disabled.indexOf(this.props.nextStep);
+          if (simulationStepIndex !== -1) {
+            const newSim = deepClone(this.props.simulation);
+            newSim.disabled.splice(simulationStepIndex, 1);
+            this.props.patchSimulation(newSim);
           }
-        });
+        } else {
+          Object.keys(convertedData.results).forEach((fileName) => {
+            const fileKey = this.fileNameToKeyMap[fileName];
+            if (this.state[fileKey]) {
+              const fileId = this.state[fileKey];
+              const content = convertedData.results[fileName];
+              const blob = new Blob([content], { type: 'text/plain' });
+              client.updateFileContent(fileId, content.length)
+                .then((upload) => {
+                  client.uploadChunk(upload.data._id, 0, blob);
+                })
+                .catch((err) => {
+                  console.log('Error update content', fileKey, fileName, err);
+                });
+
+              const simulationStepIndex = this.props.simulation.disabled.indexOf(this.props.nextStep);
+              if (simulationStepIndex !== -1) {
+                const newSim = deepClone(this.props.simulation);
+                newSim.disabled.splice(simulationStepIndex, 1);
+                this.props.patchSimulation(newSim);
+              }
+            } else {
+              console.log(`No file id associated with generated file name: ${fileName}`);
+              console.log(fileName, this.fileNameToKeyMap, this.state);
+            }
+          });
+        }
       } else {
         console.error('Got errors when generating files from simput model: ');
         convertedData.errors.forEach((error) => console.error(error));
