@@ -14,7 +14,10 @@ docs:
   development:
     development__dev-intro: development__dev-intro.html
     development__panels: development__panels.html
-    development__workflows: development__workflows.html
     development__redux: development__redux.html
     development__tools: development__tools.html
     vagrant__introduction: vagrant__introduction.html
+  workflows:
+    workflows__introduction: workflows__introduction.html
+    workflows__adding: workflows__adding.html
+    workflows__pages: workflows__pages.html

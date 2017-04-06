@@ -1,4 +1,4 @@
-# Adding new workflows
+# Defining New Workflows
 
 There are front end and back end requirements for workflows. 
 
@@ -107,4 +107,3 @@ The keys in 'primaryJobs' are the step names, the value is the name of the job w
 ```
 
 Labels for the steps and step subviews.
-
