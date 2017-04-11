@@ -45,7 +45,7 @@
 <meta property="og:url" content="https://kitware.github.io/HPCCloud/docs/workflows__pages.html">
 <meta property="og:site_name" content="HPCCloud">
 <meta property="og:description" content="Workflow pagesEach workflow has a set of steps, those steps have pages associated with them. For most cases there are at least two pages:   Input, a Simput panel for modifiying or creating the simulat">
-<meta property="og:updated_time" content="2017-04-07T23:23:18.932Z">
+<meta property="og:updated_time" content="2017-04-11T18:29:11.740Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="HPCCloud">
 <meta name="twitter:description" content="Workflow pagesEach workflow has a set of steps, those steps have pages associated with them. For most cases there are at least two pages:   Input, a Simput panel for modifiying or creating the simulat">
@@ -110,11 +110,10 @@
 <h2 id="Input" class="article-heading"><a href="#Input" class="headerlink" title="Input"></a>Input<a class="article-anchor" href="#Input" aria-hidden="true"></a></h2><p>Import the component <code>generic/components/steps/SimputReact</code> and pass the following props: </p>
 <ul>
 <li><code>simputType</code>, the name of the simput type</li>
-<li><code>inputFileKeys</code>, arguments to simput on the key for the file in the simulation metadata <code>key: String</code>, the name of the file <code>name: String</code>, and if the input file should be parsed <code>parse: Boolean</code></li>
 <li><p><code>initialDataModel</code>, the initial data model for simput. Of format:  </p>
 <figure class="highlight js"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="attr">data</span>: &#123;&#125;,</div><div class="line">  <span class="attr">type</span>: <span class="string">`<span class="subst">$&#123;simput_type_name&#125;</span>`</span>,</div><div class="line">  <span class="attr">hideViews</span>: [], <span class="comment">// strings of the view names you would like to hide</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
 </li>
-<li><p><code>simputModelDecorator</code>, a function which takes model and props </p>
+<li><p><code>simputModelDecorator</code>, a function which takes model and props and extends the data model if desired.</p>
 </li>
 </ul>
 <h2 id="Submission" class="article-heading"><a href="#Submission" class="headerlink" title="Submission"></a>Submission<a class="article-anchor" href="#Submission" aria-hidden="true"></a></h2><p>Submit a taskflow to a cluster or EC2 instance. You can provision EC2 clusters and volumes from the forms on this panel. Import component `generic/components/steps/JobSubmission’ and pass the following props: </p>
@@ -140,7 +139,7 @@
 
               </div>
               <footer class="article-footer">
-                <time class="article-footer-updated" datetime="2017-04-07T23:23:18.932Z" itemprop="dateModified">Last updated: 2017-04-07</time>
+                <time class="article-footer-updated" datetime="2017-04-11T18:29:11.740Z" itemprop="dateModified">Last updated: 2017-04-11</time>
                 <a href="workflows__adding.html" class="article-footer-prev" title="Workflow definition"><i class="fa fa-chevron-left"></i><span>Prev</span></a>
               </footer>
               
