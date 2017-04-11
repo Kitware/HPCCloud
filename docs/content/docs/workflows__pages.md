@@ -17,7 +17,6 @@ src/workflows/generic/components/steps
 Import the component `generic/components/steps/SimputReact` and pass the following props: 
 
 - `simputType`, the name of the simput type
-- `inputFileKeys`, arguments to simput on the key for the file in the simulation metadata `key: String`, the name of the file `name: String`, and if the input file should be parsed `parse: Boolean`
 - `initialDataModel`, the initial data model for simput. Of format:  
   ```js
     {
@@ -27,7 +26,7 @@ Import the component `generic/components/steps/SimputReact` and pass the followi
     }
   ```
 
-- `simputModelDecorator`, a function which takes model and props 
+- `simputModelDecorator`, a function which takes model and props and extends the data model if desired.
 
 
 ## Submission
