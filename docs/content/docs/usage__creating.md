@@ -6,7 +6,7 @@ Projects contain simulations of a certain type. Go to `/` or click on the HPC-Cl
 
 ### Creating 
 
-Click on the "+" icon on the top right in the toolbar, this will take you to a new page. On this page name and describe your project. Depending on the project type, you may also need to upload some files required for simulations. Name your project and add a description if desired. Click "Create Project" and after your file(s) upload you'll be taken to the simulations page for your new project. 
+Click on the "+" icon on the top right in the toolbar, this will take you to a new page. Name and describe your project on this page. Depending on the project type, you may also need to upload some files required for simulations. Name your project and add a description if desired. Click "Create Project" and after your file(s) upload you'll be taken to the simulations page for your new project. 
 
 ### Editing 
 If you named or described your project incorrectly click on the pen icon on the homepage and modify these attributes. You cannot reupload files if the project required any.

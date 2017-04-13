@@ -22,6 +22,7 @@ sidebar:
     general__introduction: Introduction
     general__getting-started: Getting Started
     general__glossary: Glossary
+    general__troubleshooting: Troubleshooting
     usage: Usage
     usage__create-account: Signing up
     usage__trad-cluster: Adding traditional clusters
@@ -32,7 +33,10 @@ sidebar:
     development: Development
     development__dev-intro: Introduction
     development__panels: Panels
-    development__workflows: Adding new workflows
     development__redux: Redux data model
     development__tools: Available tools
     vagrant__introduction: Vagrant - How to...
+    workflows: Workflows
+    workflows__introduction: Introduction
+    workflows__adding: Workflow definition
+    workflows__pages: Workflow pages

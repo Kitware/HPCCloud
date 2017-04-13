@@ -2,7 +2,13 @@
 
 Simput is a tool for simplifying the process of writing and editing simulation input files. It can be a standalone tool but for HPCCloud we've integrated it to support input generation for simulations such as PyFR.
 
-## Usage with PyFR - euler-vortex-2d
+## Usage 
+
+### Parsed input
+
+If you uploaded a file to the parent project or simulation, and the simulation type is supported by Simput then the input file will be parsed and displayed for editing. Otherwise the fields will be blank and ready for your input.
+
+### Manual input for PyFR - euler-vortex-2d
 
 This example will lead you through the creation of an input file for PyFR using SimPut. You will create an input file that can be used with one of PyFR's [examples](https://github.com/vincentlab/PyFR/blob/develop/examples/euler_vortex_2d/).
 
