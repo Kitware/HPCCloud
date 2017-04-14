@@ -1,3 +1,4 @@
+sudo: false
 language: python
 python:
     - "2.7"
@@ -6,7 +7,16 @@ python:
 node_js:
     - "4.1"
 
-sudo: false
+env:
+    - CXX=g++-4.8
+
+addons:
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+        packages:
+            - g++-4.8
+
 notifications:
     email:
         recipients:
