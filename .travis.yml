@@ -54,7 +54,7 @@ before_install:
     - ln -s "${HOME}/build/Kitware/HPCCloud/server/pvwproxy" "${HOME}/build/girder/plugins/pvwproxy"
     # Install CMake
     - CACHE=$HOME/.cache CMAKE_VERSION=3.1.0 CMAKE_SHORT_VERSION=3.1 source $HOME/build/girder/scripts/install_cmake.sh
-    - nvm install 4.1
+    - nvm install 5.1
 
 install:
     - pip install -U -r requirements.txt
