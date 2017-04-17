@@ -98,7 +98,7 @@ class Simulations(Resource):
         Description('Update a simulation')
         .modelParam('id', 'The simulation to update.',
                     model='simulation', plugin='hpccloud', level=AccessType.WRITE)
-        .jsonParam('updates', 'The properies of the simulation to update.',
+        .jsonParam('updates', 'The properties of the simulation to update.',
                    dataType='UpdateProperties', required=True, paramType='body')
     )
     @access.user
