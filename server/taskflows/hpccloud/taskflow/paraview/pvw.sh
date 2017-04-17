@@ -5,7 +5,7 @@
 
 # Set up cluster-specific variables
 PARAVIEW_DIR={{paraviewInstallDir if paraviewInstallDir else "/opt/paraview/install"}}
-PV_PYTHON="${PARAVIEW_DIR}/bin/pvpython"
+PV_BATCH="${PARAVIEW_DIR}/bin/pvbatch"
 LIB_VERSION_DIR=`ls ${PARAVIEW_DIR}/lib | grep paraview`
 APPS_DIR="lib/${LIB_VERSION_DIR}/site-packages/paraview/web"
 VISUALIZER="pvw-visualizer.py"
@@ -13,9 +13,17 @@ GET_PORT_PYTHON_CMD='import socket; s=socket.socket(); s.bind(("", 0)); print(s.
 RC_PORT=`python -c "${GET_PORT_PYTHON_CMD}"`
 echo ${RC_PORT} > /tmp/{{job._id}}.rc_port
 
+# Enable interactors for pvbatch
+export PV_ALLOW_BATCH_INTERACTION=1
+
+# Run in MPI mode
+MPIPROG="mpiexec"
+
 # Need to adjust paths for Mac application install
 case $PARAVIEW_DIR in
-     *paraview.app) PV_PYTHON="${PARAVIEW_DIR}/Contents/bin/pvpython";;
+     *paraview.app) PV_BATCH="${PARAVIEW_DIR}/Contents/bin/pvbatch"
+      MPIPROG="${PARAVIEW_DIR}/Contents/MacOS/mpiexec"
+      ;;
 esac
 
 REVERSE="--reverse-connect-port ${RC_PORT}"
@@ -45,8 +53,8 @@ export LD_LIBRARY_PATH
 DISPLAY=:0
 export DISPLAY
 
-# First run pvpython
-${PV_PYTHON} {{'--mesa-llvm' if not gpu else ''}} ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} \
+# First run pvbatch
+${MPIPROG} {{ '-n %s' % numberOfSlots if numberOfSlots else '-n 1'}} ${PV_BATCH} {{'--mesa-llvm' if not gpu else ''}} ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} \
 {{ '--data %s' % dataDir if dataDir else ''}} \
 {{ '--load-file %s' % fileName if fileName else '' }}
 
