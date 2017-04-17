@@ -56,5 +56,19 @@
         "updated": {
 
         }
+    },
+    "definitions": {
+        "share": {
+            "type": "object",
+            "properties": {
+                "users": {
+                    "$ref": "#/arrayOfIds"
+                },
+                "groups": {
+                    "$ref": "#/arrayOfIds"
+                }
+            },
+            "additionalProperties": false
+        }
     }
 }

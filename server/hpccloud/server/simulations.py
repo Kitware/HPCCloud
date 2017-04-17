@@ -219,8 +219,22 @@ class Simulations(Resource):
                dataType='object', required=True, paramType='body')
     )
     @access.user
-    def share(self, project, share, params):
-        return 1
+    def share(self, simulation, share params):
+        user = getCurrentUser()
+
+        # Validate we have been given a value body
+        try:
+            ref_resolver = jsonschema.RefResolver.from_schema(
+                schema.definitions)
+            jsonschema.validate(share, schema.simulation['definitions']['share'],
+                                resolver=ref_resolver)
+        except jsonschema.ValidationError as ve:
+            raise RestException(ve.message, 400)
+
+        users = share.get('users', [])
+        groups = share.get('groups', [])
+
+        return self._model.share(user, simulation, users, groups)
 
     @autoDescribeRoute(
         Description('Revoke permissions for asimulation given a set of users \
@@ -231,8 +245,22 @@ class Simulations(Resource):
                dataType='object', required=True, paramType='body')
     )
     @access.user
-    def unshare(self, project, params):
-        return 1
+    def unshare(self, simulation, share, params):
+        user = getCurrentUser()
+
+        # Validate we have been given a value body
+        try:
+            ref_resolver = jsonschema.RefResolver.from_schema(
+                schema.definitions)
+            jsonschema.validate(share, schema.simulation['definitions']['share'],
+                                resolver=ref_resolver)
+        except jsonschema.ValidationError as ve:
+            raise RestException(ve.message, 400)
+
+        users = share.get('users', [])
+        groups = share.get('groups', [])
+
+        return self._model.unshare(user, simulation, users, groups)
 
    @autoDescribeRoute(
         Description('Download all the asset associated with a simulation')
