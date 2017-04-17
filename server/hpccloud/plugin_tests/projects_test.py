@@ -127,292 +127,292 @@ class ProjectsTestCase(TestCase):
         self.assertStatus(r, 201)
 
 
-#     def test_update(self):
-#         body = {
-#             'name': 'myProject',
-#             'type': 'PyFR',
-#             'steps': ['onestep']
-#         }
-#
-#         json_body = json.dumps(body)
-#         r = self.request('/projects', method='POST',
-#                          type='application/json', body=json_body, user=self._user)
-#         self.assertStatus(r, 201)
-#         project = r.json
-#
-#         # Fetch the project so we get the right updated time ( its a timestamp
-#         # truncation thing )
-#         r = self.request('/projects/%s' % str(project['_id']), method='GET',
-#                          type='application/json', user=self._user)
-#         self.assertStatusOk(r)
-#         project = r.json
-#         updated = project['updated']
-#
-#         # Now try and update one of the immutable properties
-#         body = {
-#             'type': 'FooBar'
-#         }
-#
-#         json_body = json.dumps(body)
-#         r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
-#                          type='application/json', body=json_body, user=self._user)
-#         self.assertStatus(r, 400)
-#
-#         # Now try add some bogus data to our project
-#         body = {
-#             'metadata': {
-#                 'foo': 'bogus'
-#             }
-#         }
-#
-#         json_body = json.dumps(body)
-#         r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
-#                          type='application/json', body=json_body, user=self._user)
-#         self.assertStatus(r, 200)
-#         self.assertNotEqual(updated, r.json['updated'])
-#
-#         # Check the data was added
-#         project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
-#         self.assertEqual(project_model['metadata'], body['metadata'])
-#
-#         # Now try changing the name
-#         body = {
-#             'name': 'FooBar'
-#         }
-#
-#         json_body = json.dumps(body)
-#         r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
-#                          type='application/json', body=json_body, user=self._user)
-#         self.assertStatus(r, 200)
-#
-#         # Check the name was updated
-#         project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
-#         self.assertEqual(project_model['name'], body['name'])
-#
-#         # Now try changing the description
-#         body = {
-#             'description': 'FooBar'
-#         }
-#
-#         json_body = json.dumps(body)
-#         r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
-#                          type='application/json', body=json_body, user=self._user)
-#         self.assertStatus(r, 200)
-#
-#         # Check the description was updated
-#         project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
-#         self.assertEqual(project_model['description'], body['description'])
-#
-#     def _create_project(self, name, user):
-#         body = {
-#             'name': name,
-#             'type': 'PyFR',
-#             'steps': ['onestep']
-#         }
-#
-#         json_body = json.dumps(body)
-#         r = self.request('/projects', method='POST',
-#                          type='application/json', body=json_body,
-#                          user=user)
-#         self.assertStatus(r, 201)
-#
-#         return r.json
-#
-#
-#     def test_get_all(self):
-#         # _yet_another_user because _user has admin privilege
-#         self._create_project('project1', self._yet_another_user)
-#         self._create_project('project2', self._yet_another_user)
-#         self._create_project('project3', self._yet_another_user)
-#         project4 = self._create_project('project4', self._another_user)
-#
-#         # test limit and offset for _user
-#         r = self.request('/projects', method='GET', params={'limit':2},
-#                          type='application/json', user=self._yet_another_user)
-#         self.assertStatus(r, 200)
-#         self.assertEqual(len(r.json), 2)
-#         self.assertEqual(r.json[0]['name'], 'project1')
-#         self.assertEqual(r.json[1]['name'], 'project2')
-#
-#         r = self.request('/projects', method='GET',
-#                          params={'offset':2},
-#                          type='application/json', user=self._yet_another_user)
-#         self.assertStatus(r, 200)
-#         self.assertEqual(len(r.json), 1)
-#         self.assertEqual(r.json[0]['name'], 'project3')
-#
-#         # test that _another_user only gets the projects that belongs to them
-#         r = self.request('/projects', method='GET',
-#                          type='application/json', user=self._another_user)
-#         self.assertStatus(r, 200)
-#         self.assertEqual(len(r.json), 1)
-#         del r.json[0]['created']
-#         del r.json[0]['updated']
-#         del project4['created']
-#         del project4['updated']
-#         self.assertEqual(r.json[0], project4)
-#
-#     def test_delete(self):
-#
-#         body = {
-#             'name': 'deleteme',
-#             'type': 'PyFR',
-#             'steps': ['onestep']
-#         }
-#
-#         json_body = json.dumps(body)
-#         r = self.request('/projects', method='POST',
-#                          type='application/json', body=json_body,
-#                          user=self._another_user)
-#         self.assertStatus(r, 201)
-#         project = r.json
-#
-#         project_folder = self.model('folder').load(
-#             project['folderId'], user = self._another_user)
-#
-#         # Create a test folder
-#         folder = self.model('folder').createFolder(project_folder,
-#                                                    'Delete me please',
-#                                                    creator=self._another_user)
-#
-#         # Create a test item
-#         item = self.model('item').createItem('deleteme', self._another_user,
-#                                              project_folder)
-#
-#         # Create a test file
-#         r = self.request(path='/assetstore', method='GET',
-#                          user=self._user)
-#         self.assertStatusOk(r)
-#         self.assertEqual(1, len(r.json))
-#         assetstore = r.json[0]
-#
-#         file_item = self.model('item').createItem('fileItem', self._another_user,
-#                                              project_folder)
-#         file = self.model('file').createFile(self._another_user, file_item,
-#                                              'test', 100, assetstore)
-#         file['sha512'] = 'dummy'
-#         self.model('file').save(file)
-#
-#         # Now delete the project
-#         r = self.request('/projects/%s' % str(project['_id']), method='DELETE',
-#                          type='application/json', body=json_body,
-#                          user=self._another_user)
-#         self.assertStatusOk(r)
-#
-#         # Check that the project was deleted
-#         self.assertIsNone(self.model('project', 'hpccloud').load(project['_id'],
-#                                                                  force=True))
-#
-#         # Check that the folder was deleted
-#         self.assertIsNone(self.model('folder').load(folder['_id'], force=True))
-#
-#         # Check that the item was deleted
-#         self.assertIsNone(self.model('item').load(item['_id'], force=True))
-#
-#         # Check that the file was deleted
-#         self.assertIsNone(self.model('file').load(file['_id'], force=True))
-#
-#         # Check that the project folder was remove
-#         self.assertIsNone(self.model('folder').load(project['folderId'],
-#                                                     force=True))
-#
-#         # Try deleting a project containing a simulation
-#         body = {
-#             'name': 'deleteme',
-#             'type': 'PyFR',
-#             'steps': ['onestep']
-#         }
-#
-#         json_body = json.dumps(body)
-#         r = self.request('/projects', method='POST',
-#                          type='application/json', body=json_body,
-#                          user=self._another_user)
-#         self.assertStatus(r, 201)
-#         project = r.json
-#
-#         body = {
-#             "name": "mySim",
-#             "steps": {
-#                 "step1": {
-#                     "type": "input"
-#                 },
-#                 "step2": {
-#                     "type": "input"
-#                 },
-#                 "step3": {
-#                     "type": "input"
-#                 }
-#             }
-#         }
-#
-#         json_body = json.dumps(body)
-#         r = self.request('/projects/%s/simulations' % str(project['_id']), method='POST',
-#                          type='application/json', body=json_body, user=self._another_user)
-#         self.assertStatus(r, 201)
-#
-#         # The delete should fail
-#         r = self.request('/projects/%s' % str(project['_id']), method='DELETE',
-#                  type='application/json', body=json_body,
-#                  user=self._another_user)
-#         self.assertStatus(r, 400)
-#
-#     def test_get(self):
-#         project1 = self._create_project('project1', self._user)
-#         project2 = self._create_project('project2', self._another_user)
-#
-#         r = self.request('/projects/%s' % str(project2['_id']), method='GET',
-#                          type='application/json', user=self._another_user)
-#         self.assertStatus(r, 200)
-#         del r.json['created']
-#         del r.json['updated']
-#         del project2['created']
-#         del project2['updated']
-#         self.assertEqual(r.json, project2)
-#
-#         # Now try and get a project we shouldn't have access to
-#         r = self.request('/projects/%s' % str(project1['_id']), method='GET',
-#                          type='application/json', user=self._another_user)
-#         self.assertStatus(r, 403)
-#
-#     def test_share(self):
-#         project1 = self._create_project('project1', self._yet_another_user)
-#         project2 = self._create_project('project2', self._another_user)
-#
-#         r = self.request('/projects', method='GET',
-#                          type='application/json', user=self._another_user)
-#         self.assertStatus(r, 200)
-#         self.assertEqual(len(r.json), 1)
-#         del r.json[0]['created']
-#         del r.json[0]['updated']
-#         del project2['created']
-#         del project2['updated']
-#         self.assertEqual(r.json[0], project2)
-#
-#         # Now share the other project
-#         body = {
-#             'users': [str(self._another_user['_id'])]
-#         }
-#
-#         json_body = json.dumps(body)
-#         r = self.request('/projects/%s/share' % str(project1['_id']),
-#                          method='PUT', type='application/json', body=json_body,
-#                          user=self._yet_another_user)
-#         self.assertStatus(r, 200)
-#
-#         # We should now have access to both projects
-#         r = self.request('/projects', method='GET',
-#                          type='application/json', user=self._another_user)
-#         self.assertStatus(r, 200)
-#         self.assertEqual(len(r.json), 2)
-#
-#         # Check we have read access to the project folder
-#         r = self.request('/folder/%s' % str(project1['folderId']), method='GET',
-#                          type='application/json', user=self._another_user)
-#         self.assertStatus(r, 200)
-#         self.assertEqual(r.json['_id'], project1['folderId'])
-#
-#         # Check that owner still has access
-#         r = self.request('/projects/%s' % str(project1['_id']), method='GET',
-#                  type='application/json', user=self._yet_another_user)
-#         self.assertStatus(r, 200)
-#         self.assertEqual(r.json['_id'], project1['_id'])
+    def test_update(self):
+        body = {
+            'name': 'myProject',
+            'type': 'PyFR',
+            'steps': ['onestep']
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects', method='POST',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 201)
+        project = r.json
+
+        # Fetch the project so we get the right updated time ( its a timestamp
+        # truncation thing )
+        r = self.request('/projects/%s' % str(project['_id']), method='GET',
+                         type='application/json', user=self._user)
+        self.assertStatusOk(r)
+        project = r.json
+        updated = project['updated']
+
+        # Now try and update one of the immutable properties
+        body = {
+            'type': 'FooBar'
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 400)
+
+        # Now try add some bogus data to our project
+        body = {
+            'metadata': {
+                'foo': 'bogus'
+            }
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 200)
+        self.assertNotEqual(updated, r.json['updated'])
+
+        # Check the data was added
+        project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
+        self.assertEqual(project_model['metadata'], body['metadata'])
+
+        # Now try changing the name
+        body = {
+            'name': 'FooBar'
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 200)
+
+        # Check the name was updated
+        project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
+        self.assertEqual(project_model['name'], body['name'])
+
+        # Now try changing the description
+        body = {
+            'description': 'FooBar'
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s' % str(project['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 200)
+
+        # Check the description was updated
+        project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
+        self.assertEqual(project_model['description'], body['description'])
+
+    def _create_project(self, name, user):
+        body = {
+            'name': name,
+            'type': 'PyFR',
+            'steps': ['onestep']
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects', method='POST',
+                         type='application/json', body=json_body,
+                         user=user)
+        self.assertStatus(r, 201)
+
+        return r.json
+
+
+    def test_get_all(self):
+        # _yet_another_user because _user has admin privilege
+        self._create_project('project1', self._yet_another_user)
+        self._create_project('project2', self._yet_another_user)
+        self._create_project('project3', self._yet_another_user)
+        project4 = self._create_project('project4', self._another_user)
+
+        # test limit and offset for _user
+        r = self.request('/projects', method='GET', params={'limit':2},
+                         type='application/json', user=self._yet_another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(len(r.json), 2)
+        self.assertEqual(r.json[0]['name'], 'project1')
+        self.assertEqual(r.json[1]['name'], 'project2')
+
+        r = self.request('/projects', method='GET',
+                         params={'offset':2},
+                         type='application/json', user=self._yet_another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(len(r.json), 1)
+        self.assertEqual(r.json[0]['name'], 'project3')
+
+        # test that _another_user only gets the projects that belongs to them
+        r = self.request('/projects', method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(len(r.json), 1)
+        del r.json[0]['created']
+        del r.json[0]['updated']
+        del project4['created']
+        del project4['updated']
+        self.assertEqual(r.json[0], project4)
+
+    def test_delete(self):
+
+        body = {
+            'name': 'deleteme',
+            'type': 'PyFR',
+            'steps': ['onestep']
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects', method='POST',
+                         type='application/json', body=json_body,
+                         user=self._another_user)
+        self.assertStatus(r, 201)
+        project = r.json
+
+        project_folder = self.model('folder').load(
+            project['folderId'], user = self._another_user)
+
+        # Create a test folder
+        folder = self.model('folder').createFolder(project_folder,
+                                                   'Delete me please',
+                                                   creator=self._another_user)
+
+        # Create a test item
+        item = self.model('item').createItem('deleteme', self._another_user,
+                                             project_folder)
+
+        # Create a test file
+        r = self.request(path='/assetstore', method='GET',
+                         user=self._user)
+        self.assertStatusOk(r)
+        self.assertEqual(1, len(r.json))
+        assetstore = r.json[0]
+
+        file_item = self.model('item').createItem('fileItem', self._another_user,
+                                             project_folder)
+        file = self.model('file').createFile(self._another_user, file_item,
+                                             'test', 100, assetstore)
+        file['sha512'] = 'dummy'
+        self.model('file').save(file)
+
+        # Now delete the project
+        r = self.request('/projects/%s' % str(project['_id']), method='DELETE',
+                         type='application/json', body=json_body,
+                         user=self._another_user)
+        self.assertStatusOk(r)
+
+        # Check that the project was deleted
+        self.assertIsNone(self.model('project', 'hpccloud').load(project['_id'],
+                                                                 force=True))
+
+        # Check that the folder was deleted
+        self.assertIsNone(self.model('folder').load(folder['_id'], force=True))
+
+        # Check that the item was deleted
+        self.assertIsNone(self.model('item').load(item['_id'], force=True))
+
+        # Check that the file was deleted
+        self.assertIsNone(self.model('file').load(file['_id'], force=True))
+
+        # Check that the project folder was remove
+        self.assertIsNone(self.model('folder').load(project['folderId'],
+                                                    force=True))
+
+        # Try deleting a project containing a simulation
+        body = {
+            'name': 'deleteme',
+            'type': 'PyFR',
+            'steps': ['onestep']
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects', method='POST',
+                         type='application/json', body=json_body,
+                         user=self._another_user)
+        self.assertStatus(r, 201)
+        project = r.json
+
+        body = {
+            "name": "mySim",
+            "steps": {
+                "step1": {
+                    "type": "input"
+                },
+                "step2": {
+                    "type": "input"
+                },
+                "step3": {
+                    "type": "input"
+                }
+            }
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s/simulations' % str(project['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 201)
+
+        # The delete should fail
+        r = self.request('/projects/%s' % str(project['_id']), method='DELETE',
+                 type='application/json', body=json_body,
+                 user=self._another_user)
+        self.assertStatus(r, 400)
+
+    def test_get(self):
+        project1 = self._create_project('project1', self._user)
+        project2 = self._create_project('project2', self._another_user)
+
+        r = self.request('/projects/%s' % str(project2['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+        del r.json['created']
+        del r.json['updated']
+        del project2['created']
+        del project2['updated']
+        self.assertEqual(r.json, project2)
+
+        # Now try and get a project we shouldn't have access to
+        r = self.request('/projects/%s' % str(project1['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 403)
+
+    def test_share(self):
+        project1 = self._create_project('project1', self._yet_another_user)
+        project2 = self._create_project('project2', self._another_user)
+
+        r = self.request('/projects', method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(len(r.json), 1)
+        del r.json[0]['created']
+        del r.json[0]['updated']
+        del project2['created']
+        del project2['updated']
+        self.assertEqual(r.json[0], project2)
+
+        # Now share the other project
+        body = {
+            'users': [str(self._another_user['_id'])]
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s/share' % str(project1['_id']),
+                         method='PUT', type='application/json', body=json_body,
+                         user=self._yet_another_user)
+        self.assertStatus(r, 200)
+
+        # We should now have access to both projects
+        r = self.request('/projects', method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(len(r.json), 2)
+
+        # Check we have read access to the project folder
+        r = self.request('/folder/%s' % str(project1['folderId']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(r.json['_id'], project1['folderId'])
+
+        # Check that owner still has access
+        r = self.request('/projects/%s' % str(project1['_id']), method='GET',
+                 type='application/json', user=self._yet_another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(r.json['_id'], project1['_id'])
