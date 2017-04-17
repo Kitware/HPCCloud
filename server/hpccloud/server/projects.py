@@ -69,7 +69,7 @@ class Projects(Resource):
         Description('Update a project')
         .modelParam('id', 'The project to update.', model='project',
                     plugin='hpccloud', level=AccessType.WRITE)
-        .jsonParam('body', 'The properies of the project to update.',
+        .jsonParam('updates', 'The properties of the project to update.',
                    required=True, paramType='body')
     )
     @access.user
