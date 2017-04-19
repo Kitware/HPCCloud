@@ -214,12 +214,12 @@ class Simulations(Resource):
     @autoDescribeRoute(
         Description('Share a simulation with a set of users or groups')
         .modelParam('id', 'The simulation to be shared.',
-               dataType='string', required=True, paramType='path')
+                    model='simulation', plugin='hpccloud', level=AccessType.WRITE)
         .jsonParam('share', 'Array of users to share the project with.',
-               dataType='object', required=True, paramType='body')
+                   dataType='object', required=True, paramType='body')
     )
     @access.user
-    def share(self, simulation, share params):
+    def share(self, simulation, share, params):
         user = getCurrentUser()
 
         # Validate we have been given a value body
@@ -240,9 +240,9 @@ class Simulations(Resource):
         Description('Revoke permissions for asimulation given a set of users \
                     or groups')
         .modelParam('id', 'The simulation to be unshared.',
-               dataType='string', required=True, paramType='path')
+                    model='simulation', plugin='hpccloud', level=AccessType.WRITE)
         .jsonParam('share', 'Array of users to share the project with.',
-               dataType='object', required=True, paramType='body')
+                   dataType='object', required=True, paramType='body')
     )
     @access.user
     def unshare(self, simulation, share, params):
@@ -262,7 +262,7 @@ class Simulations(Resource):
 
         return self._model.unshare(user, simulation, users, groups)
 
-   @autoDescribeRoute(
+    @autoDescribeRoute(
         Description('Download all the asset associated with a simulation')
         .modelParam('id', 'The simulation to download.',
                     model='simulation', plugin='hpccloud', level=AccessType.READ)

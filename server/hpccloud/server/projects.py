@@ -129,10 +129,10 @@ class Projects(Resource):
 
     @autoDescribeRoute(
         Description('Share a give project with a set of users or groups')
-        .modelParam('id', 'The project to shared.',
+        .modelParam('id', 'The project to be shared.',
                     model='project', plugin='hpccloud', level=AccessType.WRITE)
         .jsonParam('share', 'The users and groups to share with.',
-                   dataType='SimProperties', required=True, paramType='body')
+                   dataType='ShareProperties', required=True, paramType='body')
     )
     @access.user
     def share(self, project, share, params):
@@ -155,10 +155,10 @@ class Projects(Resource):
     @autoDescribeRoute(
         Description('Revoke permissions for project given a set of users \
                     or groups')
-        .modelParam('id', 'The project to shared.',
+        .modelParam('id', 'The project to be unshared.',
                     model='project', plugin='hpccloud', level=AccessType.WRITE)
         .jsonParam('share', 'The users and groups to share with.',
-                   dataType='SimProperties', required=True, paramType='body')
+                   dataType='ShareProperties', required=True, paramType='body')
     )
     @access.user
     def unshare(self, project, share, params):
