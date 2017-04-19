@@ -413,6 +413,40 @@ class ProjectsTestCase(TestCase):
 
         # Check that owner still has access
         r = self.request('/projects/%s' % str(project1['_id']), method='GET',
-                 type='application/json', user=self._yet_another_user)
+                         type='application/json', user=self._yet_another_user)
         self.assertStatus(r, 200)
         self.assertEqual(r.json['_id'], project1['_id'])
+
+    def test_unshare(self):
+        project1 = self._create_project('project1', self._user)
+
+        # Share the project
+        body = {
+            'users': [str(self._another_user['_id']), str(self._yet_another_user['_id'])]
+        }
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s/share' % str(project1['_id']),
+                         method='PUT', type='application/json', body=json_body,
+                         user=self._user)
+        self.assertStatus(r, 200)
+
+        # revoke access to '_another_user'
+        body = {
+            'users': [str(self._another_user['_id'])]
+        }
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s/unshare' % str(project1['_id']),
+                         method='PUT', type='application/json', body=json_body,
+                         user=self._user)
+        self.assertStatus(r, 200)
+
+        # _yet_another_user still has access
+        r = self.request('/projects/%s' % str(project1['_id']), method='GET',
+                         type='application/json', user=self._yet_another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(r.json['_id'], project1['_id'])
+
+        # _another_user does not have access
+        r = self.request('/projects/%s' % str(project1['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 403)
