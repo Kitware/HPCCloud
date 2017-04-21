@@ -20,7 +20,7 @@ const SimulationEdit = React.createClass({
     error: React.PropTypes.string,
     project: React.PropTypes.object,
     simulation: React.PropTypes.object,
-
+    currentUser: React.PropTypes.string,
     onSave: React.PropTypes.func,
     onDelete: React.PropTypes.func,
     onCancel: React.PropTypes.func,
@@ -78,7 +78,10 @@ const SimulationEdit = React.createClass({
         onAction={ this.onAction }
       >
         { workflowAddOn }
-        <SharePanel shareItem={this.props.simulation} />
+        { this.props.currentUser === this.props.simulation.userId ?
+          <SharePanel shareItem={this.props.simulation} />
+          : null
+        }
       </ItemEditor>);
   },
 });
@@ -95,6 +98,7 @@ export default connect(
       project = state.projects.mapById[simulation.projectId];
     }
     return {
+      currentUser: state.auth.user._id,
       error: getNetworkError(state, ['save_simulation', `delete_simulation_${props.params.id}`]),
       project,
       simulation,
