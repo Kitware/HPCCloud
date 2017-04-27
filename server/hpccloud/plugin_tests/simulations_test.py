@@ -416,6 +416,34 @@ class SimulationTestCase(TestCase):
         files = list(self.model('item').childFiles(cloned_step1_file_item))
         self.assertEqual(len(files), 1)
 
+    def test_share(self):
+        sim = self._create_simulation(self._project1, self._user, 'sim1')
+
+        body = {
+            'users': [str(self._another_user['_id'])],
+            'groups': []
+        }
+        json_body = json.dumps(body)
+
+        # share with another_user
+        r = self.request('/simulations/%s/share' % str(sim['_id']), method='PUT',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 200)
+
+        r = self.request('/simulations/%s' % str(sim['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+
+        # revoke access
+        r = self.request('/simulations/%s/unshare' % str(sim['_id']), method='PUT',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 200)
+
+        r = self.request('/simulations/%s' % str(sim['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 403)
+
+
     def test_get_simulation_step(self):
         sim = self._create_simulation(
             self._project1, self._another_user, 'sim1')
