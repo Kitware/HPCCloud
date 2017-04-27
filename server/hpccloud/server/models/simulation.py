@@ -273,25 +273,13 @@ class Simulation(AccessControlledModel):
         return self.save(simulation)
 
     def unshare(self, sharer, simulation, users, groups):
-        access_list = simulation.get('access', {})
+        access_list = simulation.get('access', {'groups': [], 'users': []})
         users = [user for user in users if user != sharer['_id']]
 
-        # revoke users
-        for user_id in users:
-            access_object = {
-                'id': to_object_id(user_id),
-                'level': AccessType.READ
-            }
-            ind = access_list['users'].index(access_object)
-            del access_list['users'][ind]
-
-        for group_id in groups:
-            access_object = {
-                'id': to_object_id(group_id),
-                'level': AccessType.READ
-            }
-            ind = access_list['groups'].index(access_object)
-            del access_list['groups'][ind]
+        access_list['groups'] = [g for g in access_list['groups']
+                                 if str(g['id']) not in groups]
+        access_list['users'] = [u for u in access_list['users']
+                                if str(u['id']) not in users]
 
         # revoke the simulation folder
         simulation_folder = self.model('folder').load(

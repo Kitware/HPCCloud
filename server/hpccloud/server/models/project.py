@@ -211,24 +211,13 @@ class Project(AccessControlledModel):
         return self.save(project)
 
     def unshare(self, sharer, project, users, groups):
-        access_list = project['access']
+        access_list = project.get('access', {'groups': [], 'users': []})
         users = [user for user in users if user != sharer['_id']]
 
-        for user_id in users:
-            access_object = {
-                'id': to_object_id(user_id),
-                'level': AccessType.READ
-            }
-            ind = access_list['users'].index(access_object)
-            del access_list['users'][ind]
-
-        for group_id in groups:
-            access_object = {
-                'id': to_object_id(group_id),
-                'level': AccessType.READ
-            }
-            ind = access_list['groups'].index(access_object)
-            del access_list['groups'][ind]
+        access_list['groups'] = [g for g in access_list['groups']
+                                 if str(g['id']) not in groups]
+        access_list['users'] = [u for u in access_list['users']
+                                if str(u['id']) not in users]
 
         project_folder = self.model('folder').load(
             project['folderId'], user=sharer)
