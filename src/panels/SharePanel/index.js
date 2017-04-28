@@ -12,9 +12,10 @@ const SharePanel = React.createClass({
   displayName: 'SharePanel',
 
   propTypes: {
+    shareToType: React.PropTypes.oneOf(['users', 'groups']).isRequired,
+    shareItem: React.PropTypes.object.isRequired, // project or simulation object
     currentUser: React.PropTypes.object,
-    userMap: React.PropTypes.object,
-    shareItem: React.PropTypes.object, // project or simulation object
+    targetMap: React.PropTypes.object,
     onMount: React.PropTypes.func,
     shareProject: React.PropTypes.func,
     shareSimulation: React.PropTypes.func,
@@ -23,15 +24,14 @@ const SharePanel = React.createClass({
   },
 
   getDefaultProps() {
-    return { userMap: {} };
+    return { targetMap: {} };
   },
 
   getInitialState() {
     return {
-      shareUsers: [],
-      unShareUsers: [],
-      shareGroups: [],
-      unShareGroups: [] };
+      shareIds: [],
+      unShareIds: [],
+    };
   },
 
   componentDidMount() {
@@ -51,17 +51,27 @@ const SharePanel = React.createClass({
   },
 
   shareAction(e) {
-    if (this.props.shareItem.projectId) {
-      this.props.shareSimulation(this.props.shareItem,
-        this.state.shareUsers, this.state.shareGroups);
+    let shareIds;
+    if (this.props.shareToType === 'users') {
+      shareIds = [this.state.shareIds, []];
     } else {
-      this.props.shareProject(this.props.shareItem,
-        this.state.shareUsers, this.state.shareGroups);
+      shareIds = [[], this.state.shareIds];
     }
-    this.setState({ shareUsers: [], shareGroups: [] });
+    if (this.props.shareItem.projectId) {
+      this.props.shareSimulation(this.props.shareItem, ...shareIds);
+    } else {
+      this.props.shareProject(this.props.shareItem, ...shareIds);
+    }
+    this.setState({ shareIds: [] });
   },
 
   unShareAction(e) {
+    let shareIds;
+    if (this.props.shareToType === 'users') {
+      shareIds = [this.state.shareIds, []];
+    } else {
+      shareIds = [[], this.state.shareIds];
+    }
     if (this.state.unShareUsers.indexOf(this.props.shareItem.userId) !== -1) {
       console.log('Cannot remove the owner from their own project.');
       return;
@@ -73,47 +83,45 @@ const SharePanel = React.createClass({
     }
 
     if (this.props.shareItem.projectId) {
-      this.props.unShareSimulation(this.props.shareItem,
-        this.state.unShareUsers, this.state.unShareGroups);
+      this.props.unShareSimulation(this.props.shareItem, ...shareIds);
     } else {
-      this.props.unShareProject(this.props.shareItem,
-        this.state.unShareUsers, this.state.unShareGroups);
+      this.props.unShareProject(this.props.shareItem, ...shareIds);
     }
-    this.setState({ unShareUsers: [], unShareGroups: [] });
+    this.setState({ unShareIds: [] });
   },
 
   render() {
-    const hasUsers = Object.keys(this.props.userMap).length;
+    const hasUsers = Object.keys(this.props.targetMap).length;
     const projectUsers = this.props.shareItem.access.users.reduce((prev, cur) => prev.concat([cur.id]), []);
     return (<div>
         <div className={style.group}>
-          <label className={style.label}>User Access</label>
+          <label className={style.label}>{ this.props.shareToType === 'users' ? 'User Access' : 'Groups Access'}</label>
           <section className={style.splitView}>
             <div className={style.splitViewItem}>
-              <select multiple data-which="shareUsers" className={style.input}
-                onChange={this.handleChange} value={this.state.shareUsers}
+              <select multiple data-which="shareIds" className={style.input}
+                onChange={this.handleChange} value={this.state.shareIds}
               >
-                { Object.keys(this.props.userMap).filter((userId) => projectUsers.indexOf(userId) === -1)
-                  .map((userId, i) => <option key={`${userId}_${i}`} value={userId}>{ hasUsers ? this.props.userMap[userId].login : '' }</option>)
+                { Object.keys(this.props.targetMap).filter((userId) => projectUsers.indexOf(userId) === -1)
+                  .map((userId, i) => <option key={`${userId}_${i}`} value={userId}>{ hasUsers ? this.props.targetMap[userId].login : '' }</option>)
                 }
               </select>
               <button onClick={this.shareAction}
-                disabled={!this.state.shareUsers.length}
+                disabled={!this.state.shareIds.length}
                 className={style.shareButton}>
                 Add
               </button>
             </div>
             <div className={style.splitViewItem}>
-              <select multiple data-which="unShareUsers" className={style.input}
-                onChange={this.handleChange} value={this.state.unShareUsers}
+              <select multiple data-which="unShareIds" className={style.input}
+                onChange={this.handleChange} value={this.state.unShareIds}
               >
                 { projectUsers.map((_id, i) => {
-                  const name = hasUsers ? this.props.userMap[_id].login : '';
+                  const name = hasUsers ? this.props.targetMap[_id].login : '';
                   return <option key={`${_id}_${i}`} value={_id}>{ name }</option>;
                 }) }
               </select>
               <button onClick={this.unShareAction}
-                disabled={!this.state.unShareUsers.length}
+                disabled={!this.state.unShareIds.length}
                 className={style.shareButton}>
                 Remove
               </button>
@@ -126,12 +134,15 @@ const SharePanel = React.createClass({
 
 
 export default connect(
-  (state, props) => ({
-    currentUser: state.auth.user,
-    userMap: state.auth.userMap,
-  }),
+  (state, props) => {
+    return {
+      currentUser: state.auth.user,
+      targetMap: this.props.shareToType === 'users' ? state.auth.userMap : state.groups.mapById,
+    };
+  },
   () => ({
-    onMount: () => dispatch(AuthActions.getUsers()),
+    fetchUsers: () => dispatch(AuthActions.getUsers()),
+    fetchGroups: () => dispatch(GroupActions.getGroups()),
     shareProject: (simulation, users, groups) => dispatch(ProjActions.shareProject(simulation, users, groups)),
     shareSimulation: (simulation, users, groups) => dispatch(ProjActions.shareSimulation(simulation, users, groups)),
     unShareProject: (project, users, groups) => dispatch(ProjActions.unShareProject(project, users, groups)),
