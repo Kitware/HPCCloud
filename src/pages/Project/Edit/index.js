@@ -85,7 +85,7 @@ const ProjectEdit = React.createClass({
 export default connect(
   (state, props) => {
     return {
-      currentUser: state.auth.user._id,
+      currentUser: state.auth.user ? state.auth.user._id : '',
       project: state.projects.mapById[props.params.id],
       error: getNetworkError(state, ['save_project', 'delete_project', 'share_project', 'unshare_project']),
     };

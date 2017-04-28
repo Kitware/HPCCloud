@@ -36,8 +36,8 @@ export default function ({ client, filterQuery, mustContain, busy }) {
       return busy(client._.delete(`/projects/${id}`));
     },
 
-    shareProject(_id, users, groups) {
-      return busy(client._.put(`/projects/${_id}/share`, { users, groups }));
+    shareProject(_id, users, groups, flags = []) {
+      return busy(client._.put(`/projects/${_id}/share`, { users, groups, flags }));
     },
 
     unshareProject(_id, users, groups) {

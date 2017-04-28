@@ -2,6 +2,7 @@ import React from 'react';
 
 import * as ProjActions from '../../redux/actions/projects';
 import * as AuthActions from '../../redux/actions/user';
+import * as GroupActions from '../../redux/actions/groups';
 
 import { connect }  from 'react-redux';
 import { dispatch } from '../../redux';
@@ -16,7 +17,8 @@ const SharePanel = React.createClass({
     shareItem: React.PropTypes.object.isRequired, // project or simulation object
     currentUser: React.PropTypes.object,
     targetMap: React.PropTypes.object,
-    onMount: React.PropTypes.func,
+    fetchUsers: React.PropTypes.func,
+    fetchGroups: React.PropTypes.func,
     shareProject: React.PropTypes.func,
     shareSimulation: React.PropTypes.func,
     unShareProject: React.PropTypes.func,
@@ -35,7 +37,11 @@ const SharePanel = React.createClass({
   },
 
   componentDidMount() {
-    this.props.onMount();
+    if (this.props.shareToType === 'users') {
+      this.props.fetchUsers();
+    } else {
+      this.props.fetchGroups();
+    }
   },
 
   handleChange(e) {
@@ -91,8 +97,9 @@ const SharePanel = React.createClass({
   },
 
   render() {
-    const hasUsers = Object.keys(this.props.targetMap).length;
-    const projectUsers = this.props.shareItem.access.users.reduce((prev, cur) => prev.concat([cur.id]), []);
+    const hasContents = Object.keys(this.props.targetMap).length;
+    const targetKey = this.props.shareToType === 'users' ? 'login' : 'name';
+    const targetMembers = this.props.shareItem.access[this.props.shareToType].reduce((prev, cur) => prev.concat([cur.id]), []);
     return (<div>
         <div className={style.group}>
           <label className={style.label}>{ this.props.shareToType === 'users' ? 'User Access' : 'Groups Access'}</label>
@@ -101,8 +108,8 @@ const SharePanel = React.createClass({
               <select multiple data-which="shareIds" className={style.input}
                 onChange={this.handleChange} value={this.state.shareIds}
               >
-                { Object.keys(this.props.targetMap).filter((userId) => projectUsers.indexOf(userId) === -1)
-                  .map((userId, i) => <option key={`${userId}_${i}`} value={userId}>{ hasUsers ? this.props.targetMap[userId].login : '' }</option>)
+                { Object.keys(this.props.targetMap).filter((fId) => targetMembers.indexOf(fId) === -1)
+                  .map((_id, i) => <option key={`${_id}_${i}`} value={_id}>{ hasContents ? this.props.targetMap[_id][targetKey] : '' }</option>)
                 }
               </select>
               <button onClick={this.shareAction}
@@ -115,8 +122,8 @@ const SharePanel = React.createClass({
               <select multiple data-which="unShareIds" className={style.input}
                 onChange={this.handleChange} value={this.state.unShareIds}
               >
-                { projectUsers.map((_id, i) => {
-                  const name = hasUsers ? this.props.targetMap[_id].login : '';
+                { targetMembers.map((_id, i) => {
+                  const name = hasContents ? this.props.targetMap[_id][targetKey] : '';
                   return <option key={`${_id}_${i}`} value={_id}>{ name }</option>;
                 }) }
               </select>
@@ -134,12 +141,10 @@ const SharePanel = React.createClass({
 
 
 export default connect(
-  (state, props) => {
-    return {
-      currentUser: state.auth.user,
-      targetMap: this.props.shareToType === 'users' ? state.auth.userMap : state.groups.mapById,
-    };
-  },
+  (state, props) => ({
+    currentUser: state.auth.user,
+    targetMap: props.shareToType === 'users' ? state.auth.userMap : state.groups.mapById,
+  }),
   () => ({
     fetchUsers: () => dispatch(AuthActions.getUsers()),
     fetchGroups: () => dispatch(GroupActions.getGroups()),

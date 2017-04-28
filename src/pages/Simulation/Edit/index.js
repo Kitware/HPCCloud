@@ -79,7 +79,10 @@ const SimulationEdit = React.createClass({
       >
         { workflowAddOn }
         { this.props.currentUser === this.props.simulation.userId ?
-          <SharePanel shareItem={this.props.simulation} />
+          <div>
+            <SharePanel shareItem={this.props.simulation} shareToType="users" />
+            <SharePanel shareItem={this.props.simulation} shareToType="groups" />
+          </div>
           : null
         }
       </ItemEditor>);

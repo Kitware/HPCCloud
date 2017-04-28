@@ -233,8 +233,9 @@ class Simulations(Resource):
 
         users = share.get('users', [])
         groups = share.get('groups', [])
+        flags = share.get('flags', [])
 
-        return self._model.share(user, simulation, users, groups)
+        return self._model.share(user, simulation, users, groups, flags=flags)
 
     @autoDescribeRoute(
         Description('Revoke permissions for asimulation given a set of users \

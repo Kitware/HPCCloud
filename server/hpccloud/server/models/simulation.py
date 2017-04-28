@@ -236,7 +236,7 @@ class Simulation(AccessControlledModel):
 
         return cloned_simulations
 
-    def share(self, sharer, simulation, users, groups):
+    def share(self, sharer, simulation, users, groups, flags=[]):
         """
         Share a simulation.
 
@@ -253,14 +253,16 @@ class Simulation(AccessControlledModel):
         for user_id in users:
             access_object = {
                 'id': to_object_id(user_id),
-                'level': AccessType.READ
+                'level': AccessType.READ,
+                'flags': flags
             }
             access_list['users'].append(access_object)
 
         for group_id in groups:
             access_object = {
                 'id': to_object_id(group_id),
-                'level': AccessType.READ
+                'level': AccessType.READ,
+                'flags': flags
             }
             access_list['groups'].append(access_object)
 
