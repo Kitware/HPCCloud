@@ -154,7 +154,7 @@ class Project(AccessControlledModel):
 
         super(Project, self).remove(project)
 
-    def share(self, sharer, project, users, groups):
+    def share(self, sharer, project, users, groups, flags=[]):
         """
         Share a give project.
         :param sharer: The user sharing the project
@@ -171,14 +171,16 @@ class Project(AccessControlledModel):
         for user_id in users:
             access_object = {
                 'id': to_object_id(user_id),
-                'level': AccessType.READ
+                'level': AccessType.READ,
+                'flags': flags
             }
             access_list['users'].append(access_object)
 
         for group_id in groups:
             access_object = {
                 'id': to_object_id(group_id),
-                'level': AccessType.READ
+                'level': AccessType.READ,
+                'flags': flags
             }
             access_list['groups'].append(access_object)
 
@@ -204,7 +206,7 @@ class Project(AccessControlledModel):
         sims = self.model('simulation', 'hpccloud').find(query=query)
         for sim in sims:
             self.model('simulation', 'hpccloud').share(
-                sharer, sim, users, groups)
+                sharer, sim, users, groups, flags)
 
         project['updated'] = datetime.datetime.utcnow()
 

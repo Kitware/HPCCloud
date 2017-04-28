@@ -106,10 +106,10 @@ export function updateProject(project) {
   return { type: UPDATE_PROJECT, project };
 }
 
-export function shareProject(project, users, groups) {
+export function shareProject(project, users, groups, flags = []) {
   return (dispatch) => {
     const action = netActions.addNetworkCall('share_project', `Share project users: ${users}\ngroups: ${groups}`);
-    client.shareProject(project._id, users, groups)
+    client.shareProject(project._id, users, groups, flags)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateProject(resp.data));
@@ -163,26 +163,27 @@ export function unShareProject(project, users, groups) {
 export function saveProject(project, attachments) {
   return (dispatch) => {
     const action = netActions.addNetworkCall('save_project', `Save project ${project.name}`);
-
     if (attachments && Object.keys(attachments).length) {
       dispatch(netActions.prepareUpload(attachments));
     }
 
+    let fullProject;
     ProjectHelper.saveProject(project, attachments)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         const respWithProj = Array.isArray(resp) ? resp[resp.length - 1] : resp;
         dispatch(updateProject(respWithProj.data));
+        fullProject = respWithProj.data;
         if (attachments && Object.keys(attachments).length) {
           setTimeout(() => { dispatch(router.push(`/View/Project/${respWithProj.data._id}`)); }, 1500);
         } else {
           dispatch(router.push(`/View/Project/${respWithProj.data._id}`));
         }
         return client.createGroup({ name: `${project.name} group`,
-          description: `Group for the project ${project.name}`, public: false });
+          description: `Group for the project '${project.name}'`, public: false });
       })
       .then((resp) => {
-        dispatch(shareProject(project, [], resp.data));
+        dispatch(shareProject(fullProject, [], [resp.data._id], ['execute']));
       })
       .catch((error) => {
         dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
