@@ -68,7 +68,10 @@ const ProjectEdit = React.createClass({
       >
         { workflowAddOn }
         { this.props.currentUser === this.props.project.userId ?
-          <SharePanel shareItem={this.props.project} />
+          <div>
+            <SharePanel shareItem={this.props.project} shareToType="users" />
+            <SharePanel shareItem={this.props.project} shareToType="groups" />
+          </div>
           : null
         }
       </ItemEditor>);

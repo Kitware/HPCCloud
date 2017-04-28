@@ -106,34 +106,6 @@ export function updateProject(project) {
   return { type: UPDATE_PROJECT, project };
 }
 
-export function saveProject(project, attachments) {
-  return (dispatch) => {
-    const action = netActions.addNetworkCall('save_project', `Save project ${project.name}`);
-
-    if (attachments && Object.keys(attachments).length) {
-      dispatch(netActions.prepareUpload(attachments));
-    }
-
-    ProjectHelper.saveProject(project, attachments)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          const respWithProj = Array.isArray(resp) ? resp[resp.length - 1] : resp;
-          dispatch(updateProject(respWithProj.data));
-          if (attachments && Object.keys(attachments).length) {
-            setTimeout(() => { dispatch(router.push(`/View/Project/${respWithProj.data._id}`)); }, 1500);
-          } else {
-            dispatch(router.push(`/View/Project/${respWithProj.data._id}`));
-          }
-        },
-        (error) => {
-          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
-        });
-
-    return action;
-  };
-}
-
 export function shareProject(project, users, groups) {
   return (dispatch) => {
     const action = netActions.addNetworkCall('share_project', `Share project users: ${users}\ngroups: ${groups}`);
@@ -184,6 +156,38 @@ export function unShareProject(project, users, groups) {
       .catch((error) => {
         dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
       });
+    return action;
+  };
+}
+
+export function saveProject(project, attachments) {
+  return (dispatch) => {
+    const action = netActions.addNetworkCall('save_project', `Save project ${project.name}`);
+
+    if (attachments && Object.keys(attachments).length) {
+      dispatch(netActions.prepareUpload(attachments));
+    }
+
+    ProjectHelper.saveProject(project, attachments)
+      .then((resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        const respWithProj = Array.isArray(resp) ? resp[resp.length - 1] : resp;
+        dispatch(updateProject(respWithProj.data));
+        if (attachments && Object.keys(attachments).length) {
+          setTimeout(() => { dispatch(router.push(`/View/Project/${respWithProj.data._id}`)); }, 1500);
+        } else {
+          dispatch(router.push(`/View/Project/${respWithProj.data._id}`));
+        }
+        return client.createGroup({ name: `${project.name} group`,
+          description: `Group for the project ${project.name}`, public: false });
+      })
+      .then((resp) => {
+        dispatch(shareProject(project, [], resp.data));
+      })
+      .catch((error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
+      });
+
     return action;
   };
 }
