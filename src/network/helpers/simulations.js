@@ -1,5 +1,6 @@
 import girder from '../';
 import { invalidateSimulation } from './notifications';
+import { userHasAccess } from '../../utils/AccessHelper';
 
 function createItemForSimulation(simulation, name, file) {
   return girder.createItem(simulation.metadata.inputFolder._id, name)
@@ -125,7 +126,7 @@ export function saveSimulation(simulation_, attachments) {
   return girder.editSimulation(simulation);
 }
 
-export function activateSimulationStep(simulation, active, disabled) {
+export function activateSimulationStep(user, simulation, active, disabled) {
   // Update local data
   simulation.active = active;
 
@@ -138,5 +139,12 @@ export function activateSimulationStep(simulation, active, disabled) {
   }
   invalidateSimulation(simulation);
 
-  return girder.editSimulation(simulation);
+  if (userHasAccess(user, simulation.access, 'WRITE')) {
+    return girder.editSimulation(simulation);
+  }
+
+  return new Promise((res, rej) => {
+    console.warn('User does not have sufficient access to update step on server');
+    res();
+  });
 }
