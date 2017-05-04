@@ -24,6 +24,7 @@ const SimulationView = React.createClass({
     project: React.PropTypes.object,
     onMount: React.PropTypes.func,
     fetchClusters: React.PropTypes.func,
+    user: React.PropTypes.object,
   },
 
   getDefaultProps() {
@@ -57,7 +58,7 @@ const SimulationView = React.createClass({
       return <LoadingPanel />;
     }
 
-    const { project, simulation } = this.props;
+    const { project, simulation, user } = this.props;
     const wfModule = Workflows[project.type];
     const step = this.props.params.step || simulation.active || wfModule.steps._order[0];
     const taskFlowName = wfModule.taskFlows && wfModule.taskFlows[step] ? wfModule.taskFlows[step] : null;
@@ -84,6 +85,7 @@ const SimulationView = React.createClass({
             primaryJob={primaryJob}
             location={this.props.location}
             module={wfModule}
+            user={user}
           />
         </div>);
     }
@@ -104,6 +106,7 @@ export default connect(
     return {
       project,
       simulation,
+      user: state.auth.user,
     };
   },
   () => {
