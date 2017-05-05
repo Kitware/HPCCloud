@@ -94,7 +94,7 @@ export default class JobSubmission extends React.Component {
         const volumeSize = this.state.EC2.volumeSize;
         const volumeName = this.state.EC2.volumeName.trim();
         try {
-          if (volumeNames.includes(volumeName)) {
+          if (volumeNames.indexOf(volumeName) !== -1) {
             throw Error(`A volume with the name '${volumeName}' already exists`);
           } else if (volumeSize <= 0) {
             throw Error('Volume size must be greater than zero');

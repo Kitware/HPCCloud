@@ -14,7 +14,7 @@ function ec2ClusterPayload(name, machine, clusterSize = 1, profileId, clusterNam
     throw Error('Missing required field: "machine"');
   } else if (typeof profileId === 'undefined') {
     throw Error('Missing required field: "profileId"');
-  } else if (clusterNames.includes(name.trim())) {
+  } else if (clusterNames.indexOf(name.trim()) !== -1) {
     throw Error('An EC2 instance with this name already exists');
   }
 
