@@ -149,9 +149,8 @@ class Projects(Resource):
 
         users = share.get('users', [])
         groups = share.get('groups', [])
-        flags = share.get('flags', [])
 
-        return self._model.share(user, project, users, groups, flags=flags)
+        return self._model.share(user, project, users, groups)
 
     @autoDescribeRoute(
         Description('Revoke permissions for project given a set of users \

@@ -43,8 +43,8 @@ export default function ({ client, filterQuery, mustContain, busy }) {
       }));
     },
 
-    shareSimulation(_id, users, groups, flags = []) {
-      return busy(client._.put(`/simulations/${_id}/share`, { users, groups, flags }));
+    shareSimulation(_id, users, groups) {
+      return busy(client._.put(`/simulations/${_id}/share`, { users, groups }));
     },
 
     unshareSimulation(_id, users, groups) {
