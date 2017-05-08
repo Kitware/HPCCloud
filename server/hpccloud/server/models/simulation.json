@@ -66,12 +66,6 @@
                 },
                 "groups": {
                     "$ref": "#/arrayOfIds"
-                },
-                "flags": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
                 }
             },
             "additionalProperties": false
