@@ -217,7 +217,7 @@ export default React.createClass({
             data-key="volume" disabled={this.props.contents.cluster}
           >
             <option value={null}></option>
-            {this.state.volumes.filter(el => (el.status === 'created' || el.status === 'detached'))
+            {this.state.volumes.filter(el => (el.status === 'created' || el.status === 'available'))
               .map((el, index) => <option key={el._id} value={el._id}>{el.name}</option>)}
           </select>
         </section>
