@@ -23,20 +23,6 @@
     composes: form-control from 'bootstrap/dist/css/bootstrap.css';
 }
 
-.splitView {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  flex: 1;
-}
-
-.splitViewItem {
-  flex: 0.5;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
 textarea.input {
     resize: none;
 }
@@ -90,4 +76,45 @@ textarea.input {
 
 .hidden {
   display: none;
+}
+
+/* Share/Permission Panel styles */
+
+.splitView {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex: 1;
+}
+
+.splitViewItem {
+  flex: 0.5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.permissionPanelContainer {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  width: 99.5%;
+  padding: 6px 12px;
+  line-height: 1.42857143;
+  height: 82px;
+}
+
+.ppRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.selected .ppRowSelect {
+  color: black;
+}
+
+.selected {
+  background-color: rgb(0, 105, 217);
+  color: white;
 }

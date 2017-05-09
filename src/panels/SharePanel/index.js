@@ -1,4 +1,5 @@
 import React from 'react';
+import PermissionPanel from './PermissionPanel';
 
 import * as ProjActions from '../../redux/actions/projects';
 import * as AuthActions from '../../redux/actions/user';
@@ -45,15 +46,23 @@ const SharePanel = React.createClass({
   },
 
   handleChange(e) {
-    const which = e.target.dataset.which;
-    const options = e.target.options;
-    const values = [];
-    for (let i = 0, l = options.length; i < l; i++) {
-      if (options[i].selected) {
-        values.push(options[i].value);
+    // DOM event
+    if (e.target) {
+      const which = e.target.dataset.which;
+      const options = e.target.options;
+      const values = [];
+      for (let i = 0, l = options.length; i < l; i++) {
+        if (options[i].selected) {
+          values.push(options[i].value);
+        }
       }
+      this.setState({ [which]: values });
+    // permission panel event
+    } else {
+      const which = e.which;
+      const selected = e.selected;
+      this.setState({ [which]: selected });
     }
-    this.setState({ [which]: values });
   },
 
   shareAction(e) {
@@ -119,14 +128,11 @@ const SharePanel = React.createClass({
               </button>
             </div>
             <div className={style.splitViewItem}>
-              <select multiple data-which="unShareIds" className={style.input}
-                onChange={this.handleChange} value={this.state.unShareIds}
-              >
-                { targetMembers.map((_id, i) => {
-                  const name = hasContents ? this.props.targetMap[_id][targetKey] : '';
-                  return <option key={`${_id}_${i}`} value={_id}>{ name }</option>;
-                }) }
-              </select>
+              <PermissionPanel className={style.splitViewItem}
+                shareType={this.props.shareToType}
+                items={targetMembers.map(el => this.props.targetMap[el])}
+                selected={this.state.unShareIds} onSelect={this.handleChange}
+              />
               <button onClick={this.unShareAction}
                 disabled={!this.state.unShareIds.length}
                 className={style.shareButton}>
