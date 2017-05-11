@@ -109,7 +109,7 @@ export function updateProject(project) {
 export function shareProject(project, users, groups) {
   return (dispatch) => {
     const action = netActions.addNetworkCall('share_project', `Share project users: ${users}\ngroups: ${groups}`);
-    client.shareProject(project._id, users, groups)
+    client.patchProjectAccess(project._id, users, groups)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateProject(resp.data));
@@ -136,7 +136,7 @@ export function shareProject(project, users, groups) {
 export function unShareProject(project, users, groups) {
   return (dispatch) => {
     const action = netActions.addNetworkCall('unshare_project', `Unshare project users: ${users}\ngroups: ${groups}`);
-    client.unshareProject(project._id, users, groups)
+    client.revokeProjectAccess(project._id, users, groups)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateProject(resp.data));
@@ -314,7 +314,7 @@ export function updateSimulationStep(id, stepName, data, location) {
 export function shareSimulation(simulation, users, groups) {
   return (dispatch) => {
     const action = netActions.addNetworkCall('share_simulation', `Share simulation users: ${users}\ngroups: ${groups}`);
-    client.shareSimulation(simulation._id, users, groups)
+    client.patchSimulationAccess(simulation._id, users, groups)
       .then(
         (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -337,7 +337,7 @@ export function shareSimulation(simulation, users, groups) {
 export function unShareSimulation(simulation, users, groups) {
   return (dispatch) => {
     const action = netActions.addNetworkCall('unshare_simulation', `Share simulation users: ${users}\ngroups: ${groups}`);
-    client.unshareSimulation(simulation._id, users, groups)
+    client.revokeSimulationAccess(simulation._id, users, groups)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateSimulation(resp.data));
