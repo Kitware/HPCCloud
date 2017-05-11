@@ -36,12 +36,20 @@ export default function ({ client, filterQuery, mustContain, busy }) {
       return busy(client._.delete(`/projects/${id}`));
     },
 
-    shareProject(_id, users, groups) {
-      return busy(client._.put(`/projects/${_id}/share`, { users, groups }));
+    getAccess(_id) {
+      return busy(client._.get(`/projects/${_id}/access`));
     },
 
-    unshareProject(_id, users, groups) {
-      return busy(client._.put(`/projects/${_id}/unshare`, { users, groups }));
+    setAccess(_id, users, groups, level, flags = []) {
+      return busy(client._.put(`/projects/${_id}/access`, { users, groups, level, flags }));
+    },
+
+    patchAccess(_id, users, groups, level, flags = []) {
+      return busy(client._.patch(`/projects/${_id}/access`, { users, groups, level, flags }));
+    },
+
+    revokeSimulation(_id, users, groups) {
+      return busy(client._.delete(`/projects/${_id}/access`, { users, groups }));
     },
 
     // List all the simulations associated with a project

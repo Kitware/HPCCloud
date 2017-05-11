@@ -26,7 +26,7 @@ from girder.models.model_base import AccessControlledModel, ValidationException
 from girder.constants import AccessType
 
 from ..utility import to_object_id, get_simulations_folder, share_folder, \
-    unshare_folder
+    unshare_folder, merge_access
 from . import schema
 
 
@@ -236,7 +236,8 @@ class Simulation(AccessControlledModel):
 
         return cloned_simulations
 
-    def share(self, sharer, simulation, users, groups):
+    def set_access(self, sharer, simulation, users, groups,
+                   level=AccessType.READ, flags=[]):
         """
         Share a simulation.
 
@@ -245,24 +246,21 @@ class Simulation(AccessControlledModel):
         :param users: The users to share with.
         :param groups: The groups to share with.
         """
-        access_list = simulation.get('access', {})
-        access_list['users'] = [user for user in access_list.get('users', [])
-                                if user != sharer['_id']]
-        access_list['groups'] = []
+        access_list = {'groups': [], 'users': []}
 
         for user_id in users:
             access_object = {
                 'id': to_object_id(user_id),
-                'level': AccessType.READ,
-                'flags': []
+                'level': level,
+                'flags': flags
             }
             access_list['users'].append(access_object)
 
         for group_id in groups:
             access_object = {
                 'id': to_object_id(group_id),
-                'level': AccessType.READ,
-                'flags': []
+                'level': level,
+                'flags': flags
             }
             access_list['groups'].append(access_object)
 
@@ -274,7 +272,20 @@ class Simulation(AccessControlledModel):
 
         return self.save(simulation)
 
-    def unshare(self, sharer, simulation, users, groups):
+    def patch_access(self, sharer, simulation, users, groups,
+                     level=AccessType.READ, flags=[]):
+        access_list = simulation.get('access', {'groups': [], 'users': []})
+
+        new_users = merge_access(access_list['users'], users, level, flags)
+        new_groups = merge_access(access_list['groups'], groups, level, flags)
+
+        simulation_folder = self.model('folder').load(
+            simulation['folderId'], user=sharer)
+        share_folder(sharer, simulation_folder, new_users, new_groups)
+
+        return self.save(simulation)
+
+    def revoke_access(self, sharer, simulation, users, groups):
         access_list = simulation.get('access', {'groups': [], 'users': []})
         users = [user for user in users if user != sharer['_id']]
 

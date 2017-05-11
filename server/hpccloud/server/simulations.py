@@ -43,8 +43,10 @@ class Simulations(Resource):
         self.route('GET', (':id', 'steps', ':stepName'), self.get_step)
         self.route('PATCH', (':id', 'steps', ':stepName'), self.update_step)
         self.route('GET', (':id', 'download'), self.download)
-        self.route('PUT', (':id', 'share'), self.share)
-        self.route('PUT', (':id', 'unshare'), self.unshare)
+        self.route('GET', (':id', 'access'), self.get_access)
+        self.route('PUT', (':id', 'access'), self.set_access)
+        self.route('PATCH', (':id', 'access'), self.patch_access)
+        self.route('DELETE', (':id', 'access'), self.revoke_access)
 
         self._model = self.model('simulation', 'hpccloud')
 
@@ -212,14 +214,23 @@ class Simulations(Resource):
             user, simulation, stepName, status, metadata, export, view)
 
     @autoDescribeRoute(
+        Description('Get access object of simulation')
+        .modelParam('id', 'id of the simulation', model='simulation',
+                    plugin='hpccloud', level=AccessType.WRITE)
+    )
+    @access.user
+    def get_access(self, simulation):
+        return simulation.get('access', {'groups': [], 'users': []})
+
+    @autoDescribeRoute(
         Description('Share a simulation with a set of users or groups')
-        .modelParam('id', 'The simulation to be shared.',
-                    model='simulation', plugin='hpccloud', level=AccessType.WRITE)
+        .modelParam('id', 'The simulation to be shared.', model='simulation',
+                    plugin='hpccloud', level=AccessType.WRITE)
         .jsonParam('share', 'Array of users to share the project with.',
                    dataType='object', required=True, paramType='body')
     )
     @access.user
-    def share(self, simulation, share, params):
+    def set_access(self, simulation, share, params):
         user = getCurrentUser()
 
         # Validate we have been given a value body
@@ -234,18 +245,43 @@ class Simulations(Resource):
         users = share.get('users', [])
         groups = share.get('groups', [])
 
-        return self._model.share(user, simulation, users, groups)
+        return self._model.set_access(user, simulation, users, groups)
+
+    @autoDescribeRoute(
+        Description('Share a simulation with a set of users or groups')
+        .modelParam('id', 'The simulation to be shared.', model='simulation',
+                    plugin='hpccloud', level=AccessType.WRITE)
+        .jsonParam('share', 'Array of users to share the project with.',
+                   dataType='object', required=True, paramType='body')
+    )
+    @access.user
+    def patch_access(self, simulation, share, params):
+        user = getCurrentUser()
+
+        # Validate we have been given a value body
+        try:
+            ref_resolver = jsonschema.RefResolver.from_schema(
+                schema.definitions)
+            jsonschema.validate(share, schema.simulation['definitions']['share'],
+                                resolver=ref_resolver)
+        except jsonschema.ValidationError as ve:
+            raise RestException(ve.message, 400)
+
+        users = share.get('users', [])
+        groups = share.get('groups', [])
+
+        return self._model.patch_access(user, simulation, users, groups)
 
     @autoDescribeRoute(
         Description('Revoke permissions for asimulation given a set of users \
                     or groups')
-        .modelParam('id', 'The simulation to be unshared.',
-                    model='simulation', plugin='hpccloud', level=AccessType.WRITE)
+        .modelParam('id', 'The simulation to be unshared.', model='simulation',
+                    plugin='hpccloud', level=AccessType.WRITE)
         .jsonParam('share', 'Array of users to share the project with.',
                    dataType='object', required=True, paramType='body')
     )
     @access.user
-    def unshare(self, simulation, share, params):
+    def revoke_access(self, simulation, share, params):
         user = getCurrentUser()
 
         # Validate we have been given a value body
@@ -260,7 +296,7 @@ class Simulations(Resource):
         users = share.get('users', [])
         groups = share.get('groups', [])
 
-        return self._model.unshare(user, simulation, users, groups)
+        return self._model.revoke_access(user, simulation, users, groups)
 
     @autoDescribeRoute(
         Description('Download all the asset associated with a simulation')

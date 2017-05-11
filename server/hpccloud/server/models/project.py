@@ -27,7 +27,7 @@ from girder.api.rest import getCurrentUser
 from . import schema
 
 from ..utility import get_hpccloud_folder, to_object_id, \
-    get_simulations_folder, share_folder, unshare_folder
+    get_simulations_folder, share_folder, unshare_folder, merge_access
 
 from ..constants import SIMULATIONS_FOLDER
 
@@ -154,7 +154,8 @@ class Project(AccessControlledModel):
 
         super(Project, self).remove(project)
 
-    def share(self, sharer, project, users, groups):
+    def set_access(self, sharer, project, users, groups,
+                   level=AccessType.READ, flags=[]):
         """
         Share a give project.
         :param sharer: The user sharing the project
@@ -163,10 +164,7 @@ class Project(AccessControlledModel):
         :param groups: The groups to share the project with.
         """
 
-        access_list = project['access']
-        access_list['users'] \
-            = [user for user in access_list['users'] if user != sharer['_id']]
-        access_list['groups'] = []
+        access_list = {'users': [], 'groups': []}
 
         for user_id in users:
             access_object = {
@@ -205,14 +203,27 @@ class Project(AccessControlledModel):
         }
         sims = self.model('simulation', 'hpccloud').find(query=query)
         for sim in sims:
-            self.model('simulation', 'hpccloud').share(
+            self.model('simulation', 'hpccloud').set_access(
                 sharer, sim, users, groups)
 
         project['updated'] = datetime.datetime.utcnow()
 
         return self.save(project)
 
-    def unshare(self, sharer, project, users, groups):
+    def patch_access(self, sharer, project, users, groups,
+                     level=AccessType.READ, flags=[]):
+        access_list = project.get('access', {'groups': [], 'users': []})
+
+        new_users = merge_access(access_list['users'], users, level, flags)
+        new_groups = merge_access(access_list['groups'], groups, level, flags)
+
+        project_folder = self.model('folder').load(
+            project['folderId'], user=sharer)
+        share_folder(sharer, project_folder, new_users, new_groups)
+
+        return self.save(project)
+
+    def revoke_access(self, sharer, project, users, groups):
         access_list = project.get('access', {'groups': [], 'users': []})
         users = [user for user in users if user != sharer['_id']]
 
@@ -237,7 +248,7 @@ class Project(AccessControlledModel):
         }
         sims = self.model('simulation', 'hpccloud').find(query=query)
         for sim in sims:
-            self.model('simulation', 'hpccloud').unshare(
+            self.model('simulation', 'hpccloud').revoke_access(
                 sharer, sim, users, groups)
 
         project['updated'] = datetime.datetime.utcnow()

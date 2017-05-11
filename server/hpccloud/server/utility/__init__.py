@@ -101,9 +101,7 @@ def to_object_id(id):
 def share_folder(owner, folder, users, groups, level=AccessType.READ,
                  recurse=False):
     folder_access_list = folder['access']
-    folder_access_list['users'] \
-        = [user for user in folder_access_list['users']
-           if user != owner['_id']]
+    folder_access_list['users'] = []
     folder_access_list['groups'] = []
 
     for user_id in users:
@@ -151,6 +149,29 @@ def unshare_folder(owner, folder, users, groups, recurse=False):
 
     return ModelImporter.model('folder').setAccessList(
         folder, folder_access_list, save=True, recurse=recurse, user=owner)
+
+
+def merge_access(target, members, level, flags):
+    new_members = []
+    member_ids = [item['id'] for item in target]
+    for member_id in members:
+        # append member not in the target
+        if member_id not in member_ids:
+            access_object = {
+                'id': to_object_id(member_id),
+                'level': level,
+                'flags': flags
+            }
+            target.append(access_object)
+            new_members.append(access_object)
+        # update member if it's in the target
+        else:
+            for item in target:
+                if member_id == item.id:
+                    item['level'] = level
+                    item['flags'] = flags
+                    break
+    return new_members
 
 
 def _list_item(item, prefix, export):
