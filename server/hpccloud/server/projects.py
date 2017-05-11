@@ -40,8 +40,10 @@ class Projects(Resource):
         self.route('PATCH', (':id', ), self.update)
         self.route('GET', (), self.get_all)
         self.route('DELETE', (':id', ), self.delete)
-        self.route('PUT', (':id', 'share'), self.share)
-        self.route('PUT', (':id', 'unshare'), self.unshare)
+        self.route('GET', (':id', 'access'), self.get_access)
+        self.route('PUT', (':id', 'access'), self.set_access)
+        self.route('PATCH', (':id', 'access'), self.patch_access)
+        self.route('DELETE', (':id', 'access'), self.revoke_access)
         self.route('POST', (':id', 'simulations'), self.create_simulation)
         self.route('GET', (':id', 'simulations'), self.simulations)
         self.route('GET', (':id',), self.get)
@@ -130,12 +132,21 @@ class Projects(Resource):
     @autoDescribeRoute(
         Description('Share a give project with a set of users or groups')
         .modelParam('id', 'The project to be shared.',
+                    model='project', plugin='hpccloud', level=AccessType.READ)
+    )
+    @access.user
+    def get_access(self, project):
+        return project.get('access', {'groups': [], 'users': []})
+
+    @autoDescribeRoute(
+        Description('Share a given project with a set of users or groups')
+        .modelParam('id', 'The project to be shared.',
                     model='project', plugin='hpccloud', level=AccessType.WRITE)
         .jsonParam('share', 'The users and groups to share with.',
                    dataType='ShareProperties', required=True, paramType='body')
     )
     @access.user
-    def share(self, project, share, params):
+    def set_access(self, project, share, params):
         user = getCurrentUser()
 
         # Validate we have been given a value body
@@ -150,7 +161,32 @@ class Projects(Resource):
         users = share.get('users', [])
         groups = share.get('groups', [])
 
-        return self._model.share(user, project, users, groups)
+        return self._model.set_access(user, project, users, groups)
+
+    @autoDescribeRoute(
+        Description('Share a given project with a set of users or groups')
+        .modelParam('id', 'The project to be shared.',
+                    model='project', plugin='hpccloud', level=AccessType.WRITE)
+        .jsonParam('share', 'The users and groups to share with.',
+                   dataType='ShareProperties', required=True, paramType='body')
+    )
+    @access.user
+    def patch_access(self, project, share, params):
+        user = getCurrentUser()
+
+        # Validate we have been given a value body
+        try:
+            ref_resolver = jsonschema.RefResolver.from_schema(
+                schema.definitions)
+            jsonschema.validate(share, schema.project['definitions']['share'],
+                                resolver=ref_resolver)
+        except jsonschema.ValidationError as ve:
+            raise RestException(ve.message, 400)
+
+        users = share.get('users', [])
+        groups = share.get('groups', [])
+
+        return self._model.patch_access(user, project, users, groups)
 
     @autoDescribeRoute(
         Description('Revoke permissions for project given a set of users \
@@ -161,7 +197,7 @@ class Projects(Resource):
                    dataType='ShareProperties', required=True, paramType='body')
     )
     @access.user
-    def unshare(self, project, share, params):
+    def revoke_access(self, project, share, params):
         user = getCurrentUser()
 
         # Validate we have been given a value body
@@ -176,7 +212,7 @@ class Projects(Resource):
         users = share.get('users', [])
         groups = share.get('groups', [])
 
-        return self._model.unshare(user, project, users, groups)
+        return self._model.revoke_access(user, project, users, groups)
 
     addModel('SimProperties', schema.simulation, 'projects')
 

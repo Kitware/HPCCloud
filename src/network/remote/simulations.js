@@ -43,12 +43,20 @@ export default function ({ client, filterQuery, mustContain, busy }) {
       }));
     },
 
-    shareSimulation(_id, users, groups) {
-      return busy(client._.put(`/simulations/${_id}/share`, { users, groups }));
+    getAccess(_id) {
+      return busy(client._.get(`/simulations/${_id}/access`));
     },
 
-    unshareSimulation(_id, users, groups) {
-      return busy(client._.put(`/simulations/${_id}/unshare`, { users, groups }));
+    setAccess(_id, users, groups, level, flags = []) {
+      return busy(client._.put(`/simulations/${_id}/access`, { users, groups, level, flags }));
+    },
+
+    patchAccess(_id, users, groups, level, flags = []) {
+      return busy(client._.patch(`/simulations/${_id}/access`, { users, groups, level, flags }));
+    },
+
+    revokeSimulation(_id, users, groups) {
+      return busy(client._.delete(`/simulations/${_id}/access`, { users, groups }));
     },
   };
 }
