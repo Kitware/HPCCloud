@@ -102,7 +102,7 @@ class Project(AccessControlledModel):
 
         return project
 
-    def update(self, user, project, name=None, metadata=None, description=None):
+    def update_project(self, user, project, name=None, metadata=None, description=None):
         """
         Update an existing project, this involves update the data property.
         For now we will just do a dict update, in the future we might want

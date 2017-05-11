@@ -119,10 +119,9 @@ class Simulations(Resource):
         metadata = updates.get('metadata')
         steps = updates.get('steps')
 
-        return self._model.update(user, simulation, name=name,
-                                  metadata=metadata, description=description,
-                                  active=active, disabled=disabled,
-                                  status=status, steps=steps)
+        return self._model.update_simulation(user, simulation, name,
+                                             metadata, description, active,
+                                             disabled,  status, steps)
 
     addModel('CloneParams', {
         'id': 'CloneParams',

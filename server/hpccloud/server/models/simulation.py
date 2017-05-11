@@ -149,8 +149,9 @@ class Simulation(AccessControlledModel):
         self.remove(simulation)
         self.model('folder').remove(simulation_folder)
 
-    def update(self, user, simulation, name, metadata=None, description=None,
-               active=None, disabled=None, status=None, steps=None):
+    def update_simulation(self, user, simulation, name, metadata=None,
+                          description=None, active=None, disabled=None,
+                          status=None, steps=None):
         """
         Update a simulation.
 
