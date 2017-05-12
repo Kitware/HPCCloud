@@ -53,6 +53,18 @@
                 },
                 "groups": {
                     "$ref": "#/arrayOfIds"
+                },
+                "level": {
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 2
+                },
+                "flags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "minItems": 0
+                    }
                 }
             },
             "additionalProperties": false
