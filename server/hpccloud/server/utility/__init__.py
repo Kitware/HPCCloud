@@ -152,22 +152,29 @@ def unshare_folder(owner, folder, users, groups, recurse=False):
 
 
 def merge_access(target, members, level, flags):
+    """
+    :param target: array of acces objects{id, level, flags}...
+    :param members: array of ids
+    :param level: number, AccessType [-1..2]
+    :param flags: array of strings
+    """
     new_members = []
-    member_ids = [item['id'] for item in target]
+    target_ids = [str(item['id']) for item in target]
+    print(target_ids, members)
     for member_id in members:
         # append member not in the target
-        if member_id not in member_ids:
+        if member_id not in target_ids:
             access_object = {
                 'id': to_object_id(member_id),
                 'level': level,
                 'flags': flags
             }
             target.append(access_object)
-            new_members.append(access_object)
+            new_members.append(member_id)
         # update member if it's in the target
         else:
             for item in target:
-                if member_id == item.id:
+                if member_id == item['id']:
                     item['level'] = level
                     item['flags'] = flags
                     break
