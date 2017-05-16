@@ -40,8 +40,8 @@ export default React.createClass({
     const backend = { type: active };
     if (active === 'cuda') {
       backend['device-id'] = value;
-    } else if (this.state.bakendProfile && this.state.bakendProfile[active]) {
-      const addOn = this.state.bakendProfile[active].find((item) => item.name === this.state[active]);
+    } else if (this.state.backendProfile && this.state.backendProfile[active]) {
+      const addOn = this.state.backendProfile[active].find((item) => item.name === this.state[active]);
       Object.assign(backend, addOn);
     }
 
@@ -54,31 +54,31 @@ export default React.createClass({
   },
 
   getStateFromProps(props) {
-    const newState = Object.assign({ bakendProfile: { cuda: false, openmp: [], opencl: [] } }, this.state);
+    const newState = Object.assign({ backendProfile: { cuda: false, openmp: [], opencl: [] } }, this.state);
     const previousClusterId = this.state ? this.state.clusterId : '';
 
     if (props.parentState.serverType === 'Traditional') {
       const clusterId = props.parentState.Traditional.profile;
-      const bakendProfile = get(props, `parentProps.clusters.${clusterId}.config.pyfr`);
-      if (bakendProfile && previousClusterId !== clusterId) {
+      const backendProfile = get(props, `parentProps.clusters.${clusterId}.config.pyfr`);
+      if (backendProfile && previousClusterId !== clusterId) {
         newState.clusterId = clusterId;
-        newState.bakendProfile = bakendProfile;
+        newState.backendProfile = backendProfile;
 
         // Update options
         newState.options = [];
-        if (bakendProfile.cuda) {
+        if (backendProfile.cuda) {
           newState.active = 'cuda';
           newState.options.push('cuda');
         }
-        if (bakendProfile.opencl.length) {
+        if (get(backendProfile, 'opencl.length')) {
           newState.active = 'opencl';
           newState.options.push('opencl');
-          newState.opencl = bakendProfile.opencl[0].name;
+          newState.opencl = backendProfile.opencl[0].name;
         }
-        if (bakendProfile.openmp.length) {
+        if (get(backendProfile, 'openmp.length')) {
           newState.active = 'openmp';
           newState.options.push('openmp');
-          newState.openmp = bakendProfile.openmp[0].name;
+          newState.openmp = backendProfile.openmp[0].name;
         }
       }
     }
@@ -104,8 +104,8 @@ export default React.createClass({
     }
 
     let profiles = [];
-    if (this.state.bakendProfile && this.state.bakendProfile[this.state.active] && this.state.active !== 'cuda') {
-      profiles = this.state.bakendProfile[this.state.active];
+    if (this.state.backendProfile && this.state.backendProfile[this.state.active] && this.state.active !== 'cuda') {
+      profiles = this.state.backendProfile[this.state.active];
     }
 
     return (
