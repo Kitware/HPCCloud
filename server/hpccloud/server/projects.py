@@ -43,7 +43,7 @@ class Projects(Resource):
         self.route('GET', (':id', 'access'), self.get_access)
         self.route('PUT', (':id', 'access'), self.set_access)
         self.route('PATCH', (':id', 'access'), self.patch_access)
-        self.route('DELETE', (':id', 'access'), self.revoke_access)
+        self.route('PATCH', (':id', 'access', 'revoke'), self.revoke_access)
         self.route('POST', (':id', 'simulations'), self.create_simulation)
         self.route('GET', (':id', 'simulations'), self.simulations)
         self.route('GET', (':id',), self.get)

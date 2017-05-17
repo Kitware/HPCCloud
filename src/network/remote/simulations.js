@@ -56,7 +56,7 @@ export default function ({ client, filterQuery, mustContain, busy }) {
     },
 
     revokeSimulationAccess(_id, users, groups) {
-      return busy(client._.delete(`/simulations/${_id}/access`, { users, groups }));
+      return busy(client._.patch(`/simulations/${_id}/access/revoke`, { users, groups }));
     },
   };
 }

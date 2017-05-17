@@ -129,23 +129,12 @@ def share_folder(owner, folder, users, groups, level=AccessType.READ,
 
 
 def unshare_folder(owner, folder, users, groups, recurse=False):
-    folder_access_list = folder['access']
+    folder_access_list = folder.get('access', {'users': [], 'groups':[]})
 
-    for user_id in users:
-        ind = 0
-        for user in folder_access_list['users']:
-            if user_id == user['id']:
-                break
-            ind += 0
-        del folder_access_list['users'][ind]
-
-    for group_id in groups:
-        ind = 0
-        for group in folder_access_list['groups']:
-            if group_id == group['id']:
-                break
-            ind += 0
-        del folder_access_list['groups'][ind]
+    folder_access_list['groups'] = [g for g in folder_access_list['groups']
+                                    if str(g['id']) not in groups]
+    folder_access_list['users'] = [u for u in folder_access_list['users']
+                                    if str(u['id']) not in users]
 
     return ModelImporter.model('folder').setAccessList(
         folder, folder_access_list, save=True, recurse=recurse, user=owner)
@@ -160,7 +149,6 @@ def merge_access(target, members, level, flags):
     """
     new_members = []
     target_ids = [str(item['id']) for item in target]
-    print(target_ids, members)
     for member_id in members:
         # append member not in the target
         if member_id not in target_ids:

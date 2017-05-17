@@ -231,7 +231,6 @@ class Project(AccessControlledModel):
                                  if str(g['id']) not in groups]
         access_list['users'] = [u for u in access_list['users']
                                 if str(u['id']) not in users]
-
         project_folder = self.model('folder').load(
             project['folderId'], user=sharer)
 
@@ -252,7 +251,6 @@ class Project(AccessControlledModel):
                 sharer, sim, users, groups)
 
         project['updated'] = datetime.datetime.utcnow()
-
         return self.save(project)
 
     def simulations(self, user, project, limit, offset):
