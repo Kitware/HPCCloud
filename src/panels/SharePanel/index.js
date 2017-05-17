@@ -59,6 +59,7 @@ const SharePanel = React.createClass({
       this.setState({ [which]: values });
     // permission panel event
     } else {
+      console.log(e);
       const which = e.which;
       const selected = e.selected;
       this.setState({ [which]: selected });
@@ -81,26 +82,26 @@ const SharePanel = React.createClass({
   },
 
   unShareAction(e) {
-    let shareIds;
+    let unShareIds;
     if (this.props.shareToType === 'users') {
-      shareIds = [this.state.shareIds, []];
+      unShareIds = [this.state.unShareIds, []];
     } else {
-      shareIds = [[], this.state.shareIds];
+      unShareIds = [[], this.state.unShareIds];
     }
-    if (this.state.unShareUsers.indexOf(this.props.shareItem.userId) !== -1) {
+    if (this.state.unShareIds.indexOf(this.props.shareItem.userId) !== -1) {
       console.log('Cannot remove the owner from their own project.');
       return;
     }
 
-    if (this.state.unShareUsers.indexOf(this.props.currentUser._id) !== -1) {
+    if (this.state.unShareIds.indexOf(this.props.currentUser._id) !== -1) {
       console.log('You cannot remove yourself from this project');
       return;
     }
 
     if (this.props.shareItem.projectId) {
-      this.props.unShareSimulation(this.props.shareItem, ...shareIds);
+      this.props.unShareSimulation(this.props.shareItem, ...unShareIds);
     } else {
-      this.props.unShareProject(this.props.shareItem, ...shareIds);
+      this.props.unShareProject(this.props.shareItem, ...unShareIds);
     }
     this.setState({ unShareIds: [] });
   },
@@ -154,9 +155,9 @@ export default connect(
   () => ({
     fetchUsers: () => dispatch(AuthActions.getUsers()),
     fetchGroups: () => dispatch(GroupActions.getGroups()),
-    shareProject: (simulation, users, groups) => dispatch(ProjActions.shareProject(simulation, users, groups)),
+    shareProject: (project, users, groups) => dispatch(ProjActions.shareProject(project, users, groups)),
     shareSimulation: (simulation, users, groups) => dispatch(ProjActions.shareSimulation(simulation, users, groups)),
     unShareProject: (project, users, groups) => dispatch(ProjActions.unShareProject(project, users, groups)),
-    unShareSimulation: (project, users, groups) => dispatch(ProjActions.unShareSimulation(project, users, groups)),
+    unShareSimulation: (simulation, users, groups) => dispatch(ProjActions.unShareSimulation(simulation, users, groups)),
   })
 )(SharePanel);

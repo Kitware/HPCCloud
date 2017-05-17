@@ -70,14 +70,16 @@
                 "level": {
                     "type": "number",
                     "minimum": -1,
-                    "maximum": 2
+                    "maximum": 2,
+                    "default": 0
                 },
                 "flags": {
                     "type": "array",
                     "items": {
                         "type": "string",
                         "minItems": 0
-                    }
+                    },
+                    "default": []
                 }
             },
             "additionalProperties": false

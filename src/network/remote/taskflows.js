@@ -62,7 +62,7 @@ export default function ({ client, filterQuery, mustContain, busy }) {
     },
 
     unshareTaskflow(id, users = [], groups = []) {
-      return busy(client._.delete(`/taskflows/${id}/access`, { users, groups }));
+      return busy(client._.patch(`/taskflows/${id}/access/revoke`, { users, groups }));
     },
   };
 }

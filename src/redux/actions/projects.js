@@ -134,6 +134,7 @@ export function shareProject(project, users, groups) {
 }
 
 export function unShareProject(project, users, groups) {
+  console.log(users, groups);
   return (dispatch) => {
     const action = netActions.addNetworkCall('unshare_project', `Unshare project users: ${users}\ngroups: ${groups}`);
     client.revokeProjectAccess(project._id, users, groups)
