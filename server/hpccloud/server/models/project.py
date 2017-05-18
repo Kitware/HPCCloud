@@ -214,12 +214,23 @@ class Project(AccessControlledModel):
                      level=AccessType.READ, flags=[]):
         access_list = project.get('access', {'groups': [], 'users': []})
 
-        new_users = merge_access(access_list['users'], users, level, flags)
-        new_groups = merge_access(access_list['groups'], groups, level, flags)
+        merge_access(access_list['users'], users, level, flags)
+        merge_access(access_list['groups'], groups, level, flags)
 
         project_folder = self.model('folder').load(
             project['folderId'], user=sharer)
-        share_folder(sharer, project_folder, new_users, new_groups)
+        share_folder(sharer, project_folder,
+                     [str(u['id']) for u in access_list['users']],
+                     [str(g['id']) for g in access_list['groups']])
+
+        # patch access for any simulations associated with this project
+        query = {
+            'projectId': project['_id']
+        }
+        sims = self.model('simulation', 'hpccloud').find(query=query)
+        for sim in sims:
+            self.model('simulation', 'hpccloud').patch_access(
+                sharer, sim, users, groups)
 
         return self.save(project)
 

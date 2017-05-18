@@ -216,10 +216,10 @@ class Simulations(Resource):
     @autoDescribeRoute(
         Description('Get access object of simulation')
         .modelParam('id', 'id of the simulation', model='simulation',
-                    plugin='hpccloud', level=AccessType.WRITE)
+                    plugin='hpccloud', level=AccessType.READ)
     )
     @access.user
-    def get_access(self, simulation):
+    def get_access(self, simulation, params):
         return simulation.get('access', {'groups': [], 'users': []})
 
     @autoDescribeRoute(
