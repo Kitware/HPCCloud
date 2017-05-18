@@ -76,7 +76,6 @@ def get_simulations_folder(user, project):
     filters = {
         'name': SIMULATIONS_FOLDER
     }
-
     try:
         simulations_folder = six.next(
             ModelImporter.model('folder').childFolders(
@@ -100,24 +99,27 @@ def to_object_id(id):
 
 
 def share_folder(owner, folder, users, groups, level=AccessType.READ,
-                 recurse=False):
-    folder_access_list = folder['access']
-    folder_access_list['users'] = []
-    folder_access_list['groups'] = []
+                 recurse=False, force=False):
+    folder_access_list = folder.get('access', {'groups': [], 'users': []})
 
-    for user_id in users:
-        access_object = {
-            'id': to_object_id(user_id),
-            'level': level
-        }
-        folder_access_list['users'].append(access_object)
+    if force:
+        for user_id in users:
+            access_object = {
+                'id': to_object_id(user_id),
+                'level': level
+            }
+            folder_access_list['users'].append(access_object)
 
-    for group_id in groups:
-        access_object = {
-            'id': to_object_id(group_id),
-            'level': level
-        }
-        folder_access_list['groups'].append(access_object)
+        for group_id in groups:
+            access_object = {
+                'id': to_object_id(group_id),
+                'level': level
+            }
+            folder_access_list['groups'].append(access_object)
+    else:
+        # merge to maintain access level of other members
+        merge_access(folder_access_list['users'], users, level, [])
+        merge_access(folder_access_list['groups'], groups, level, [])
 
     return ModelImporter.model('folder').setAccessList(
         folder, folder_access_list, save=True, recurse=recurse, user=owner)

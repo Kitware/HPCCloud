@@ -368,10 +368,9 @@ class SimulationTestCase(TestCase):
         r = self.request('/simulations/%s/access' % str(sim['_id']), method='GET',
                          type='application/json', user=self._yet_another_user)
         self.assertStatusOk(r)
-        print([u['id'] for u in r.json['users']], self._yet_another_user['_id'])
         self.assertTrue(str(self._yet_another_user['_id']) in
                         [u['id'] for u in r.json['users']],
-                        'user does not have access to project simulations')
+                        'User does not have access to project simulations')
 
         # First try without providing a name
         body = {
