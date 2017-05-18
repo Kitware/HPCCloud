@@ -188,7 +188,7 @@ class Project(AccessControlledModel):
         # Share the project folder
         share_folder(
             sharer, project_folder, users, groups, level=AccessType.READ,
-            recurse=True)
+            recurse=True, force=True)
 
         # We need to share the _simulations folder, with WRITE access, so the
         # user can create simulations
@@ -214,15 +214,12 @@ class Project(AccessControlledModel):
                      level=AccessType.READ, flags=[]):
         access_list = project.get('access', {'groups': [], 'users': []})
 
-        merge_access(access_list['users'], users, level, flags)
-        merge_access(access_list['groups'], groups, level, flags)
+        new_users = merge_access(access_list['users'], users, level, flags)
+        new_groups = merge_access(access_list['groups'], groups, level, flags)
 
         project_folder = self.model('folder').load(
             project['folderId'], user=sharer)
-        share_folder(sharer, project_folder,
-                     [str(u['id']) for u in access_list['users']],
-                     [str(g['id']) for g in access_list['groups']])
-
+        share_folder(sharer, project_folder, new_users, new_groups, recurse=True)
         # patch access for any simulations associated with this project
         query = {
             'projectId': project['_id']

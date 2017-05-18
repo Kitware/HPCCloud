@@ -50,7 +50,6 @@ export const projectFunctions = {
     const ret = {
       image: Workflow[project.type] ? Workflow[project.type].logo : '',
     };
-    console.log(ret);
     return ret;
   },
 

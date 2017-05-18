@@ -268,7 +268,7 @@ class Simulation(AccessControlledModel):
         simulation_folder = self.model('folder').load(
             simulation['folderId'], user=sharer)
 
-        share_folder(sharer, simulation_folder, users, groups)
+        share_folder(sharer, simulation_folder, users, groups, force=True)
 
         return self.save(simulation)
 
@@ -276,15 +276,13 @@ class Simulation(AccessControlledModel):
                      level=AccessType.READ, flags=[]):
         access_list = simulation.get('access', {'groups': [], 'users': []})
 
-        merge_access(access_list['users'], users, level, flags)
-        merge_access(access_list['groups'], groups, level, flags)
+        new_users = merge_access(access_list['users'], users, level, flags)
+        new_groups = merge_access(access_list['groups'], groups, level, flags)
 
         # Share the simulation folder
         simulation_folder = self.model('folder').load(
             simulation['folderId'], user=sharer)
-        share_folder(sharer, simulation_folder,
-                     [str(u['id']) for u in access_list['users']],
-                     [str(g['id']) for g in access_list['groups']])
+        share_folder(sharer, simulation_folder, new_users, new_groups)
 
         return self.setAccessList(simulation, access_list, save=True)
 
