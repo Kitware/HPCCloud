@@ -356,13 +356,22 @@ class SimulationTestCase(TestCase):
 
         # Now share the project and clone
         body = {
-            'users': [str(self._yet_another_user['_id'])]
+            'users': [str(self._yet_another_user['_id'])],
         }
 
         json_body = json.dumps(body)
-        r = self.request('/projects/%s/share' % str(self._project1['_id']), method='PUT',
+        r = self.request('/projects/%s/access' % str(self._project1['_id']), method='PATCH',
                          type='application/json', body=json_body, user=self._another_user)
         self.assertStatusOk(r)
+
+        # make sure we can access the simulation before cloning
+        r = self.request('/simulations/%s/access' % str(sim['_id']), method='GET',
+                         type='application/json', user=self._yet_another_user)
+        self.assertStatusOk(r)
+        print([u['id'] for u in r.json['users']], self._yet_another_user['_id'])
+        self.assertTrue(str(self._yet_another_user['_id']) in
+                        [u['id'] for u in r.json['users']],
+                        'user does not have access to project simulations')
 
         # First try without providing a name
         body = {
@@ -421,12 +430,11 @@ class SimulationTestCase(TestCase):
 
         body = {
             'users': [str(self._another_user['_id'])],
-            'groups': []
         }
         json_body = json.dumps(body)
 
         # share with another_user
-        r = self.request('/simulations/%s/share' % str(sim['_id']), method='PUT',
+        r = self.request('/simulations/%s/access' % str(sim['_id']), method='PATCH',
                          type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 200)
 
@@ -435,7 +443,7 @@ class SimulationTestCase(TestCase):
         self.assertStatus(r, 200)
 
         # revoke access
-        r = self.request('/simulations/%s/unshare' % str(sim['_id']), method='PUT',
+        r = self.request('/simulations/%s/access/revoke' % str(sim['_id']), method='PATCH',
                          type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 200)
 

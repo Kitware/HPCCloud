@@ -83,7 +83,8 @@ def get_simulations_folder(user, project):
                 parentType='folder', user=user, parent=project_folder,
                 filters=filters, limit=1))
     except StopIteration:
-        raise Exception('Unable to find project simulations folder')
+        raise Exception('Unable to find project simulations folder' +
+                        'for project "%s"' % project['name'])
 
     return simulations_folder
 
@@ -111,9 +112,6 @@ def share_folder(owner, folder, users, groups, level=AccessType.READ,
         }
         folder_access_list['users'].append(access_object)
 
-        # Give read access to the project folder
-        folder_access_list['users'].append(access_object)
-
     for group_id in groups:
         access_object = {
             'id': to_object_id(group_id),
@@ -121,20 +119,17 @@ def share_folder(owner, folder, users, groups, level=AccessType.READ,
         }
         folder_access_list['groups'].append(access_object)
 
-        # Give read access to the project folder
-        folder_access_list['groups'].append(access_object)
-
     return ModelImporter.model('folder').setAccessList(
         folder, folder_access_list, save=True, recurse=recurse, user=owner)
 
 
 def unshare_folder(owner, folder, users, groups, recurse=False):
-    folder_access_list = folder.get('access', {'users': [], 'groups':[]})
+    folder_access_list = folder.get('access', {'users': [], 'groups': []})
 
     folder_access_list['groups'] = [g for g in folder_access_list['groups']
                                     if str(g['id']) not in groups]
     folder_access_list['users'] = [u for u in folder_access_list['users']
-                                    if str(u['id']) not in users]
+                                   if str(u['id']) not in users]
 
     return ModelImporter.model('folder').setAccessList(
         folder, folder_access_list, save=True, recurse=recurse, user=owner)

@@ -374,7 +374,7 @@ class ProjectsTestCase(TestCase):
                          type='application/json', user=self._another_user)
         self.assertStatus(r, 403)
 
-    def test_share(self):
+    def test_access(self):
         project1 = self._create_project('project1', self._yet_another_user)
         project2 = self._create_project('project2', self._another_user)
 
@@ -394,8 +394,8 @@ class ProjectsTestCase(TestCase):
         }
 
         json_body = json.dumps(body)
-        r = self.request('/projects/%s/share' % str(project1['_id']),
-                         method='PUT', type='application/json', body=json_body,
+        r = self.request('/projects/%s/access' % str(project1['_id']),
+                         method='PATCH', type='application/json', body=json_body,
                          user=self._yet_another_user)
         self.assertStatus(r, 200)
 
@@ -417,7 +417,7 @@ class ProjectsTestCase(TestCase):
         self.assertStatus(r, 200)
         self.assertEqual(r.json['_id'], project1['_id'])
 
-    def test_unshare(self):
+    def test_access_revoke(self):
         project1 = self._create_project('project1', self._user)
 
         # Share the project
@@ -425,8 +425,8 @@ class ProjectsTestCase(TestCase):
             'users': [str(self._another_user['_id']), str(self._yet_another_user['_id'])]
         }
         json_body = json.dumps(body)
-        r = self.request('/projects/%s/share' % str(project1['_id']),
-                         method='PUT', type='application/json', body=json_body,
+        r = self.request('/projects/%s/access' % str(project1['_id']),
+                         method='PATCH', type='application/json', body=json_body,
                          user=self._user)
         self.assertStatus(r, 200)
 
@@ -435,8 +435,8 @@ class ProjectsTestCase(TestCase):
             'users': [str(self._another_user['_id'])]
         }
         json_body = json.dumps(body)
-        r = self.request('/projects/%s/unshare' % str(project1['_id']),
-                         method='PUT', type='application/json', body=json_body,
+        r = self.request('/projects/%s/access/revoke' % str(project1['_id']),
+                         method='PATCH', type='application/json', body=json_body,
                          user=self._user)
         self.assertStatus(r, 200)
 
