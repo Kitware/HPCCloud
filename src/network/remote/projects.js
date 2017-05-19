@@ -41,11 +41,11 @@ export default function ({ client, filterQuery, mustContain, busy }) {
     },
 
     setProjectAccess(_id, users, groups, level = 0, flags = []) {
-      return busy(client._.put(`/projects/${_id}/access`, { users, groups, level, flags }));
+      return busy(client._.put(`/projects/${_id}/access`, { users, groups, level: parseInt(level, 10), flags }));
     },
 
     patchProjectAccess(_id, users, groups, level = 0, flags = []) {
-      return busy(client._.patch(`/projects/${_id}/access`, { users, groups, level, flags }));
+      return busy(client._.patch(`/projects/${_id}/access`, { users, groups, level: parseInt(level, 10), flags }));
     },
 
     revokeProjectAccess(_id, users, groups) {

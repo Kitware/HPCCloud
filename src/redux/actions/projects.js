@@ -161,6 +161,17 @@ export function unShareProject(project, users, groups) {
   };
 }
 
+export function updateProjectPermissions(project, users, groups, level) {
+  return (dispatch) => {
+    const action = netActions.addNetworkCall('update_proj_permission', `update project permission: ${users}\ngroups: ${groups}\nlevel:${level}`);
+    client.patchProjectAccess(project._id, users, groups, level)
+      .then((resp) => {
+        dispatch(updateProject(resp.data));
+      });
+    return action;
+  };
+}
+
 export function saveProject(project, attachments) {
   return (dispatch) => {
     const action = netActions.addNetworkCall('save_project', `Save project ${project.name}`);
@@ -352,6 +363,17 @@ export function unShareSimulation(simulation, users, groups) {
       })
       .catch((error) => {
         dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
+      });
+    return action;
+  };
+}
+
+export function updateSimulationPermissions(simulation, users, groups, level) {
+  return (dispatch) => {
+    const action = netActions.addNetworkCall('update_sim_permission', `update simulation permission: ${users}\ngroups: ${groups}\nlevel:${level}`);
+    client.patchSimulationAccess(simulation._id, users, groups, level)
+      .then((resp) => {
+        dispatch(updateSimulation(resp.data));
       });
     return action;
   };
