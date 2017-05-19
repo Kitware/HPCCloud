@@ -210,14 +210,6 @@ export default React.createClass({
             disabled={this.props.contents.cluster}
           />
         </section>
-        <section className={style.group}>
-          <label className={style.label}>Volume size:</label>
-          <input type="number" min="1" max="16384" className={style.input}
-            data-key="volumeSize" value={this.props.contents.volumeSize}
-            onChange={this.dataChange} required
-            disabled={this.props.contents.cluster || this.props.contents.volume}
-          />
-        </section>
       { /* EBS Volume */ }
         <section className={style.group}>
           <label className={style.label}>Existing Volume:</label>
