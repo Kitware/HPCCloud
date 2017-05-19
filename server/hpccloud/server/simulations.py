@@ -269,8 +269,11 @@ class Simulations(Resource):
 
         users = share.get('users', [])
         groups = share.get('groups', [])
+        level = share.get('level', 0)
+        flags = share.get('flags', [])
 
-        return self._model.patch_access(user, simulation, users, groups)
+        return self._model.patch_access(user, simulation,
+                                        users, groups, level, flags)
 
     @autoDescribeRoute(
         Description('Revoke permissions for asimulation given a set of users \

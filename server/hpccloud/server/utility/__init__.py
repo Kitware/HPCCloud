@@ -159,7 +159,7 @@ def merge_access(target, members, level, flags):
         # update member if it's in the target
         else:
             for item in target:
-                if member_id == item['id']:
+                if member_id == str(item['id']):
                     item['level'] = level
                     item['flags'] = flags
                     break

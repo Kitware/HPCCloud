@@ -2,17 +2,19 @@ import React from 'react';
 
 import style    from 'HPCCloudStyle/ItemEditor.mcss';
 
-const permissions = ['Read', 'Write', 'Admin'];
+const permissionLevels = ['Read', 'Write', 'Admin'];
 
 export default React.createClass({
   displayName: 'PermissionPanel',
 
   propTypes: {
     items: React.PropTypes.array,
+    permissions: React.PropTypes.array,
     shareType: React.PropTypes.oneOf(['users', 'groups']).isRequired,
     selected: React.PropTypes.array,
     showAdmin: React.PropTypes.bool,
     onSelect: React.PropTypes.func,
+    onPermissionChange: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -43,7 +45,7 @@ export default React.createClass({
   },
 
   onPermissionChange(e) {
-    console.log('permission change');
+    this.props.onPermissionChange(e.target.parentElement.dataset.id, e.target.value);
   },
 
   optionMapper(el, i, arr) {
@@ -51,7 +53,8 @@ export default React.createClass({
     if (i === 0 || (!this.props.showAdmin && el === 'Admin')) {
       return null;
     }
-    return (<option key={`${arr[0].name}_${el}`} value={i}>
+    // value = i-1 because we skip the first item
+    return (<option key={`${arr[0].name}_${el}`} value={i - 1}>
       {el}
     </option>);
   },
@@ -66,8 +69,8 @@ export default React.createClass({
       className={[style.ppRow, this.props.selected.indexOf(el._id) !== -1 ? style.selected : null].join(' ')}
       >
       <span>{ name }</span>
-      <select onChange={this.onPermissionChange} data-index={i} className={style.ppRowSelect}>
-        { [{ name, i }].concat(permissions).map(this.optionMapper) }
+      <select onChange={this.onPermissionChange} data-index={i} className={style.ppRowSelect} value={this.props.permissions[i].level}>
+        { [{ name, i }].concat(permissionLevels).map(this.optionMapper) }
       </select>
     </div>);
   },

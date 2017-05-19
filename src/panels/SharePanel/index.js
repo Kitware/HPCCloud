@@ -18,10 +18,13 @@ const SharePanel = React.createClass({
     shareItem: React.PropTypes.object.isRequired, // project or simulation object
     currentUser: React.PropTypes.object,
     targetMap: React.PropTypes.object,
+    // many functions for a component that can work with simulations or projects
     fetchUsers: React.PropTypes.func,
     fetchGroups: React.PropTypes.func,
     shareProject: React.PropTypes.func,
     shareSimulation: React.PropTypes.func,
+    updateProjectPermission: React.PropTypes.func,
+    updateSimulationPermission: React.PropTypes.func,
     unShareProject: React.PropTypes.func,
     unShareSimulation: React.PropTypes.func,
   },
@@ -59,7 +62,6 @@ const SharePanel = React.createClass({
       this.setState({ [which]: values });
     // permission panel event
     } else {
-      console.log(e);
       const which = e.which;
       const selected = e.selected;
       this.setState({ [which]: selected });
@@ -106,6 +108,22 @@ const SharePanel = React.createClass({
     this.setState({ unShareIds: [] });
   },
 
+  handlePermissionUpdate(memberId, level) {
+    let permIds;
+    if (this.props.shareToType === 'users') {
+      permIds = [[memberId], [], level];
+    } else {
+      permIds = [[], [memberId], level];
+    }
+
+    if (this.props.shareItem.projectId) {
+      this.props.updateSimulationPermission(this.props.shareItem, ...permIds);
+    } else {
+      this.props.updateProjectPermission(this.props.shareItem, ...permIds);
+    }
+    this.setState({ unShareIds: [] });
+  },
+
   render() {
     const hasContents = Object.keys(this.props.targetMap).length;
     const targetKey = this.props.shareToType === 'users' ? 'login' : 'name';
@@ -132,7 +150,11 @@ const SharePanel = React.createClass({
               <PermissionPanel className={style.splitViewItem}
                 shareType={this.props.shareToType}
                 items={targetMembers.map(el => this.props.targetMap[el])}
-                selected={this.state.unShareIds} onSelect={this.handleChange}
+                permissions={this.props.shareItem.access[this.props.shareToType]}
+                showAdmin={this.props.currentUser.admin}
+                selected={this.state.unShareIds}
+                onSelect={this.handleChange}
+                onPermissionChange={this.handlePermissionUpdate}
               />
               <button onClick={this.unShareAction}
                 disabled={!this.state.unShareIds.length}
@@ -157,6 +179,8 @@ export default connect(
     fetchGroups: () => dispatch(GroupActions.getGroups()),
     shareProject: (project, users, groups) => dispatch(ProjActions.shareProject(project, users, groups)),
     shareSimulation: (simulation, users, groups) => dispatch(ProjActions.shareSimulation(simulation, users, groups)),
+    updateProjectPermission: (project, users, groups, level) => dispatch(ProjActions.updateProjectPermissions(project, users, groups, level)),
+    updateSimulationPermission: (simulation, users, groups, level) => dispatch(ProjActions.updateSimulationPermissions(simulation, users, groups, level)),
     unShareProject: (project, users, groups) => dispatch(ProjActions.unShareProject(project, users, groups)),
     unShareSimulation: (simulation, users, groups) => dispatch(ProjActions.unShareSimulation(simulation, users, groups)),
   })
