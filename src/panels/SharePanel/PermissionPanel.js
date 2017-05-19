@@ -28,14 +28,23 @@ export default React.createClass({
   getInitialState() {
     return {
       nameKey: this.props.shareType === 'users' ? 'login' : 'name',
+      focused: false,
     };
   },
 
+  // this replicates the behavior of <select multiple>
   onSelect(e) {
     const event = { which: 'unShareIds' };
     const id = e.currentTarget.dataset.id;
-    if (this.props.selected.indexOf(id) === -1) {
+    const multiselect = (e.metaKey || e.ctrlKey);
+
+    // if no meta key, the clicked option becomes the sole selected one
+    if (!multiselect) {
+      event.selected = [e.currentTarget.dataset.id];
+    // otherwise concat the option with the others
+    } else if (this.props.selected.indexOf(id) === -1) {
       event.selected = this.props.selected.concat([e.currentTarget.dataset.id]);
+    // unselect
     } else {
       const tmp = [].concat(this.props.selected);
       tmp.splice(tmp.indexOf(id), 1);
@@ -46,6 +55,14 @@ export default React.createClass({
 
   onPermissionChange(e) {
     this.props.onPermissionChange(e.target.parentElement.dataset.id, e.target.value);
+  },
+
+  onFocus() {
+    this.setState({ focused: true });
+  },
+
+  onBlur() {
+    this.setState({ focused: false });
   },
 
   optionMapper(el, i, arr) {
@@ -76,7 +93,8 @@ export default React.createClass({
   },
 
   render() {
-    return (<div className={style.permissionPanelContainer}>
+    return (<div className={[style.permissionPanelContainer, this.state.focused ? style.focused : ''].join(' ')}
+      onClick={this.onFocus} onBlur={this.onBlur} tabIndex="6">
       { this.props.items.map(this.rowMapper) }
     </div>);
   },
