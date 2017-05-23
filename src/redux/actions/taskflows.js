@@ -462,7 +462,7 @@ function processLogEvent(id, type, log) {
         dispatch(clusterActions.appendToClusterLog(id, log));
         break;
       case 'volume':
-        console.log('unimplemented: volume log event with taskflowId');
+        dispatch(volumeActions.appendToVolumeLog(id, log));
         break;
       default:
         console.log(`unrecognized ServerEvent with type "${type}",` +
@@ -480,7 +480,7 @@ function processLogEvent(id, type, log) {
         dispatch(clusterActions.fetchClusters(null));
         break;
       case 'volume':
-        console.log('unimplemented: volume log event without taskflowId');
+        dispatch(volumeActions.fetchVolumes());
         break;
       default:
         console.log(`unrecognized ServerEvent with type "${type}",` +

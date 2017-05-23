@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import { dispatch } from '../../../redux';
 import * as Actions from '../../../redux/actions/taskflows';
 import { fetchClusters } from '../../../redux/actions/clusters';
+import { fetchVolumes } from '../../../redux/actions/volumes';
 
 const SimulationView = React.createClass({
 
@@ -24,6 +25,7 @@ const SimulationView = React.createClass({
     project: React.PropTypes.object,
     onMount: React.PropTypes.func,
     fetchClusters: React.PropTypes.func,
+    fetchVolumes: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -37,6 +39,7 @@ const SimulationView = React.createClass({
     if (this.props.simulation) {
       this.props.onMount(this.props.simulation);
       this.props.fetchClusters();
+      this.props.fetchVolumes();
     }
   },
 
@@ -49,6 +52,7 @@ const SimulationView = React.createClass({
   componentDidUpdate(prevProps) {
     if (!prevProps.simulation) {
       this.props.fetchClusters();
+      this.props.fetchVolumes();
     }
   },
 
@@ -110,6 +114,7 @@ export default connect(
     return {
       onMount: (simulation) => dispatch(Actions.updateTaskflowFromSimulation(simulation)),
       fetchClusters: () => dispatch(fetchClusters()),
+      fetchVolumes: () => dispatch(fetchVolumes()),
     };
   }
 )(SimulationView);

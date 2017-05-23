@@ -5,12 +5,12 @@ import style                from 'HPCCloudStyle/JobMonitor.mcss';
 import { connect }  from 'react-redux';
 import { dispatch }     from '../../redux';
 import * as ClusterActions from '../../redux/actions/clusters';
+import * as VolumeActions from '../../redux/actions/volumes';
 
 const JobMonitor = React.createClass({
   displayName: 'JobMonitor',
 
   propTypes: {
-    clusterId: React.PropTypes.string,
     tasks: React.PropTypes.array,
     jobs: React.PropTypes.array,
 
@@ -18,11 +18,18 @@ const JobMonitor = React.createClass({
     taskflowStatus: React.PropTypes.string,
     taskflowLog: React.PropTypes.array,
 
+    clusterId: React.PropTypes.string,
     clusterName: React.PropTypes.string,
     clusterStatus: React.PropTypes.string,
     clusterLog: React.PropTypes.array,
 
+    volumeId: React.PropTypes.string,
+    volumeName: React.PropTypes.string,
+    volumeStatus: React.PropTypes.string,
+    volumeLog: React.PropTypes.array,
+
     getClusterLog: React.PropTypes.func,
+    getVolumeLog: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -40,6 +47,13 @@ const JobMonitor = React.createClass({
     if (open) {
       const offset = this.props.clusterLog.length;
       this.props.getClusterLog(this.props.clusterId, offset);
+    }
+  },
+
+  volumeLogOpen(open) {
+    if (open) {
+      const offset = this.props.clusterLog.length;
+      this.props.getVolumeLog(this.props.volumeId, offset);
     }
   },
 
@@ -111,6 +125,23 @@ const JobMonitor = React.createClass({
                   </div>
                 </div> : null
               }
+              { this.props.volumeId ?
+                <div>
+                  <div className={ style.toolbar }>
+                    <div className={ style.title }>
+                        Volume log
+                    </div>
+                    <div className={ style.buttons } />
+                  </div>
+                  <div className={ style.taskflowContent }>
+                    {
+                      <ExecutionUnit unit={{ name: this.props.volumeName, log: this.props.volumeLog, status: this.props.volumeStatus }}
+                        onToggle={this.volumeLogOpen} alwaysShowLogToggle
+                      />
+                    }
+                  </div>
+                </div> : null
+              }
           </div>
       </div>);
   },
@@ -143,6 +174,9 @@ export default connect(
     var clusterName = '';
     var clusterStatus = '';
     var clusterLog = [];
+    var volumeName = '';
+    var volumeStatus = '';
+    var volumeLog = [];
 
     // get tasks and jobs
     if (taskflow && taskflow.taskMapById && taskflow.jobMapById) {
@@ -154,6 +188,13 @@ export default connect(
       jobs.push(...Object.keys(taskflow.jobMapById).map((id) => taskflow.jobMapById[id]));
       statusCounter(taskflow.jobMapById, taskStatusCount);
       taskflowLog = taskflow.log;
+    }
+
+    const volumeId = state.volumes.mapByClusterId[clusterId];
+    if (volumeId) {
+      volumeName = state.volumes.mapById[volumeId].name;
+      volumeStatus = state.volumes.mapById[volumeId].status;
+      volumeLog = state.volumes.logById[volumeId] || [];
     }
 
     // Sort the tasks by created timestamp
@@ -174,12 +215,12 @@ export default connect(
       taskStatusCount,
       taskflowStatus,
       taskflowLog,
-      clusterName,
-      clusterStatus,
-      clusterLog,
+      clusterName, clusterStatus, clusterLog,
+      volumeId, volumeName, volumeStatus, volumeLog,
     };
   },
   () => ({
     getClusterLog: (id, offset) => dispatch(ClusterActions.getClusterLog(id, offset)),
+    getVolumeLog: (id, offset) => dispatch(VolumeActions.getVolumeLog(id, offset)),
   })
 )(JobMonitor);

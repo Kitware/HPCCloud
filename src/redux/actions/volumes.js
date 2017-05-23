@@ -7,6 +7,8 @@ export const UPDATE_ACTIVE_VOLUME = 'UPDATE_ACTIVE_VOLUME';
 export const REMOVE_VOLUME = 'REMOVE_VOLUME';
 export const UPDATE_VOLUMES = 'UPDATE_VOLUMES';
 export const UPDATE_VOLUME = 'UPDATE_VOLUME';
+export const UPDATE_VOLUME_LOG = 'UPDATE_VOLUME';
+export const APPEND_TO_VOLUME_LOG = 'APPEND_TO_VOLUME_LOG';
 export const UPDATE_VOLUME_STATUS = 'UPDATE_VOLUME_STATUS';
 export const SAVE_VOLUME = 'SAVE_VOLUME';
 export const PENDING_VOLUME_NETWORK = 'PENDING_VOLUME_NETWORK';
@@ -31,6 +33,14 @@ export function updateVolumes(volumes) {
 
 export function updateVolumeStatus(volumeId, status) {
   return { type: UPDATE_VOLUME_STATUS, volumeId, status };
+}
+
+export function updateVolumeLog(id, log) {
+  return { type: UPDATE_VOLUME_LOG, id, log };
+}
+
+export function appendToVolumeLog(id, logEntry) {
+  return { type: APPEND_TO_VOLUME_LOG, id, logEntry };
 }
 
 export function fetchVolumes() {
@@ -95,6 +105,25 @@ export function updateVolume(index, volume, pushToServer = false) {
           dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
           dispatch(pendingNetworkCall(false));
         });
+    return action;
+  };
+}
+
+export function getVolumeLog(id, offset) {
+  return (dispatch) => {
+    const action = netActions.addNetworkCall(`cluster_log_${id}`, 'Check cluster log');
+    client.getVolumeLog(id, offset)
+      .then((resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        if (!offset) { // offset is 0 or undefined
+          dispatch(updateVolumeLog(id, resp.data.log));
+        } else {
+          dispatch(appendToVolumeLog(id, resp.data.log));
+        }
+      })
+      .catch((error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error));
+      });
     return action;
   };
 }

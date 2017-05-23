@@ -38,11 +38,11 @@ export default function ({ client, filterQuery, mustContain, encodeQueryAsString
 
     // get /volumes/{id}/log
     //     Get log entries for volume
-    getVolumeLog(taskId, offset = 0) {
+    getVolumeLog(volumeId, offset = 0) {
       if (offset) {
-        return busy(client._.get(`/volumes/${taskId}/log?offset=${offset}`));
+        return busy(client._.get(`/volumes/${volumeId}/log?offset=${offset}`));
       }
-      return busy(client._.get(`/volumes/${taskId}/log`));
+      return busy(client._.get(`/volumes/${volumeId}/log`));
     },
 
     // get /volumes/{id}/status
