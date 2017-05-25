@@ -120,7 +120,7 @@ class Projects(Resource):
     @autoDescribeRoute(
         Description('Get a particular project')
         .modelParam('id', 'The project to get.',
-                    model='project', plugin='hpccloud', level=AccessType.READ)
+                    model='project', plugin='hpccloud', level=AccessType.WRITE)
     )
     @access.user
     def get(self, project, params):
@@ -222,7 +222,7 @@ class Projects(Resource):
     @autoDescribeRoute(
         Description('Create a simulation associated with a project.')
         .modelParam('id', 'The project the simulation will be created in.',
-                    model='project', plugin='hpccloud', level=AccessType.READ)
+                    model='project', plugin='hpccloud', level=AccessType.WRITE)
         .jsonParam('simulation', 'The properties of the simulation.',
                    dataType='SimProperties', required=True, paramType='body')
     )
