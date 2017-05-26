@@ -166,6 +166,12 @@ def merge_access(target, members, level, flags):
     return new_members
 
 
+# reduce target list to items that are not in source list
+def _not_in_filter(source_list, target_list):
+    target_list = [item['id'] for item in target_list]
+    return [item for item in source_list if item not in target_list]
+
+
 def _list_item(item, prefix, export):
     """
     Generate a list of files within a item.

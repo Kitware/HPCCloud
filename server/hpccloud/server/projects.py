@@ -120,7 +120,7 @@ class Projects(Resource):
     @autoDescribeRoute(
         Description('Get a particular project')
         .modelParam('id', 'The project to get.',
-                    model='project', plugin='hpccloud', level=AccessType.WRITE)
+                    model='project', plugin='hpccloud', level=AccessType.READ)
     )
     @access.user
     def get(self, project, params):

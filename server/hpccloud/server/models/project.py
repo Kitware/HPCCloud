@@ -102,7 +102,8 @@ class Project(AccessControlledModel):
 
         return project
 
-    def update_project(self, user, project, name=None, metadata=None, description=None):
+    def update_project(self, user, project, name=None, metadata=None,
+                       description=None):
         """
         Update an existing project, this involves update the data property.
         For now we will just do a dict update, in the future we might want
@@ -155,7 +156,7 @@ class Project(AccessControlledModel):
         super(Project, self).remove(project)
 
     def set_access(self, sharer, project, users, groups,
-                   level=AccessType.READ, flags=[]):
+                   level=AccessType.READ, flags=[], single=False):
         """
         Share a give project.
         :param sharer: The user sharing the project
@@ -195,41 +196,55 @@ class Project(AccessControlledModel):
         simulations_folder = get_simulations_folder(sharer, project)
 
         share_folder(sharer, simulations_folder, users, groups,
-                     level=AccessType.ADMIN, recurse=True)
+                     level=AccessType.WRITE, recurse=True)
 
-        # Now share any simulation associated with this project
-        query = {
-            'projectId': project['_id']
-        }
-        sims = self.model('simulation', 'hpccloud').find(query=query)
-        for sim in sims:
-            self.model('simulation', 'hpccloud').set_access(
-                sharer, sim, users, groups)
+        saved_project = self.save(project)
+
+        if not single:
+            # Now share any simulation associated with this project
+            query = {
+                'projectId': project['_id']
+            }
+            sims = self.model('simulation', 'hpccloud').find(query=query)
+            for sim in sims:
+                self.model('simulation', 'hpccloud').set_access(
+                    sharer, sim, users, groups)
 
         project['updated'] = datetime.datetime.utcnow()
 
-        return self.save(project)
+        return saved_project
 
     def patch_access(self, sharer, project, users, groups,
-                     level=AccessType.READ, flags=[]):
+                     level=AccessType.READ, flags=[], single=False):
         access_list = project.get('access', {'groups': [], 'users': []})
 
         new_users = merge_access(access_list['users'], users, level, flags)
         new_groups = merge_access(access_list['groups'], groups, level, flags)
 
+        # share project folder
         project_folder = self.model('folder').load(
             project['folderId'], user=sharer)
-        share_folder(sharer, project_folder, new_users, new_groups, recurse=True)
-        # patch access for any simulations associated with this project
-        query = {
-            'projectId': project['_id']
-        }
-        sims = self.model('simulation', 'hpccloud').find(query=query)
-        for sim in sims:
-            self.model('simulation', 'hpccloud').patch_access(
-                sharer, sim, users, groups)
+        share_folder(sharer, project_folder,
+                     new_users, new_groups, recurse=True)
 
-        return self.save(project)
+        # share simulations folder
+        simulations_folder = get_simulations_folder(sharer, project)
+        share_folder(sharer, simulations_folder, users, groups,
+                     level=AccessType.WRITE, recurse=True)
+
+        saved_project = self.save(project)
+
+        # patch access for any simulations associated with this project
+        if not single:
+            query = {
+                'projectId': project['_id']
+            }
+            sims = self.model('simulation', 'hpccloud').find(query=query)
+            for sim in sims:
+                self.model('simulation', 'hpccloud').patch_access(
+                    sharer, sim, users, groups)
+
+        return saved_project
 
     def revoke_access(self, sharer, project, users, groups):
         access_list = project.get('access', {'groups': [], 'users': []})

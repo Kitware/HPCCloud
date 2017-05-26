@@ -26,7 +26,7 @@ from girder.models.model_base import AccessControlledModel, ValidationException
 from girder.constants import AccessType
 
 from ..utility import to_object_id, get_simulations_folder, share_folder, \
-    unshare_folder, merge_access
+    unshare_folder, merge_access, _not_in_filter
 from . import schema
 
 
@@ -268,6 +268,11 @@ class Simulation(AccessControlledModel):
         simulation_folder = self.model('folder').load(
             simulation['folderId'], user=sharer)
 
+        # Set access on project if just this simulation is being shared
+        project = self.model('project', 'hpccloud').get(simulation['projectId'])
+        if False:
+            project.patch_access(sharer, project, users, groups, single=True)
+
         share_folder(sharer, simulation_folder, users, groups, force=True)
 
         return self.save(simulation)
@@ -283,6 +288,19 @@ class Simulation(AccessControlledModel):
         simulation_folder = self.model('folder').load(
             simulation['folderId'], user=sharer)
         share_folder(sharer, simulation_folder, new_users, new_groups)
+
+        # Set access on project if just this simulation is being shared
+        # print('gets here!', simulation)
+        project = self.model('project', 'hpccloud').load(
+            simulation['projectId'], user=sharer)
+        new_proj_users = _not_in_filter(new_users,
+                                        project['access']['users'])
+        new_proj_groups = _not_in_filter(new_groups,
+                                         project['access']['groups'])
+        # print('gets here', new_proj_users, new_proj_groups)
+        if len(new_proj_users) or len(new_proj_groups):
+            self.model('project', 'hpccloud').patch_access(
+                sharer, project, new_proj_users, new_proj_groups, single=True)
 
         return self.setAccessList(simulation, access_list, save=True)
 
