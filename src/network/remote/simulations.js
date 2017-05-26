@@ -47,11 +47,11 @@ export default function ({ client, filterQuery, mustContain, busy }) {
       return busy(client._.get(`/simulations/${_id}/access`));
     },
 
-    setSimulationAccess(_id, users, groups, level, flags = []) {
+    setSimulationAccess(_id, users, groups, level = 0, flags = []) {
       return busy(client._.put(`/simulations/${_id}/access`, { users, groups, level: parseInt(level, 10), flags }));
     },
 
-    patchSimulationAccess(_id, users, groups, level, flags = []) {
+    patchSimulationAccess(_id, users, groups, level = 0, flags = []) {
       return busy(client._.patch(`/simulations/${_id}/access`, { users, groups, level: parseInt(level, 10), flags }));
     },
 

@@ -257,7 +257,6 @@ class Simulations(Resource):
     @access.user
     def patch_access(self, simulation, share, params):
         user = getCurrentUser()
-
         # Validate we have been given a value body
         try:
             ref_resolver = jsonschema.RefResolver.from_schema(
