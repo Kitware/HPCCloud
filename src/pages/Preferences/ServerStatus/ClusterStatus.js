@@ -53,11 +53,15 @@ export default React.createClass({
           subtitle={ this.props.status }
           onChange={this.props.logToggle}
         >
+          { this.props.simulation ?
+          <div>
           <p>Active Simulation: <em>{this.props.simulation.name}</em></p>
           { this.props.simulation.step ?
             <p>Step: <em>{this.props.simulation.step}</em></p>
             : null
           }
+          </div>
+          : null }
           <ExecutionUnit inline logOnly
             unit={{ name: 'Log', log: (this.props.log || []), status: '' }}
             open

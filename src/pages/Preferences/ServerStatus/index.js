@@ -33,6 +33,7 @@ const StatusPage = React.createClass({
   propTypes: {
     ec2: React.PropTypes.array,
     volumes: React.PropTypes.array,
+    volumeLogs: React.PropTypes.object,
     ec2Clusters: React.PropTypes.array,
     tradClusters: React.PropTypes.array,
     network: React.PropTypes.object,
@@ -43,12 +44,14 @@ const StatusPage = React.createClass({
     fetchClusters: React.PropTypes.func,
     fetchServers: React.PropTypes.func,
     fetchVolumes: React.PropTypes.func,
+    getVolumeLog: React.PropTypes.func,
   },
 
   getDefaultProps() {
     return {
       ec2: [],
       clusters: [],
+      volumeLogs: {},
     };
   },
 
@@ -62,6 +65,14 @@ const StatusPage = React.createClass({
     return (open) => {
       if (open) {
         this.props.getClusterLog(id, offset);
+      }
+    };
+  },
+
+  volumeLogToggle(id, offset) {
+    return (open) => {
+      if (open) {
+        this.props.getVolumeLog(id, offset);
       }
     };
   },
@@ -107,6 +118,15 @@ const StatusPage = React.createClass({
     />);
   },
 
+  volumeMapper(el, index) {
+    const log = this.props.volumeLogs[el._id] || [];
+    const offset = el.log ? el.log.length : 0;
+    return (<ClusterStatus key={el._id} title={el.name} status={el.status}
+      log={log} logToggle={this.volumeLogToggle(el._id, offset)}
+      noControls
+    />);
+  },
+
   render() {
     return (
       <div className={ style.rootContainer }>
@@ -129,9 +149,13 @@ const StatusPage = React.createClass({
           </div>
 
         {/* Volumes */}
-          <OutputPanel table title="EBS Volumes"
-            headers={['Name', 'Size', 'Status', 'Cluster', 'Profile']}
-            items={this.props.volumes.map(this.volumesMapper)} />
+          <div className={ style.toolbar }>
+            <div className={ style.title }> EBS Volumes </div>
+            <div className={ style.buttons } />
+          </div>
+          <div className={ style.taskflowContent }>
+            { this.props.volumes.map(this.volumeMapper) }
+          </div>
 
         {/* Trad Clusters */}
           <div className={ style.toolbar }>
@@ -161,6 +185,7 @@ export default connect(
       network: state.network,
       ec2: localState.statuses.ec2,
       volumes: localState.volumes.list,
+      volumeLogs: localState.volumes.logById,
       ec2Clusters,
       tradClusters,
     };
@@ -172,5 +197,6 @@ export default connect(
     fetchClusters: () => dispatch(ClusterActions.fetchClusters()),
     fetchServers: () => dispatch(fetchServers()),
     fetchVolumes: () => dispatch(VolumeActions.fetchVolumes()),
+    getVolumeLog: (id, offset) => dispatch(VolumeActions.getVolumeLog(id, offset)),
   })
 )(StatusPage);
