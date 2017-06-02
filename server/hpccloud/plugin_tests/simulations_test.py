@@ -424,7 +424,7 @@ class SimulationTestCase(TestCase):
         files = list(self.model('item').childFiles(cloned_step1_file_item))
         self.assertEqual(len(files), 1)
 
-    def test_share(self):
+    def test_patch_access_read(self):
         sim = self._create_simulation(self._project1, self._user, 'sim1')
 
         body = {
@@ -439,6 +439,57 @@ class SimulationTestCase(TestCase):
 
         r = self.request('/simulations/%s' % str(sim['_id']), method='GET',
                          type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+
+        # Check the addes user has access to the simulation's folder
+        r = self.request('/folder/%s/access' % str(sim['folderId']), method='GET',
+                         type='application/json', user=self._user)
+        self.assertStatus(r, 200)
+        self.assertTrue(str(self._another_user['_id']) in
+            [str(item['id']) for item in r.json['users']])
+
+        update_body = {'description': 'some new description'}
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json.dumps(update_body),
+                         user=self._another_user)
+        self.assertStatus(r, 403)
+
+    def test_patch_access_write(self):
+        sim = self._create_simulation(self._project1, self._user, 'sim1')
+
+        body = {
+            'users': [str(self._another_user['_id'])],
+            'level': 1
+        }
+        json_body = json.dumps(body)
+
+        # share with another_user
+        r = self.request('/simulations/%s/access' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 200)
+
+        r = self.request('/simulations/%s' % str(sim['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+
+        update_body = {'description': 'some new description'}
+        r = self.request('/simulations/%s' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json.dumps(update_body),
+                         user=self._another_user)
+        self.assertStatus(r, 200)
+
+    def test_revoke_access(self):
+        sim = self._create_simulation(self._project1, self._user, 'sim1')
+
+        body = {
+            'users': [str(self._another_user['_id'])],
+        }
+        json_body = json.dumps(body)
+
+
+        # share with another_user
+        r = self.request('/simulations/%s/access' % str(sim['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._user)
         self.assertStatus(r, 200)
 
         # revoke access
