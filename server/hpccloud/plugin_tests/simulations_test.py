@@ -486,7 +486,6 @@ class SimulationTestCase(TestCase):
         }
         json_body = json.dumps(body)
 
-
         # share with another_user
         r = self.request('/simulations/%s/access' % str(sim['_id']), method='PATCH',
                          type='application/json', body=json_body, user=self._user)
