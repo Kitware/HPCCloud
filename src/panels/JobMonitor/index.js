@@ -52,7 +52,7 @@ const JobMonitor = React.createClass({
 
   volumeLogOpen(open) {
     if (open) {
-      const offset = this.props.clusterLog.length;
+      const offset = this.props.volumeLog.length;
       this.props.getVolumeLog(this.props.volumeId, offset);
     }
   },

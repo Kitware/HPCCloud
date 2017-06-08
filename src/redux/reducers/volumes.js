@@ -59,9 +59,19 @@ export default function volumesReducer(state = initialState, action) {
     //   return state;
     // }
     case Actions.UPDATE_VOLUME_STATUS: {
-      const newState = Object.assign({}, state);
-      newState.mapById[action.volumeId].status = action.status;
-      return newState;
+      const { volumeId, status } = action;
+      const list = [].concat(state.list);
+      const mapById = Object.assign({}, state.mapById);
+      const volume = Object.assign({}, state.mapById[volumeId]);
+      volume.status = status;
+      mapById[volumeId] = volume;
+      for (let i = 0; i < list.length; i++) {
+        if (list[i]._id === volumeId) {
+          list[i] = volume;
+          break;
+        }
+      }
+      return Object.assign({}, state, { list, mapById });
     }
     case Actions.SAVE_VOLUME: {
       const { index, volume } = action;
