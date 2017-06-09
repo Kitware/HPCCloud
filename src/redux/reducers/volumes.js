@@ -45,7 +45,7 @@ export default function volumesReducer(state = initialState, action) {
       const mapByClusterId = {};
       list.forEach(vol => {
         if (vol._id) {
-          mapById[vol._id] = Object.assign({}, vol, volumeTemplate);
+          mapById[vol._id] = Object.assign({}, volumeTemplate, vol);
           if (vol.clusterId) {
             mapByClusterId[vol.clusterId] = vol._id;
           }

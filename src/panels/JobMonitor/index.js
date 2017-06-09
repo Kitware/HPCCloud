@@ -190,11 +190,11 @@ export default connect(
       taskflowLog = taskflow.log;
     }
 
-    const volumeId = state.volumes.mapByClusterId[clusterId];
+    const volumeId = state.preferences.volumes.mapByClusterId[clusterId];
     if (volumeId) {
-      volumeName = state.volumes.mapById[volumeId].name;
-      volumeStatus = state.volumes.mapById[volumeId].status;
-      volumeLog = state.volumes.logById[volumeId] || [];
+      volumeName = state.preferences.volumes.mapById[volumeId].name;
+      volumeStatus = state.preferences.volumes.mapById[volumeId].status;
+      volumeLog = state.preferences.volumes.logById[volumeId] || [];
     }
 
     // Sort the tasks by created timestamp
