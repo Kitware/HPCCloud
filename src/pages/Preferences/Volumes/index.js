@@ -110,9 +110,10 @@ const ClusterPrefs = React.createClass({
     const volumeToDelete = list[active];
     if (volumeToDelete._id && confirm('Are you sure you want to delete this volume?')) {
       onRemoveItem(active, volumeToDelete);
-    } else {
+    } else if (!volumeToDelete._id) {
       onRemoveItem(active, volumeToDelete);
     }
+    this.setState({ _error: null });
   },
 
   saveItem() {

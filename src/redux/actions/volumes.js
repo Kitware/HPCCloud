@@ -43,6 +43,10 @@ export function appendToVolumeLog(id, logEntry) {
   return { type: APPEND_TO_VOLUME_LOG, id, logEntry };
 }
 
+export function removeVolumeAtIndex(index) {
+  return { type: REMOVE_VOLUME, index };
+}
+
 export function fetchVolumes() {
   return dispatch => {
     const action = netActions.addNetworkCall('fetch_volumes', 'Retreive EBS Volumes');
@@ -64,7 +68,7 @@ export function fetchVolumes() {
 
 export function removeVolume(index, volume) {
   if (!volume._id) {
-    return { type: REMOVE_VOLUME, index };
+    return removeVolumeAtIndex(index);
   }
 
   return dispatch => {
@@ -76,7 +80,7 @@ export function removeVolume(index, volume) {
         resp => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(pendingNetworkCall(false));
-          dispatch(fetchVolumes());
+          dispatch(removeVolumeAtIndex(index));
         },
         err => {
           dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
