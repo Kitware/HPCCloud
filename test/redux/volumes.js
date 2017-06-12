@@ -51,7 +51,8 @@ describe('volumes', () => {
 
       const expectedState = deepClone(initialState);
       expectedState.list = volumes;
-      expectedState.mapById = { a: { _id: 'a', name: 'vol_a' }, b: { _id: 'b', name: 'vol_b' } };
+      expectedState.mapById = { a: Object.assign({}, volumeTemplate, { _id: 'a', name: 'vol_a' }),
+        b: Object.assign({}, volumeTemplate, { _id: 'b', name: 'vol_b' }) };
       expect(volumeReducer(initialState, expectedAction))
         .toEqual(expectedState);
     });
@@ -100,7 +101,7 @@ describe('volumes', () => {
     it('deletes volumes', (done) => {
       const volumes = [{ _id: 'b', name: 'vol_b' }];
       const expectedActions = [
-        { type: Actions.UPDATE_VOLUMES, volumes },
+        { type: Actions.REMOVE_VOLUME, index: 0 },
       ];
 
       setSpy(client, 'deleteVolume', {});
@@ -109,7 +110,7 @@ describe('volumes', () => {
         .toDispatchActions(expectedActions, complete(done));
     });
 
-    it('upates volumes', (done) => {
+    it('updates volumes', (done) => {
       const volumes = [{ _id: 'a', name: 'vol_a' }, { _id: 'b', name: 'vol_b' }];
       const expectedActions = [
         { type: Actions.UPDATE_VOLUMES, volumes },
