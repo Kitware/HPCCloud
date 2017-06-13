@@ -49,7 +49,7 @@ describe('RunForm', () => {
       const el = TestUtils.renderIntoDocument(<RunEC2
         contents={sampleData.EC2} onChange={blankFunc} />);
       el.setState(formState);
-      expect(TestUtils.scryRenderedDOMComponentsWithClass(el, style.group).length).toEqual(10);
+      expect(TestUtils.scryRenderedDOMComponentsWithClass(el, style.group).length).toEqual(9);
     });
 
     it('should not have a cluster list when there are no clusters', () => {
@@ -58,7 +58,7 @@ describe('RunForm', () => {
       var noClusters = deepClone(formState);
       delete noClusters.clusters;
       el.setState(noClusters);
-      expect(TestUtils.scryRenderedDOMComponentsWithClass(el, style.group).length).toEqual(9);
+      expect(TestUtils.scryRenderedDOMComponentsWithClass(el, style.group).length).toEqual(8);
     });
   });
 
