@@ -10,19 +10,20 @@ import deepClone from 'mout/src/lang/deepClone';
 import projectsData from '../sampleData/projectsData';
 import simulationData from '../sampleData/simulationsForProj1';
 
-import expect from 'expect';
-import complete from '../helpers/complete';
-import { registerAssertions } from 'redux-actions-assertions/expect';
-/* global describe it afterEach */
+import { registerAssertions } from 'redux-actions-assertions/jasmine';
 
-registerAssertions();
+/* global describe expect it beforeEach spyOn */
 
 function setSpy(target, method, data) {
-  expect.spyOn(target, method)
-    .andReturn(Promise.resolve({ data }));
+  spyOn(target, method)
+    .and.returnValue(Promise.resolve({ data }));
 }
 
+Object.freeze(initialState);
+Object.freeze(projectsData);
+
 describe('project actions', () => {
+  beforeEach(registerAssertions);
   // ----------------------------------------------------------------------------
   // SIMPLE ACTIONS
   // ----------------------------------------------------------------------------
@@ -32,7 +33,7 @@ describe('project actions', () => {
       const expectedAction = { type: Actions.UPDATE_PROJECT_LIST, projects: projectsData };
 
       expect(Actions.updateProjectList(projectsData))
-        .toDispatchActions(expectedAction, complete(done));
+        .toDispatchActions(expectedAction, done);
 
       newState.list = projectsData.map((el) => el._id);
       projectsData.forEach((el) => {
@@ -46,7 +47,7 @@ describe('project actions', () => {
       const id = projectsData[0]._id;
       const expectedAction = { type: Actions.UPDATE_PROJECT_SIMULATIONS, id, simulations: simulationData };
       expect(Actions.updateProjectSimulations(id, simulationData))
-        .toDispatchActions(expectedAction, complete(done));
+        .toDispatchActions(expectedAction, done);
 
       expect(Object.keys(projectsReducer(initialState, expectedAction).simulations[id]).length)
         .toEqual(simulationData.length);
@@ -55,13 +56,13 @@ describe('project actions', () => {
     it('should update project data', (done) => {
       const project = projectsData[0];
       expect(Actions.updateProject(project))
-        .toDispatchActions({ type: Actions.UPDATE_PROJECT, project }, complete(done));
+        .toDispatchActions({ type: Actions.UPDATE_PROJECT, project }, done);
     });
 
     it('should update simulation data', (done) => {
       const simulation = simulationData[0];
       expect(Actions.updateSimulation(simulation))
-        .toDispatchActions({ type: Actions.UPDATE_SIMULATION, simulation }, complete(done));
+        .toDispatchActions({ type: Actions.UPDATE_SIMULATION, simulation }, done);
     });
   });
 
@@ -69,34 +70,56 @@ describe('project actions', () => {
   // AYSYNCHRONUS ACTIONS
   // ----------------------------------------------------------------------------
   describe('async actions', () => {
-    afterEach(() => {
-      expect.restoreSpies();
-    });
-
     it('should get projects', (done) => {
       setSpy(client, 'listProjects', projectsData);
       expect(Actions.fetchProjectList())
-        .toDispatchActions({ type: Actions.UPDATE_PROJECT_LIST }, complete(done));
+        .toDispatchActions({ type: Actions.UPDATE_PROJECT_LIST }, done);
     });
 
     const id = projectsData[0]._id;
     it('should get a project\'s simulations', (done) => {
       setSpy(client, 'listSimulations', simulationData);
       expect(Actions.fetchProjectSimulations(id))
-        .toDispatchActions({ type: Actions.UPDATE_PROJECT_SIMULATIONS, id, simulations: simulationData }, complete(done));
+        .toDispatchActions({ type: Actions.UPDATE_PROJECT_SIMULATIONS, id, simulations: simulationData }, done);
       expect(client.listSimulations).toHaveBeenCalled();
     });
 
     it('should save a project', (done) => {
       setSpy(ProjectHelper, 'saveProject', projectsData[0]);
       expect(Actions.saveProject(projectsData[0]))
-        .toDispatchActions({ type: Actions.UPDATE_PROJECT, project: projectsData[0] }, complete(done));
+        .toDispatchActions({ type: Actions.UPDATE_PROJECT, project: projectsData[0] }, done);
     });
 
     it('should delete a project', (done) => {
       setSpy(client, 'deleteProject', projectsData[0]);
       expect(Actions.deleteProject(projectsData[0]))
-        .toDispatchActions({ type: 'REMOVE_PROJECT', project: projectsData[0] }, complete(done));
+        .toDispatchActions({ type: 'REMOVE_PROJECT', project: projectsData[0] }, done);
+    });
+
+    it('shares a project and child simulations', (done) => {
+      const expectedProject = deepClone(projectsData[0]);
+      expectedProject.access.groups.push({ id: '123', level: 2 });
+      setSpy(client, 'patchProjectAccess', expectedProject);
+      expect(Actions.shareProject(projectsData[0], [], [{ id: '123', level: 2 }]))
+        .toDispatchActions({ type: Actions.UPDATE_PROJECT, project: expectedProject }, done);
+      expect(client.patchProjectAccess).toHaveBeenCalled();
+    });
+
+    it('revokes permissions from projects', (done) => {
+      const expectedProject = deepClone(projectsData[0]);
+      setSpy(client, 'revokeProjectAccess', expectedProject);
+      expect(Actions.unShareProject(projectsData[0], [], [{ id: '123', level: 2 }]))
+        .toDispatchActions({ type: Actions.UPDATE_PROJECT, project: expectedProject }, done);
+      expect(client.revokeProjectAccess).toHaveBeenCalled();
+    });
+
+    it('updates permissions for a project', (done) => {
+      const expectedProject = deepClone(projectsData[0]);
+      expectedProject.access.groups.push({ id: '123', level: 2 });
+      setSpy(client, 'patchProjectAccess', expectedProject);
+      expect(Actions.updateProjectPermissions(projectsData[0], [], [{ id: '123', level: 2 }]))
+        .toDispatchActions({ type: Actions.UPDATE_PROJECT, project: expectedProject }, done);
+      expect(client.patchProjectAccess).toHaveBeenCalled();
     });
   });
 });
@@ -106,12 +129,13 @@ describe('project actions', () => {
 // ----------------------------------------------------------------------------
 
 describe('simulation actions', () => {
+  beforeEach(registerAssertions);
   describe('simple actions', () => {
     it('should update Simulation', (done) => {
       const projId = projectsData[0]._id;
       const expectedAction = { type: Actions.UPDATE_SIMULATION, simulation: simulationData[0] };
       expect(Actions.updateSimulation(simulationData[0]))
-        .toDispatchActions(expectedAction, complete(done));
+        .toDispatchActions(expectedAction, done);
 
       expect(projectsReducer(initialState, expectedAction).simulations[projId].list)
         .toContain(simulationData[0]._id);
@@ -125,17 +149,13 @@ describe('simulation actions', () => {
   });
 
   describe('async actions', () => {
-    afterEach(() => {
-      expect.restoreSpies();
-    });
-
     it('should save simulation', (done) => {
       const expectedSim = Object.assign({}, simulationData[0]);
       const expectedAction = { type: Actions.UPDATE_SIMULATION, simulation: expectedSim };
       setSpy(SimulationHelper, 'saveSimulation', expectedSim);
 
       expect(Actions.saveSimulation(expectedSim))
-        .toDispatchActions(expectedAction, complete(done));
+        .toDispatchActions(expectedAction, done);
     });
 
     it('should patch a simulation', (done) => {
@@ -144,7 +164,7 @@ describe('simulation actions', () => {
       setSpy(client, 'editSimulation', patchedSimulation);
 
       expect(Actions.patchSimulation(patchedSimulation))
-        .toDispatchActions(expectedAction, complete(done));
+        .toDispatchActions(expectedAction, done);
       expect(client.editSimulation).toHaveBeenCalled();
     });
 
@@ -167,7 +187,7 @@ describe('simulation actions', () => {
       setSpy(client, 'updateSimulationStep', expectedSim);
       setSpy(client, 'deleteTaskflow', '');
       expect(Actions.updateSimulationStep(expectedSim._id, 'Simulation', { status: 'complete', metadata: { taskflowId: newTaskflowId } }))
-        .toDispatchActions(expectedActions, complete(done));
+        .toDispatchActions(expectedActions, done);
     });
 
     it('should delete simulation and its taskflows', (done) => {
@@ -180,7 +200,24 @@ describe('simulation actions', () => {
       setSpy(client, 'deleteSimulation', null);
       setSpy(client, 'deleteTaskflow', '');
       expect(Actions.deleteSimulation(deletedSim))
-        .toDispatchActions(expectedActions, complete(done));
+        .toDispatchActions(expectedActions, done);
+    });
+
+    it('shares the simulation', (done) => {
+      const expectedSimulation = deepClone(simulationData[0]);
+      expectedSimulation.access.groups.push({ id: '123', level: 2 });
+      setSpy(client, 'patchSimulationAccess', expectedSimulation);
+      expect(Actions.shareSimulation(simulationData[0], [], [{ id: '123', level: 2 }]))
+        .toDispatchActions({ type: Actions.UPDATE_SIMULATION, simulation: expectedSimulation }, done);
+      expect(client.patchSimulationAccess).toHaveBeenCalled();
+    });
+
+    it('revokes permissions for a simulation', (done) => {
+      const expectedSimulation = deepClone(simulationData[0]);
+      setSpy(client, 'revokeSimulationAccess', expectedSimulation);
+      expect(Actions.unShareSimulation(simulationData[0], [], [{ id: '123', level: 2 }]))
+        .toDispatchActions({ type: Actions.UPDATE_SIMULATION, simulation: expectedSimulation }, done);
+      expect(client.revokeSimulationAccess).toHaveBeenCalled();
     });
   });
 });
