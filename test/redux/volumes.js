@@ -118,8 +118,40 @@ describe('volumes', () => {
 
       setSpy(client, 'createVolume', { _id: 'a', name: 'vol_a' });
       setSpy(client, 'listVolumes', volumes);
-      return expect(Actions.updateVolume(0, { _id: 'a', name: 'vol_a' }, true))
+      expect(Actions.updateVolume(0, { _id: 'a', name: 'vol_a' }, true))
         .toDispatchActions(expectedActions, complete(done));
+    });
+
+    it('fetches volume log', (done) => {
+      const log = [{ entry: 'job submitted ...' },
+        { entry: 'job running ...' },
+        { entry: 'job finished ...' },
+      ];
+      setSpy(client, 'getVolumeLog', { log });
+      const expectedAction = { type: Actions.UPDATE_VOLUME_LOG, id: 'abc', log };
+      expect(Actions.getVolumeLog('abc', 0))
+        .toDispatchActions(expectedAction, complete(done));
+
+      const givenState = deepClone(initialState);
+      const expectedState = deepClone(givenState);
+      expectedState.logById.abc = log;
+      expect(volumeReducer(givenState, expectedAction))
+        .toEqual(expectedState);
+    });
+
+    it('fetches volume log and appends', (done) => {
+      const logEntry = { entry: 'job running' };
+      setSpy(client, 'getVolumeLog', { log: logEntry });
+      const expectedAction = { type: Actions.APPEND_TO_VOLUME_LOG, id: 'abc', logEntry };
+      expect(Actions.getVolumeLog('abc', 3))
+        .toDispatchActions(expectedAction, complete(done));
+
+      const givenState = deepClone(initialState);
+      givenState.logById.abc = [{ entry: 'job starting' }];
+      const expectedState = deepClone(givenState);
+      expectedState.logById.abc.push(logEntry);
+      expect(volumeReducer(givenState, expectedAction))
+        .toEqual(expectedState);
     });
   });
 });
