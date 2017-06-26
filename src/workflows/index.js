@@ -4,6 +4,7 @@ import NWChemNeb          from './nwchem/nwchem-neb';
 import OpenFOAMTutorial   from './openfoam/tutorials';
 import OpenFOAMWindTunnel from './openfoam/windtunnel';
 import PyFr               from './pyfr';
+import SparkMPI           from './spark-mpi';
 import Visualizer         from './visualizer';
 
 const Workflows = {
@@ -13,6 +14,7 @@ const Workflows = {
   OpenFOAMTutorial,
   OpenFOAMWindTunnel,
   PyFr,
+  SparkMPI,
   Visualizer,
 };
 
