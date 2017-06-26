@@ -182,6 +182,8 @@ export function saveProject(project, attachments) {
         dispatch(updateProject(respWithProj.data));
         if (attachments && Object.keys(attachments).length) {
           setTimeout(() => { dispatch(router.push(`/View/Project/${respWithProj.data._id}`)); }, 1500);
+        } else if (project._id) {
+          dispatch(router.push('/'));
         } else {
           dispatch(router.push(`/View/Project/${respWithProj.data._id}`));
         }
