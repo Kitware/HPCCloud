@@ -1,4 +1,4 @@
-# basec on https://github.com/Kitware/spark-mpi-experimentation/blob/master/experimentations/14-spark-pipeline/pvw-spark.py
+# based on https://github.com/Kitware/spark-mpi-experimentation/blob/master/experimentations/14-spark-pipeline/pvw-spark.py
 from __future__ import print_function
 import os
 import sys
@@ -40,7 +40,7 @@ nbMPIPartition = int(os.environ["MPI_SIZE"])
 t0 = time.time()
 print('### Start execution - %s' % str(datetime.now()))
 
-filePath = '/data/sebastien/SparkMPI/data-convert/TiltSeries_NanoParticle_doi_10.1021-nl103400a.tif'
+filePath = '{{spark_path}}/SparkMPI/data-convert/TiltSeries_NanoParticle_doi_10.1021-nl103400a.tif'
 reader = simple.TIFFSeriesReader(FileNames=[filePath])
 reader.UpdatePipeline()
 imageData = reader.GetClientSideObject().GetOutputDataObject(0)
@@ -127,7 +127,7 @@ class Options(object):
     host = 'localhost'
     port = 9753
     timeout = 300
-    content = '/data/sebastien/SparkMPI/runtime/visualizer/dist'
+    content = '{{spark_path}}/SparkMPI/runtime/visualizer/dist'
     forceFlush = False
     sslKey = ''
     sslCert = ''

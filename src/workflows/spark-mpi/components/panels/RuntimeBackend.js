@@ -1,12 +1,5 @@
 import React      from 'react';
-import get        from '../../../../utils/get';
 import formStyle  from 'HPCCloudStyle/ItemEditor.mcss';
-
-const TYPES = {
-  cuda: 'Cuda',
-  opencl: 'OpenCL',
-  openmp: 'OpenMP',
-};
 
 export default React.createClass({
 
