@@ -20,10 +20,10 @@ export default {
   },
   config: {
     cluster: {
-      'config.paraview.installDir': {
+      'config.sparkmpi.sparkPath': {
         type: 'text',
-        label: 'ParaView Directory',
-        description: 'Path to the home directory of ParaView.',
+        label: 'Spark-MPI Directory',
+        description: 'Path to the SparkMPI directory.',
       },
     },
   },

@@ -40,7 +40,8 @@ nbMPIPartition = int(os.environ["MPI_SIZE"])
 t0 = time.time()
 print('### Start execution - %s' % str(datetime.now()))
 
-filePath = '{{spark_path}}/SparkMPI/data-convert/TiltSeries_NanoParticle_doi_10.1021-nl103400a.tif'
+filePath = '%s/data-convert/TiltSeries_NanoParticle_doi_10.1021-nl103400a' + \
+           '.tif' % os.environ["SPARK_MPI_PATH"]
 reader = simple.TIFFSeriesReader(FileNames=[filePath])
 reader.UpdatePipeline()
 imageData = reader.GetClientSideObject().GetOutputDataObject(0)
@@ -127,7 +128,7 @@ class Options(object):
     host = 'localhost'
     port = 9753
     timeout = 300
-    content = '{{spark_path}}/SparkMPI/runtime/visualizer/dist'
+    content = '%s/runtime/visualizer/dist' % (os.environ["SPARK_MPI_PATH"])
     forceFlush = False
     sslKey = ''
     sslCert = ''

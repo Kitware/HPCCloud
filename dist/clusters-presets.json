@@ -12,6 +12,7 @@
         "numberOfSlots": 32
       }
     },
+    "config.sparkmpi.sparkPath": "/data/kitware/SparkMPI",
     "config.paraview.installDir": "/data/kitware/opt/paraview",
     "config.pyfr.cuda": true,
     "config.pyfr.opencl": [],
@@ -38,6 +39,7 @@
         "numberOfSlots": 1
       }
     },
+    "config.sparkmpi.sparkPath": "",
     "config.paraview.installDir": "/opt/paraview",
     "config.pyfr.cuda": true,
     "config.pyfr.opencl": [],
@@ -65,6 +67,7 @@
         "numberOfSlots": 1
       }
     },
+    "config.sparkmpi.sparkPath": "",
     "config.paraview.installDir": "/opt/paraview",
     "config.pyfr.cuda": false,
     "config.pyfr.opencl": [],
