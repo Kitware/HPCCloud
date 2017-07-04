@@ -70,8 +70,8 @@ class PyFrTaskFlow(cumulus.taskflow.cluster.ClusterProvisioningTaskFlow):
     PYFR_IMAGE = {
         'owner': '695977956746',
         'tags': {
-            'pyfr': '1.3',
-            'paraview': '5.0.1'
+            'pyfr': '1.6',
+            'paraview': '5.4'
         }
     }
 

@@ -47,7 +47,7 @@ class ParaViewTaskFlow(cumulus.taskflow.cluster.ClusterProvisioningTaskFlow):
     PARAVIEW_IMAGE = {
         'owner': '695977956746',
         'tags': {
-            'paraview': '5.0.1'
+            'paraview': '5.4'
         }
     }
 
