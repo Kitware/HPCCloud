@@ -19,7 +19,7 @@ const JobMonitor = React.createClass({
     taskflowStatus: React.PropTypes.string,
     taskStatusCount: React.PropTypes.object,
 
-    clusterOwner: React.PropTypes.object,
+    clusterOwner: React.PropTypes.string,
     clusterLog: React.PropTypes.array,
     clusterName: React.PropTypes.string,
     clusterStatus: React.PropTypes.string,
@@ -44,7 +44,6 @@ const JobMonitor = React.createClass({
       const offset = this.props.clusterLog.length;
       this.props.getClusterLog(this.props.clusterId, offset);
     } else if (open && this.props.user._id !== this.props.clusterOwner) {
-      console.log('restricted!');
       this.props.restrictedClusterLog(this.props.clusterId);
     }
   },

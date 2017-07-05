@@ -22,9 +22,10 @@ const accessTypes = [
 
 // user(obj): full user object,
 // objAccess(obj): access object of the simulation or project
-// atLeastAccess(string): check that the user has at least this access level
+// atLeastAccess(int|string): check that the user has at least this access level
 export function userHasAccess(user, objAccess, atLeastAccess) {
-  const accessLevel = accessTypes.indexOf(atLeastAccess);
+  const accessLevel = typeof atLeastAccess === 'number' ? accessTypes[atLeastAccess]
+    : accessTypes.indexOf(atLeastAccess);
 
   // check groups
   const groups = objAccess.groups;
