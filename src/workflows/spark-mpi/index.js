@@ -10,7 +10,7 @@ export default {
   name: 'Spark-MPI',
   logo: require('./logo.png'),
   requiredAttachments: {
-    project: ['tif'],
+    project: ['startScript', 'sparkScript', 'input'],
     simulation: [],
   },
   components: {

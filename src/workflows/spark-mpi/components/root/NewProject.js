@@ -4,7 +4,9 @@ import { FileUploadEntry }  from '../../../../panels/ItemEditor';
 export default function NewProject(props) {
   return (
     <div>
-      <FileUploadEntry name="tif" label="Tif (tif, tiff)" accept=".tif,.tiff" owner={props.owner} />
+      <FileUploadEntry name="startScript" label="Start script" accept=".sh" owner={props.owner} />
+      <FileUploadEntry name="sparkScript" label="Spark script" accept=".py" owner={props.owner} />
+      <FileUploadEntry name="input" label="Input file" accept="*" owner={props.owner} />
     </div>);
 }
 
