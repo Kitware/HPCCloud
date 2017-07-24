@@ -35,5 +35,8 @@ describe('userHasAccess', () => {
     // users
     accessObj.users.push({ id: 'abc123', flags: [], level: 2 });
     expect(AccessHelper.userHasAccess(user, accessObj, 'ADMIN')).toEqual(true);
+
+    // works with numbers as access
+    expect(AccessHelper.userHasAccess(user, accessObj, 2)).toEqual(true);
   });
 });
