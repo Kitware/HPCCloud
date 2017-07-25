@@ -10,7 +10,7 @@ function nodeEnv() {
   return '\'development\'';
 }
 
-var definePlugin = new webpack.DefinePlugin({
+const definePlugin = new webpack.DefinePlugin({
   'process.env.NODE_ENV': nodeEnv(),
 });
 
@@ -18,10 +18,9 @@ module.exports = {
   plugins: [
     definePlugin,
   ],
-  noInfo: true,
   module: {
     loaders: loaders.concat([
-      { test: /\.js$/, include: /node_modules\/pvw-visualizer\//, loader: 'babel?presets[]=es2015,presets[]=react' }
+      { test: /\.js$/, include: /node_modules\/pvw-visualizer\//, loader: 'babel?presets[]=es2015,presets[]=react' },
     ]),
     postLoaders: [
       {

@@ -52,14 +52,33 @@ class ProjectsTestCase(TestCase):
             'firstName': 'First',
             'lastName': 'Last',
             'password': 'goodpassword'
-        },
-        {
+        }, {
             'email': 'yetanother@email.com',
             'login': 'yetanother',
             'firstName': 'First',
             'lastName': 'Last',
             'password': 'goodpassword'
         })
+
+        self.simulationBody = {
+            'name': 'mySim',
+            'description': 'my description',
+            'metadata': {
+                'my': 'data'
+            },
+            'steps': {
+                'step1': {
+                    'type': 'input'
+                },
+                'step2': {
+                    'type': 'input'
+                },
+                'step3': {
+                    'type': 'input'
+                }
+            }
+        }
+
         self._user, self._another_user, self._yet_another_user = \
             [self.model('user').createUser(**user) for user in users]
 
@@ -330,22 +349,7 @@ class ProjectsTestCase(TestCase):
         self.assertStatus(r, 201)
         project = r.json
 
-        body = {
-            "name": "mySim",
-            "steps": {
-                "step1": {
-                    "type": "input"
-                },
-                "step2": {
-                    "type": "input"
-                },
-                "step3": {
-                    "type": "input"
-                }
-            }
-        }
-
-        json_body = json.dumps(body)
+        json_body = json.dumps(self.simulationBody)
         r = self.request('/projects/%s/simulations' % str(project['_id']), method='POST',
                          type='application/json', body=json_body, user=self._another_user)
         self.assertStatus(r, 201)
@@ -374,7 +378,7 @@ class ProjectsTestCase(TestCase):
                          type='application/json', user=self._another_user)
         self.assertStatus(r, 403)
 
-    def test_share(self):
+    def test_patch_access_read(self):
         project1 = self._create_project('project1', self._yet_another_user)
         project2 = self._create_project('project2', self._another_user)
 
@@ -394,8 +398,8 @@ class ProjectsTestCase(TestCase):
         }
 
         json_body = json.dumps(body)
-        r = self.request('/projects/%s/share' % str(project1['_id']),
-                         method='PUT', type='application/json', body=json_body,
+        r = self.request('/projects/%s/access' % str(project1['_id']),
+                         method='PATCH', type='application/json', body=json_body,
                          user=self._yet_another_user)
         self.assertStatus(r, 200)
 
@@ -413,6 +417,187 @@ class ProjectsTestCase(TestCase):
 
         # Check that owner still has access
         r = self.request('/projects/%s' % str(project1['_id']), method='GET',
-                 type='application/json', user=self._yet_another_user)
+                         type='application/json', user=self._yet_another_user)
         self.assertStatus(r, 200)
         self.assertEqual(r.json['_id'], project1['_id'])
+
+        # check that the _another_user cannot create simulations
+        json_body = json.dumps(self.simulationBody)
+        r = self.request('/projects/%s/simulations' % str(project1['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 403)
+
+    def test_patch_access_write(self):
+        project1 = self._create_project('project1', self._yet_another_user)
+        project2 = self._create_project('project2', self._another_user)
+
+        r = self.request('/projects', method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(len(r.json), 1)
+        del r.json[0]['created']
+        del r.json[0]['updated']
+        del project2['created']
+        del project2['updated']
+        self.assertEqual(r.json[0], project2)
+
+        # Now share the other project
+        body = {
+            'users': [str(self._another_user['_id'])],
+            'level': 1
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s/access' % str(project1['_id']),
+                         method='PATCH', type='application/json', body=json_body,
+                         user=self._yet_another_user)
+        self.assertStatus(r, 200)
+
+        # Check the added user has write access to the project folder
+        r = self.request('/folder/%s/access' % str(project1['folderId']), method='GET',
+                         type='application/json', user=self._yet_another_user)
+        self.assertStatus(r, 200)
+        self.assertTrue(str(self._another_user['_id']) in
+            [str(item['id']) for item in r.json['users']])
+
+        # check that the added user can create simulations
+        json_body = json.dumps(self.simulationBody)
+        r = self.request('/projects/%s/simulations' % str(project1['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 201)
+        self.assertEqual(r.json['name'], self.simulationBody['name'])
+
+    def test_single_simulation_share(self):
+        project1 = self._create_project('project1', self._user)
+
+        sim1 = self.simulationBody
+        json_body = json.dumps(sim1)
+        r = self.request('/projects/%s/simulations' % str(project1['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 201)
+        sim1 = r.json
+
+        sim2 = dict(self.simulationBody)
+        sim2['name'] = 'another simulation'
+        json_body = json.dumps(sim2)
+        r = self.request('/projects/%s/simulations' % str(project1['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 201)
+
+        # we've created two simulations in the project
+        r = self.request('/projects/%s/simulations' % str(project1['_id']), method='GET',
+                         type='application/json', user=self._user)
+        self.assertStatus(r, 200)
+        self.assertEqual(len(r.json), 2)
+
+        # Share only sim1
+        body = {
+            'users': [str(self._another_user['_id'])],
+        }
+        json_body = json.dumps(body)
+
+        r = self.request('/simulations/%s/access' % str(sim1['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 200)
+
+        # check that _another_user can access the project
+        r = self.request('/projects', method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+
+        # check that _another_user can only access the simulation shared with them
+        r = self.request('/projects/%s/simulations' % str(project1['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(len(r.json), 1)
+
+        # check that the added user cannot create simulations in the project
+        sim3 = dict(self.simulationBody)
+        sim3['name'] = 'a third simulation'
+        json_body = json.dumps(sim3)
+        r = self.request('/projects/%s/simulations' % str(project1['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 403)
+
+        # update access to write
+        body = {
+            'users': [str(self._another_user['_id'])],
+            'level': 1
+        }
+        json_body = json.dumps(body)
+
+        r = self.request('/simulations/%s/access' % str(sim1['_id']), method='PATCH',
+                         type='application/json', body=json_body, user=self._user)
+        self.assertStatus(r, 200)
+
+        # ensure the new write permission doesn't bubble up to the project
+        json_body = json.dumps(sim3)
+        r = self.request('/projects/%s/simulations' % str(project1['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 403)
+
+    def test_revoke_access(self):
+        project1 = self._create_project('project1', self._user)
+
+        # Share the project
+        body = {
+            'users': [str(self._another_user['_id']), str(self._yet_another_user['_id'])]
+        }
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s/access' % str(project1['_id']),
+                         method='PATCH', type='application/json', body=json_body,
+                         user=self._user)
+        self.assertStatus(r, 200)
+
+        # revoke access to '_another_user'
+        body = {
+            'users': [str(self._another_user['_id'])]
+        }
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s/access/revoke' % str(project1['_id']),
+                         method='PATCH', type='application/json', body=json_body,
+                         user=self._user)
+        self.assertStatus(r, 200)
+
+        # _yet_another_user still has access
+        r = self.request('/projects/%s' % str(project1['_id']), method='GET',
+                         type='application/json', user=self._yet_another_user)
+        self.assertStatus(r, 200)
+        self.assertEqual(r.json['_id'], project1['_id'])
+
+        # _another_user does not have access
+        r = self.request('/projects/%s' % str(project1['_id']), method='GET',
+                         type='application/json', user=self._another_user)
+        self.assertStatus(r, 403)
+
+    def test_access_group(self):
+        project1 = self._create_project('project1', self._user)
+        my_group = self.model('group').createGroup('myGroup', self._user)
+
+        self.model('group').addUser(my_group, self._another_user)
+
+        # Now share the project with write access to the group
+        body = {
+            'groups': [str(my_group['_id'])],
+            'level': 1
+        }
+
+        json_body = json.dumps(body)
+        r = self.request('/projects/%s/access' % str(project1['_id']),
+                         method='PATCH', type='application/json', body=json_body,
+                         user=self._user)
+        self.assertStatus(r, 200)
+
+        # # Check that _another_user has write access to the project folder
+        r = self.request('/folder/%s/access' % str(project1['folderId']), method='GET',
+                         type='application/json', user=self._user)
+        self.assertStatus(r, 200)
+        self.assertTrue(str(my_group['_id']) in
+            [str(item['id']) for item in r.json['groups']])
+
+        # # check that _another_user can create simulations
+        json_body = json.dumps(self.simulationBody)
+        r = self.request('/projects/%s/simulations' % str(project1['_id']), method='POST',
+                         type='application/json', body=json_body, user=self._another_user)
+        self.assertStatus(r, 201)
+        self.assertEqual(r.json['name'], self.simulationBody['name'])

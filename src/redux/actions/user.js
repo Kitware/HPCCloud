@@ -6,6 +6,7 @@ import { dispatch } from '..';
 export const LOGGED_IN = 'LOGGED_IN';
 export const AUTH_PENDING = 'AUTH_PENDING';
 export const LOGOUT = 'LOGOUT';
+export const GET_USERS = 'GET_USERS';
 
 /* eslint-disable no-shadow */
 export function authenticationPending(pending = true) {
@@ -129,6 +130,22 @@ export function updateUser(user, pushOnServer = false) {
       return action;
     }
     return loggedIn(user);
+  };
+}
+
+export function getUsers() {
+  return (dispatch) => {
+    const action = netActions.addNetworkCall('user_updatePassword', 'Update password');
+
+    client.listUsers()
+      .then((resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch({ type: GET_USERS, users: resp.data });
+      })
+      .catch((err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err));
+      });
+    return action;
   };
 }
 

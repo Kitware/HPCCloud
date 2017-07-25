@@ -19,6 +19,7 @@ export const CLUSTER_APPLY_PRESET = 'CLUSTER_APPLY_PRESET';
 export const TESTING_CLUSTER = 'TESTING_CLUSTER';
 export const UPDATE_CLUSTER_LOG = 'UPDATE_CLUSTER_LOG';
 export const APPEND_TO_CLUSTER_LOG = 'APPEND_TO_CLUSTER_LOG';
+export const RESTRICTED_CLUSTER_LOG = 'RESTRICTED_CLUSTER_LOG';
 
 /* eslint-disable no-shadow */
 
@@ -67,6 +68,10 @@ export function updateClusterLog(id, log) {
 
 export function appendToClusterLog(id, logEntry) {
   return { type: APPEND_TO_CLUSTER_LOG, id, logEntry };
+}
+
+export function restrictedClusterLog(id) {
+  return { type: RESTRICTED_CLUSTER_LOG, id };
 }
 
 function updateTaskflowActionsForClusterEvent(cluster, status) {

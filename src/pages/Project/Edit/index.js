@@ -1,4 +1,5 @@
 import ItemEditor   from '../../../panels/ItemEditor';
+import SharePanel   from '../../../panels/SharePanel';
 import React        from 'react';
 
 import Workflows    from '../../../workflows';
@@ -17,7 +18,7 @@ const ProjectEdit = React.createClass({
   propTypes: {
     error: React.PropTypes.string,
     project: React.PropTypes.object,
-
+    currentUser: React.PropTypes.string,
     onSave: React.PropTypes.func,
     onDelete: React.PropTypes.func,
     onCancel: React.PropTypes.func,
@@ -66,6 +67,13 @@ const ProjectEdit = React.createClass({
         onAction={ this.onAction }
       >
         { workflowAddOn }
+        { this.props.currentUser === this.props.project.userId ?
+          <div>
+            <SharePanel shareItem={this.props.project} shareToType="users" />
+            <SharePanel shareItem={this.props.project} shareToType="groups" />
+          </div>
+          : null
+        }
       </ItemEditor>);
   },
 });
@@ -77,8 +85,9 @@ const ProjectEdit = React.createClass({
 export default connect(
   (state, props) => {
     return {
+      currentUser: state.auth.user ? state.auth.user._id : '',
       project: state.projects.mapById[props.params.id],
-      error: getNetworkError(state, ['save_project', 'delete_project']),
+      error: getNetworkError(state, ['save_project', 'delete_project', 'share_project', 'unshare_project']),
     };
   },
   () => {

@@ -76,14 +76,14 @@ def get_simulations_folder(user, project):
     filters = {
         'name': SIMULATIONS_FOLDER
     }
-
     try:
         simulations_folder = six.next(
             ModelImporter.model('folder').childFolders(
                 parentType='folder', user=user, parent=project_folder,
                 filters=filters, limit=1))
     except StopIteration:
-        raise Exception('Unable to find project simulations folder')
+        raise Exception('Unable to find project simulations folder' +
+                        'for project "%s"' % project['name'])
 
     return simulations_folder
 
@@ -99,35 +99,77 @@ def to_object_id(id):
 
 
 def share_folder(owner, folder, users, groups, level=AccessType.READ,
-                 recurse=False):
-    folder_access_list = folder['access']
-    folder_access_list['users'] \
-        = [user for user in folder_access_list['users']
-           if user != owner['_id']]
-    folder_access_list['groups'] = []
+                 recurse=False, force=False):
+    folder_access_list = folder.get('access', {'groups': [], 'users': []})
 
-    for user_id in users:
-        access_object = {
-            'id': to_object_id(user_id),
-            'level': level
-        }
-        folder_access_list['users'].append(access_object)
+    if force:
+        for user_id in users:
+            access_object = {
+                'id': to_object_id(user_id),
+                'level': level
+            }
+            folder_access_list['users'].append(access_object)
 
-        # Give read access to the project folder
-        folder_access_list['users'].append(access_object)
-
-    for group_id in groups:
-        access_object = {
-            'id': to_object_id(group_id),
-            'level': level
-        }
-        folder_access_list['groups'].append(access_object)
-
-        # Give read access to the project folder
-        folder_access_list['groups'].append(access_object)
+        for group_id in groups:
+            access_object = {
+                'id': to_object_id(group_id),
+                'level': level
+            }
+            folder_access_list['groups'].append(access_object)
+    else:
+        # merge to maintain access level of other members
+        merge_access(folder_access_list['users'], users, level, [])
+        merge_access(folder_access_list['groups'], groups, level, [])
 
     return ModelImporter.model('folder').setAccessList(
         folder, folder_access_list, save=True, recurse=recurse, user=owner)
+
+
+def unshare_folder(owner, folder, users, groups, recurse=False):
+    folder_access_list = folder.get('access', {'users': [], 'groups': []})
+
+    folder_access_list['groups'] = [g for g in folder_access_list['groups']
+                                    if str(g['id']) not in groups]
+    folder_access_list['users'] = [u for u in folder_access_list['users']
+                                   if str(u['id']) not in users]
+
+    return ModelImporter.model('folder').setAccessList(
+        folder, folder_access_list, save=True, recurse=recurse, user=owner)
+
+
+def merge_access(target, members, level, flags):
+    """
+    :param target: array of acces objects{id, level, flags}...
+    :param members: array of ids
+    :param level: number, AccessType [-1..2]
+    :param flags: array of strings
+    """
+    new_members = []
+    target_ids = [str(item['id']) for item in target]
+    for member_id in members:
+        # append member not in the target
+        if member_id not in target_ids:
+            access_object = {
+                'id': to_object_id(member_id),
+                'level': level,
+                'flags': flags
+            }
+            target.append(access_object)
+            new_members.append(member_id)
+        # update member if it's in the target
+        else:
+            for item in target:
+                if member_id == str(item['id']):
+                    item['level'] = level
+                    item['flags'] = flags
+                    break
+    return new_members
+
+
+# reduce target list to items that are not in source list
+def _not_in_filter(source_list, target_list):
+    target_list = [item['id'] for item in target_list]
+    return [item for item in source_list if item not in target_list]
 
 
 def _list_item(item, prefix, export):

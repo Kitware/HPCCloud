@@ -1,4 +1,5 @@
 import ItemEditor from '../../../panels/ItemEditor';
+import SharePanel   from '../../../panels/SharePanel';
 import React      from 'react';
 import Workflows  from '../../../workflows';
 
@@ -19,7 +20,7 @@ const SimulationEdit = React.createClass({
     error: React.PropTypes.string,
     project: React.PropTypes.object,
     simulation: React.PropTypes.object,
-
+    currentUser: React.PropTypes.string,
     onSave: React.PropTypes.func,
     onDelete: React.PropTypes.func,
     onCancel: React.PropTypes.func,
@@ -76,7 +77,14 @@ const SimulationEdit = React.createClass({
           { name: 'editSimulation', label: 'Save simulation' }]}
         onAction={ this.onAction }
       >
-      { workflowAddOn }
+        { workflowAddOn }
+        { this.props.currentUser === this.props.simulation.userId ?
+          <div>
+            <SharePanel shareItem={this.props.simulation} shareToType="users" />
+            <SharePanel shareItem={this.props.simulation} shareToType="groups" />
+          </div>
+          : null
+        }
       </ItemEditor>);
   },
 });
@@ -86,10 +94,14 @@ const SimulationEdit = React.createClass({
 
 export default connect(
   (state, props) => {
-    const project = state.projects.mapById[state.projects.active];
-    const simulations = state.projects.simulations[state.projects.active];
-    const simulation = state.simulations.mapById[simulations.active];
+    const simId = props.params.id;
+    const simulation = state.simulations.mapById[simId];
+    let project = {};
+    if (simulation && simulation.projectId) {
+      project = state.projects.mapById[simulation.projectId];
+    }
     return {
+      currentUser: state.auth.user._id,
       error: getNetworkError(state, ['save_simulation', `delete_simulation_${props.params.id}`]),
       project,
       simulation,

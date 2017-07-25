@@ -16,7 +16,6 @@ import * as Actions from '../../../redux/actions/aws';
 import * as NetActions from '../../../redux/actions/network';
 import { dispatch } from '../../../redux';
 
-const awsBreadCrumb = Object.assign({}, breadcrumb, { active: 2 });
 function getActions(disabled, showSave) {
   var ret = [{ name: 'removeItem', label: 'Delete', icon: style.deleteIcon, disabled }];
   if (showSave) {
@@ -35,6 +34,7 @@ const AWSPrefs = React.createClass({
     list: React.PropTypes.array,
     error: React.PropTypes.string,
     buttonsDisabled: React.PropTypes.bool,
+    user: React.PropTypes.object,
 
     onUpdateItem: React.PropTypes.func,
     onActiveChange: React.PropTypes.func,
@@ -129,6 +129,7 @@ const AWSPrefs = React.createClass({
   render() {
     const { active, list, error, buttonsDisabled } = this.props;
     const activeData = active < list.length ? list[active] : null;
+    const awsBreadCrumb = breadcrumb(this.props.user, 'EC2');
 
     let content = null;
     if (list.length) {
@@ -185,6 +186,7 @@ export default connect(
       list: localState.list,
       buttonsDisabled: localState.pending,
       error: getNetworkError(state, ['save_aws_profile', 'remove_aws_profile']),
+      user: state.auth.user,
     };
   },
   () => {

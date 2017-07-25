@@ -66,7 +66,7 @@ export default function networkReducer(state = initialState, action) {
       const error = Object.assign({}, state.error);
       const activeErrors = Object.assign({}, state.activeErrors);
 
-      if (!error[id].invalid) {
+      if (error[id] && !error[id].invalid) {
         error[id].invalid = true;
       }
 
