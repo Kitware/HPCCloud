@@ -60,6 +60,8 @@ install:
     - pip install -U -r requirements.txt
 
 script:
+    # Hack! See https://github.com/travis-ci/travis-ci/issues/7940
+    - export BOTO_CONFIG=/dev/null
     # Run client tests, only with python 2.7
     - if [ -n "${PY2}" ]; then npm install; fi
     - if [ -n "${PY2}" ]; then npm run build:release; fi
