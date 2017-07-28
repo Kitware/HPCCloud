@@ -27,6 +27,7 @@ sidebar:
     usage__create-account: Signing up
     usage__trad-cluster: Adding traditional clusters
     usage__aws-profiles: Adding AWS profiles
+    usage__ebs-volumes: Adding EBS volumes
     usage__creating: Projects and simulations
     usage__simput: Simput
     usage__running: Running workflows

@@ -8,6 +8,7 @@ docs:
     usage__create-account: usage__create-account.html
     usage__trad-cluster: usage__trad-cluster.html
     usage__aws-profiles: usage__aws-profiles.html
+    usage__ebs-volumes: usage__ebs-volumes.html
     usage__creating: usage__creating.html
     usage__simput: usage__simput.html
     usage__running: usage__running.html
