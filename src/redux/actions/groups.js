@@ -84,10 +84,12 @@ export function saveGroup(index, group) {
         (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
           dispatch(updateLocalGroup(index, resp.data));
+          dispatch(getGroupUsers(resp.data._id));
         },
         (err) => {
           dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
         });
+    return action;
   };
 }
 
