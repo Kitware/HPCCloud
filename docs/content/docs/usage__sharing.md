@@ -14,3 +14,4 @@ Only a project owner can share projects and the corresponding simulations with g
 
 Sharing a project with users or groups also shares the simulations and the corresponding taskflows within. You can share individual simulations with users and groups as well, doing so will share the parent project but only the shared simulation will be visible to the sharees. 
 
+Level of access per project and simulation can also be set. The possible values are Read, Write, and Admin. Beware setting admin permissions to groups and users on the project level as they will have access to all containing simulations and files.
