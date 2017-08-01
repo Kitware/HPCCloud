@@ -1,5 +1,5 @@
 import React                from 'react';
-import { projectFunctions, SimulationHelper } from '../../../utils/AccessHelper';
+import { projectFunctions, SimulationHelper, userHasAccess } from '../../../utils/AccessHelper';
 import TableListing         from '../../../panels/TableListing';
 import EmptyPlaceholder     from '../../../panels/EmptyPlaceholder';
 import { primaryBreadCrumbs } from '../../../utils/Constants';
@@ -22,6 +22,7 @@ const ProjectView = React.createClass({
     onActivate: React.PropTypes.func,
     onLocationChange: React.PropTypes.func,
     onDelete: React.PropTypes.func,
+    hasAccess: React.PropTypes.bool,
   },
 
   onAction(action, arg) {
@@ -61,6 +62,7 @@ const ProjectView = React.createClass({
         accessHelper={ SimulationHelper }
         items={ this.props.simulations }
         onAction={ this.onAction }
+        hasAccess={this.props.hasAccess}
         title={ <span> <img src={projectFunctions.getIcon(this.props.project).image} height="20px" /> {this.props.project.name} / Simulations</span> }
         placeholder={
           <EmptyPlaceholder phrase={
@@ -86,6 +88,7 @@ export default connect(
     const projectSims = state.projects.simulations[project._id];
     const simulations = projectSims ? projectSims.list.map((id) => state.simulations.mapById[id]).filter((i) => !!i) : [];
     return {
+      hasAccess: userHasAccess(state.auth.user, project.access, 'write'),
       project,
       simulations,
     };

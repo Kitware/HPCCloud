@@ -1,5 +1,6 @@
 import ItemEditor from '../../../panels/ItemEditor';
 import SharePanel   from '../../../panels/SharePanel';
+import { userHasAccess } from '../../../utils/AccessHelper';
 import React      from 'react';
 import Workflows  from '../../../workflows';
 
@@ -11,6 +12,17 @@ import { dispatch } from '../../../redux';
 import * as Actions from '../../../redux/actions/projects';
 import * as Router  from '../../../redux/actions/router';
 
+function actionsForUser(user, accessObject, props) {
+  if (userHasAccess(user, accessObject, 'write')) {
+    return [
+      { name: 'cancel', label: 'Cancel' },
+      { name: 'delete', label: 'Delete simulation', disabled: props.simulation.metadata.status === 'running' },
+      { name: 'editSimulation', label: 'Save simulation' },
+    ];
+  }
+  return [];
+}
+
 /* eslint-disable no-alert */
 const SimulationEdit = React.createClass({
 
@@ -20,7 +32,7 @@ const SimulationEdit = React.createClass({
     error: React.PropTypes.string,
     project: React.PropTypes.object,
     simulation: React.PropTypes.object,
-    currentUser: React.PropTypes.string,
+    currentUser: React.PropTypes.object,
     onSave: React.PropTypes.func,
     onDelete: React.PropTypes.func,
     onCancel: React.PropTypes.func,
@@ -50,7 +62,7 @@ const SimulationEdit = React.createClass({
       return null;
     }
 
-    const { simulation, project, error } = this.props;
+    const { currentUser, simulation, project, error } = this.props;
     const projectId = simulation.projectId;
     const childComponent = project.type ? Workflows[project.type].components.EditSimulation : null;
     const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.container,
@@ -71,14 +83,11 @@ const SimulationEdit = React.createClass({
         error={error}
         ref={(c) => {this.container = c;}}
         title="Edit Simulation"
-        actions={[
-          { name: 'cancel', label: 'Cancel' },
-          { name: 'delete', label: 'Delete simulation', disabled: this.props.simulation.metadata.status === 'running' },
-          { name: 'editSimulation', label: 'Save simulation' }]}
+        actions={actionsForUser(currentUser, simulation.access, this.props)}
         onAction={ this.onAction }
       >
         { workflowAddOn }
-        { this.props.currentUser === this.props.simulation.userId ?
+        { currentUser._id === this.props.simulation.userId ?
           <div>
             <SharePanel shareItem={this.props.simulation} shareToType="users" />
             <SharePanel shareItem={this.props.simulation} shareToType="groups" />
@@ -101,7 +110,7 @@ export default connect(
       project = state.projects.mapById[simulation.projectId];
     }
     return {
-      currentUser: state.auth.user._id,
+      currentUser: state.auth.user,
       error: getNetworkError(state, ['save_simulation', `delete_simulation_${props.params.id}`]),
       project,
       simulation,

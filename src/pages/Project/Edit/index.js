@@ -1,5 +1,6 @@
 import ItemEditor   from '../../../panels/ItemEditor';
 import SharePanel   from '../../../panels/SharePanel';
+import { userHasAccess } from '../../../utils/AccessHelper';
 import React        from 'react';
 
 import Workflows    from '../../../workflows';
@@ -10,6 +11,17 @@ import { dispatch } from '../../../redux';
 import * as Router  from '../../../redux/actions/router';
 import * as Actions from '../../../redux/actions/projects';
 
+function actionsForUser(user, accessObject) {
+  if (userHasAccess(user, accessObject, 'write')) {
+    return [
+      { name: 'cancel', label: 'Cancel' },
+      { name: 'delete', label: 'Delete project' },
+      { name: 'editProject', label: 'Save project' },
+    ];
+  }
+  return [];
+}
+
 /* eslint-disable no-alert */
 const ProjectEdit = React.createClass({
 
@@ -18,7 +30,7 @@ const ProjectEdit = React.createClass({
   propTypes: {
     error: React.PropTypes.string,
     project: React.PropTypes.object,
-    currentUser: React.PropTypes.string,
+    currentUser: React.PropTypes.object,
     onSave: React.PropTypes.func,
     onDelete: React.PropTypes.func,
     onCancel: React.PropTypes.func,
@@ -44,7 +56,7 @@ const ProjectEdit = React.createClass({
   },
 
   render() {
-    const { project, error } = this.props;
+    const { currentUser, project, error } = this.props;
     if (!project) {
       return null;
     }
@@ -60,14 +72,11 @@ const ProjectEdit = React.createClass({
         error={ error }
         ref={(c) => {this.container = c;}}
         title="Edit Project"
-        actions={[
-          { name: 'cancel', label: 'Cancel' },
-          { name: 'delete', label: 'Delete project' },
-          { name: 'editProject', label: 'Save project' }]}
+        actions={actionsForUser(currentUser, project.access)}
         onAction={ this.onAction }
       >
         { workflowAddOn }
-        { this.props.currentUser === this.props.project.userId ?
+        { currentUser._id === this.props.project.userId ?
           <div>
             <SharePanel shareItem={this.props.project} shareToType="users" />
             <SharePanel shareItem={this.props.project} shareToType="groups" />
@@ -85,7 +94,7 @@ const ProjectEdit = React.createClass({
 export default connect(
   (state, props) => {
     return {
-      currentUser: state.auth.user ? state.auth.user._id : '',
+      currentUser: state.auth.user,
       project: state.projects.mapById[props.params.id],
       error: getNetworkError(state, ['save_project', 'delete_project', 'share_project', 'unshare_project']),
     };

@@ -2,7 +2,7 @@ import merge             from 'mout/src/object/merge';
 import React             from 'react';
 import TableListing      from '../../../panels/TableListing';
 import EmptyPlaceholder  from '../../../panels/EmptyPlaceholder';
-import { ProjectHelper } from '../../../utils/AccessHelper';
+import { ProjectHelper, userHasAccess } from '../../../utils/AccessHelper';
 import { primaryBreadCrumbs } from '../../../utils/Constants';
 
 import theme from 'HPCCloudStyle/Theme.mcss';
@@ -62,6 +62,7 @@ const ProjectAll = React.createClass({
         items={ this.props.projects }
         onAction={ this.onAction }
         title="Projects"
+        hasAccess
         placeholder={
           <EmptyPlaceholder phrase={
             <div>

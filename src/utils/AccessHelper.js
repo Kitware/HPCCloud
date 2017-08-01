@@ -25,7 +25,7 @@ const accessTypes = [
 // atLeastAccess(int|string): check that the user has at least this access level
 export function userHasAccess(user, objAccess, atLeastAccess) {
   const accessLevel = typeof atLeastAccess === 'number' ? atLeastAccess
-    : accessTypes.indexOf(atLeastAccess);
+    : accessTypes.indexOf(atLeastAccess.toUpperCase());
 
   // check groups
   const groups = objAccess.groups;
