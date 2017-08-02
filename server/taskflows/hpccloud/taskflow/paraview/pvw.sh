@@ -1,8 +1,3 @@
-{% if cluster.type == 'ec2' -%}
-#$ -q all.q@@master
-{% endif -%}
-
-
 # Set up cluster-specific variables
 PARAVIEW_DIR={{paraviewInstallDir if paraviewInstallDir else "/opt/paraview/install"}}
 PV_BATCH="${PARAVIEW_DIR}/bin/pvbatch"
