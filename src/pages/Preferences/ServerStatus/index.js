@@ -15,7 +15,6 @@ import * as ClusterActions from '../../../redux/actions/clusters';
 import * as VolumeActions from '../../../redux/actions/volumes';
 import { fetchServers } from '../../../redux/actions/statuses';
 
-const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 4 });
 const noSimulation = { name: 'no simulation on this cluster.', step: '' };
 
 function matchIdInArray(_id, arr, key = 'name') {

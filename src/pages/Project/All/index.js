@@ -2,7 +2,7 @@ import merge             from 'mout/src/object/merge';
 import React             from 'react';
 import TableListing      from '../../../panels/TableListing';
 import EmptyPlaceholder  from '../../../panels/EmptyPlaceholder';
-import { ProjectHelper, userHasAccess } from '../../../utils/AccessHelper';
+import { ProjectHelper } from '../../../utils/AccessHelper';
 import { primaryBreadCrumbs } from '../../../utils/Constants';
 
 import theme from 'HPCCloudStyle/Theme.mcss';

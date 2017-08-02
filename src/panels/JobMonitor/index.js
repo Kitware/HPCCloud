@@ -181,7 +181,6 @@ export default connect(
     var clusterLog = [];
     var clusterName = '';
     var clusterStatus = '';
-    var clusterLog = [];
     var volumeName = '';
     var volumeStatus = '';
     var volumeLog = [];
@@ -225,7 +224,7 @@ export default connect(
       taskflowLog,
       taskflowStatus,
       taskStatusCount,
-      clusterName, clusterStatus, clusterLog, clusterOwner
+      clusterName, clusterStatus, clusterLog, clusterOwner,
       volumeId, volumeName, volumeStatus, volumeLog,
     };
   },
