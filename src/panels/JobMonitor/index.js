@@ -13,15 +13,17 @@ const JobMonitor = React.createClass({
   propTypes: {
     tasks: React.PropTypes.array,
     jobs: React.PropTypes.array,
+    user: React.PropTypes.object,
 
-    taskStatusCount: React.PropTypes.object,
-    taskflowStatus: React.PropTypes.string,
     taskflowLog: React.PropTypes.array,
+    taskflowStatus: React.PropTypes.string,
+    taskStatusCount: React.PropTypes.object,
 
     clusterId: React.PropTypes.string,
+    clusterOwner: React.PropTypes.string,
+    clusterLog: React.PropTypes.array,
     clusterName: React.PropTypes.string,
     clusterStatus: React.PropTypes.string,
-    clusterLog: React.PropTypes.array,
 
     volumeId: React.PropTypes.string,
     volumeName: React.PropTypes.string,
@@ -30,6 +32,7 @@ const JobMonitor = React.createClass({
 
     getClusterLog: React.PropTypes.func,
     getVolumeLog: React.PropTypes.func,
+    restrictedClusterLog: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -44,9 +47,11 @@ const JobMonitor = React.createClass({
   },
 
   clusterLogOpen(open) {
-    if (open) {
+    if (open && this.props.user._id === this.props.clusterOwner) {
       const offset = this.props.clusterLog.length;
       this.props.getClusterLog(this.props.clusterId, offset);
+    } else if (open && this.props.user._id !== this.props.clusterOwner) {
+      this.props.restrictedClusterLog(this.props.clusterId);
     }
   },
 
@@ -162,6 +167,7 @@ function statusCounter(source, target) {
 // Binding --------------------------------------------------------------------
 export default connect(
   (state, props) => {
+    const user = state.auth.user;
     const taskflowId = props.taskflowId;
     const clusterId = props.clusterId;
     const taskflow = taskflowId ? state.taskflows.mapById[taskflowId] : null;
@@ -171,6 +177,8 @@ export default connect(
     const taskStatusCount = {};
     var taskflowStatus = '';
     var taskflowLog = [];
+    var clusterOwner = '';
+    var clusterLog = [];
     var clusterName = '';
     var clusterStatus = '';
     var clusterLog = [];
@@ -203,6 +211,7 @@ export default connect(
     // get cluster status, logs, and stream state.
     if (cluster) {
       clusterName = cluster.name;
+      clusterOwner = cluster.userId;
       clusterStatus = cluster.status;
       if (cluster.log && cluster.log.length) {
         clusterLog = cluster.log.sort((task1, task2) => task1.created - task2.created);
@@ -210,17 +219,19 @@ export default connect(
     }
 
     return {
+      user,
       tasks,
       jobs,
-      taskStatusCount,
-      taskflowStatus,
       taskflowLog,
-      clusterName, clusterStatus, clusterLog,
+      taskflowStatus,
+      taskStatusCount,
+      clusterName, clusterStatus, clusterLog, clusterOwner
       volumeId, volumeName, volumeStatus, volumeLog,
     };
   },
   () => ({
     getClusterLog: (id, offset) => dispatch(ClusterActions.getClusterLog(id, offset)),
     getVolumeLog: (id, offset) => dispatch(VolumeActions.getVolumeLog(id, offset)),
+    restrictedClusterLog: (id) => dispatch(ClusterActions.restrictedClusterLog(id)),
   })
 )(JobMonitor);

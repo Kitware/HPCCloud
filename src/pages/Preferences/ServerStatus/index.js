@@ -37,6 +37,7 @@ const StatusPage = React.createClass({
     ec2Clusters: React.PropTypes.array,
     tradClusters: React.PropTypes.array,
     network: React.PropTypes.object,
+    user: React.PropTypes.object,
 
     getClusterLog: React.PropTypes.func,
     terminateCluster: React.PropTypes.func,
@@ -128,6 +129,7 @@ const StatusPage = React.createClass({
   },
 
   render() {
+    const clusterBreadCrumb = breadcrumb(this.props.user, 'Status');
     return (
       <div className={ style.rootContainer }>
         <Toolbar breadcrumb={ clusterBreadCrumb } title="Status"
@@ -188,6 +190,7 @@ export default connect(
       volumeLogs: localState.volumes.logById,
       ec2Clusters,
       tradClusters,
+      user: state.auth.user,
     };
   },
   () => ({

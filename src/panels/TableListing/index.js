@@ -21,6 +21,7 @@ export default React.createClass({
   displayName: 'TableListing',
 
   propTypes: {
+    hasAccess: React.PropTypes.bool.isRequired,
     accessHelper: React.PropTypes.object,
     breadcrumb: React.PropTypes.object,
     items: React.PropTypes.array,
@@ -37,13 +38,14 @@ export default React.createClass({
   getDefaultProps() {
     return {
       title: 'Items',
+      hasAccess: false,
     };
   },
 
   getInitialState() {
     return {
       selected: [],
-      actions: [TOOLBAR_ACTIONS.add],
+      actions: this.props.hasAccess ? [TOOLBAR_ACTIONS.add] : [],
       sortKey: '',
       sortReverse: false,
     };
@@ -74,7 +76,7 @@ export default React.createClass({
       const items = [].concat(this.props.items).sort(sorter);
       this.props.onAction(action, this.state.selected.map((index) => items[index]));
       // reset selection after action is performed on them.
-      this.setState({ selected: [], actions: [TOOLBAR_ACTIONS.add] });
+      this.setState({ selected: [], actions: this.props.hasAccess ? [TOOLBAR_ACTIONS.add] : [] });
     }
   },
 
@@ -87,7 +89,8 @@ export default React.createClass({
     var selectedIndex = -1;
     const filter = '';
 
-    if ((e.metaKey || e.ctrlKey) && e.target) {
+    // item was selected
+    if (this.props.hasAccess && (e.metaKey || e.ctrlKey) && e.target) {
       let trEl = e.target;
       while (!trEl.dataset.index) {
         trEl = trEl.parentNode;
@@ -111,6 +114,7 @@ export default React.createClass({
       }
 
       this.setState({ selected, actions });
+    // item was clicked
     } else if (e.target) {
       let trEl = e.target;
       while (!trEl.dataset.link) {
@@ -182,9 +186,9 @@ export default React.createClass({
               <tr key={ `${item._id}_${index}` } data-link={ helper.viewLink(item) } data-index={ index }
                 className={this.state.selected.indexOf(index) !== -1 ? style.selected : ''}
               >
-                { helper.cellContentFunctions.map((func, idx) => (
+                { helper.cellContentFunctions.map((cellFunc, idx) => (
                   <td key={ `${item._id}_${idx}` } onClick={ this.itemClicked }>
-                    {func(item)}
+                    {cellFunc(item)}
                   </td>
                 )) }
                 <td>{ helper.actionItem ? helper.actionItem(item, this.lineAction) : null }</td>

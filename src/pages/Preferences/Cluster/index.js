@@ -18,8 +18,6 @@ import * as Actions from '../../../redux/actions/clusters';
 import * as NetActions from '../../../redux/actions/network';
 import { dispatch } from '../../../redux';
 
-const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 1 });
-
 function getActions(disabled, test) {
   if (test) {
     return [
@@ -47,6 +45,7 @@ const ClusterPrefs = React.createClass({
     simulations: React.PropTypes.object,
     taskflows: React.PropTypes.array,
     buttonsDisabled: React.PropTypes.bool,
+    user: React.PropTypes.object,
 
     onUpdateItem: React.PropTypes.func,
     onActiveChange: React.PropTypes.func,
@@ -155,6 +154,8 @@ const ClusterPrefs = React.createClass({
     const { active, list, error, buttonsDisabled, presetNames } = this.props;
     const activeData = active < list.length ? list[active] : null;
 
+    const clusterBreadCrumb = breadcrumb(this.props.user, 'Cluster');
+
     let content = null;
     if (list && list.length) {
       content = (<div className={ style.content }>
@@ -221,6 +222,7 @@ export default connect(
       error: getNetworkError(state, ['save_cluster', 'remove_cluster']),
       taskflows,
       simulations,
+      user: state.auth.user,
     };
   },
   () => {

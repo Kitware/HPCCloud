@@ -247,6 +247,19 @@ export default function clustersReducer(state = initialState, action) {
       return Object.assign({}, state, { mapById });
     }
 
+    case Actions.RESTRICTED_CLUSTER_LOG: {
+      const mapById = Object.assign({}, state.mapById);
+      const cluster = Object.assign({}, state.mapById[action.id]);
+      cluster.log = [{
+        created: Date.now() / 1000,
+        levelname: 'INFO',
+        status: 'not permitted',
+        msg: 'Cluster log access not permitted',
+      }];
+      mapById[action.id] = cluster;
+      return Object.assign({}, state, { mapById });
+    }
+
     default:
       return state;
   }

@@ -6,6 +6,8 @@ import * as FSActions       from './redux/actions/fs';
 import Workflows            from 'workflows';
 /* eslint-enable import/extensions */
 
+import { userHasAccess } from './utils/AccessHelper';
+import get from './utils/get';
 import equals from 'mout/src/array/equals';
 import { dispatch } from './redux';
 
@@ -73,7 +75,9 @@ export function handleTaskflowChange(state, taskflow) {
       const metadata = Object.assign({}, simulation.metadata, { status: simulationStatus[0] });
       const sim = state.simulations.mapById[taskflow.simulation];
       simulationsStatus[simulation._id] = simulationStatus[0];
-      dispatch(ProjectActions.saveSimulation(Object.assign({}, simulation, { metadata })));
+      if (userHasAccess(state.auth.user, simulation.access, 1)) {
+        dispatch(ProjectActions.saveSimulation(Object.assign({}, simulation, { metadata })));
+      }
       dispatch(FSActions.fetchFolder(sim.steps[sim.active].folderId));
     }
   }
@@ -93,13 +97,13 @@ export function handleTaskflowChange(state, taskflow) {
       tfCluster = state.preferences.clusters.mapById[tfClusterId];
 
     // if we have no cluster in preferences, but we have an ID fetch it.
-    if (!tfCluster && tfClusterId.length) {
+    if (!tfCluster && tfClusterId.length && state.auth.user._id === get(tfCluster, 'userId')) {
       dispatch(ClusterActions.fetchCluster(tfClusterId, taskflow.flow._id));
-    } else {
+    } else if (tfCluster) {
       // add simulation info to cluster config.
       if (taskflow.flow.meta.cluster && taskflow.simulation) {
         const tfSimulation = state.simulations.mapById[taskflow.simulation];
-        if (tfSimulation && tfCluster.config && !tfCluster.config.simulation) {
+        if (tfSimulation && tfCluster.config && !tfCluster.config.simulation && state.auth.user._id === tfCluster.userId) {
           const simulation = {
             _id: tfSimulation._id,
             name: tfSimulation.name,

@@ -12,6 +12,7 @@ import PreferencesAWS       from '../pages/Preferences/AWS';
 import PreferencesCluster   from '../pages/Preferences/Cluster';
 import PreferencesVolumes   from '../pages/Preferences/Volumes';
 import PreferencesUser      from '../pages/Preferences/User';
+import PreferencesGroups    from '../pages/Preferences/Groups';
 import PreferencesStatus    from '../pages/Preferences/ServerStatus';
 import PreferencesNetwork   from '../pages/Preferences/Network';
 import ProjectAll           from '../pages/Project/All';
@@ -162,6 +163,18 @@ export default {
         {
           path: 'User',
           component: PreferencesUser,
+        }, {
+          onEnter: (nextState, replace) => {
+            client.isLoggedIn()
+              .then(() => {
+                const user = client.getLoggedInUser();
+                if (user === undefined || !user.admin) {
+                  dispatch(router.replace({ pathname: '/Preferences/User' }));
+                }
+              });
+          },
+          path: 'Groups',
+          component: PreferencesGroups,
         }, {
           path: 'AWS',
           component: PreferencesAWS,
