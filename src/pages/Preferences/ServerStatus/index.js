@@ -14,7 +14,6 @@ import { dispatch }   from '../../../redux';
 import * as ClusterActions from '../../../redux/actions/clusters';
 import { fetchServers } from '../../../redux/actions/statuses';
 
-const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 3 });
 const noSimulation = { name: 'no simulation on this cluster.', step: '' };
 
 const StatusPage = React.createClass({
@@ -25,6 +24,7 @@ const StatusPage = React.createClass({
     ec2Clusters: React.PropTypes.array,
     tradClusters: React.PropTypes.array,
     network: React.PropTypes.object,
+    user: React.PropTypes.object,
 
     getClusterLog: React.PropTypes.func,
     terminateCluster: React.PropTypes.func,
@@ -84,6 +84,7 @@ const StatusPage = React.createClass({
   },
 
   render() {
+    const clusterBreadCrumb = breadcrumb(this.props.user, 'Status');
     return (
       <div className={ style.rootContainer }>
         <Toolbar breadcrumb={ clusterBreadCrumb } title="Status"
@@ -128,6 +129,7 @@ export default connect(
       ec2: localState.statuses.ec2,
       ec2Clusters,
       tradClusters,
+      user: state.auth.user,
     };
   },
   () => ({

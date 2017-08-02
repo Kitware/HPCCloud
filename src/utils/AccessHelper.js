@@ -2,17 +2,56 @@ import React            from 'react';
 import ImageIcon        from '../widgets/ImageIcon';
 import IconActionList   from '../panels/IconActionList';
 
-import Workflow from '../workflows';
 import style from 'HPCCloudStyle/Theme.mcss';
+let Workflow;
+if (process.env.NODE_ENV !== 'test') {
+  Workflow = require('../workflows').default;
+} else {
+  Workflow = { test: { name: 'test', logo: 'my-logo' } };
+}
 
 /* eslint-disable new-cap */
 const SHORT_DESCRIPTION_SIZE = 80;
 
+// Girder access levels
+const accessTypes = [
+  'READ',
+  'WRITE',
+  'ADMIN',
+];
+
+// user(obj): full user object,
+// objAccess(obj): access object of the simulation or project
+// atLeastAccess(int|string): check that the user has at least this access level
+export function userHasAccess(user, objAccess, atLeastAccess) {
+  const accessLevel = typeof atLeastAccess === 'number' ? atLeastAccess
+    : accessTypes.indexOf(atLeastAccess.toUpperCase());
+
+  // check groups
+  const groups = objAccess.groups;
+  for (let i = 0; i < groups.length; i++) {
+    if (user.groups.indexOf(groups[i].id) !== -1 && groups[i].level >= accessLevel) {
+      return true;
+    }
+  }
+
+  // check user
+  const users = objAccess.users;
+  for (let i = 0; i < users.length; i++) {
+    if (user._id === users[i].id && users[i].level >= accessLevel) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 export const projectFunctions = {
   getIcon(project) {
-    return {
+    const ret = {
       image: Workflow[project.type] ? Workflow[project.type].logo : '',
     };
+    return ret;
   },
 
   getName(project) {

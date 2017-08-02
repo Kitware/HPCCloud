@@ -3,6 +3,7 @@ import * as Actions from '../actions/user';
 export const initialState = {
   pending: false,
   user: null,
+  userMap: {},
 };
 
 export default function authReducer(state = initialState, action) {
@@ -16,7 +17,15 @@ export default function authReducer(state = initialState, action) {
     }
 
     case Actions.LOGOUT: {
-      return { pending: false, user: null };
+      return initialState;
+    }
+
+    case Actions.GET_USERS: {
+      const users = {};
+      action.users.forEach((u) => {
+        users[u._id] = u;
+      });
+      return Object.assign({}, state, { userMap: users });
     }
 
     default:

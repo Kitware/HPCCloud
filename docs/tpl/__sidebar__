@@ -11,6 +11,7 @@ docs:
     usage__creating: usage__creating.html
     usage__simput: usage__simput.html
     usage__running: usage__running.html
+    usage__sharing: usage__sharing.html
   development:
     development__dev-intro: development__dev-intro.html
     development__panels: development__panels.html

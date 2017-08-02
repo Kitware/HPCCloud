@@ -3,6 +3,7 @@ import { routerReducer }  from 'react-router-redux';
 
 import auth         from './auth';
 import fs           from './fs';
+import groups       from './groups';
 import network      from './network';
 import preferences  from './preferences';
 import progress     from './progress';
@@ -15,6 +16,7 @@ import visualizer   from 'pvw-visualizer/src/redux/reducers';
 export default combineReducers({
   auth,
   fs,
+  groups,
   network,
   preferences,
   progress,

@@ -16,6 +16,7 @@ export default React.createClass({
   propTypes: {
     module: React.PropTypes.object,
     simulation: React.PropTypes.object,
+    user: React.PropTypes.object,
     step: React.PropTypes.string,
     view: React.PropTypes.string,
   },
@@ -26,7 +27,7 @@ export default React.createClass({
 
   updateActiveStep(idx, item) {
     const stepName = this.props.module.steps._order[idx];
-    activateSimulationStep(this.props.simulation, stepName)
+    activateSimulationStep(this.props.user, this.props.simulation, stepName)
       .then((resp) => this.context.router.replace(['/View/Simulation', this.props.simulation._id, stepName].join('/')))
       .catch((err) => {
         console.log('Update active error for', stepName);

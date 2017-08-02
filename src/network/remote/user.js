@@ -1,6 +1,6 @@
 export default function ({ client, filterQuery, mustContain, busy, encodeQueryAsString }) {
   return {
-    listUsers(query) {
+    listUsers(query = {}) {
       const params = filterQuery(query, 'text', 'limit', 'offset', 'sort', 'sortdir');
       return busy(client._.get('/user', { params }));
     },

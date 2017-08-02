@@ -25,7 +25,8 @@ import six
 from girder.models.model_base import AccessControlledModel, ValidationException
 from girder.constants import AccessType
 
-from ..utility import share_folder, to_object_id, get_simulations_folder
+from ..utility import to_object_id, get_simulations_folder, share_folder, \
+    unshare_folder, merge_access, _not_in_filter
 from . import schema
 
 
@@ -235,7 +236,8 @@ class Simulation(AccessControlledModel):
 
         return cloned_simulations
 
-    def share(self, sharer, simulation, users, groups):
+    def set_access(self, sharer, simulation, users, groups,
+                   level=AccessType.READ, flags=[]):
         """
         Share a simulation.
 
@@ -244,22 +246,21 @@ class Simulation(AccessControlledModel):
         :param users: The users to share with.
         :param groups: The groups to share with.
         """
-        access_list = simulation.get('access', {})
-        access_list['users'] = [user for user in access_list.get('users', [])
-                                if user != sharer['_id']]
-        access_list['groups'] = []
+        access_list = {'groups': [], 'users': []}
 
         for user_id in users:
             access_object = {
                 'id': to_object_id(user_id),
-                'level': AccessType.READ
+                'level': level,
+                'flags': flags
             }
             access_list['users'].append(access_object)
 
         for group_id in groups:
             access_object = {
                 'id': to_object_id(group_id),
-                'level': AccessType.READ
+                'level': level,
+                'flags': flags
             }
             access_list['groups'].append(access_object)
 
@@ -267,7 +268,55 @@ class Simulation(AccessControlledModel):
         simulation_folder = self.model('folder').load(
             simulation['folderId'], user=sharer)
 
-        share_folder(sharer, simulation_folder, users, groups)
+        # Set access on project if just this simulation is being shared
+        project = self.model('project', 'hpccloud').get(simulation['projectId'])
+        if False:
+            project.patch_access(sharer, project, users, groups, single=True)
+
+        share_folder(sharer, simulation_folder, users, groups, force=True)
+
+        return self.save(simulation)
+
+    def patch_access(self, sharer, simulation, users, groups,
+                     level=AccessType.READ, flags=[]):
+        access_list = simulation.get('access', {'groups': [], 'users': []})
+
+        new_users = merge_access(access_list['users'], users, level, flags)
+        new_groups = merge_access(access_list['groups'], groups, level, flags)
+
+        # Share the simulation folder
+        simulation_folder = self.model('folder').load(
+            simulation['folderId'], user=sharer)
+        share_folder(sharer, simulation_folder, new_users, new_groups)
+
+        # Set access on project if just this simulation is being shared
+        # print('gets here!', simulation)
+        project = self.model('project', 'hpccloud').load(
+            simulation['projectId'], user=sharer)
+        new_proj_users = _not_in_filter(new_users,
+                                        project['access']['users'])
+        new_proj_groups = _not_in_filter(new_groups,
+                                         project['access']['groups'])
+        # print('gets here', new_proj_users, new_proj_groups)
+        if len(new_proj_users) or len(new_proj_groups):
+            self.model('project', 'hpccloud').patch_access(
+                sharer, project, new_proj_users, new_proj_groups, single=True)
+
+        return self.setAccessList(simulation, access_list, save=True)
+
+    def revoke_access(self, sharer, simulation, users, groups):
+        access_list = simulation.get('access', {'groups': [], 'users': []})
+        users = [user for user in users if user != sharer['_id']]
+
+        access_list['groups'] = [g for g in access_list['groups']
+                                 if str(g['id']) not in groups]
+        access_list['users'] = [u for u in access_list['users']
+                                if str(u['id']) not in users]
+
+        # revoke the simulation folder
+        simulation_folder = self.model('folder').load(
+            simulation['folderId'], user=sharer)
+        unshare_folder(sharer, simulation_folder, users, groups)
 
         return self.save(simulation)
 

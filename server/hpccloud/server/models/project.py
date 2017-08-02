@@ -26,8 +26,8 @@ from girder.constants import AccessType
 from girder.api.rest import getCurrentUser
 from . import schema
 
-from ..utility import get_hpccloud_folder, share_folder, to_object_id, \
-    get_simulations_folder
+from ..utility import get_hpccloud_folder, to_object_id, \
+    get_simulations_folder, share_folder, unshare_folder, merge_access
 
 from ..constants import SIMULATIONS_FOLDER
 
@@ -102,7 +102,8 @@ class Project(AccessControlledModel):
 
         return project
 
-    def update_project(self, user, project, name=None, metadata=None, description=None):
+    def update_project(self, user, project, name=None, metadata=None,
+                       description=None):
         """
         Update an existing project, this involves update the data property.
         For now we will just do a dict update, in the future we might want
@@ -154,7 +155,8 @@ class Project(AccessControlledModel):
 
         super(Project, self).remove(project)
 
-    def share(self, sharer, project, users, groups):
+    def set_access(self, sharer, project, users, groups,
+                   level=AccessType.READ, flags=[], single=False):
         """
         Share a give project.
         :param sharer: The user sharing the project
@@ -163,22 +165,21 @@ class Project(AccessControlledModel):
         :param groups: The groups to share the project with.
         """
 
-        access_list = project['access']
-        access_list['users'] \
-            = [user for user in access_list['users'] if user != sharer['_id']]
-        access_list['groups'] = []
+        access_list = {'users': [], 'groups': []}
 
         for user_id in users:
             access_object = {
                 'id': to_object_id(user_id),
-                'level': AccessType.READ
+                'level': AccessType.READ,
+                'flags': []
             }
             access_list['users'].append(access_object)
 
         for group_id in groups:
             access_object = {
                 'id': to_object_id(group_id),
-                'level': AccessType.READ
+                'level': AccessType.READ,
+                'flags': []
             }
             access_list['groups'].append(access_object)
 
@@ -188,14 +189,80 @@ class Project(AccessControlledModel):
         # Share the project folder
         share_folder(
             sharer, project_folder, users, groups, level=AccessType.READ,
-            recurse=True)
+            recurse=True, force=True)
 
         # We need to share the _simulations folder, with WRITE access, so the
         # user can create simulations
         simulations_folder = get_simulations_folder(sharer, project)
 
         share_folder(sharer, simulations_folder, users, groups,
-                     level=AccessType.ADMIN)
+                     level=AccessType.WRITE, recurse=True)
+
+        saved_project = self.save(project)
+
+        if not single:
+            # Now share any simulation associated with this project
+            query = {
+                'projectId': project['_id']
+            }
+            sims = self.model('simulation', 'hpccloud').find(query=query)
+            for sim in sims:
+                self.model('simulation', 'hpccloud').set_access(
+                    sharer, sim, users, groups)
+
+        project['updated'] = datetime.datetime.utcnow()
+
+        return saved_project
+
+    def patch_access(self, sharer, project, users, groups,
+                     level=AccessType.READ, flags=[], single=False):
+        access_list = project.get('access', {'groups': [], 'users': []})
+
+        new_users = merge_access(access_list['users'], users, level, flags)
+        new_groups = merge_access(access_list['groups'], groups, level, flags)
+
+        # share project folder
+        project_folder = self.model('folder').load(
+            project['folderId'], user=sharer)
+        share_folder(sharer, project_folder,
+                     new_users, new_groups, recurse=True)
+
+        # share simulations folder
+        simulations_folder = get_simulations_folder(sharer, project)
+        share_folder(sharer, simulations_folder, users, groups,
+                     level=AccessType.WRITE, recurse=True)
+
+        saved_project = self.save(project)
+
+        # patch access for any simulations associated with this project
+        if not single:
+            query = {
+                'projectId': project['_id']
+            }
+            sims = self.model('simulation', 'hpccloud').find(query=query)
+            for sim in sims:
+                self.model('simulation', 'hpccloud').patch_access(
+                    sharer, sim, users, groups)
+
+        return saved_project
+
+    def revoke_access(self, sharer, project, users, groups):
+        access_list = project.get('access', {'groups': [], 'users': []})
+        users = [user for user in users if user != sharer['_id']]
+
+        access_list['groups'] = [g for g in access_list['groups']
+                                 if str(g['id']) not in groups]
+        access_list['users'] = [u for u in access_list['users']
+                                if str(u['id']) not in users]
+        project_folder = self.model('folder').load(
+            project['folderId'], user=sharer)
+
+        # unshare the project folder
+        unshare_folder(sharer, project_folder, users, groups, recurse=True)
+
+        # We need to revoke the _simulations folder
+        simulations_folder = get_simulations_folder(sharer, project)
+        unshare_folder(sharer, simulations_folder, users, groups)
 
         # Now share any simulation associated with this project
         query = {
@@ -203,11 +270,10 @@ class Project(AccessControlledModel):
         }
         sims = self.model('simulation', 'hpccloud').find(query=query)
         for sim in sims:
-            self.model('simulation', 'hpccloud').share(
+            self.model('simulation', 'hpccloud').revoke_access(
                 sharer, sim, users, groups)
 
         project['updated'] = datetime.datetime.utcnow()
-
         return self.save(project)
 
     def simulations(self, user, project, limit, offset):
