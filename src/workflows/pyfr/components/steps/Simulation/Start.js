@@ -63,5 +63,6 @@ export default connect(
   (state) => ({
     error: getNetworkError(state, ['create_taskflow', 'start_taskflow']),
     clusters: state.preferences.clusters.mapById,
+    volumes: state.preferences.volumes.mapById,
   })
 )(pyfrStart);

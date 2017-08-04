@@ -28,7 +28,6 @@ describe('fs', () => {
   Object.freeze(fsState);
 
   describe('simple actions', () => {
-
     it('should update folder', (done) => {
       const expectedAction = { type: Actions.UPDATE_FOLDER, folder, id: folder._id };
       expect(Actions.updateFolder(folder))
@@ -63,8 +62,8 @@ describe('fs', () => {
 
     // // this stalls phantomJS?
     it('should fetch folders and child items', (done) => {
-      const childFolders = [ { _id: 'c3d4' }, { _id: 'e5f6' } ];
-      const items = [ { _id:'item1' }, { _id: 'item2' }, { _id: 'item3' } ];
+      const childFolders = [{ _id: 'c3d4' }, { _id: 'e5f6' }];
+      const items = [{ _id: 'item1' }, { _id: 'item2' }, { _id: 'item3' }];
       const expectedActions = [
         { type: Actions.CHILDREN_FOLDERS, children: childFolders, id: folder._id },
         { type: Actions.CHILDREN_ITEMS, children: items, id: folder._id },

@@ -1,11 +1,11 @@
 // import client           from '../../../network';
+import React            from 'react';
 import ClusterForm      from './ClusterForm';
 import ActiveList       from '../../../panels/ActiveList';
 import Toolbar          from '../../../panels/Toolbar';
 import ButtonBar        from '../../../panels/ButtonBar';
 import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
 import PresetSelector   from '../PresetSelector';
-import React            from 'react';
 import { breadcrumb }   from '..';
 import getNetworkError  from '../../../utils/getNetworkError';
 

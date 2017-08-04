@@ -14,6 +14,14 @@ export const taskflowActions = {
   moveOffline: { name: 'moveOffline', label: 'Move Files Offline', icon: '' },
 };
 
+export const volumeTypes = {
+  'General Purpose SSD': 'GP2',
+  'Provisioned IOPS SSD': 'IO1',
+  Magnetic: 'Magnetic',
+  'Throughput Optimized HDD': 'ST1',
+  'Cold HDD': 'SC1',
+};
+
 export function primaryBreadCrumbs(projectId = null, simulationId = null) {
   var ret = {
     paths: ['/'],

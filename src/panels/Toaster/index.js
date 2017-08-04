@@ -55,6 +55,9 @@ export default connect(
       }
       // the error doesn't necessarily get logged otherwise
       console.error(localState.error[id]);
+      if (localState.error[id].label) {
+        message = `${localState.error[id].label}: ${message}`;
+      }
     }
 
     return {

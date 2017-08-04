@@ -13,7 +13,7 @@ import * as ProjectActions          from './redux/actions/projects';
 import * as TaskflowActions         from './redux/actions/taskflows';
 import * as NetworkActions          from './redux/actions/network';
 import * as Behavior                from './StateTransitionBehavior';
-import Toaster                      from './widgets/Toaster';
+import Toaster                      from './panels/Toaster';
 
 import { updateVisualizerStateAccessor } from 'pvw-visualizer/src/redux/selectors/stateAccessor';
 

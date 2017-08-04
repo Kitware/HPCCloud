@@ -122,3 +122,15 @@
   composes: fa-spin    from 'font-awesome/css/font-awesome.css';
   margin-right: 5px;
 }
+
+.attachIcon {
+    composes: fa            from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
+    composes: fa-mail-forward    from 'font-awesome/css/font-awesome.css';
+}
+
+.detachIcon {
+    composes: fa            from 'font-awesome/css/font-awesome.css';
+    composes: fa-fw         from 'font-awesome/css/font-awesome.css';
+    composes: fa-mail-reply      from 'font-awesome/css/font-awesome.css';
+}

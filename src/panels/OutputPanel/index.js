@@ -1,3 +1,15 @@
+/* Output panel can display a simple list with a title
+TITLE
+name1                        value1
+name2                        value2
+---
+or a table with headers
+TITLE
+headerA    headerB    headerC
+name1      someItem   someValue
+name2      someItem   someValue
+name3      someItem   someValue
+*/
 import React from 'react';
 import style from 'HPCCloudStyle/JobMonitor.mcss';
 
@@ -5,6 +17,10 @@ export default React.createClass({
   displayName: 'OutputPanel',
   propTypes: {
     advanced: React.PropTypes.bool,
+    table: React.PropTypes.bool,
+    // if table, headers is an array of strings, these function as header values an keys
+    headers: React.PropTypes.array,
+    // if table, items is an array of objects with keys that match the headers array and an _id
     items: React.PropTypes.array,
     title: React.PropTypes.string,
     subtitle: React.PropTypes.string,
@@ -12,6 +28,8 @@ export default React.createClass({
   getDefaultProps() {
     return {
       advanced: false,
+      table: false,
+      headers: [],
       items: [],
       title: '',
       subtitle: '',
@@ -25,6 +43,16 @@ export default React.createClass({
   toggleAdvanced() {
     this.setState({ open: !this.state.open });
   },
+  tableMapper(el, i) {
+    return (<tr key={el._id}>
+      { this.props.headers.map((h) => (
+          <td key={`${el._id}_${h}`}>
+            {el[h]}
+          </td>
+        ))
+      }
+    </tr>);
+  },
   render() {
     var advancedControl = null;
     if (this.props.advanced) {
@@ -36,6 +64,31 @@ export default React.createClass({
          />
       </div>);
     }
+    // table layout
+    if (this.props.table) {
+      return (
+        <div>
+          <div className={ style.toolbar }>
+            <div className={ style.title }>{this.props.title}</div>
+            {advancedControl}
+          </div>
+          <div className={ this.state.open ? style.tableContainer : style.hidden }>
+            <table className={ style.table }>
+              <thead>
+                <tr>
+                  { this.props.headers.map((h, i) => <th key={`${h}_${i}`}>{h}</th>) }
+                </tr>
+              </thead>
+              <tbody>
+                { this.props.items.map(this.tableMapper) }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // not table layout
     return (
       <div>
         <div className={ style.toolbar }>
@@ -46,8 +99,9 @@ export default React.createClass({
           {this.props.items.map((el, index) => {
             if (!el) {return null;}
             return (<section key={`${el.name}_${index}`} className={ style.listItem }>
-                          <strong className={ style.itemContent }>{ el.name }</strong> <span>{ el.value }</span>
-                        </section>);
+                      <strong className={ style.itemContent }>{ el.name }</strong>
+                      <span>{ el.value }</span>
+                    </section>);
           }) }
         </div>
       </div>

@@ -10,7 +10,7 @@ import Logout               from '../pages/Logout';
 import Preferences          from '../pages/Preferences';
 import PreferencesAWS       from '../pages/Preferences/AWS';
 import PreferencesCluster   from '../pages/Preferences/Cluster';
-import PreferencesOpenStack from '../pages/Preferences/OpenStack';
+import PreferencesVolumes   from '../pages/Preferences/Volumes';
 import PreferencesUser      from '../pages/Preferences/User';
 import PreferencesGroups    from '../pages/Preferences/Groups';
 import PreferencesStatus    from '../pages/Preferences/ServerStatus';
@@ -182,14 +182,14 @@ export default {
           path: 'Cluster',
           component: PreferencesCluster,
         }, {
+          path: 'Volumes',
+          component: PreferencesVolumes,
+        }, {
           path: 'Status',
           component: PreferencesStatus,
         }, {
           path: 'Network',
           component: PreferencesNetwork,
-        }, {
-          path: 'OpenStack',
-          component: PreferencesOpenStack,
         },
       ],
     },

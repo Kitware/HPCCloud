@@ -1,5 +1,5 @@
 import React            from 'react';
-import ImageIcon        from '../widgets/ImageIcon';
+import ImageIcon        from '../panels/ImageIcon';
 import IconActionList   from '../panels/IconActionList';
 
 import style from 'HPCCloudStyle/Theme.mcss';

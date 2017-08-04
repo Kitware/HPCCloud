@@ -1,9 +1,26 @@
 import client   from '../../network';
 import React    from 'react';
 import { Link } from 'react-router';
+// import { volumeTypes }    from '../../utils/Constants';
 
 import theme    from 'HPCCloudStyle/Theme.mcss';
 import style    from 'HPCCloudStyle/ItemEditor.mcss';
+
+// render mappers
+const optionMapper = (el, index) =>
+  <option key={ `${el.name}_${index}` } value={index}>
+    {el.name}
+  </option>;
+const machineFamilyMapper = (family, index) =>
+  <option key={family} value={family}>
+    { family }
+  </option>;
+const machineMapper = (machine, index) =>
+  <option key={machine.id} value={ index } >
+    { `${machine.id} - ${machine.cpu} core${machine.cpu > 1 ? 's' : ''} - ` +
+      `${machine.memory} ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` +
+      ` - $${Number(machine.price).toPrecision(3)} est. per hour per node` }
+  </option>;
 
 export default React.createClass({
   displayName: 'panels/run/RunEC2',
@@ -12,12 +29,16 @@ export default React.createClass({
     contents: React.PropTypes.object,
     onChange: React.PropTypes.func,
     clusterFilter: React.PropTypes.func,
+    clusterNames: React.PropTypes.array,
+    volumeNames: React.PropTypes.array,
+    onFormError: React.PropTypes.func,
   },
 
   getInitialState() {
     return {
       busy: false,
 
+      clusters: [],
       selectedCluster: '',
 
       profiles: [],
@@ -26,6 +47,8 @@ export default React.createClass({
       machines: {},
       machineFamilies: [],
       machinesInFamily: [],
+
+      volumes: [],
     };
   },
 
@@ -67,13 +90,15 @@ export default React.createClass({
       })
       .then((resp) => {
         newState.clusters = resp.data;
-
-        if (this.props.clusterFilter) {
-          newState.clusters = newState.clusters.filter(this.props.clusterFilter);
-        }
-
         if (this.props.onChange) {
           this.props.onChange('cluster', null, 'EC2');
+        }
+        return client.listVolumes();
+      })
+      .then((resp) => {
+        newState.volumes = resp.data;
+        if (this.props.onChange) {
+          this.props.onChange('volume', null, 'EC2');
         }
         this.setState(newState);
       })
@@ -86,25 +111,31 @@ export default React.createClass({
   dataChange(event) {
     var key = event.currentTarget.dataset.key,
       value = event.target.value;
-    if (key === 'profile') {
-      value = this.state.profiles[value];
-      this.setState({
-        machineFamilies: Object.keys(this.state.machines[value.regionName]),
-        profile: value,
-      });
-      // Only want to propagate the id
-      value = value._id;
-    } else if (key === 'machineFamily') {
-      this.setState({
-        machinesInFamily: this.state.machines[this.state.profile.regionName][value],
-      });
+    switch (key) {
+      case 'profile':
+        value = this.state.profiles[value];
+        this.setState({
+          machineFamilies: Object.keys(this.state.machines[value.regionName]),
+          profile: value,
+        });
+        // Only want to propagate the id
+        value = value._id;
+        break;
+      case 'machineFamily':
+        this.setState({
+          machinesInFamily: this.state.machines[this.state.profile.regionName][value],
+        });
 
-      if (this.props.onChange) {
-        this.props.onChange('machine', this.state.machines[this.state.profile.regionName][value][0], 'EC2');
-      }
-    } else if (key === 'machine') {
-      // Convert from index into machine object
-      value = this.state.machinesInFamily[value];
+        if (this.props.onChange) {
+          this.props.onChange('machine', this.state.machines[this.state.profile.regionName][value][0], 'EC2');
+        }
+        break;
+      case 'machine':
+        // Convert from index into machine object
+        value = this.state.machinesInFamily[value];
+        break;
+      default:
+        break;
     }
 
     if (this.props.onChange) {
@@ -123,21 +154,7 @@ export default React.createClass({
         </div>;
     }
 
-    const runningClusters = this.state.clusters ? this.state.clusters.filter((el) => el.status === 'running') : [];
-    const optionMapper = (el, index) =>
-      <option key={ `${el.name}_${index}` } value={index}>
-        {el.name}
-      </option>;
-    const machineFamilyMapper = (family, index) =>
-      <option key={family} value={family}>
-        { family }
-      </option>;
-    const machineMapper = (machine, index) =>
-      <option key={machine.id} value={ index } >
-        { `${machine.id} - ${machine.cpu} core${machine.cpu > 1 ? 's' : ''} - ` +
-          `${machine.memory} ${machine.gpu ? ' + GPU' : ''} - ${machine.storage}` +
-          ` - $${Number(machine.price).toPrecision(3)} est. per hour per node` }
-      </option>;
+    const runningClusters = this.state.clusters.filter((el) => el.status === 'running');
     return (
       <div className={style.container}>
         { runningClusters.length ?
@@ -193,14 +210,51 @@ export default React.createClass({
             disabled={this.props.contents.cluster}
           />
         </section>
+      { /* EBS Volume */ }
         <section className={style.group}>
-          <label className={style.label}>Volume size:</label>
+          <label className={style.label}>Existing Volume:</label>
+          <select className={style.input} onChange={this.dataChange}
+            data-key="volume" disabled={this.props.contents.cluster}
+          >
+            <option value={null}></option>
+            {this.state.volumes.filter(el => (el.status === 'created' || el.status === 'available'))
+              .map((el, index) => <option key={el._id} value={el._id}>{el.name}</option>)}
+          </select>
+        </section>
+        <section className={style.group}>
+          <label className={style.label}>Volume Name:</label>
+          <input type="text" className={style.input}
+            data-key="volumeName" value={this.props.contents.volumeName}
+            onChange={this.dataChange} required
+            disabled={this.props.contents.volume}
+            placeholder="New Volume Name"
+          />
+        </section>
+        <section className={style.group}>
+          <label className={style.label}>Size:</label>
           <input type="number" min="1" max="16384" className={style.input}
             data-key="volumeSize" value={this.props.contents.volumeSize}
             onChange={this.dataChange} required
-            disabled={this.props.contents.cluster}
+            disabled={this.props.contents.volume}
+            placeholder="New Volume Size"
           />
         </section>
+        {/* only valid type on the endpoint is ebs?
+          <section className={style.group}>
+              <label className={style.label}>Type</label>
+              <select
+                className={style.input}
+                data-key="type"
+                onChange={this.formChange}
+                disabled={this.props.data._id}
+                required
+              >
+                { Object.keys(types).map((key, index) =>
+                  <option key={`${key}_${index}`} value={types[key]}>{key} ({types[key]})</option>)
+                }
+              </select>
+          </section>
+          */}
       </div>);
   },
 });

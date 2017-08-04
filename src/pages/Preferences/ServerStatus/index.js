@@ -12,15 +12,27 @@ import style from 'HPCCloudStyle/JobMonitor.mcss';
 import { connect }  from 'react-redux';
 import { dispatch }   from '../../../redux';
 import * as ClusterActions from '../../../redux/actions/clusters';
+import * as VolumeActions from '../../../redux/actions/volumes';
 import { fetchServers } from '../../../redux/actions/statuses';
 
 const noSimulation = { name: 'no simulation on this cluster.', step: '' };
+
+function matchIdInArray(_id, arr, key = 'name') {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i]._id === _id) {
+      return arr[i][key];
+    }
+  }
+  return '';
+}
 
 const StatusPage = React.createClass({
   displayName: 'Preferences/Status',
 
   propTypes: {
     ec2: React.PropTypes.array,
+    volumes: React.PropTypes.array,
+    volumeLogs: React.PropTypes.object,
     ec2Clusters: React.PropTypes.array,
     tradClusters: React.PropTypes.array,
     network: React.PropTypes.object,
@@ -31,18 +43,22 @@ const StatusPage = React.createClass({
     deleteCluster: React.PropTypes.func,
     fetchClusters: React.PropTypes.func,
     fetchServers: React.PropTypes.func,
+    fetchVolumes: React.PropTypes.func,
+    getVolumeLog: React.PropTypes.func,
   },
 
   getDefaultProps() {
     return {
       ec2: [],
       clusters: [],
+      volumeLogs: {},
     };
   },
 
   componentDidMount() {
     this.props.fetchClusters();
     this.props.fetchServers();
+    this.props.fetchVolumes();
   },
 
   logToggle(id, offset) {
@@ -53,8 +69,27 @@ const StatusPage = React.createClass({
     };
   },
 
+  volumeLogToggle(id, offset) {
+    return (open) => {
+      if (open) {
+        this.props.getVolumeLog(id, offset);
+      }
+    };
+  },
+
   profileMapper(el, index) {
-    return { name: el.name, value: el.status };
+    return { _id: el._id, Name: el.name, Region: el.regionName, Status: el.status };
+  },
+
+  volumesMapper(el, index) {
+    return {
+      _id: el._id,
+      Name: el.name,
+      Size: el.size,
+      Status: el.status,
+      Cluster: matchIdInArray(el.clusterId, this.props.ec2Clusters),
+      Profile: matchIdInArray(el.profileId, this.props.ec2),
+    };
   },
 
   ec2Mapper(el, index) {
@@ -83,6 +118,15 @@ const StatusPage = React.createClass({
     />);
   },
 
+  volumeMapper(el, index) {
+    const log = this.props.volumeLogs[el._id] || [];
+    const offset = el.log ? el.log.length : 0;
+    return (<ClusterStatus key={el._id} title={el.name} status={el.status}
+      log={log} logToggle={this.volumeLogToggle(el._id, offset)}
+      noControls
+    />);
+  },
+
   render() {
     const clusterBreadCrumb = breadcrumb(this.props.user, 'Status');
     return (
@@ -91,8 +135,12 @@ const StatusPage = React.createClass({
           onAction={this.addItem} hasTabs
         />
         <div className={ style.container }>
-          <OutputPanel items={ this.props.ec2.map(this.profileMapper) } title="EC2 Profiles" />
+        {/* AWS Profiles */}
+          <OutputPanel table title="AWS Profiles"
+            headers={['Name', 'Region', 'Status']}
+            items={ this.props.ec2.map(this.profileMapper) } />
 
+        {/* EC2 Clusters */}
           <div className={ style.toolbar }>
             <div className={ style.title }> EC2 Clusters </div>
             <div className={ style.buttons } />
@@ -101,6 +149,16 @@ const StatusPage = React.createClass({
             { this.props.ec2Clusters.map(this.ec2Mapper) }
           </div>
 
+        {/* Volumes */}
+          <div className={ style.toolbar }>
+            <div className={ style.title }> EBS Volumes </div>
+            <div className={ style.buttons } />
+          </div>
+          <div className={ style.taskflowContent }>
+            { this.props.volumes.map(this.volumeMapper) }
+          </div>
+
+        {/* Trad Clusters */}
           <div className={ style.toolbar }>
             <div className={ style.title }> Traditional Clusters </div>
             <div className={ style.buttons } />
@@ -127,6 +185,8 @@ export default connect(
       simulations: state.simulations.mapById,
       network: state.network,
       ec2: localState.statuses.ec2,
+      volumes: localState.volumes.list,
+      volumeLogs: localState.volumes.logById,
       ec2Clusters,
       tradClusters,
       user: state.auth.user,
@@ -138,5 +198,7 @@ export default connect(
     deleteCluster: (id) => dispatch(ClusterActions.deleteCluster(id)),
     fetchClusters: () => dispatch(ClusterActions.fetchClusters()),
     fetchServers: () => dispatch(fetchServers()),
+    fetchVolumes: () => dispatch(VolumeActions.fetchVolumes()),
+    getVolumeLog: (id, offset) => dispatch(VolumeActions.getVolumeLog(id, offset)),
   })
 )(StatusPage);

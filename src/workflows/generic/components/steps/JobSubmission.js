@@ -4,6 +4,8 @@ import defaultServerParameters from '../../../../panels/run/defaults';
 import RunClusterFrom          from '../../../../panels/run';
 import getClusterPayload       from '../../../../utils/ClusterPayload';
 
+import values    from 'mout/src/object/values';
+
 import { dispatch }    from '../../../../redux';
 import * as Actions    from '../../../../redux/actions/taskflows';
 import * as NetActions from '../../../../redux/actions/network';
@@ -72,8 +74,9 @@ export default class JobSubmission extends React.Component {
     // Generic cluster management
     const clusterSettings = this.state[this.state.serverType];
     Object.assign(payload, clusterSettings.runtime);
+    const clusterNames = values(this.props.clusters).filter(el => el.type === 'ec2').map(el => el.name);
     try {
-      const cluster = getClusterPayload(this.state.serverType, clusterSettings);
+      const cluster = getClusterPayload(this.state.serverType, clusterSettings, clusterNames);
       if (!cluster) {
         throw Error(`Unrecognized serverType: ${this.state.serverType}`);
       }
@@ -81,6 +84,30 @@ export default class JobSubmission extends React.Component {
     } catch (error) {
       this.props.onError(error.message);
       return;
+    }
+
+    if (this.state.serverType === 'EC2') {
+      const volumeNames = values(this.props.volumes).map(el => el.name);
+      if (this.state.EC2.volume) {
+        payload.volume = { _id: this.state.EC2.volume };
+      } else if (this.state.EC2.volumeName && this.state.EC2.volumeSize) {
+        const volumeSize = this.state.EC2.volumeSize;
+        const volumeName = this.state.EC2.volumeName.trim();
+        try {
+          if (volumeNames.indexOf(volumeName) !== -1) {
+            throw Error(`A volume with the name '${volumeName}' already exists`);
+          } else if (volumeSize <= 0) {
+            throw Error('Volume size must be greater than zero');
+          }
+          payload.volume = {
+            name: volumeName,
+            size: volumeSize,
+          };
+        } catch (error) {
+          this.props.onError(error.message);
+          return;
+        }
+      }
     }
 
     this.props.onJobSubmition(
@@ -141,6 +168,7 @@ JobSubmission.propTypes = {
   view: React.PropTypes.string,
   error: React.PropTypes.string,
   clusters: React.PropTypes.object,
+  volumes: React.PropTypes.object,
 
   onJobSubmition: React.PropTypes.func,
   onError: React.PropTypes.func,

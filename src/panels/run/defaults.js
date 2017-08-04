@@ -2,13 +2,12 @@ export default {
   EC2: {
     profile: '',
     machine: '',
-    clusterSize: '',
+    clusterSize: 1,
+    volume: '',
+    volumeName: '',
     volumeSize: '',
   },
   Traditional: {
-    profile: '',
-  },
-  OpenStack: {
     profile: '',
   },
 };
