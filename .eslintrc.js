@@ -1,41 +1,51 @@
+var prettierConf = require('./prettier.config.js');
+
 module.exports = {
-  extends: 'airbnb',
-  env: { browser: true },
+  extends: ['airbnb', 'prettier'],
   rules: {
-    // ESLint ----------------------------------
-    'block-spacing': 0,
-    'global-require': 0,
-    'max-len': [1, 160, 4, {"ignoreUrls": true}],
-    'no-console': 0,
-    'no-mixed-operators': 0,
-    'no-multi-spaces': [2, { exceptions: { "ImportDeclaration": true } }],
-    'no-nested-ternary': 0,
-    'no-param-reassign': [2, { props: false }],
-    'no-plusplus': ["error", { "allowForLoopAfterthoughts": true }],
-    'no-prototype-builtins': 0,
-    'no-underscore-dangle': 0,
-    'no-unused-vars': [2, { args: 'none' }],
-    'no-var': 0,
-    'one-var': 0,
-    // imports ----------------------------------
-    'import/imports-first': 0,
-    'import/no-extraneous-dependencies': 0,
-    'import/no-named-as-default-member': 0,
-    'import/no-unresolved': 0,
-    'import/prefer-default-export': 0,
-    // react ----------------------------------
-    'react/forbid-prop-types': 0,
-    'react/jsx-closing-bracket-location': 0,
-    'react/jsx-curly-spacing': 0,
-    'react/jsx-filename-extension': 0,
-    'react/jsx-first-prop-new-line': 0,
-    'react/jsx-indent': 0,
-    'react/no-is-mounted': 1,
-    'react/prefer-es6-class': 0,
-    'react/prefer-stateless-function': 0,
-    // jsx-a11y ----------------------------------
-    'jsx-a11y/img-has-alt': 0,
+    'prettier/prettier': ['error', prettierConf],
+
+    // But we want the following
+    'no-multi-spaces': ["error", { exceptions: { "ImportDeclaration": true } }],
+    'no-param-reassign': ["error", { props: false }],
+    'no-unused-vars': ["error", { args: 'none' }],
+    'prefer-destructuring': ["error", { VariableDeclarator: { array: false, object: true }, AssignmentExpression: { array: false, object: false } }, { enforceForRenamedProperties: false }],
+    'import/no-extraneous-dependencies': 0, // Needed for tests
+    // 'no-mixed-operators': 'error', // Wish we can put it back with prettier
+
+    // Not for us
     'jsx-a11y/label-has-for': 0,
+    'no-console': 0,
+    'no-plusplus': 0,
+    'import/no-named-as-default': 0,
+    'import/no-named-as-default-member': 0,
+    'prefer-destructuring': 0, // Can have unwanted side effect
+    'react/jsx-filename-extension': 0,
     'jsx-a11y/no-static-element-interactions': 0,
-  }
+    'jsx-a11y/click-events-have-key-events': 0,
+    'jsx-a11y/no-noninteractive-element-interactions': 0,
+
+    // Introduced with new eslint
+    // and no time to fix them...
+    // [...]
+    'linebreak-style': 0,
+    'no-useless-escape': 0,
+    'no-nested-ternary': 0,
+    'react/forbid-prop-types': 0,
+    'react/no-array-index-key': 0,
+  },
+  plugins: [
+    'prettier'
+  ],
+  globals: {
+    __BASE_PATH__: false,
+    VRFrameData: true,
+  },
+  'settings': {
+    'import/resolver': 'webpack'
+  },
+  env: {
+    es6: true,
+    browser: true,
+  },
 };
