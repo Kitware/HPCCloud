@@ -1,11 +1,10 @@
-import React              from 'react';
-import deepClone          from 'mout/src/lang/deepClone';
-import style              from 'HPCCloudStyle/ItemEditor.mcss';
+import React from 'react';
+import deepClone from 'mout/src/lang/deepClone';
+import style from 'HPCCloudStyle/ItemEditor.mcss';
 
 // import { volumeTypes }    from '../../utils/Constants';
 
 export default React.createClass({
-
   displayName: 'VolumeForm',
 
   propTypes: {
@@ -53,34 +52,35 @@ export default React.createClass({
 
     return (
       <div>
-          <section className={style.group}>
-              <label className={style.label}>Name</label>
-              <input
-                className={style.input}
-                type="text"
-                value={this.props.data.name}
-                data-key="name"
-                onChange={this.formChange}
-                disabled={this.props.data._id}
-                autoFocus required
-                ref="nameInput"
-              />
-          </section>
-          <section className={style.group}>
-              <label className={style.label}>Size</label>
-              <input
-                className={style.input}
-                type="number"
-                min="1"
-                max="16384"
-                value={this.props.data.size}
-                data-key="size"
-                onChange={this.formChange}
-                disabled={this.props.data._id}
-                required
-              />
-          </section>
-          {/* only valid type on the endpoint is ebs?
+        <section className={style.group}>
+          <label className={style.label}>Name</label>
+          <input
+            className={style.input}
+            type="text"
+            value={this.props.data.name}
+            data-key="name"
+            onChange={this.formChange}
+            disabled={this.props.data._id}
+            autoFocus
+            required
+            ref="nameInput"
+          />
+        </section>
+        <section className={style.group}>
+          <label className={style.label}>Size</label>
+          <input
+            className={style.input}
+            type="number"
+            min="1"
+            max="16384"
+            value={this.props.data.size}
+            data-key="size"
+            onChange={this.formChange}
+            disabled={this.props.data._id}
+            required
+          />
+        </section>
+        {/* only valid type on the endpoint is ebs?
           <section className={style.group}>
               <label className={style.label}>Type</label>
               <select
@@ -96,26 +96,26 @@ export default React.createClass({
               </select>
           </section>
           */}
-          <section className={style.group}>
-              <label className={style.label}>AWS Profile</label>
-              <select
-                className={style.input}
-                data-key="profileId"
-                onChange={this.formChange}
-                disabled={this.props.data._id}
-                defaultValue={this.props.profiles.length ? this.props.profiles[0]._id : null}
-                required
-              >
-                { this.props.profiles.map((prof) =>
-                  <option
-                    key={ `${prof._id}` }
-                    value={ prof._id }
-                  >
-                  { prof.name }
-                  </option>
-                )}
-              </select>
-          </section>
-      </div>);
+        <section className={style.group}>
+          <label className={style.label}>AWS Profile</label>
+          <select
+            className={style.input}
+            data-key="profileId"
+            onChange={this.formChange}
+            disabled={this.props.data._id}
+            defaultValue={
+              this.props.profiles.length ? this.props.profiles[0]._id : null
+            }
+            required
+          >
+            {this.props.profiles.map((prof) => (
+              <option key={`${prof._id}`} value={prof._id}>
+                {prof.name}
+              </option>
+            ))}
+          </select>
+        </section>
+      </div>
+    );
   },
 });

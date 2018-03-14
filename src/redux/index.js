@@ -1,6 +1,6 @@
-import reducers                                   from './reducers';
-import { createStore, applyMiddleware }           from 'redux';
-import { hashHistory }                            from 'react-router';
+import reducers from './reducers';
+import { createStore, applyMiddleware } from 'redux';
+import { hashHistory } from 'react-router';
 import { syncHistoryWithStore, routerMiddleware } from 'react-router-redux';
 
 const routingMiddleware = routerMiddleware(hashHistory);
@@ -18,8 +18,4 @@ function dispatch(action) {
 
 export default store;
 
-export {
-  store,
-  dispatch,
-  history,
-};
+export { store, dispatch, history };

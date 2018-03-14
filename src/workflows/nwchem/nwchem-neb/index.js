@@ -1,11 +1,11 @@
-import rootNewProject         from './components/root/NewProject';
-import rootViewSimulation     from '../../generic/components/root/ViewSimulation';
+import rootNewProject from './components/root/NewProject';
+import rootViewSimulation from '../../generic/components/root/ViewSimulation';
 
-import stepIntroduction       from '../common/steps/Introduction';
-import stepInput              from './components/steps/Input';
-import stepSimulationStart    from '../common/steps/Simulation/Start';
-import stepSimulationView     from './components/steps/SimulationView';
-import stepVisualization      from './components/steps/Visualization';
+import stepIntroduction from '../common/steps/Introduction';
+import stepInput from './components/steps/Input';
+import stepSimulationStart from '../common/steps/Simulation/Start';
+import stepSimulationView from './components/steps/SimulationView';
+import stepVisualization from './components/steps/Visualization';
 
 export default {
   name: 'NWChem - Nudged Elastic Band (NEB) method',

@@ -1,7 +1,7 @@
-import React    from 'react';
+import React from 'react';
 import LinkIcon from '../LinkIcon';
 import { Link } from 'react-router';
-import style    from 'HPCCloudStyle/Theme.mcss';
+import style from 'HPCCloudStyle/Theme.mcss';
 
 const DEFAULT_BREADCRUMB_ICONS = [
   style.breadCrumbRootIcon,
@@ -39,34 +39,44 @@ export default React.createClass({
   render() {
     var mapper;
     if (!this.props.hasTabs) {
-      mapper = (path, index) =>
-        <LinkIcon key={`${path}_${index}`} to={path}
+      mapper = (path, index) => (
+        <LinkIcon
+          key={`${path}_${index}`}
+          to={path}
           icon={this.props.icons[index]}
           title={this.props.titles ? this.props.titles[index] : null}
-          className={ index === this.props.active ? style.activeBreadCrumb : null}
-        />;
+          className={
+            index === this.props.active ? style.activeBreadCrumb : null
+          }
+        />
+      );
     } else {
       const iconClasses = (index) => [
         this.props.icons[index],
         index === this.props.active ? style.activeBreadCrumb : null,
       ];
-      mapper = (path, index) =>
+      mapper = (path, index) => (
         <span key={`${path}_${index}`} className={this.props.className}>
-          <Link to={path} className={this.props.className}
+          <Link
+            to={path}
+            className={this.props.className}
             title={this.props.titles ? this.props.titles[index] : null}
           >
-            <i className={ iconClasses(index).join(' ') } />
-            <span className={index === this.props.active ? style.activeBreadCrumb : null}>
-              &nbsp;{ this.props.labels[index] }
+            <i className={iconClasses(index).join(' ')} />
+            <span
+              className={
+                index === this.props.active ? style.activeBreadCrumb : null
+              }
+            >
+              &nbsp;{this.props.labels[index]}
             </span>
           </Link>
-        </span>;
+        </span>
+      );
     }
 
-
     return (
-      <div className={ this.props.className }>
-        { this.props.paths.map(mapper) }
-      </div>);
+      <div className={this.props.className}>{this.props.paths.map(mapper)}</div>
+    );
   },
 });

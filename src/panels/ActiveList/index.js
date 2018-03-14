@@ -41,17 +41,27 @@ export default React.createClass({
   },
 
   render() {
-    var mapper = (el, index) =>
-        <li key={`${el.name}_${index}`}
-          className={ el.disabled ? style.unselectable : (this.props.active === index ? style.active : style.selectable) }
-          data-index={index}
-          onClick={this.changeActive}
-        >
-          <i className={el.classPrefix} />
-          {el.name}
-          <i className={el.classSufix} />
-        </li>;
+    var mapper = (el, index) => (
+      <li
+        key={`${el.name}_${index}`}
+        className={
+          el.disabled
+            ? style.unselectable
+            : this.props.active === index ? style.active : style.selectable
+        }
+        data-index={index}
+        onClick={this.changeActive}
+      >
+        <i className={el.classPrefix} />
+        {el.name}
+        <i className={el.classSufix} />
+      </li>
+    );
 
-    return (<ul className={[this.props.className, style.list].join(' ')}>{this.props.list.map(mapper)}</ul>);
+    return (
+      <ul className={[this.props.className, style.list].join(' ')}>
+        {this.props.list.map(mapper)}
+      </ul>
+    );
   },
 });

@@ -1,9 +1,9 @@
-import rootNewSimulation    from './components/root/NewSimulation';
-import rootViewSimulation   from '../generic/components/root/ViewSimulation';
+import rootNewSimulation from './components/root/NewSimulation';
+import rootViewSimulation from '../generic/components/root/ViewSimulation';
 
-import stepIntroduction     from './components/steps/Introduction';
-import stepStartViz         from './components/steps/Visualization/Start';
-import stepVisualizer       from './components/steps/Visualization/View';
+import stepIntroduction from './components/steps/Introduction';
+import stepStartViz from './components/steps/Visualization/Start';
+import stepVisualizer from './components/steps/Visualization/View';
 
 export default {
   name: 'ParaViewWeb',

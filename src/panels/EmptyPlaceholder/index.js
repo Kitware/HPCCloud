@@ -12,16 +12,14 @@ const classes = [
   style.textCenter,
 ].join(' ');
 
-const placeholder = (props) => (
-  <div className={ classes }>
-    { props.phrase }
-  </div>
-);
+const placeholder = (props) => <div className={classes}>{props.phrase}</div>;
 
 placeholder.displayName = 'EmptyPlaceholder';
-placeholder.propTypes = { phrase: React.PropTypes.oneOfType([
-  React.PropTypes.string,
-  React.PropTypes.object,
-]) };
+placeholder.propTypes = {
+  phrase: React.PropTypes.oneOfType([
+    React.PropTypes.string,
+    React.PropTypes.object,
+  ]),
+};
 
 export default placeholder;

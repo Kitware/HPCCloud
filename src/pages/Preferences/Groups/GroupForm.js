@@ -1,7 +1,7 @@
-import React  from 'react';
-import style  from 'HPCCloudStyle/ItemEditor.mcss';
+import React from 'react';
+import style from 'HPCCloudStyle/ItemEditor.mcss';
 
-import set       from 'mout/src/object/set';
+import set from 'mout/src/object/set';
 import deepClone from 'mout/src/lang/deepClone';
 
 export default React.createClass({
@@ -65,56 +65,84 @@ export default React.createClass({
 
   render() {
     const groupUsersArray = this.props.groupUsers.map((el) => el.id);
-    return (<div>
-      <section className={style.group}>
-        <label className={style.label}>Name</label>
-        <input
-          className={style.input}
-          type="text"
-          value={this.props.data.name}
-          data-key="name"
-          onChange={this.formChange}
-          required
-        />
-      </section>
-      <section className={style.group}>
-        <label className={style.label}>Description</label>
-        <textarea
-          className={ style.input }
-          data-key="description"
-          rows="5"
-          onChange={ this.formChange }
-          value={this.props.data.description}
-        />
-      </section>
-      <section className={style.group} style={{ display: (this.props.data._id ? null : 'none') }}>
-        <label className={style.label}>Users</label>
-        <section className={style.splitView}>
-          <div className={style.splitViewItem}>
-            <select className={ style.input } data-which="shareUsers" multiple
-              onChange={this.handleUserChange} value={this.state.shareUsers}
-            >
-              { Object.keys(this.props.users).filter((id) => groupUsersArray.indexOf(id) === -1)
-                .map((id, ind) => <option
-                  key={id} value={id}>
-                  { this.props.users[id].login }
-                </option>) }
-            </select>
-            <button className={style.shareButton} onClick={this.userAdd} disabled={!this.state.shareUsers.length}>Add</button>
-          </div>
-          <div className={style.splitViewItem}>
-            <select className={ style.input } data-which="unShareUsers" multiple
-              onChange={this.handleUserChange} value={this.state.unShareUsers}
-            >
-              { this.props.groupUsers.map((el, ind) => <option
-                key={`${el.id}_${ind}`} value={el.id}>
-                { el.login }
-              </option>) }
-            </select>
-            <button className={style.shareButton} onClick={this.userRemove} disabled={!this.state.unShareUsers.length}>Remove</button>
-          </div>
+    return (
+      <div>
+        <section className={style.group}>
+          <label className={style.label}>Name</label>
+          <input
+            className={style.input}
+            type="text"
+            value={this.props.data.name}
+            data-key="name"
+            onChange={this.formChange}
+            required
+          />
         </section>
-      </section>
-    </div>);
+        <section className={style.group}>
+          <label className={style.label}>Description</label>
+          <textarea
+            className={style.input}
+            data-key="description"
+            rows="5"
+            onChange={this.formChange}
+            value={this.props.data.description}
+          />
+        </section>
+        <section
+          className={style.group}
+          style={{ display: this.props.data._id ? null : 'none' }}
+        >
+          <label className={style.label}>Users</label>
+          <section className={style.splitView}>
+            <div className={style.splitViewItem}>
+              <select
+                className={style.input}
+                data-which="shareUsers"
+                multiple
+                onChange={this.handleUserChange}
+                value={this.state.shareUsers}
+              >
+                {Object.keys(this.props.users)
+                  .filter((id) => groupUsersArray.indexOf(id) === -1)
+                  .map((id, ind) => (
+                    <option key={id} value={id}>
+                      {this.props.users[id].login}
+                    </option>
+                  ))}
+              </select>
+              <button
+                className={style.shareButton}
+                onClick={this.userAdd}
+                disabled={!this.state.shareUsers.length}
+              >
+                Add
+              </button>
+            </div>
+            <div className={style.splitViewItem}>
+              <select
+                className={style.input}
+                data-which="unShareUsers"
+                multiple
+                onChange={this.handleUserChange}
+                value={this.state.unShareUsers}
+              >
+                {this.props.groupUsers.map((el, ind) => (
+                  <option key={`${el.id}_${ind}`} value={el.id}>
+                    {el.login}
+                  </option>
+                ))}
+              </select>
+              <button
+                className={style.shareButton}
+                onClick={this.userRemove}
+                disabled={!this.state.unShareUsers.length}
+              >
+                Remove
+              </button>
+            </div>
+          </section>
+        </section>
+      </div>
+    );
   },
 });

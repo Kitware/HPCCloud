@@ -1,8 +1,7 @@
-import React  from 'react';
+import React from 'react';
 import client from '../../network';
 
 export default React.createClass({
-
   displayName: 'Logout',
 
   contextTypes: {
@@ -10,7 +9,8 @@ export default React.createClass({
   },
 
   componentDidMount() {
-    client.logout()
+    client
+      .logout()
       .then((_) => this.context.router.replace('/'))
       .catch((_) => this.context.router.replace('/'));
   },

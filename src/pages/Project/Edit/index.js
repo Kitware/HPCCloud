@@ -1,14 +1,14 @@
-import ItemEditor   from '../../../panels/ItemEditor';
-import SharePanel   from '../../../panels/SharePanel';
+import ItemEditor from '../../../panels/ItemEditor';
+import SharePanel from '../../../panels/SharePanel';
 import { userHasAccess } from '../../../utils/AccessHelper';
-import React        from 'react';
+import React from 'react';
 
-import Workflows    from '../../../workflows';
-import getNetworkError  from '../../../utils/getNetworkError';
+import Workflows from '../../../workflows';
+import getNetworkError from '../../../utils/getNetworkError';
 
-import { connect }  from 'react-redux';
+import { connect } from 'react-redux';
 import { dispatch } from '../../../redux';
-import * as Router  from '../../../redux/actions/router';
+import * as Router from '../../../redux/actions/router';
 import * as Actions from '../../../redux/actions/projects';
 
 function actionsForUser(user, accessObject) {
@@ -24,7 +24,6 @@ function actionsForUser(user, accessObject) {
 
 /* eslint-disable no-alert */
 const ProjectEdit = React.createClass({
-
   displayName: 'Project/Edit',
 
   propTypes: {
@@ -61,32 +60,39 @@ const ProjectEdit = React.createClass({
       return null;
     }
 
-    const childComponent = project.type ? Workflows[project.type].components.EditProject : null;
-    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.container,
-      parentProps: this.props }) : null;
+    const childComponent = project.type
+      ? Workflows[project.type].components.EditProject
+      : null;
+    const workflowAddOn = childComponent
+      ? React.createElement(childComponent, {
+          owner: () => this.container,
+          parentProps: this.props,
+        })
+      : null;
 
     return (
       <ItemEditor
-        name={ project.name }
-        description={ project.description }
-        error={ error }
-        ref={(c) => {this.container = c;}}
+        name={project.name}
+        description={project.description}
+        error={error}
+        ref={(c) => {
+          this.container = c;
+        }}
         title="Edit Project"
         actions={actionsForUser(currentUser, project.access)}
-        onAction={ this.onAction }
+        onAction={this.onAction}
       >
-        { workflowAddOn }
-        { currentUser._id === this.props.project.userId ?
+        {workflowAddOn}
+        {currentUser._id === this.props.project.userId ? (
           <div>
             <SharePanel shareItem={this.props.project} shareToType="users" />
             <SharePanel shareItem={this.props.project} shareToType="groups" />
           </div>
-          : null
-        }
-      </ItemEditor>);
+        ) : null}
+      </ItemEditor>
+    );
   },
 });
-
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
@@ -96,7 +102,12 @@ export default connect(
     return {
       currentUser: state.auth.user,
       project: state.projects.mapById[props.params.id],
-      error: getNetworkError(state, ['save_project', 'delete_project', 'share_project', 'unshare_project']),
+      error: getNetworkError(state, [
+        'save_project',
+        'delete_project',
+        'share_project',
+        'unshare_project',
+      ]),
     };
   },
   () => {
@@ -107,4 +118,3 @@ export default connect(
     };
   }
 )(ProjectEdit);
-

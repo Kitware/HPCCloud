@@ -8,7 +8,7 @@ export default function get(obj, prop) {
     return falseyReturn;
   }
 
-  while (prop = parts.shift()) {
+  while ((prop = parts.shift())) {
     obj = obj[prop];
     if (obj == null) {
       return falseyReturn;

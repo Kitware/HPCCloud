@@ -1,7 +1,6 @@
 import React from 'react';
 
 export default React.createClass({
-
   displayName: 'FormPanel/CheckboxInput',
 
   propTypes: {
@@ -23,13 +22,16 @@ export default React.createClass({
 
     return (
       <section className={style.group}>
-        <label className={style.label} title={item.description}>{item.label}</label>
+        <label className={style.label} title={item.description}>
+          {item.label}
+        </label>
         <input
           style={{ position: 'relative', top: '-5px' }}
           type="checkbox"
-          checked={ value }
+          checked={value}
           onChange={this.editField}
         />
-      </section>);
+      </section>
+    );
   },
 });

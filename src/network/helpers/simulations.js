@@ -3,7 +3,8 @@ import { invalidateSimulation } from './notifications';
 import { userHasAccess } from '../../utils/AccessHelper';
 
 function createItemForSimulation(simulation, name, file) {
-  return girder.createItem(simulation.metadata.inputFolder._id, name)
+  return girder
+    .createItem(simulation.metadata.inputFolder._id, name)
     .then((resp) => {
       // fill item with file
       const itemId = resp.data._id,
@@ -20,14 +21,21 @@ function createItemForSimulation(simulation, name, file) {
       return girder.editSimulation(simulation);
     })
     .catch((error) => {
-      const msg = error.data && error.data.message ? error.data.message : error.message;
+      const msg =
+        error.data && error.data.message ? error.data.message : error.message;
       console.error('upload failed:', msg);
     });
 }
 
-export function addFileForSimulationWithContents(simulation, itemName, fileName, contents) {
+export function addFileForSimulationWithContents(
+  simulation,
+  itemName,
+  fileName,
+  contents
+) {
   let fileId;
-  return girder.createItem(simulation.metadata.inputFolder._id, itemName)
+  return girder
+    .createItem(simulation.metadata.inputFolder._id, itemName)
     .then((resp) => {
       const parentId = resp.data._id;
       return girder.newFile({
@@ -40,7 +48,8 @@ export function addFileForSimulationWithContents(simulation, itemName, fileName,
     .then((resp) => {
       fileId = resp.data._id;
       const blob = new Blob([contents], { type: 'text/plain' });
-      return girder.updateFileContent(resp.data._id, contents.length)
+      return girder
+        .updateFileContent(resp.data._id, contents.length)
         .then((upload) => {
           girder.uploadChunk(fileId, 0, blob);
         });
@@ -52,7 +61,8 @@ export function addFileForSimulationWithContents(simulation, itemName, fileName,
 }
 
 export function addEmptyFileForSimulation(simulation, itemName, fileName) {
-  return girder.createItem(simulation.metadata.inputFolder._id, itemName)
+  return girder
+    .createItem(simulation.metadata.inputFolder._id, itemName)
     .then((resp) => {
       const parentId = resp.data._id;
       return girder.newFile({
@@ -71,56 +81,68 @@ export function saveSimulation(simulation_, attachments) {
   if (!simulation._id) {
     let folder;
     let outputFolder;
-    return girder.createSimulation(simulation.projectId, simulation)
-      // make output folder
-      .then((resp) => {
-        simulation = resp.data;
-        folder = {
-          name: 'output',
-          parentType: 'folder',
-          parentId: resp.data.folderId,
-        };
-        return girder.createFolder(folder);
-      })
-      // make input folder
-      .then((resp) => {
-        outputFolder = resp.data._id;
-        folder.name = 'input';
-        return girder.createFolder(folder);
-      })
-      // update sim metadata
-      .then((resp) => {
-        const inputFolder = resp.data._id;
-        simulation.metadata = Object.assign({}, simulation.metadata, {
-          status: 'created',
-          inputFolder: {
-            _id: inputFolder,
-            files: {},
-          },
-          outputFolder: {
-            _id: outputFolder,
-            files: {},
-          },
-        });
-        return girder.editSimulation(simulation);
-      })
-      // upload files to inputfolder if there are any,
-      // returns either promise result array with sim object as last item or simulation object.
-      .then((resp) => {
-        if (attachments) {
-          const promises = [];
-          Object.keys(attachments).forEach((file) => {
-            promises.push(createItemForSimulation(simulation, file, attachments[file]));
+    return (
+      girder
+        .createSimulation(simulation.projectId, simulation)
+        // make output folder
+        .then((resp) => {
+          simulation = resp.data;
+          folder = {
+            name: 'output',
+            parentType: 'folder',
+            parentId: resp.data.folderId,
+          };
+          return girder.createFolder(folder);
+        })
+        // make input folder
+        .then((resp) => {
+          outputFolder = resp.data._id;
+          folder.name = 'input';
+          return girder.createFolder(folder);
+        })
+        // update sim metadata
+        .then((resp) => {
+          const inputFolder = resp.data._id;
+          simulation.metadata = Object.assign({}, simulation.metadata, {
+            status: 'created',
+            inputFolder: {
+              _id: inputFolder,
+              files: {},
+            },
+            outputFolder: {
+              _id: outputFolder,
+              files: {},
+            },
           });
-          return new Promise((a, r) => {
-            Promise.all(promises).then(() => {
-              a({ data: simulation });
+          return girder.editSimulation(simulation);
+        })
+        // upload files to inputfolder if there are any,
+        // returns either promise result array with sim object as last item or simulation object.
+        .then((resp) => {
+          if (attachments) {
+            const promises = [];
+            Object.keys(attachments).forEach((file) => {
+              promises.push(
+                createItemForSimulation(simulation, file, attachments[file])
+              );
             });
+            return new Promise((a, r) => {
+              Promise.all(promises).then(() => {
+                a({ data: simulation });
+              });
+            });
+          }
+          return new Promise((a, r) => {
+            a({ data: simulation });
           });
-        }
-        return new Promise((a, r) => { a({ data: simulation }); });
-      })
-      .catch((error) => new Promise((a, r) => { r(error); }));
+        })
+        .catch(
+          (error) =>
+            new Promise((a, r) => {
+              r(error);
+            })
+        )
+    );
   }
 
   return girder.editSimulation(simulation);
@@ -144,7 +166,9 @@ export function activateSimulationStep(user, simulation, active, disabled) {
   }
 
   return new Promise((res, rej) => {
-    console.warn('User does not have sufficient access to update step on server');
+    console.warn(
+      'User does not have sufficient access to update step on server'
+    );
     res();
   });
 }

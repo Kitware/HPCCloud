@@ -1,32 +1,38 @@
-import AWSForm          from './AWSForm';
-import ActiveList       from '../../../panels/ActiveList';
-import ButtonBar        from '../../../panels/ButtonBar';
-import Toolbar          from '../../../panels/Toolbar';
-import React            from 'react';
+import AWSForm from './AWSForm';
+import ActiveList from '../../../panels/ActiveList';
+import ButtonBar from '../../../panels/ButtonBar';
+import Toolbar from '../../../panels/Toolbar';
+import React from 'react';
 import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
-import { breadcrumb }   from '..';
-import getNetworkError  from '../../../utils/getNetworkError';
-import get              from '../../../utils/get';
+import { breadcrumb } from '..';
+import getNetworkError from '../../../utils/getNetworkError';
+import get from '../../../utils/get';
 
 import theme from 'HPCCloudStyle/Theme.mcss';
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
-import { connect }  from 'react-redux';
+import { connect } from 'react-redux';
 import * as Actions from '../../../redux/actions/aws';
 import * as NetActions from '../../../redux/actions/network';
 import { dispatch } from '../../../redux';
 
 function getActions(disabled, showSave) {
-  var ret = [{ name: 'removeItem', label: 'Delete', icon: style.deleteIcon, disabled }];
+  var ret = [
+    { name: 'removeItem', label: 'Delete', icon: style.deleteIcon, disabled },
+  ];
   if (showSave) {
-    ret.push({ name: 'saveItem', label: 'Save', icon: style.saveIcon, disabled });
+    ret.push({
+      name: 'saveItem',
+      label: 'Save',
+      icon: style.saveIcon,
+      disabled,
+    });
   }
   return ret;
 }
 
 /* eslint-disable no-alert */
 const AWSPrefs = React.createClass({
-
   displayName: 'Preferences/AWS',
 
   propTypes: {
@@ -65,7 +71,9 @@ const AWSPrefs = React.createClass({
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState._error !== this.state._error) {
-      this.timeout = setTimeout(() => { this.setState({ _error: null }); }, 3000);
+      this.timeout = setTimeout(() => {
+        this.setState({ _error: null });
+      }, 3000);
     }
   },
 
@@ -97,7 +105,10 @@ const AWSPrefs = React.createClass({
     const { list, active, onRemoveItem } = this.props;
     const profileToDelete = list[active];
 
-    if (profileToDelete._id && confirm('Are you sure you want to delete this profile?')) {
+    if (
+      profileToDelete._id &&
+      confirm('Are you sure you want to delete this profile?')
+    ) {
       onRemoveItem(active, profileToDelete);
     } else if (!profileToDelete._id) {
       onRemoveItem(active, profileToDelete);
@@ -133,46 +144,52 @@ const AWSPrefs = React.createClass({
 
     let content = null;
     if (list.length) {
-      content = (<div className={ style.content }>
-        <AWSForm
-          data={activeData}
-          onChange={ this.changeItem }
-        />
-        <ButtonBar
-          visible={!!activeData}
-          onAction={ this.formAction }
-          error={ this.state._error || error }
-          actions={getActions(buttonsDisabled, !get(activeData, '_id'))}
-        />
-      </div>);
+      content = (
+        <div className={style.content}>
+          <AWSForm data={activeData} onChange={this.changeItem} />
+          <ButtonBar
+            visible={!!activeData}
+            onAction={this.formAction}
+            error={this.state._error || error}
+            actions={getActions(buttonsDisabled, !get(activeData, '_id'))}
+          />
+        </div>
+      );
     } else {
-      content = (<EmptyPlaceholder phrase={
-        <span>
-          There are no EC2 Profiles available <br />
-          You can create some with the <i className={theme.addIcon} /> above
-        </span> }
-      />);
+      content = (
+        <EmptyPlaceholder
+          phrase={
+            <span>
+              There are no EC2 Profiles available <br />
+              You can create some with the <i className={theme.addIcon} /> above
+            </span>
+          }
+        />
+      );
     }
 
     return (
-      <div className={ style.rootContainer }>
-        <Toolbar breadcrumb={ awsBreadCrumb } title="AWS EC2"
-          actions={[{ name: 'add', icon: style.addIcon }]} onAction={this.addItem}
+      <div className={style.rootContainer}>
+        <Toolbar
+          breadcrumb={awsBreadCrumb}
+          title="AWS EC2"
+          actions={[{ name: 'add', icon: style.addIcon }]}
+          onAction={this.addItem}
           hasTabs
         />
-        <div className={ style.container }>
+        <div className={style.container}>
           <ActiveList
-            className={ style.menu }
+            className={style.menu}
             onActiveChange={this.activeChange}
             active={active}
             list={list}
           />
-          { content }
+          {content}
         </div>
-      </div>);
+      </div>
+    );
   },
 });
-
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
@@ -191,12 +208,20 @@ export default connect(
   },
   () => {
     return {
-      onUpdateItem: (index, profile, server) => dispatch(Actions.updateAWSProfile(index, profile, server)),
+      onUpdateItem: (index, profile, server) =>
+        dispatch(Actions.updateAWSProfile(index, profile, server)),
       onActiveChange: (index) => dispatch(Actions.updateActiveProfile(index)),
       onAddItem: () => dispatch(Actions.addAWSProfile()),
-      onRemoveItem: (index, profile) => dispatch(Actions.removeAWSProfile(index, profile)),
+      onRemoveItem: (index, profile) =>
+        dispatch(Actions.removeAWSProfile(index, profile)),
       onMount: () => dispatch(Actions.fetchAWSProfiles()),
-      invalidateErrors: () => dispatch(NetActions.invalidateErrors(['save_aws_profile', 'remove_aws_profile'])),
+      invalidateErrors: () =>
+        dispatch(
+          NetActions.invalidateErrors([
+            'save_aws_profile',
+            'remove_aws_profile',
+          ])
+        ),
     };
   }
 )(AWSPrefs);

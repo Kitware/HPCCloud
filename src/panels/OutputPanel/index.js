@@ -44,44 +44,51 @@ export default React.createClass({
     this.setState({ open: !this.state.open });
   },
   tableMapper(el, i) {
-    return (<tr key={el._id}>
-      { this.props.headers.map((h) => (
-          <td key={`${el._id}_${h}`}>
-            {el[h]}
-          </td>
-        ))
-      }
-    </tr>);
+    return (
+      <tr key={el._id}>
+        {this.props.headers.map((h) => <td key={`${el._id}_${h}`}>{el[h]}</td>)}
+      </tr>
+    );
   },
   render() {
     var advancedControl = null;
     if (this.props.advanced) {
-      advancedControl = (<div className={ style.buttons }>
-        <span className={ style.count }>{ this.props.subtitle ? `${this.props.subtitle}(${this.props.items.length})` : null }</span>
-        <i
-          className={ this.state.open ? style.advancedIconOn : style.advancedIconOff}
-          onClick={ this.toggleAdvanced }
-         />
-      </div>);
+      advancedControl = (
+        <div className={style.buttons}>
+          <span className={style.count}>
+            {this.props.subtitle
+              ? `${this.props.subtitle}(${this.props.items.length})`
+              : null}
+          </span>
+          <i
+            className={
+              this.state.open ? style.advancedIconOn : style.advancedIconOff
+            }
+            onClick={this.toggleAdvanced}
+          />
+        </div>
+      );
     }
     // table layout
     if (this.props.table) {
       return (
         <div>
-          <div className={ style.toolbar }>
-            <div className={ style.title }>{this.props.title}</div>
+          <div className={style.toolbar}>
+            <div className={style.title}>{this.props.title}</div>
             {advancedControl}
           </div>
-          <div className={ this.state.open ? style.tableContainer : style.hidden }>
-            <table className={ style.table }>
+          <div
+            className={this.state.open ? style.tableContainer : style.hidden}
+          >
+            <table className={style.table}>
               <thead>
                 <tr>
-                  { this.props.headers.map((h, i) => <th key={`${h}_${i}`}>{h}</th>) }
+                  {this.props.headers.map((h, i) => (
+                    <th key={`${h}_${i}`}>{h}</th>
+                  ))}
                 </tr>
               </thead>
-              <tbody>
-                { this.props.items.map(this.tableMapper) }
-              </tbody>
+              <tbody>{this.props.items.map(this.tableMapper)}</tbody>
             </table>
           </div>
         </div>
@@ -91,18 +98,24 @@ export default React.createClass({
     // not table layout
     return (
       <div>
-        <div className={ style.toolbar }>
-          <div className={ style.title }>{this.props.title}</div>
+        <div className={style.toolbar}>
+          <div className={style.title}>{this.props.title}</div>
           {advancedControl}
         </div>
-        <div className={ this.state.open ? style.taskflowContainer : style.hidden }>
+        <div
+          className={this.state.open ? style.taskflowContainer : style.hidden}
+        >
           {this.props.items.map((el, index) => {
-            if (!el) {return null;}
-            return (<section key={`${el.name}_${index}`} className={ style.listItem }>
-                      <strong className={ style.itemContent }>{ el.name }</strong>
-                      <span>{ el.value }</span>
-                    </section>);
-          }) }
+            if (!el) {
+              return null;
+            }
+            return (
+              <section key={`${el.name}_${index}`} className={style.listItem}>
+                <strong className={style.itemContent}>{el.name}</strong>
+                <span>{el.value}</span>
+              </section>
+            );
+          })}
         </div>
       </div>
     );

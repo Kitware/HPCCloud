@@ -1,12 +1,12 @@
-import client                from '../../network';
+import client from '../../network';
 import * as SimulationHelper from '../../network/helpers/simulations';
-import * as ProjectHelper    from '../../network/helpers/projects';
-import * as netActions       from './network';
-import * as taskflowActions  from './taskflows';
-import * as router           from './router';
-import get                   from '../../utils/get';
-import values                from 'mout/src/object/values';
-import { store, dispatch }          from '../';
+import * as ProjectHelper from '../../network/helpers/projects';
+import * as netActions from './network';
+import * as taskflowActions from './taskflows';
+import * as router from './router';
+import get from '../../utils/get';
+import values from 'mout/src/object/values';
+import { store, dispatch } from '../';
 
 export const FETCH_PROJECT_LIST = 'FETCH_PROJECT_LIST';
 export const UPDATE_PROJECT_LIST = 'UPDATE_PROJECT_LIST';
@@ -33,9 +33,13 @@ export function updateProjectSimulations(id, simulations) {
 
 export function fetchProjectSimulations(id) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall(`fetch_project_simulations_${id}`, 'Retreive project simulations');
+    const action = netActions.addNetworkCall(
+      `fetch_project_simulations_${id}`,
+      'Retreive project simulations'
+    );
 
-    client.listSimulations(id)
+    client
+      .listSimulations(id)
       .then((resp) => {
         const simulations = resp.data;
         dispatch(netActions.successNetworkCall(action.id, resp));
@@ -51,9 +55,13 @@ export function fetchProjectSimulations(id) {
 
 export function fetchProjectList() {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('fetch_project_list', 'Retreive projects');
+    const action = netActions.addNetworkCall(
+      'fetch_project_list',
+      'Retreive projects'
+    );
 
-    client.listProjects()
+    client
+      .listProjects()
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateProjectList(resp.data));
@@ -71,18 +79,21 @@ export function fetchProjectList() {
 
 export function deleteProject(project) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('delete_project', `Delete project ${project.name}`);
+    const action = netActions.addNetworkCall(
+      'delete_project',
+      `Delete project ${project.name}`
+    );
 
-    client.deleteProject(project._id)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch({ type: REMOVE_PROJECT, project });
-          dispatch(router.push('/'));
-        },
-        (error) => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
-        });
+    client.deleteProject(project._id).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch({ type: REMOVE_PROJECT, project });
+        dispatch(router.push('/'));
+      },
+      (error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error));
+      }
+    );
 
     return action;
   };
@@ -106,13 +117,18 @@ export function updateProject(project) {
 
 export function shareProject(project, users, groups) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('share_project', `Share project users: ${users}\ngroups: ${groups}`);
-    client.patchProjectAccess(project._id, users, groups)
+    const action = netActions.addNetworkCall(
+      'share_project',
+      `Share project users: ${users}\ngroups: ${groups}`
+    );
+    client
+      .patchProjectAccess(project._id, users, groups)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateProject(resp.data));
         // fetch all simulations and update their taskflow permissions
-        const simulationIds = store.getState().projects.simulations[project._id].list;
+        const simulationIds = store.getState().projects.simulations[project._id]
+          .list;
         const simulationsMap = store.getState().simulations.mapById;
         const taskflows = [];
         simulationIds.forEach((id) => {
@@ -122,7 +138,9 @@ export function shareProject(project, users, groups) {
             }
           });
         });
-        return Promise.all(taskflows.map((id) => client.shareTaskflow(id, users, groups)));
+        return Promise.all(
+          taskflows.map((id) => client.shareTaskflow(id, users, groups))
+        );
       })
       .catch((error) => {
         dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
@@ -133,13 +151,18 @@ export function shareProject(project, users, groups) {
 
 export function unShareProject(project, users, groups) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('unshare_project', `Unshare project users: ${users}\ngroups: ${groups}`);
-    client.revokeProjectAccess(project._id, users, groups)
+    const action = netActions.addNetworkCall(
+      'unshare_project',
+      `Unshare project users: ${users}\ngroups: ${groups}`
+    );
+    client
+      .revokeProjectAccess(project._id, users, groups)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateProject(resp.data));
         // fetch all simulations and update their taskflow permissions
-        const simulationIds = store.getState().projects.simulations[project._id].list;
+        const simulationIds = store.getState().projects.simulations[project._id]
+          .list;
         const simulationsMap = store.getState().simulations.mapById;
         const taskflows = [];
         simulationIds.forEach((id) => {
@@ -149,7 +172,9 @@ export function unShareProject(project, users, groups) {
             }
           });
         });
-        return Promise.all(taskflows.map((id) => client.unshareTaskflow(id, users, groups)));
+        return Promise.all(
+          taskflows.map((id) => client.unshareTaskflow(id, users, groups))
+        );
       })
       .catch((error) => {
         dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
@@ -160,8 +185,12 @@ export function unShareProject(project, users, groups) {
 
 export function updateProjectPermissions(project, users, groups, level) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('update_proj_permission', `update project permission: ${users}\ngroups: ${groups}\nlevel:${level}`);
-    client.patchProjectAccess(project._id, users, groups, level)
+    const action = netActions.addNetworkCall(
+      'update_proj_permission',
+      `update project permission: ${users}\ngroups: ${groups}\nlevel:${level}`
+    );
+    client
+      .patchProjectAccess(project._id, users, groups, level)
       .then((resp) => {
         dispatch(updateProject(resp.data));
       });
@@ -171,7 +200,10 @@ export function updateProjectPermissions(project, users, groups, level) {
 
 export function saveProject(project, attachments) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('save_project', `Save project ${project.name}`);
+    const action = netActions.addNetworkCall(
+      'save_project',
+      `Save project ${project.name}`
+    );
     if (attachments && Object.keys(attachments).length) {
       dispatch(netActions.prepareUpload(attachments));
     }
@@ -181,7 +213,9 @@ export function saveProject(project, attachments) {
         const respWithProj = Array.isArray(resp) ? resp[resp.length - 1] : resp;
         dispatch(updateProject(respWithProj.data));
         if (attachments && Object.keys(attachments).length) {
-          setTimeout(() => { dispatch(router.push(`/View/Project/${respWithProj.data._id}`)); }, 1500);
+          setTimeout(() => {
+            dispatch(router.push(`/View/Project/${respWithProj.data._id}`));
+          }, 1500);
         } else if (project._id) {
           dispatch(router.push('/'));
         } else {
@@ -206,29 +240,34 @@ export function updateSimulation(simulation) {
 
 export function saveSimulation(simulation, attachments, location) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('save_simulation', `Save simulation ${simulation.name}`);
+    const action = netActions.addNetworkCall(
+      'save_simulation',
+      `Save simulation ${simulation.name}`
+    );
 
     if (attachments && Object.keys(attachments).length) {
       dispatch(netActions.prepareUpload(attachments));
     }
 
-    SimulationHelper.saveSimulation(simulation, attachments)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          const respWithSim = Array.isArray(resp) ? resp[resp.length - 1] : resp;
-          dispatch(updateSimulation(respWithSim.data));
-          if (location && attachments && Object.keys(attachments).length) {
-            // in this 1.5s gap the progressBar will appear complete, and fade on the new page
-            setTimeout(() => { dispatch(router.push(location)); }, 1500);
-          } else if (location) {
-            // `/View/Project/${respWithSim.data.projectId}`
+    SimulationHelper.saveSimulation(simulation, attachments).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        const respWithSim = Array.isArray(resp) ? resp[resp.length - 1] : resp;
+        dispatch(updateSimulation(respWithSim.data));
+        if (location && attachments && Object.keys(attachments).length) {
+          // in this 1.5s gap the progressBar will appear complete, and fade on the new page
+          setTimeout(() => {
             dispatch(router.push(location));
-          }
-        },
-        (error) => {
-          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
-        });
+          }, 1500);
+        } else if (location) {
+          // `/View/Project/${respWithSim.data.projectId}`
+          dispatch(router.push(location));
+        }
+      },
+      (error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
+      }
+    );
     return action;
   };
 }
@@ -245,25 +284,28 @@ function getTaskflowsFromSimulation(simulation) {
 
 export function deleteSimulation(simulation, location) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall(`delete_simulation_${simulation._id}`, `Delete simulation ${simulation.name}`);
+    const action = netActions.addNetworkCall(
+      `delete_simulation_${simulation._id}`,
+      `Delete simulation ${simulation.name}`
+    );
     const simStepTaskflows = getTaskflowsFromSimulation(simulation);
-    client.deleteSimulation(simulation._id)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch({ type: REMOVE_SIMULATION, simulation });
-          if (location) {
-            dispatch(router.replace(location));
-          }
-          if (simStepTaskflows.length) {
-            simStepTaskflows.forEach((taskflowId) => {
-              dispatch(taskflowActions.deleteTaskflow(taskflowId));
-            });
-          }
-        },
-        (error) => {
-          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
-        });
+    client.deleteSimulation(simulation._id).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch({ type: REMOVE_SIMULATION, simulation });
+        if (location) {
+          dispatch(router.replace(location));
+        }
+        if (simStepTaskflows.length) {
+          simStepTaskflows.forEach((taskflowId) => {
+            dispatch(taskflowActions.deleteTaskflow(taskflowId));
+          });
+        }
+      },
+      (error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
+      }
+    );
 
     return action;
   };
@@ -271,8 +313,12 @@ export function deleteSimulation(simulation, location) {
 
 export function patchSimulation(simulation) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall(`update_simulation_${simulation._id}`, `update simulation ${simulation.name}`);
-    client.editSimulation(simulation)
+    const action = netActions.addNetworkCall(
+      `update_simulation_${simulation._id}`,
+      `update simulation ${simulation.name}`
+    );
+    client
+      .editSimulation(simulation)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateSimulation(resp.data));
@@ -298,15 +344,22 @@ export function setActiveSimulation(id, location) {
 
 export function updateSimulationStep(id, stepName, data, location) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall(`update_simulation_step_${id}`, 'Update simulation step');
+    const action = netActions.addNetworkCall(
+      `update_simulation_step_${id}`,
+      'Update simulation step'
+    );
     const state = store.getState().simulations.mapById[id];
     const stateTaskflowId = get(state, `steps.${stepName}.metadata.taskflowId`);
 
-    if (stateTaskflowId && stateTaskflowId !== get(data, 'metadata.taskflowId')) {
+    if (
+      stateTaskflowId &&
+      stateTaskflowId !== get(data, 'metadata.taskflowId')
+    ) {
       dispatch(taskflowActions.deleteTaskflow(stateTaskflowId));
     }
 
-    client.updateSimulationStep(id, stepName, data)
+    client
+      .updateSimulationStep(id, stepName, data)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateSimulation(resp.data));
@@ -324,38 +377,49 @@ export function updateSimulationStep(id, stepName, data, location) {
 
 export function shareSimulation(simulation, users, groups) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('share_simulation', `Share simulation users: ${users}\ngroups: ${groups}`);
-    client.patchSimulationAccess(simulation._id, users, groups)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(updateSimulation(resp.data));
-          const sharePromises = [];
-          values(simulation.steps).forEach((el, i) => {
-            if (el.metadata.taskflowId) {
-              sharePromises.push(client.shareTaskflow(el.metadata.taskflowId, users, groups));
-            }
-          });
-          return Promise.all(sharePromises);
-        },
-        (error) => {
-          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
+    const action = netActions.addNetworkCall(
+      'share_simulation',
+      `Share simulation users: ${users}\ngroups: ${groups}`
+    );
+    client.patchSimulationAccess(simulation._id, users, groups).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(updateSimulation(resp.data));
+        const sharePromises = [];
+        values(simulation.steps).forEach((el, i) => {
+          if (el.metadata.taskflowId) {
+            sharePromises.push(
+              client.shareTaskflow(el.metadata.taskflowId, users, groups)
+            );
+          }
         });
+        return Promise.all(sharePromises);
+      },
+      (error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
+      }
+    );
     return action;
   };
 }
 
 export function unShareSimulation(simulation, users, groups) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('unshare_simulation', `Share simulation users: ${users}\ngroups: ${groups}`);
-    client.revokeSimulationAccess(simulation._id, users, groups)
+    const action = netActions.addNetworkCall(
+      'unshare_simulation',
+      `Share simulation users: ${users}\ngroups: ${groups}`
+    );
+    client
+      .revokeSimulationAccess(simulation._id, users, groups)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateSimulation(resp.data));
         const sharePromises = [];
         values(simulation.steps).forEach((el, i) => {
           if (el.metadata.taskflowId) {
-            sharePromises.push(client.unshareTaskflow(el.metadata.taskflowId, users, groups));
+            sharePromises.push(
+              client.unshareTaskflow(el.metadata.taskflowId, users, groups)
+            );
           }
         });
         return Promise.all(sharePromises);
@@ -369,8 +433,12 @@ export function unShareSimulation(simulation, users, groups) {
 
 export function updateSimulationPermissions(simulation, users, groups, level) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('update_sim_permission', `update simulation permission: ${users}\ngroups: ${groups}\nlevel:${level}`);
-    client.patchSimulationAccess(simulation._id, users, groups, level)
+    const action = netActions.addNetworkCall(
+      'update_sim_permission',
+      `update simulation permission: ${users}\ngroups: ${groups}\nlevel:${level}`
+    );
+    client
+      .patchSimulationAccess(simulation._id, users, groups, level)
       .then((resp) => {
         dispatch(updateSimulation(resp.data));
       });

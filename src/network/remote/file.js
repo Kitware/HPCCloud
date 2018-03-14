@@ -1,4 +1,11 @@
-export default function ({ client, filterQuery, mustContain, busy, encodeQueryAsString, progress }) {
+export default function({
+  client,
+  filterQuery,
+  mustContain,
+  busy,
+  encodeQueryAsString,
+  progress,
+}) {
   function uploadChunk(uploadId, offset, chunk) {
     return new Promise((resolve, reject) => {
       const data = new FormData();
@@ -53,8 +60,8 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
         .then((upload) => {
           var chunkSize = 10 * 1024 * 1024,
             uploadNextChunk;
-            // i = 0,
-            // chunks = Math.floor(file.size / chunkSize);
+          // i = 0,
+          // chunks = Math.floor(file.size / chunkSize);
 
           uploadNextChunk = (offset) => {
             var blob;
@@ -117,7 +124,9 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
           delete params[key];
         }
       });
-      return busy(client._.get(`/file/${id}/download${encodeQueryAsString(params)}`));
+      return busy(
+        client._.get(`/file/${id}/download${encodeQueryAsString(params)}`)
+      );
     },
 
     updateFileContent(id, size) {
@@ -133,7 +142,9 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
         params = filterQuery(file, ...expected),
         { missingKeys, promise } = mustContain(file, '_id');
 
-      return missingKeys ? promise : busy(client._.put(`/file/${file._id}${encodeQueryAsString(params)}`));
+      return missingKeys
+        ? promise
+        : busy(client._.put(`/file/${file._id}${encodeQueryAsString(params)}`));
     },
 
     copyFile(fileId, itemId) {
@@ -145,11 +156,25 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
     },
 
     newFile(file) {
-      const expected = ['parentType', 'parentId', 'name', 'size', 'mimeType', 'linkUrl'],
+      const expected = [
+          'parentType',
+          'parentId',
+          'name',
+          'size',
+          'mimeType',
+          'linkUrl',
+        ],
         params = filterQuery(file, ...expected),
-        { missingKeys, promise } = mustContain(file, 'parentType', 'parentId', 'name');
+        { missingKeys, promise } = mustContain(
+          file,
+          'parentType',
+          'parentId',
+          'name'
+        );
 
-      return missingKeys ? promise : busy(client._.post(`/file${encodeQueryAsString(params)}`));
+      return missingKeys
+        ? promise
+        : busy(client._.post(`/file${encodeQueryAsString(params)}`));
     },
   };
 }

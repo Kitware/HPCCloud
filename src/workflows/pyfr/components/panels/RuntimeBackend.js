@@ -1,6 +1,6 @@
-import React      from 'react';
-import get        from '../../../../utils/get';
-import formStyle  from 'HPCCloudStyle/ItemEditor.mcss';
+import React from 'react';
+import get from '../../../../utils/get';
+import formStyle from 'HPCCloudStyle/ItemEditor.mcss';
 
 const TYPES = {
   cuda: 'Cuda',
@@ -9,7 +9,6 @@ const TYPES = {
 };
 
 export default React.createClass({
-
   displayName: 'pyfr-exec/RuntimeBackend',
 
   propTypes: {
@@ -21,7 +20,10 @@ export default React.createClass({
   },
 
   getInitialState() {
-    const state = Object.assign({ cuda: 'round-robin', active: '', openmp: '', opencl: '', options: [] }, this.getStateFromProps(this.props));
+    const state = Object.assign(
+      { cuda: 'round-robin', active: '', openmp: '', opencl: '', options: [] },
+      this.getStateFromProps(this.props)
+    );
     return state;
   },
 
@@ -41,7 +43,9 @@ export default React.createClass({
     if (active === 'cuda') {
       backend['device-id'] = value;
     } else if (this.state.backendProfile && this.state.backendProfile[active]) {
-      const addOn = this.state.backendProfile[active].find((item) => item.name === this.state[active]);
+      const addOn = this.state.backendProfile[active].find(
+        (item) => item.name === this.state[active]
+      );
       Object.assign(backend, addOn);
     }
 
@@ -54,12 +58,18 @@ export default React.createClass({
   },
 
   getStateFromProps(props) {
-    const newState = Object.assign({ backendProfile: { cuda: false, openmp: [], opencl: [] } }, this.state);
+    const newState = Object.assign(
+      { backendProfile: { cuda: false, openmp: [], opencl: [] } },
+      this.state
+    );
     const previousClusterId = this.state ? this.state.clusterId : '';
 
     if (props.parentState.serverType === 'Traditional') {
       const clusterId = props.parentState.Traditional.profile;
-      const backendProfile = get(props, `parentProps.clusters.${clusterId}.config.pyfr`);
+      const backendProfile = get(
+        props,
+        `parentProps.clusters.${clusterId}.config.pyfr`
+      );
       if (backendProfile && previousClusterId !== clusterId) {
         newState.clusterId = clusterId;
         newState.backendProfile = backendProfile;
@@ -97,54 +107,70 @@ export default React.createClass({
     this.setState({ [active]: value });
   },
 
-
   render() {
     if (this.props.parentState.serverType !== 'Traditional') {
       return null;
     }
 
     let profiles = [];
-    if (this.state.backendProfile && this.state.backendProfile[this.state.active] && this.state.active !== 'cuda') {
+    if (
+      this.state.backendProfile &&
+      this.state.backendProfile[this.state.active] &&
+      this.state.active !== 'cuda'
+    ) {
       profiles = this.state.backendProfile[this.state.active];
     }
 
     return (
       <div>
-          <section className={formStyle.group}>
-              <label className={formStyle.label}>Backend</label>
-              <select
-                className={formStyle.input}
-                value={this.state.active}
-                onChange={ this.updateActiveType }
-              >
-                { this.state.options.map((key, index) =>
-                  <option key={ `${key}_${index}` } value={ key }>{ TYPES[key] }</option>
-                )}
-              </select>
-          </section>
-          <section className={ this.state.active !== 'cuda' ? formStyle.hidden : formStyle.group }>
-            <label className={formStyle.label}>Device</label>
-              <select
-                className={formStyle.input}
-                value={this.state.cuda}
-                onChange={ this.updateActiveProfile }
-              >
-                <option value="round-robin">Round Robin</option>
-                <option value="local-rank">Local Rank</option>
-              </select>
-          </section>
-          <section className={ this.state.active === 'cuda' ? formStyle.hidden : formStyle.group }>
-            <label className={formStyle.label}>Profile</label>
-              <select
-                className={formStyle.input}
-                value={this.state[this.state.active]}
-                onChange={ this.updateActiveProfile }
-              >
-                { profiles.map((profile, index) =>
-                  <option key={ `${profile.name}_${index}` } value={ profile.name }>{ profile.name }</option>
-                )}
-              </select>
-          </section>
-      </div>);
+        <section className={formStyle.group}>
+          <label className={formStyle.label}>Backend</label>
+          <select
+            className={formStyle.input}
+            value={this.state.active}
+            onChange={this.updateActiveType}
+          >
+            {this.state.options.map((key, index) => (
+              <option key={`${key}_${index}`} value={key}>
+                {TYPES[key]}
+              </option>
+            ))}
+          </select>
+        </section>
+        <section
+          className={
+            this.state.active !== 'cuda' ? formStyle.hidden : formStyle.group
+          }
+        >
+          <label className={formStyle.label}>Device</label>
+          <select
+            className={formStyle.input}
+            value={this.state.cuda}
+            onChange={this.updateActiveProfile}
+          >
+            <option value="round-robin">Round Robin</option>
+            <option value="local-rank">Local Rank</option>
+          </select>
+        </section>
+        <section
+          className={
+            this.state.active === 'cuda' ? formStyle.hidden : formStyle.group
+          }
+        >
+          <label className={formStyle.label}>Profile</label>
+          <select
+            className={formStyle.input}
+            value={this.state[this.state.active]}
+            onChange={this.updateActiveProfile}
+          >
+            {profiles.map((profile, index) => (
+              <option key={`${profile.name}_${index}`} value={profile.name}>
+                {profile.name}
+              </option>
+            ))}
+          </select>
+        </section>
+      </div>
+    );
   },
 });

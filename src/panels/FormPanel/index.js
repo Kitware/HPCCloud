@@ -35,7 +35,6 @@ function getValue(obj, path, type = 'text') {
 }
 
 export default React.createClass({
-
   displayName: 'FormPanel',
 
   propTypes: {
@@ -90,13 +89,21 @@ export default React.createClass({
     const { config, style } = this.props;
     return (
       <div>
-        { Object.keys(config).map((key) => {
+        {Object.keys(config).map((key) => {
           const item = config[key];
           const id = key;
           const value = getValue(data, id, item.type);
 
-          return React.createElement(elementMapping[item.type], { style, item, id, key, value, onChange });
+          return React.createElement(elementMapping[item.type], {
+            style,
+            item,
+            id,
+            key,
+            value,
+            onChange,
+          });
         })}
-      </div>);
+      </div>
+    );
   },
 });

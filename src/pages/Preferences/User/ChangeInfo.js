@@ -1,16 +1,15 @@
-import React        from 'react';
-import ButtonBar    from '../../../panels/ButtonBar';
+import React from 'react';
+import ButtonBar from '../../../panels/ButtonBar';
 
-import style        from 'HPCCloudStyle/ItemEditor.mcss';
+import style from 'HPCCloudStyle/ItemEditor.mcss';
 
 import getNetworkError from '../../../utils/getNetworkError';
 import get from 'mout/src/object/get';
-import { connect }  from 'react-redux';
+import { connect } from 'react-redux';
 import * as Actions from '../../../redux/actions/user';
 import { dispatch } from '../../../redux';
 
 const ChangeInfo = React.createClass({
-
   displayName: 'User/ChangeInfo',
 
   propTypes: {
@@ -23,10 +22,12 @@ const ChangeInfo = React.createClass({
 
   getDefaultProps() {
     return {
-      buttons: [{
-        name: 'updateUser',
-        label: 'Save',
-      }],
+      buttons: [
+        {
+          name: 'updateUser',
+          label: 'Save',
+        },
+      ],
       error: null,
       success: false,
       user: {},
@@ -36,7 +37,9 @@ const ChangeInfo = React.createClass({
   changeForm(event) {
     const key = event.target.dataset.key;
     const value = event.target.value;
-    this.props.onUpdateUser(Object.assign({}, this.props.user, { [key]: value }));
+    this.props.onUpdateUser(
+      Object.assign({}, this.props.user, { [key]: value })
+    );
   },
 
   handleSubmit(event) {
@@ -48,7 +51,7 @@ const ChangeInfo = React.createClass({
 
   render() {
     return (
-      <div className={ this.props.className }>
+      <div className={this.props.className}>
         <form onSubmit={this.handleSubmit}>
           <section className={style.group}>
             <label className={style.label}>First name</label>
@@ -88,11 +91,12 @@ const ChangeInfo = React.createClass({
           </section>
         </form>
         <ButtonBar
-          onAction={ this.handleSubmit }
-          error={ this.props.error }
+          onAction={this.handleSubmit}
+          error={this.props.error}
           actions={this.props.buttons}
         />
-      </div>);
+      </div>
+    );
   },
 });
 
@@ -106,16 +110,19 @@ export default connect(
     return {
       user: state.auth.user,
       error,
-      buttons: [{
-        name: 'updateUser',
-        label: 'Save',
-        icon: success ? style.validIcon : '',
-      }],
+      buttons: [
+        {
+          name: 'updateUser',
+          label: 'Save',
+          icon: success ? style.validIcon : '',
+        },
+      ],
     };
   },
   () => {
     return {
-      onUpdateUser: (user, server) => dispatch(Actions.updateUser(user, server)),
+      onUpdateUser: (user, server) =>
+        dispatch(Actions.updateUser(user, server)),
     };
   }
 )(ChangeInfo);

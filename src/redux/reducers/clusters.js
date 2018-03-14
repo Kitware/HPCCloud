@@ -1,7 +1,7 @@
 import * as Actions from '../actions/clusters';
-import deepClone    from 'mout/src/lang/deepClone';
-import set          from 'mout/src/object/set';
-import style        from 'HPCCloudStyle/PageWithMenu.mcss';
+import deepClone from 'mout/src/lang/deepClone';
+import set from 'mout/src/object/set';
+import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
 export const initialState = {
   list: [],
@@ -72,12 +72,10 @@ function updateIcon(clusters) {
 export default function clustersReducer(state = initialState, action) {
   switch (action.type) {
     case Actions.ADD_CLUSTER: {
-      return Object.assign(
-        {}, state,
-        {
-          list: [].concat(state.list, deepClone(clusterTemplate)),
-          active: state.list.filter(tradFilter).length,
-        });
+      return Object.assign({}, state, {
+        list: [].concat(state.list, deepClone(clusterTemplate)),
+        active: state.list.filter(tradFilter).length,
+      });
     }
 
     case Actions.ADD_EXISTING_CLUSTER: {
@@ -88,7 +86,10 @@ export default function clustersReducer(state = initialState, action) {
       mapById[newCluster._id] = newCluster;
       mapById[newCluster._id].log = [];
 
-      if (newCluster.type === 'trad' && list.some((el) => el._id === newCluster._id)) {
+      if (
+        newCluster.type === 'trad' &&
+        list.some((el) => el._id === newCluster._id)
+      ) {
         for (let i = 0; i < list.length; i++) {
           if (list[i]._id === newCluster._id) {
             list[i] = newCluster;
@@ -105,7 +106,8 @@ export default function clustersReducer(state = initialState, action) {
     case Actions.REMOVE_CLUSTER: {
       const list = state.list.filter((item, idx) => idx !== action.index);
       const cluster = state.list.filter((item, idx) => idx === action.index)[0];
-      const active = (state.active < list.length) ? state.active : (list.length - 1);
+      const active =
+        state.active < list.length ? state.active : list.length - 1;
       const newState = Object.assign({}, state, { list, active });
 
       if (cluster && cluster._id && state.mapById[cluster._id]) {
@@ -119,7 +121,8 @@ export default function clustersReducer(state = initialState, action) {
     case Actions.REMOVE_CLUSTER_BY_ID: {
       const id = action.id;
       const list = state.list.filter((item) => item._id !== id);
-      const active = (state.active < list.length) ? state.active : (list.length - 1);
+      const active =
+        state.active < list.length ? state.active : list.length - 1;
       const mapById = Object.assign({}, state.mapById);
       delete mapById[id];
       return Object.assign({}, state, { mapById, list, active });
@@ -141,7 +144,8 @@ export default function clustersReducer(state = initialState, action) {
     case Actions.UPDATE_CLUSTERS: {
       // do not save ec2 clusters in the list, it's only used for trad clusters
       const list = action.clusters.filter((cluster) => cluster.type === 'trad');
-      const active = (state.active < list.length) ? state.active : (list.length - 1);
+      const active =
+        state.active < list.length ? state.active : list.length - 1;
       const mapById = Object.assign({}, state.mapById);
       updateIcon(list);
       action.clusters.forEach((cluster) => {
@@ -163,11 +167,15 @@ export default function clustersReducer(state = initialState, action) {
       const list = [].concat(
         state.list.slice(0, index),
         cluster,
-        state.list.slice(index + 1));
-      const active = (state.active < list.length) ? state.active : (list.length - 1);
+        state.list.slice(index + 1)
+      );
+      const active =
+        state.active < list.length ? state.active : list.length - 1;
 
       if (cluster._id) {
-        const mapById = Object.assign({}, state.mapById, { [cluster._id]: cluster });
+        const mapById = Object.assign({}, state.mapById, {
+          [cluster._id]: cluster,
+        });
         return Object.assign({}, state, { list, active, mapById });
       }
 
@@ -194,15 +202,22 @@ export default function clustersReducer(state = initialState, action) {
 
     case Actions.CLUSTER_APPLY_PRESET: {
       const { index, name } = action;
-      const cluster = applyPreset(Object.assign({}, state.list[index]), state.presets[name]);
+      const cluster = applyPreset(
+        Object.assign({}, state.list[index]),
+        state.presets[name]
+      );
       const list = [].concat(
         state.list.slice(0, index),
         cluster,
-        state.list.slice(index + 1));
-      const active = (state.active < list.length) ? state.active : (list.length - 1);
+        state.list.slice(index + 1)
+      );
+      const active =
+        state.active < list.length ? state.active : list.length - 1;
 
       if (cluster._id) {
-        const mapById = Object.assign({}, state.mapById, { [cluster._id]: cluster });
+        const mapById = Object.assign({}, state.mapById, {
+          [cluster._id]: cluster,
+        });
         return Object.assign({}, state, { list, active, mapById });
       }
 
@@ -215,11 +230,14 @@ export default function clustersReducer(state = initialState, action) {
 
     case Actions.TESTING_CLUSTER: {
       const index = action.index;
-      const cluster = Object.assign({}, state.list[index], { classPrefix: style.statusTestingIcon });
+      const cluster = Object.assign({}, state.list[index], {
+        classPrefix: style.statusTestingIcon,
+      });
       const list = [].concat(
         state.list.slice(0, index),
         cluster,
-        state.list.slice(index + 1));
+        state.list.slice(index + 1)
+      );
 
       return Object.assign({}, state, { list });
     }
@@ -250,12 +268,14 @@ export default function clustersReducer(state = initialState, action) {
     case Actions.RESTRICTED_CLUSTER_LOG: {
       const mapById = Object.assign({}, state.mapById);
       const cluster = Object.assign({}, state.mapById[action.id]);
-      cluster.log = [{
-        created: Date.now() / 1000,
-        levelname: 'INFO',
-        status: 'not permitted',
-        msg: 'Cluster log access not permitted',
-      }];
+      cluster.log = [
+        {
+          created: Date.now() / 1000,
+          levelname: 'INFO',
+          status: 'not permitted',
+          msg: 'Cluster log access not permitted',
+        },
+      ];
       mapById[action.id] = cluster;
       return Object.assign({}, state, { mapById });
     }

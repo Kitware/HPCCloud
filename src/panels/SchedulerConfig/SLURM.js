@@ -2,7 +2,6 @@ import React from 'react';
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 
 export default React.createClass({
-
   displayName: 'SchedulerConfig/SLURM',
 
   propTypes: {
@@ -27,7 +26,11 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="1"
-            max={ this.props.runtime && this.props.max && this.props.max.slurm ? this.props.max.slurm.numberOfNodes : null }
+            max={
+              this.props.runtime && this.props.max && this.props.max.slurm
+                ? this.props.max.slurm.numberOfNodes
+                : null
+            }
             value={this.props.config.slurm.numberOfNodes}
             data-key="slurm.numberOfNodes"
             onChange={this.updateConfig}
@@ -39,7 +42,11 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="1"
-            max={ this.props.runtime && this.props.max && this.props.max.slurm ? this.props.max.slurm.numberOfCoresPerNode : null }
+            max={
+              this.props.runtime && this.props.max && this.props.max.slurm
+                ? this.props.max.slurm.numberOfCoresPerNode
+                : null
+            }
             value={this.props.config.slurm.numberOfCoresPerNode}
             data-key="slurm.numberOfCoresPerNode"
             onChange={this.updateConfig}
@@ -51,12 +58,17 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="0"
-            max={ this.props.runtime && this.props.max && this.props.max.slurm ? this.props.max.slurm.numberOfGpusPerNode : null }
+            max={
+              this.props.runtime && this.props.max && this.props.max.slurm
+                ? this.props.max.slurm.numberOfGpusPerNode
+                : null
+            }
             value={this.props.config.slurm.numberOfGpusPerNode}
             data-key="slurm.numberOfGpusPerNode"
             onChange={this.updateConfig}
           />
         </section>
-      </div>);
+      </div>
+    );
   },
 });

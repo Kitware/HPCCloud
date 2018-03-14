@@ -1,13 +1,12 @@
-import React  from 'react';
-import style  from 'HPCCloudStyle/Login.mcss';
+import React from 'react';
+import style from 'HPCCloudStyle/Login.mcss';
 
 import getNetworkError from '../../utils/getNetworkError';
-import { connect }  from 'react-redux';
+import { connect } from 'react-redux';
 import { dispatch } from '../../redux';
 import { register } from '../../redux/actions/user';
 
 const Register = React.createClass({
-
   displayName: 'Register',
 
   propTypes: {
@@ -74,21 +73,27 @@ const Register = React.createClass({
         <form className={style.loginForm} onSubmit={this.handleSubmit}>
           <input
             className={style.loginInput}
-            ref={(c) => { this.firstName = c;}}
+            ref={(c) => {
+              this.firstName = c;
+            }}
             type="text"
             placeholder="firstName"
             required
           />
           <input
             className={style.loginInput}
-            ref={(c) => { this.lastName = c;}}
+            ref={(c) => {
+              this.lastName = c;
+            }}
             type="text"
             placeholder="lastName"
             required
           />
           <input
             className={style.loginInput}
-            ref={(c) => { this.email = c;}}
+            ref={(c) => {
+              this.email = c;
+            }}
             type="email"
             placeholder="email"
             onChange={this.resetError}
@@ -96,7 +101,9 @@ const Register = React.createClass({
           />
           <input
             className={style.loginInput}
-            ref={(c) => { this.login = c;}}
+            ref={(c) => {
+              this.login = c;
+            }}
             type="text"
             placeholder="login"
             onChange={this.resetError}
@@ -104,7 +111,9 @@ const Register = React.createClass({
           />
           <input
             className={style.loginInput}
-            ref={(c) => { this.password = c;}}
+            ref={(c) => {
+              this.password = c;
+            }}
             type="password"
             value={this.state.password}
             onChange={this.passwordChange}
@@ -113,7 +122,9 @@ const Register = React.createClass({
           />
           <input
             className={style.loginInput}
-            ref={(c) => { this.confirm = c;}}
+            ref={(c) => {
+              this.confirm = c;
+            }}
             type="password"
             value={this.state.confirm}
             onChange={this.confirmChange}
@@ -121,15 +132,14 @@ const Register = React.createClass({
             required
           />
           <div>
-              <button
-                className={style.loginButton}
-              >Register</button>
+            <button className={style.loginButton}>Register</button>
           </div>
-          {(this.state.error ? (
-              <p className={style.warningBox}>{this.state.error}</p>
-          ) : null)}
+          {this.state.error ? (
+            <p className={style.warningBox}>{this.state.error}</p>
+          ) : null}
         </form>
-      </center>);
+      </center>
+    );
   },
 });
 
@@ -144,8 +154,8 @@ export default connect(
   },
   () => {
     return {
-      onRegister: ({ firstName, lastName, login, email, password }) => dispatch(register(firstName, lastName, login, email, password)),
+      onRegister: ({ firstName, lastName, login, email, password }) =>
+        dispatch(register(firstName, lastName, login, email, password)),
     };
   }
 )(Register);
-

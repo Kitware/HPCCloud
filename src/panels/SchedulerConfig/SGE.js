@@ -2,7 +2,6 @@ import React from 'react';
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 
 export default React.createClass({
-
   displayName: 'SchedulerConfig/SGE',
 
   propTypes: {
@@ -27,7 +26,11 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="1"
-            max={ this.props.runtime && this.props.max && this.props.max.sge ? this.props.max.sge.numberOfSlots : null }
+            max={
+              this.props.runtime && this.props.max && this.props.max.sge
+                ? this.props.max.sge.numberOfSlots
+                : null
+            }
             value={this.props.config.sge.numberOfSlots}
             data-key="sge.numberOfSlots"
             onChange={this.updateConfig}
@@ -39,7 +42,11 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="0"
-            max={ this.props.runtime && this.props.max && this.props.max.sge ? this.props.max.sge.numberOfGpusPerNode : null }
+            max={
+              this.props.runtime && this.props.max && this.props.max.sge
+                ? this.props.max.sge.numberOfGpusPerNode
+                : null
+            }
             value={this.props.config.sge.numberOfGpusPerNode}
             data-key="sge.numberOfGpusPerNode"
             onChange={this.updateConfig}
@@ -56,6 +63,7 @@ export default React.createClass({
             required
           />
         </section>
-      </div>);
+      </div>
+    );
   },
 });

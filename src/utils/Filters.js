@@ -52,7 +52,7 @@ export function itemFilter(item, index, array) {
 
   Object.keys(query).forEach((key) => {
     query[key].forEach((token) => {
-      keep = keep && (item[key].toLowerCase().indexOf(token) !== -1);
+      keep = keep && item[key].toLowerCase().indexOf(token) !== -1;
     });
   });
 

@@ -7,7 +7,13 @@ function tradClusterPayload(id) {
   };
 }
 
-function ec2ClusterPayload(name, machine, clusterSize = 1, profileId, clusterNames) {
+function ec2ClusterPayload(
+  name,
+  machine,
+  clusterSize = 1,
+  profileId,
+  clusterNames
+) {
   if (typeof name === 'undefined') {
     throw Error('Missing required field: "name"');
   } else if (typeof machine === 'undefined') {

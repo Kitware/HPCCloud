@@ -1,13 +1,13 @@
-import React                   from 'react';
-import ButtonBar               from '../../../../panels/ButtonBar';
+import React from 'react';
+import ButtonBar from '../../../../panels/ButtonBar';
 import defaultServerParameters from '../../../../panels/run/defaults';
-import RunClusterFrom          from '../../../../panels/run';
-import getClusterPayload       from '../../../../utils/ClusterPayload';
+import RunClusterFrom from '../../../../panels/run';
+import getClusterPayload from '../../../../utils/ClusterPayload';
 
-import values    from 'mout/src/object/values';
+import values from 'mout/src/object/values';
 
-import { dispatch }    from '../../../../redux';
-import * as Actions    from '../../../../redux/actions/taskflows';
+import { dispatch } from '../../../../redux';
+import * as Actions from '../../../../redux/actions/taskflows';
 import * as NetActions from '../../../../redux/actions/network';
 
 // ----------------------------------------------------------------------------
@@ -22,14 +22,34 @@ function getServerProfiles(state) {
 
 // ----------------------------------------------------------------------------
 
-function onJobSubmition(taskflowName, primaryJob, payload, simulationStep, location) {
-  dispatch(Actions.createTaskflow(taskflowName, primaryJob, payload, simulationStep, location));
+function onJobSubmition(
+  taskflowName,
+  primaryJob,
+  payload,
+  simulationStep,
+  location
+) {
+  dispatch(
+    Actions.createTaskflow(
+      taskflowName,
+      primaryJob,
+      payload,
+      simulationStep,
+      location
+    )
+  );
 }
 
 // ----------------------------------------------------------------------------
 
 function onError(message) {
-  dispatch(NetActions.errorNetworkCall('create_taskflow', { data: { message } }, 'form'));
+  dispatch(
+    NetActions.errorNetworkCall(
+      'create_taskflow',
+      { data: { message } },
+      'form'
+    )
+  );
 }
 
 // ----------------------------------------------------------------------------
@@ -45,7 +65,10 @@ export default class JobSubmission extends React.Component {
     this.prepareJob = this.prepareJob.bind(this);
 
     // Manage internal state
-    this.state = Object.assign({ serverType: 'Traditional' }, defaultServerParameters);
+    this.state = Object.assign(
+      { serverType: 'Traditional' },
+      defaultServerParameters
+    );
   }
 
   dataChange(key, value, which) {
@@ -59,7 +82,14 @@ export default class JobSubmission extends React.Component {
     if (fn) {
       fn(this.props);
     } else {
-      console.error('Could not find action', action, 'from', this.props.actionFunctions, 'or', this);
+      console.error(
+        'Could not find action',
+        action,
+        'from',
+        this.props.actionFunctions,
+        'or',
+        this
+      );
     }
   }
 
@@ -74,9 +104,15 @@ export default class JobSubmission extends React.Component {
     // Generic cluster management
     const clusterSettings = this.state[this.state.serverType];
     Object.assign(payload, clusterSettings.runtime);
-    const clusterNames = values(this.props.clusters).filter(el => el.type === 'ec2').map(el => el.name);
+    const clusterNames = values(this.props.clusters)
+      .filter((el) => el.type === 'ec2')
+      .map((el) => el.name);
     try {
-      const cluster = getClusterPayload(this.state.serverType, clusterSettings, clusterNames);
+      const cluster = getClusterPayload(
+        this.state.serverType,
+        clusterSettings,
+        clusterNames
+      );
       if (!cluster) {
         throw Error(`Unrecognized serverType: ${this.state.serverType}`);
       }
@@ -87,7 +123,7 @@ export default class JobSubmission extends React.Component {
     }
 
     if (this.state.serverType === 'EC2') {
-      const volumeNames = values(this.props.volumes).map(el => el.name);
+      const volumeNames = values(this.props.volumes).map((el) => el.name);
       if (this.state.EC2.volume) {
         payload.volume = { _id: this.state.EC2.volume };
       } else if (this.state.EC2.volumeName && this.state.EC2.volumeSize) {
@@ -95,7 +131,9 @@ export default class JobSubmission extends React.Component {
         const volumeName = this.state.EC2.volumeName.trim();
         try {
           if (volumeNames.indexOf(volumeName) !== -1) {
-            throw Error(`A volume with the name '${volumeName}' already exists`);
+            throw Error(
+              `A volume with the name '${volumeName}' already exists`
+            );
           } else if (volumeSize <= 0) {
             throw Error('Volume size must be greater than zero');
           }
@@ -115,17 +153,25 @@ export default class JobSubmission extends React.Component {
       this.props.primaryJob,
       payload,
       simulationStep,
-      { // new location
+      {
+        // new location
         pathname: this.props.location.pathname,
-        query: Object.assign({}, this.props.location.query, { view: this.props.nextView }),
+        query: Object.assign({}, this.props.location.query, {
+          view: this.props.nextView,
+        }),
         state: this.props.location.state,
-      });
+      }
+    );
   }
 
   render() {
     // Add add-on UI if provided
     const workflowAddOn = this.props.addOn
-      ? React.createElement(this.props.addOn, { owner: () => this, parentProps: this.props, parentState: this.state })
+      ? React.createElement(this.props.addOn, {
+          owner: () => this,
+          parentProps: this.props,
+          parentState: this.state,
+        })
       : null;
 
     return (
@@ -137,14 +183,15 @@ export default class JobSubmission extends React.Component {
           dataChange={this.dataChange}
           clusterFilter={this.props.clusterFilter}
         />
-        { workflowAddOn }
+        {workflowAddOn}
         <ButtonBar
           visible={this.state[this.state.serverType].profile !== ''}
           onAction={this.buttonAction}
           actions={this.props.actionList}
-          error={ this.props.error }
+          error={this.props.error}
         />
-      </div>);
+      </div>
+    );
   }
 }
 

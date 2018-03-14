@@ -1,4 +1,10 @@
-export default function ({ client, filterQuery, mustContain, busy, encodeQueryAsString }) {
+export default function({
+  client,
+  filterQuery,
+  mustContain,
+  busy,
+  encodeQueryAsString,
+}) {
   return {
     updateGroupModerator(groupId, userId, onOff) {
       const url = `/group/${groupId}/moderator?userId=${userId}`;
@@ -15,7 +21,9 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
         params = filterQuery(group, ...expected),
         { missingKeys, promise } = mustContain(params, 'name');
 
-      return missingKeys ? promise : busy(client._.post(`/group${encodeQueryAsString(params)}`));
+      return missingKeys
+        ? promise
+        : busy(client._.post(`/group${encodeQueryAsString(params)}`));
     },
 
     getGroups() {
@@ -35,7 +43,11 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
         params = filterQuery(group, ...expected),
         { missingKeys, promise } = mustContain(group, '_id');
 
-      return missingKeys ? promise : busy(client._.put(`/group/${group._id}${encodeQueryAsString(params)}`));
+      return missingKeys
+        ? promise
+        : busy(
+            client._.put(`/group/${group._id}${encodeQueryAsString(params)}`)
+          );
     },
 
     listGroupInvitations(id, query = {}) {
@@ -50,7 +62,13 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
         params = filterQuery(options, ...allowed),
         { missingKeys, promise } = mustContain(params, 'userId');
 
-      return missingKeys ? promise : busy(client._.post(`/group/${id}/invitation${encodeQueryAsString(params)}`));
+      return missingKeys
+        ? promise
+        : busy(
+            client._.post(
+              `/group/${id}/invitation${encodeQueryAsString(params)}`
+            )
+          );
     },
 
     listGroupMembers(id, query = {}) {

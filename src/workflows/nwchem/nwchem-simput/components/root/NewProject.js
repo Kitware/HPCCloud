@@ -1,5 +1,5 @@
-import React                from 'react';
-import { FileUploadEntry }  from '../../../../../panels/ItemEditor';
+import React from 'react';
+import { FileUploadEntry } from '../../../../../panels/ItemEditor';
 
 function extractFileName(file) {
   return new Promise((accept, reject) => {
@@ -13,10 +13,11 @@ export default function newProject(props) {
     <FileUploadEntry
       name="geometry"
       label="Geometry file"
-      postProcess={ extractFileName }
+      postProcess={extractFileName}
       accept=".pdb,.xyz"
-      owner={ props.owner }
-    />);
+      owner={props.owner}
+    />
+  );
 }
 
 newProject.propTypes = {

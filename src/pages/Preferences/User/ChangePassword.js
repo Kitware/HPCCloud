@@ -1,25 +1,26 @@
-import React        from 'react';
-import ButtonBar    from '../../../panels/ButtonBar';
+import React from 'react';
+import ButtonBar from '../../../panels/ButtonBar';
 
-import style        from 'HPCCloudStyle/ItemEditor.mcss';
+import style from 'HPCCloudStyle/ItemEditor.mcss';
 
-import get          from 'mout/src/object/get';
+import get from 'mout/src/object/get';
 import getNetworkError from '../../../utils/getNetworkError';
-import { connect }  from 'react-redux';
+import { connect } from 'react-redux';
 import * as Actions from '../../../redux/actions/user';
 import { dispatch } from '../../../redux';
 
 function getActions(icon, disabled = false) {
-  return [{
-    name: 'changePass',
-    label: 'Change password',
-    icon,
-    disabled,
-  }];
+  return [
+    {
+      name: 'changePass',
+      label: 'Change password',
+      icon,
+      disabled,
+    },
+  ];
 }
 
 const ChangePassword = React.createClass({
-
   displayName: 'User/ChangePassword',
 
   propTypes: {
@@ -84,9 +85,9 @@ const ChangePassword = React.createClass({
 
   render() {
     const { oldPassword, password, error } = this.state;
-    const canClick = (oldPassword.length > 0 && password.length > 0 && !error);
+    const canClick = oldPassword.length > 0 && password.length > 0 && !error;
     return (
-      <div className={ this.props.className }>
+      <div className={this.props.className}>
         <form onSubmit={this.handleSubmit}>
           <section className={style.group}>
             <label className={style.label}>Password</label>
@@ -123,14 +124,14 @@ const ChangePassword = React.createClass({
           </section>
         </form>
         <ButtonBar
-          onAction={ this.handleSubmit }
-          error={ this.props.error }
+          onAction={this.handleSubmit}
+          error={this.props.error}
           actions={getActions(this.props.icon, !canClick)}
         />
-      </div>);
+      </div>
+    );
   },
 });
-
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
@@ -146,7 +147,8 @@ export default connect(
   },
   () => {
     return {
-      onPasswordChange: (old, newPass) => dispatch(Actions.changePassword(old, newPass)),
+      onPasswordChange: (old, newPass) =>
+        dispatch(Actions.changePassword(old, newPass)),
     };
   }
 )(ChangePassword);

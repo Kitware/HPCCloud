@@ -1,17 +1,16 @@
 import get from './get';
 import { taskflowActions } from './Constants';
-import Theme               from 'HPCCloudStyle/Theme.mcss';
+import Theme from 'HPCCloudStyle/Theme.mcss';
 
 // actionsList is an array of strings,
 // disabled is an object for each action either undefined or with a boolean
 export function getActions(actionsList, disabled) {
-  return actionsList.map((action) => Object.assign(
-    {},
-    taskflowActions[action],
-    {
+  return actionsList.map((action) =>
+    Object.assign({}, taskflowActions[action], {
       disabled: !!disabled[action],
       icon: disabled[action] ? Theme.loadingIcon : null,
-    }));
+    })
+  );
 }
 
 export function getDisabledButtons(network, taskflow = {}) {

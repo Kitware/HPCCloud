@@ -1,11 +1,11 @@
-import rootViewSimulation     from '../../generic/components/root/ViewSimulation';
+import rootViewSimulation from '../../generic/components/root/ViewSimulation';
 
-import stepIntroduction       from './components/steps/Introduction';
-import stepInput              from './components/steps/Input';
-import stepSimulationStart    from './components/steps/Simulation/Start';
-import stepSimulationView     from './components/steps/Simulation/View';
+import stepIntroduction from './components/steps/Introduction';
+import stepInput from './components/steps/Input';
+import stepSimulationStart from './components/steps/Simulation/Start';
+import stepSimulationView from './components/steps/Simulation/View';
 import stepVisualizationStart from './components/steps/Visualization/Start';
-import stepVisualizationView  from './components/steps/Visualization/View';
+import stepVisualizationView from './components/steps/Visualization/View';
 
 export default {
   name: 'OpenFoam - Tutorial examples',

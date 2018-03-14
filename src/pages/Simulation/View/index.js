@@ -1,12 +1,12 @@
-import React     from 'react';
+import React from 'react';
 import Workflows from '../../../workflows';
-import tools     from  '../../../tools';
+import tools from '../../../tools';
 import LoadingPanel from '../../../panels/LoadingPanel';
-import Toolbar      from '../../../panels/Toolbar';
+import Toolbar from '../../../panels/Toolbar';
 import { projectFunctions } from '../../../utils/AccessHelper';
 import { primaryBreadCrumbs } from '../../../utils/Constants';
 
-import style            from 'HPCCloudStyle/PageWithMenu.mcss';
+import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
 import { connect } from 'react-redux';
 import { dispatch } from '../../../redux';
@@ -15,7 +15,6 @@ import { fetchClusters } from '../../../redux/actions/clusters';
 import { fetchVolumes } from '../../../redux/actions/volumes';
 
 const SimulationView = React.createClass({
-
   displayName: 'Simulation/View',
 
   propTypes: {
@@ -45,7 +44,11 @@ const SimulationView = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    if (!this.props.simulation && nextProps.simulation && Object.keys(nextProps.simulation.steps).length) {
+    if (
+      !this.props.simulation &&
+      nextProps.simulation &&
+      Object.keys(nextProps.simulation.steps).length
+    ) {
       this.props.onMount(nextProps.simulation);
     }
   },
@@ -64,21 +67,46 @@ const SimulationView = React.createClass({
 
     const { project, simulation, user } = this.props;
     const wfModule = Workflows[project.type];
-    const step = this.props.params.step || simulation.active || wfModule.steps._order[0];
-    const taskFlowName = wfModule.taskFlows && wfModule.taskFlows[step] ? wfModule.taskFlows[step] : null;
-    const primaryJob = wfModule.taskFlows && wfModule.primaryJobs[step] ? wfModule.primaryJobs[step] : null;
-    const viewName = this.props.location.query.view || this.props.simulation.steps[step].view || 'default';
-    const ChildComponent = tools[viewName] ? tools[viewName].view : wfModule.components.ViewSimulation;
-    const childProvidesToolbar = tools[viewName] ? tools[viewName].providesToolbar : false;
+    const step =
+      this.props.params.step || simulation.active || wfModule.steps._order[0];
+    const taskFlowName =
+      wfModule.taskFlows && wfModule.taskFlows[step]
+        ? wfModule.taskFlows[step]
+        : null;
+    const primaryJob =
+      wfModule.taskFlows && wfModule.primaryJobs[step]
+        ? wfModule.primaryJobs[step]
+        : null;
+    const viewName =
+      this.props.location.query.view ||
+      this.props.simulation.steps[step].view ||
+      'default';
+    const ChildComponent = tools[viewName]
+      ? tools[viewName].view
+      : wfModule.components.ViewSimulation;
+    const childProvidesToolbar = tools[viewName]
+      ? tools[viewName].providesToolbar
+      : false;
 
     if (ChildComponent) {
       return (
-        <div className={ style.rootContainer }>
-          <Toolbar hidden={childProvidesToolbar}
-            breadcrumb={primaryBreadCrumbs(this.props.project._id, this.props.simulation._id)}
-            title={ <span> <img src={projectFunctions.getIcon(this.props.project).image} height="20px" />
-              &nbsp;{this.props.project.name} / {this.props.simulation.name}
-              </span> }
+        <div className={style.rootContainer}>
+          <Toolbar
+            hidden={childProvidesToolbar}
+            breadcrumb={primaryBreadCrumbs(
+              this.props.project._id,
+              this.props.simulation._id
+            )}
+            title={
+              <span>
+                {' '}
+                <img
+                  src={projectFunctions.getIcon(this.props.project).image}
+                  height="20px"
+                />
+                &nbsp;{this.props.project.name} / {this.props.simulation.name}
+              </span>
+            }
           />
           <ChildComponent
             project={project}
@@ -91,10 +119,13 @@ const SimulationView = React.createClass({
             module={wfModule}
             user={user}
           />
-        </div>);
+        </div>
+      );
     }
 
-    return <center>No simulation view for simulation of type {project.type}.</center>;
+    return (
+      <center>No simulation view for simulation of type {project.type}.</center>
+    );
   },
 });
 
@@ -105,7 +136,9 @@ export default connect(
   (state) => {
     const project = state.projects.mapById[state.projects.active];
     const simulations = state.projects.simulations[state.projects.active];
-    const simulation = simulations ? state.simulations.mapById[simulations.active] : null;
+    const simulation = simulations
+      ? state.simulations.mapById[simulations.active]
+      : null;
 
     return {
       project,
@@ -115,7 +148,8 @@ export default connect(
   },
   () => {
     return {
-      onMount: (simulation) => dispatch(Actions.updateTaskflowFromSimulation(simulation)),
+      onMount: (simulation) =>
+        dispatch(Actions.updateTaskflowFromSimulation(simulation)),
       fetchClusters: () => dispatch(fetchClusters()),
       fetchVolumes: () => dispatch(fetchVolumes()),
     };

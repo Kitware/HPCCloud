@@ -1,10 +1,10 @@
-import React      from 'react';
+import React from 'react';
 import deepEquals from 'mout/src/lang/deepEquals';
-import SGE        from './SGE';
-import SLURM      from './SLURM';
-import PBS        from './PBS';
+import SGE from './SGE';
+import SLURM from './SLURM';
+import PBS from './PBS';
 
-import style      from 'HPCCloudStyle/ItemEditor.mcss';
+import style from 'HPCCloudStyle/ItemEditor.mcss';
 
 const typeMapping = {
   sge: SGE,
@@ -32,11 +32,12 @@ function addDefaults(config) {
         numberOfCoresPerNode: 1,
         numberOfNodes: 1,
       },
-    }, config);
+    },
+    config
+  );
 }
 
 export default React.createClass({
-
   displayName: 'SchedulerConfig',
 
   propTypes: {
@@ -96,7 +97,7 @@ export default React.createClass({
     const SubConfig = typeMapping[this.state.config.type || 'sge'];
     return (
       <div>
-        <section className={ this.props.runtime ? style.hidden : style.group}>
+        <section className={this.props.runtime ? style.hidden : style.group}>
           <label className={style.label}>Scheduler</label>
           <select
             className={style.input}
@@ -110,7 +111,12 @@ export default React.createClass({
             <option value="slurm">SLURM</option>
           </select>
         </section>
-        <SubConfig config={ this.state.config } max={ this.props.max } runtime={ this.props.runtime} onChange={ this.updateConfig } />
+        <SubConfig
+          config={this.state.config}
+          max={this.props.max}
+          runtime={this.props.runtime}
+          onChange={this.updateConfig}
+        />
         <section className={style.group}>
           <label className={style.label}>Max runtime</label>
           <input
@@ -144,7 +150,9 @@ export default React.createClass({
           />
         </section>
         <section className={style.group}>
-          <label className={style.label}>{ this.props.runtime ? 'Queue' : 'Default queue' }</label>
+          <label className={style.label}>
+            {this.props.runtime ? 'Queue' : 'Default queue'}
+          </label>
           <input
             className={style.input}
             type="text"
@@ -153,6 +161,7 @@ export default React.createClass({
             onChange={this.updateConfig}
           />
         </section>
-      </div>);
+      </div>
+    );
   },
 });

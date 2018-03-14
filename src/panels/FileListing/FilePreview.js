@@ -23,7 +23,8 @@ export default React.createClass({
 
   componentDidMount() {
     document.addEventListener('keyup', this.keyPressed);
-    client.downloadItem(this.props.fileId, null, null, 'inline')
+    client
+      .downloadItem(this.props.fileId, null, null, 'inline')
       .then((resp) => {
         this.setState({ loading: false, contents: resp.data });
       })
@@ -48,15 +49,21 @@ export default React.createClass({
   },
 
   render() {
-    return (<div className={`${style.modalContainer} ${this.state.fullscreen ? style.fullscreen : ''}`}>
-      <div className={style.header}>
-        <span className={style.title}>{this.props.title}</span>
-        <i className={style.fullscreenIcon} onClick={this.toggleFullscreen} />
-        <i className={style.closeIcon} onClick={this.props.closer} />
+    return (
+      <div
+        className={`${style.modalContainer} ${
+          this.state.fullscreen ? style.fullscreen : ''
+        }`}
+      >
+        <div className={style.header}>
+          <span className={style.title}>{this.props.title}</span>
+          <i className={style.fullscreenIcon} onClick={this.toggleFullscreen} />
+          <i className={style.closeIcon} onClick={this.props.closer} />
+        </div>
+        <div className={`${style.modal} ${theme.fixedWidth}`}>
+          {this.state.loading ? <LoadingPanel /> : this.state.contents}
+        </div>
       </div>
-      <div className={`${style.modal} ${theme.fixedWidth}`}>
-        { this.state.loading ? <LoadingPanel /> : this.state.contents}
-      </div>
-    </div>);
+    );
   },
 });

@@ -1,5 +1,5 @@
-import * as netActions  from './network';
-import client           from '../../network';
+import * as netActions from './network';
+import client from '../../network';
 
 export const UPDATE_CLUSTERS_LIST = 'UPDATE_CLUSTERS_LIST';
 export const UPDATE_EC2_LIST = 'UPDATE_EC2_LIST';
@@ -19,10 +19,14 @@ export function pendingNetworkCall(pending = true) {
 
 export function fetchServers() {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('fetch_servers', 'Retreive servers');
+    const action = netActions.addNetworkCall(
+      'fetch_servers',
+      'Retreive servers'
+    );
 
     dispatch(pendingNetworkCall(true));
-    client.listClusters()
+    client
+      .listClusters()
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateClusterList(resp.data));

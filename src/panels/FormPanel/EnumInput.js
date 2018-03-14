@@ -1,7 +1,6 @@
 import React from 'react';
 
 export default React.createClass({
-
   displayName: 'FormPanel/EnumInput',
 
   propTypes: {
@@ -24,16 +23,17 @@ export default React.createClass({
 
     return (
       <section className={style.group}>
-        <label className={style.label} title={item.description}>{item.label}</label>
-        <select
-          className={style.input}
-          value={ value }
-          onChange={this.editField}
-        >
-        { item.values.map((option, index) =>
-          <option key={`${option}_${index}`} value={ option }>{ option }</option>
-        )}
+        <label className={style.label} title={item.description}>
+          {item.label}
+        </label>
+        <select className={style.input} value={value} onChange={this.editField}>
+          {item.values.map((option, index) => (
+            <option key={`${option}_${index}`} value={option}>
+              {option}
+            </option>
+          ))}
         </select>
-      </section>);
+      </section>
+    );
   },
 });

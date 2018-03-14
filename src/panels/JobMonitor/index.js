@@ -1,9 +1,9 @@
-import React                from 'react';
-import ExecutionUnit        from './ExecutionUnit';
-import style                from 'HPCCloudStyle/JobMonitor.mcss';
+import React from 'react';
+import ExecutionUnit from './ExecutionUnit';
+import style from 'HPCCloudStyle/JobMonitor.mcss';
 
-import { connect }  from 'react-redux';
-import { dispatch }     from '../../redux';
+import { connect } from 'react-redux';
+import { dispatch } from '../../redux';
 import * as ClusterActions from '../../redux/actions/clusters';
 import * as VolumeActions from '../../redux/actions/volumes';
 
@@ -64,91 +64,104 @@ const JobMonitor = React.createClass({
 
   render() {
     return (
-      <div className={ style.container }>
-          <div className={ style.toolbar }>
-              <div className={ style.title }>
-                  Jobs
-              </div>
-              <div className={ style.buttons }>
-                  { Object.keys(this.props.taskStatusCount).map((status, index) =>
-                    <span key={`${status}_${index}`} className={ style.count }>
-                      {`${status}(${this.props.taskStatusCount[status]})` }
-                    </span>
-                  )}
-                  <i
-                    className={ this.state.advanced ? style.advancedIconOn : style.advancedIconOff}
-                    onClick={ this.toggleAdvanced }
-                   />
-              </div>
+      <div className={style.container}>
+        <div className={style.toolbar}>
+          <div className={style.title}>Jobs</div>
+          <div className={style.buttons}>
+            {Object.keys(this.props.taskStatusCount).map((status, index) => (
+              <span key={`${status}_${index}`} className={style.count}>
+                {`${status}(${this.props.taskStatusCount[status]})`}
+              </span>
+            ))}
+            <i
+              className={
+                this.state.advanced
+                  ? style.advancedIconOn
+                  : style.advancedIconOff
+              }
+              onClick={this.toggleAdvanced}
+            />
           </div>
-          <div className={ style.jobContent }>
+        </div>
+        <div className={style.jobContent}>
+          {this.props.jobs.map((job) => (
+            <ExecutionUnit key={job._id} unit={job} />
+          ))}
+        </div>
+        <div
+          className={
+            this.state.advanced ? style.taskflowContainer : style.hidden
+          }
+        >
+          <div className={style.toolbar}>
+            <div className={style.title}>Workflow tasks</div>
+            <div className={style.buttons} />
+          </div>
+          <div className={style.taskflowContent}>
+            {this.props.tasks.map((task) => (
+              <ExecutionUnit key={task._id} unit={task} />
+            ))}
+          </div>
+          <div className={style.toolbar}>
+            <div className={style.title}>Workflow log</div>
+            <div className={style.buttons} />
+          </div>
+          <div className={style.taskflowContent}>
             {
-              this.props.jobs.map((job) =>
-                <ExecutionUnit key={job._id} unit={job} />
-              )
+              <ExecutionUnit
+                unit={{
+                  name: 'Log',
+                  log: this.props.taskflowLog,
+                  status: this.props.taskflowStatus,
+                }}
+              />
             }
           </div>
-          <div className={ this.state.advanced ? style.taskflowContainer : style.hidden }>
-              <div className={ style.toolbar }>
-                  <div className={ style.title }>
-                      Workflow tasks
-                  </div>
-                  <div className={ style.buttons } />
+          {this.props.clusterId ? (
+            <div>
+              <div className={style.toolbar}>
+                <div className={style.title}>Cluster log</div>
+                <div className={style.buttons} />
               </div>
-              <div className={ style.taskflowContent }>
+              <div className={style.taskflowContent}>
                 {
-                  this.props.tasks.map((task) =>
-                    <ExecutionUnit key={task._id} unit={task} />
-                  )
+                  <ExecutionUnit
+                    unit={{
+                      name: this.props.clusterName,
+                      log: this.props.clusterLog,
+                      status: this.props.clusterStatus,
+                    }}
+                    onToggle={this.clusterLogOpen}
+                    alwaysShowLogToggle
+                  />
                 }
               </div>
-              <div className={ style.toolbar }>
-                  <div className={ style.title }>
-                      Workflow log
-                  </div>
-                  <div className={ style.buttons } />
+            </div>
+          ) : null}
+          {this.props.volumeId ? (
+            <div>
+              <div className={style.toolbar}>
+                <div className={style.title}>Volume log</div>
+                <div className={style.buttons} />
               </div>
-              <div className={ style.taskflowContent }>
+              <div className={style.taskflowContent}>
                 {
-                  <ExecutionUnit unit={{ name: 'Log', log: this.props.taskflowLog, status: this.props.taskflowStatus }} />
+                  <ExecutionUnit
+                    unit={{
+                      name: this.props.volumeName,
+                      log: this.props.volumeLog,
+                      status: this.props.volumeStatus,
+                    }}
+                    onToggle={this.volumeLogOpen}
+                    alwaysShowLogToggle
+                  />
                 }
               </div>
-              { this.props.clusterId ?
-                <div>
-                  <div className={ style.toolbar }>
-                    <div className={ style.title }>
-                        Cluster log
-                    </div>
-                    <div className={ style.buttons } />
-                  </div>
-                  <div className={ style.taskflowContent }>
-                    {
-                      <ExecutionUnit unit={{ name: this.props.clusterName, log: this.props.clusterLog, status: this.props.clusterStatus }}
-                        onToggle={this.clusterLogOpen} alwaysShowLogToggle
-                      />
-                    }
-                  </div>
-                </div> : null
-              }
-              { this.props.volumeId ?
-                <div>
-                  <div className={ style.toolbar }>
-                    <div className={ style.title }>
-                        Volume log
-                    </div>
-                    <div className={ style.buttons } />
-                  </div>
-                  <div className={ style.taskflowContent }>
-                    {
-                      <ExecutionUnit unit={{ name: this.props.volumeName, log: this.props.volumeLog, status: this.props.volumeStatus }}
-                        onToggle={this.volumeLogOpen} alwaysShowLogToggle
-                      />
-                    }
-                  </div>
-                </div> : null
-              }
-          </div>
-      </div>);
+            </div>
+          ) : null}
+        </div>
+      </div>
+    );
   },
 });
 
@@ -173,7 +186,9 @@ export default connect(
     const taskflow = taskflowId ? state.taskflows.mapById[taskflowId] : null;
     const tasks = [];
     const jobs = [];
-    const cluster = clusterId ? state.preferences.clusters.mapById[clusterId] : null;
+    const cluster = clusterId
+      ? state.preferences.clusters.mapById[clusterId]
+      : null;
     const taskStatusCount = {};
     var taskflowStatus = '';
     var taskflowLog = [];
@@ -189,10 +204,16 @@ export default connect(
     if (taskflow && taskflow.taskMapById && taskflow.jobMapById) {
       // tasks
       taskflowStatus = taskflow.flow.status;
-      tasks.push(...Object.keys(taskflow.taskMapById).map((id) => taskflow.taskMapById[id]));
+      tasks.push(
+        ...Object.keys(taskflow.taskMapById).map(
+          (id) => taskflow.taskMapById[id]
+        )
+      );
       statusCounter(taskflow.taskMapById, taskStatusCount);
       // jobs
-      jobs.push(...Object.keys(taskflow.jobMapById).map((id) => taskflow.jobMapById[id]));
+      jobs.push(
+        ...Object.keys(taskflow.jobMapById).map((id) => taskflow.jobMapById[id])
+      );
       statusCounter(taskflow.jobMapById, taskStatusCount);
       taskflowLog = taskflow.log;
     }
@@ -213,7 +234,9 @@ export default connect(
       clusterOwner = cluster.userId;
       clusterStatus = cluster.status;
       if (cluster.log && cluster.log.length) {
-        clusterLog = cluster.log.sort((task1, task2) => task1.created - task2.created);
+        clusterLog = cluster.log.sort(
+          (task1, task2) => task1.created - task2.created
+        );
       }
     }
 
@@ -224,13 +247,22 @@ export default connect(
       taskflowLog,
       taskflowStatus,
       taskStatusCount,
-      clusterName, clusterStatus, clusterLog, clusterOwner,
-      volumeId, volumeName, volumeStatus, volumeLog,
+      clusterName,
+      clusterStatus,
+      clusterLog,
+      clusterOwner,
+      volumeId,
+      volumeName,
+      volumeStatus,
+      volumeLog,
     };
   },
   () => ({
-    getClusterLog: (id, offset) => dispatch(ClusterActions.getClusterLog(id, offset)),
-    getVolumeLog: (id, offset) => dispatch(VolumeActions.getVolumeLog(id, offset)),
-    restrictedClusterLog: (id) => dispatch(ClusterActions.restrictedClusterLog(id)),
+    getClusterLog: (id, offset) =>
+      dispatch(ClusterActions.getClusterLog(id, offset)),
+    getVolumeLog: (id, offset) =>
+      dispatch(VolumeActions.getVolumeLog(id, offset)),
+    restrictedClusterLog: (id) =>
+      dispatch(ClusterActions.restrictedClusterLog(id)),
   })
 )(JobMonitor);

@@ -1,5 +1,5 @@
 import React from 'react';
-import Theme  from 'HPCCloudStyle/Theme.mcss';
+import Theme from 'HPCCloudStyle/Theme.mcss';
 import Layout from 'HPCCloudStyle/Layout.mcss';
 
 export default React.createClass({
@@ -27,10 +27,12 @@ export default React.createClass({
     }
 
     return (
-      <div className={layoutClasses.join(' ')} style={{ marginTop: this.props.large ? '2em' : 'auto' }}>
+      <div
+        className={layoutClasses.join(' ')}
+        style={{ marginTop: this.props.large ? '2em' : 'auto' }}
+      >
         <span style={{ margin: '15px' }}>
-          <i className={Theme.loadingIcon} />&nbsp;
-          Loading...
+          <i className={Theme.loadingIcon} />&nbsp; Loading...
         </span>
       </div>
     );

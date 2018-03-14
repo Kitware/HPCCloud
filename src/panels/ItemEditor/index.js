@@ -1,8 +1,8 @@
-import React        from 'react';
-import Toolbar      from '../Toolbar';
-import ButtonBar    from '../ButtonBar';
+import React from 'react';
+import Toolbar from '../Toolbar';
+import ButtonBar from '../ButtonBar';
 
-import style    from 'HPCCloudStyle/ItemEditor.mcss';
+import style from 'HPCCloudStyle/ItemEditor.mcss';
 
 function NoOp() {}
 
@@ -53,7 +53,8 @@ const FileUploadEntry = React.createClass({
 
     // Let's post process it
     if (this.props.owner && this.props.postProcess) {
-      this.props.postProcess(file, this.props.owner)
+      this.props
+        .postProcess(file, this.props.owner)
         .then((metadata) => {
           Object.keys(metadata).forEach((key) => {
             this.props.owner().addMetadata(key, metadata[key]);
@@ -70,17 +71,19 @@ const FileUploadEntry = React.createClass({
       <div className={style.group}>
         <label className={style.label}>{this.props.label}</label>
         <input
-          ref={(c) => {this.input = c;}}
+          ref={(c) => {
+            this.input = c;
+          }}
           className={style.input}
           data-name={this.props.name}
           accept={this.props.accept}
           type="file"
           onChange={this.processFile}
         />
-      </div>);
+      </div>
+    );
   },
 });
-
 
 const TextEntry = React.createClass({
   displayName: 'ItemEditor/TextEntry',
@@ -117,28 +120,34 @@ const TextEntry = React.createClass({
           className={style.input}
           data-name={this.props.name}
           type="text"
-          value={ this.state[this.props.name] }
+          value={this.state[this.props.name]}
           onChange={this.updateMetadata}
         />
-      </div>);
+      </div>
+    );
   },
 });
 
 export { FileUploadEntry, TextEntry };
 
 export default React.createClass({
-
   displayName: 'ItemEditor',
 
   propTypes: {
     actions: React.PropTypes.array,
     breadcrumb: React.PropTypes.object,
-    children: React.PropTypes.oneOfType([React.PropTypes.object, React.PropTypes.array]),
+    children: React.PropTypes.oneOfType([
+      React.PropTypes.object,
+      React.PropTypes.array,
+    ]),
     description: React.PropTypes.string,
     error: React.PropTypes.string,
     name: React.PropTypes.string,
     onAction: React.PropTypes.func,
-    title: React.PropTypes.oneOfType([React.PropTypes.object, React.PropTypes.string]),
+    title: React.PropTypes.oneOfType([
+      React.PropTypes.object,
+      React.PropTypes.string,
+    ]),
   },
 
   getDefaultProps() {
@@ -214,40 +223,43 @@ export default React.createClass({
 
   render() {
     return (
-      <div className={ style.container }>
-          <Toolbar
-            breadcrumb={ this.props.breadcrumb || { paths: ['/'], icons: [style.listIcon] }}
-            title={ this.props.title }
-          />
+      <div className={style.container}>
+        <Toolbar
+          breadcrumb={
+            this.props.breadcrumb || { paths: ['/'], icons: [style.listIcon] }
+          }
+          title={this.props.title}
+        />
 
-          <div className={ style.group }>
-              <div className={ style.label }> Name </div>
-              <input
-                className={ style.input }
-                type="text"
-                value={ this.state.name }
-                data-name="name"
-                onChange={ this.updateForm }
-                autoFocus
-              />
-          </div>
-          <div className={ style.group }>
-              <div className={ style.label }> Description </div>
-              <textarea
-                className={ style.input }
-                data-name="description"
-                rows="5"
-                onChange={ this.updateForm }
-                value={this.state.description}
-              />
-          </div>
-          { this.props.children }
-          <ButtonBar
-            error={this.props.error}
-            actions={ this.props.actions }
-            onAction={ this.onAction }
+        <div className={style.group}>
+          <div className={style.label}> Name </div>
+          <input
+            className={style.input}
+            type="text"
+            value={this.state.name}
+            data-name="name"
+            onChange={this.updateForm}
+            autoFocus
           />
-      </div>);
+        </div>
+        <div className={style.group}>
+          <div className={style.label}> Description </div>
+          <textarea
+            className={style.input}
+            data-name="description"
+            rows="5"
+            onChange={this.updateForm}
+            value={this.state.description}
+          />
+        </div>
+        {this.props.children}
+        <ButtonBar
+          error={this.props.error}
+          actions={this.props.actions}
+          onAction={this.onAction}
+        />
+      </div>
+    );
   },
 });
 

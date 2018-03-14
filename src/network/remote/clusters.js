@@ -5,9 +5,14 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-export default function ({ client, filterQuery, mustContain, encodeQueryAsString, busy }) {
+export default function({
+  client,
+  filterQuery,
+  mustContain,
+  encodeQueryAsString,
+  busy,
+}) {
   return {
-
     // get /clusters
     //     Search for clusters with certain properties (type: 'trad' || 'ec2')
     //     TODO: limit and offset argument.
@@ -21,9 +26,12 @@ export default function ({ client, filterQuery, mustContain, encodeQueryAsString
     // post /clusters
     //     Create a cluster
     createCluster(cluster) {
-      return busy(client._.post('/clusters', cluster, {
-        transformRequest, headers,
-      }));
+      return busy(
+        client._.post('/clusters', cluster, {
+          transformRequest,
+          headers,
+        })
+      );
     },
 
     // get /clusters/{id}
@@ -51,9 +59,12 @@ export default function ({ client, filterQuery, mustContain, encodeQueryAsString
         delete editableCluster.config.host;
       }
 
-      return busy(client._.patch(`/clusters/${cluster._id}`, params, {
-        transformRequest, headers,
-      }));
+      return busy(
+        client._.patch(`/clusters/${cluster._id}`, params, {
+          transformRequest,
+          headers,
+        })
+      );
     },
 
     // delete /clusters/{id}

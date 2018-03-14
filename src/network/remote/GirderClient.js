@@ -10,16 +10,20 @@ const EVENT_TOPIC = 'girder.notification';
 class Observable {}
 Monologue.mixInto(Observable);
 
-const _LOGIN_PROMISE = () => new Promise((resolve, reject) => {
-  resolve();
-});
-const _LOGOUT_PROMISE = () => new Promise((resolve, reject) => {
-  reject();
-});
+const _LOGIN_PROMISE = () =>
+  new Promise((resolve, reject) => {
+    resolve();
+  });
+const _LOGOUT_PROMISE = () =>
+  new Promise((resolve, reject) => {
+    reject();
+  });
 // ----------------------------------------------------------------------------
 
 function encodeQueryAsString(query = {}) {
-  const params = Object.keys(query).map((name) => [encodeURIComponent(name), encodeURIComponent(query[name])].join('='));
+  const params = Object.keys(query).map((name) =>
+    [encodeURIComponent(name), encodeURIComponent(query[name])].join('=')
+  );
   return params.length ? `?${params.join('&')}` : '';
 }
 
@@ -49,11 +53,14 @@ function mustContain(object = {}, ...keys) {
     missingKeys = undefined;
     promise = new Promise((resolve, reject) => resolve());
   } else {
-    promise = new Promise((resolve, reject) => reject(`Missing keys ${missingKeys.join(', ')}`));
+    promise = new Promise((resolve, reject) =>
+      reject(`Missing keys ${missingKeys.join(', ')}`)
+    );
   }
 
   return {
-    missingKeys, promise,
+    missingKeys,
+    promise,
   };
 }
 
@@ -67,8 +74,7 @@ export function build(config = location, ...extensions) {
     eventSource = null,
     busyCounter = 0;
 
-  const
-    client = {}, // Must be const otherwise the created closure will fail
+  const client = {}, // Must be const otherwise the created closure will fail
     notification = new Observable(),
     idle = () => {
       busyCounter -= 1;
@@ -104,12 +110,13 @@ export function build(config = location, ...extensions) {
         };
       }
     },
-    {
-      extractLocalToken, updateGirderInstance, updateAuthenticationState,
-    } = {
+    { extractLocalToken, updateGirderInstance, updateAuthenticationState } = {
       extractLocalToken() {
         try {
-          return document.cookie.split('girderToken=')[1].split(';')[0].trim();
+          return document.cookie
+            .split('girderToken=')[1]
+            .split(';')[0]
+            .trim();
         } catch (e) {
           return undefined;
         }
@@ -125,7 +132,9 @@ export function build(config = location, ...extensions) {
         client._ = {};
 
         const methods = axios.create({
-          baseURL, timeout, headers,
+          baseURL,
+          timeout,
+          headers,
         });
 
         // wrap xhr requests so we can give a cancel to each,
@@ -134,9 +143,12 @@ export function build(config = location, ...extensions) {
           client._[req] = (url, conf) => {
             const cSource = CancelToken.source();
             client.cancel = cSource.cancel;
-            return methods[req](url, Object.assign({}, conf, {
-              cancelToken: cSource.token,
-            }));
+            return methods[req](
+              url,
+              Object.assign({}, conf, {
+                cancelToken: cSource.token,
+              })
+            );
           };
         });
 
@@ -144,9 +156,13 @@ export function build(config = location, ...extensions) {
           client._[req] = (url, data, conf) => {
             const cSource = CancelToken.source();
             client.cancel = cSource.cancel;
-            return methods[req](url, data, Object.assign({}, conf, {
-              cancelToken: cSource.token,
-            }));
+            return methods[req](
+              url,
+              data,
+              Object.assign({}, conf, {
+                cancelToken: cSource.token,
+              })
+            );
           };
         });
       },
@@ -178,7 +194,9 @@ export function build(config = location, ...extensions) {
     },
     progress = (id, current, total = 1) => {
       notification.emit(PROGRESS_TOPIC, {
-        id, current, total,
+        id,
+        current,
+        total,
       });
     };
 
@@ -186,40 +204,45 @@ export function build(config = location, ...extensions) {
   const publicObject = {
     login(username, password) {
       const auth = {
-        username, password,
+        username,
+        password,
       };
       return new Promise((accept, reject) => {
-        busy(client._.get('/user/authentication', { auth })
-          .then((resp) => {
-            token = resp.data.authToken.token;
-            userData = resp.data.user;
+        busy(
+          client._.get('/user/authentication', { auth })
+            .then((resp) => {
+              token = resp.data.authToken.token;
+              userData = resp.data.user;
 
-            // Update userData for external modules
-            client.user = userData;
-            client.token = token;
+              // Update userData for external modules
+              client.user = userData;
+              client.token = token;
 
-            updateAuthenticationState(true);
-            accept();
-          })
-          .catch((err) => {
-            updateAuthenticationState(false);
-            reject();
-          }));
+              updateAuthenticationState(true);
+              accept();
+            })
+            .catch((err) => {
+              updateAuthenticationState(false);
+              reject();
+            })
+        );
       });
     },
 
     logout() {
-      return busy(client._.delete('/user/authentication')
-        .then(
+      return busy(
+        client._.delete('/user/authentication').then(
           (ok) => {
             updateAuthenticationState(false);
             if (document && document.cookie) {
-              document.cookie = 'Girder-Token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+              document.cookie =
+                'Girder-Token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             }
           },
           (ko) => {
             console.log('loggout error', ko);
-          })
+          }
+        )
       );
     },
 
@@ -267,7 +290,8 @@ export function build(config = location, ...extensions) {
     token = config.token || extractLocalToken();
     updateGirderInstance();
     if (token) {
-      publicObject.me()
+      publicObject
+        .me()
         .then((resp) => {
           if (!resp.data) {
             updateAuthenticationState(false);

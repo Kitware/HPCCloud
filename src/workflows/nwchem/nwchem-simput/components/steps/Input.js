@@ -1,4 +1,4 @@
-import React       from 'react';
+import React from 'react';
 import SimputReact from '../../../../generic/components/steps/SimputReact';
 
 // ----------------------------------------------------------------------------
@@ -22,7 +22,6 @@ function simputModelDecorator(model, props) {
 export default (props) => (
   <SimputReact
     {...props}
-
     simputType="nwchem"
     inputFileKeys={[{ key: 'nw', name: 'job.nw', parse: false }]}
     initialDataModel={{
@@ -31,4 +30,5 @@ export default (props) => (
       hideViews: [],
     }}
     simputModelDecorator={simputModelDecorator}
-  />);
+  />
+);

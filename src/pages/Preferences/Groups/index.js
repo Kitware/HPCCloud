@@ -1,20 +1,20 @@
-import ActiveList       from '../../../panels/ActiveList';
-import Toolbar          from '../../../panels/Toolbar';
-import GroupForm      from './GroupForm';
+import ActiveList from '../../../panels/ActiveList';
+import Toolbar from '../../../panels/Toolbar';
+import GroupForm from './GroupForm';
 import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
-import ButtonBar        from '../../../panels/ButtonBar';
-import React            from 'react';
-import { breadcrumb }   from '..';
-import getNetworkError  from '../../../utils/getNetworkError';
+import ButtonBar from '../../../panels/ButtonBar';
+import React from 'react';
+import { breadcrumb } from '..';
+import getNetworkError from '../../../utils/getNetworkError';
 
 import theme from 'HPCCloudStyle/Theme.mcss';
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
-import { connect }      from 'react-redux';
-import * as Actions     from '../../../redux/actions/groups';
+import { connect } from 'react-redux';
+import * as Actions from '../../../redux/actions/groups';
 import * as UserActions from '../../../redux/actions/user';
-import * as NetActions  from '../../../redux/actions/network';
-import { dispatch }     from '../../../redux';
+import * as NetActions from '../../../redux/actions/network';
+import { dispatch } from '../../../redux';
 
 const GroupPrefs = React.createClass({
   displayName: 'Preferences/Groups',
@@ -96,57 +96,80 @@ const GroupPrefs = React.createClass({
     const clusterBreadCrumb = breadcrumb(this.props.user, 'Groups');
     const { active, list } = this.props;
     const activeData = active < list.length ? list[active] : null;
-    const actions = [{ name: 'removeItem', label: 'Delete Group', icon: style.deleteIcon, disabled: false }];
+    const actions = [
+      {
+        name: 'removeItem',
+        label: 'Delete Group',
+        icon: style.deleteIcon,
+        disabled: false,
+      },
+    ];
     let groupUsers = [];
     if (activeData && activeData._id === undefined) {
-      actions.push({ name: 'saveItem', label: 'Save Group', icon: style.saveIcon, disabled: false });
+      actions.push({
+        name: 'saveItem',
+        label: 'Save Group',
+        icon: style.saveIcon,
+        disabled: false,
+      });
     } else if (activeData && activeData._id) {
       groupUsers = this.props.usersByGroup[activeData._id];
     }
 
     let content = null;
     if (list && list.length) {
-      content = (<div className={ style.content }>
-        <GroupForm data={activeData}
-          onChange={ this.changeItem }
-          users={this.props.users}
-          groupUsers={groupUsers}
-          onUserAdd={this.addUsers}
-          onUserRemove={this.removeUsers}
-        />
-        <hr />
-        <ButtonBar
-          visible={!!activeData}
-          onAction={ this.formAction }
-          error={ this.props.error }
-          actions={actions}
-        />
-      </div>);
+      content = (
+        <div className={style.content}>
+          <GroupForm
+            data={activeData}
+            onChange={this.changeItem}
+            users={this.props.users}
+            groupUsers={groupUsers}
+            onUserAdd={this.addUsers}
+            onUserRemove={this.removeUsers}
+          />
+          <hr />
+          <ButtonBar
+            visible={!!activeData}
+            onAction={this.formAction}
+            error={this.props.error}
+            actions={actions}
+          />
+        </div>
+      );
     } else {
-      content = (<EmptyPlaceholder phrase={
-        <span>
-          There are no Groups available <br />
-          You can create some with the <i className={theme.addIcon} /> above
-        </span> }
-      />);
+      content = (
+        <EmptyPlaceholder
+          phrase={
+            <span>
+              There are no Groups available <br />
+              You can create some with the <i className={theme.addIcon} /> above
+            </span>
+          }
+        />
+      );
     }
 
     return (
-      <div className={ style.rootContainer }>
-        <Toolbar breadcrumb={ clusterBreadCrumb } title="Groups"
-          actions={[{ name: 'add', icon: style.addIcon }]} onAction={this.props.onAddItem}
+      <div className={style.rootContainer}>
+        <Toolbar
+          breadcrumb={clusterBreadCrumb}
+          title="Groups"
+          actions={[{ name: 'add', icon: style.addIcon }]}
+          onAction={this.props.onAddItem}
           hasTabs
         />
-        <div className={ style.container }>
+        <div className={style.container}>
           <ActiveList
-            className={ style.menu }
+            className={style.menu}
             onActiveChange={this.activeChange}
             active={active}
             list={list}
           />
-          { content }
+          {content}
         </div>
-      </div>);
+      </div>
+    );
   },
 });
 
@@ -166,7 +189,8 @@ export default connect(
   () => ({
     getGroups: () => dispatch(Actions.getGroups()),
     getUsers: () => dispatch(UserActions.getUsers()),
-    invalidateErrors: () => dispatch(NetActions.invalidateErrors(['save_group', 'remove_group'])),
+    invalidateErrors: () =>
+      dispatch(NetActions.invalidateErrors(['save_group', 'remove_group'])),
 
     onAddItem: () => dispatch(Actions.addGroup()),
     onActiveChange: (index) => dispatch(Actions.updateActiveGroup(index)),
@@ -174,7 +198,9 @@ export default connect(
     onSaveItem: (index, group) => dispatch(Actions.saveGroup(index, group)),
     onUpdateItem: (index, group) => dispatch(Actions.updateGroup(index, group)),
     onRemoveItem: (index, group) => dispatch(Actions.deleteGroup(index, group)),
-    addToGroup: (groupId, users) => dispatch(Actions.addToGroup(groupId, users)),
-    removeFromGroup: (groupId, users) => dispatch(Actions.removeFromGroup(groupId, users)),
+    addToGroup: (groupId, users) =>
+      dispatch(Actions.addToGroup(groupId, users)),
+    removeFromGroup: (groupId, users) =>
+      dispatch(Actions.removeFromGroup(groupId, users)),
   })
 )(GroupPrefs);

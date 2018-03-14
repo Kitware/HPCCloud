@@ -1,16 +1,16 @@
-import React            from 'react';
-import Toolbar          from '../../panels/Toolbar';
-import LoadingPanel     from '../../panels/LoadingPanel';
-import network          from 'pvw-visualizer/src/network';
+import React from 'react';
+import Toolbar from '../../panels/Toolbar';
+import LoadingPanel from '../../panels/LoadingPanel';
+import network from 'pvw-visualizer/src/network';
 // ControlPanel is also an exported component from this file, we want the default though
-import ControlPanelDef     from 'pvw-visualizer/src/panels/ControlPanel';
-import VtkRenderer      from 'paraviewweb/src/React/Renderers/VtkRenderer';
-import client           from '../../network';
-import { projectFunctions }   from '../../utils/AccessHelper';
+import ControlPanelDef from 'pvw-visualizer/src/panels/ControlPanel';
+import VtkRenderer from 'paraviewweb/src/React/Renderers/VtkRenderer';
+import client from '../../network';
+import { projectFunctions } from '../../utils/AccessHelper';
 import { primaryBreadCrumbs } from '../../utils/Constants';
 
-import style            from 'HPCCloudStyle/PageWithMenu.mcss';
-import vizStyle         from 'HPCCloudStyle/Visualizer.mcss';
+import style from 'HPCCloudStyle/PageWithMenu.mcss';
+import vizStyle from 'HPCCloudStyle/Visualizer.mcss';
 
 import { connect } from 'react-redux';
 import { dispatch, store } from '../../redux';
@@ -23,7 +23,6 @@ import ImageProviders from 'pvw-visualizer/src/ImageProviders';
 setVisualizerActiveStore(store);
 
 const visualizer = React.createClass({
-
   displayName: 'Visualization',
 
   propTypes: {
@@ -60,11 +59,16 @@ const visualizer = React.createClass({
     });
 
     // props.simulation is not necessarily updated with latest metadata, so we fetch it.
-    client.getSimulationStep(this.props.simulation._id, this.props.step)
+    client
+      .getSimulationStep(this.props.simulation._id, this.props.step)
       .then((resp) => {
-        const hostname = this.props.location.hostname ? this.props.location.hostname : window.location.hostname;
+        const hostname = this.props.location.hostname
+          ? this.props.location.hostname
+          : window.location.hostname;
         const config = {
-          sessionURL: `ws://${hostname}:8888/proxy?sessionId=${resp.data.metadata.sessionId}&path=ws`,
+          sessionURL: `ws://${hostname}:8888/proxy?sessionId=${
+            resp.data.metadata.sessionId
+          }&path=ws`,
           retry: true,
         };
         network.connect(config);
@@ -107,57 +111,80 @@ const visualizer = React.createClass({
   },
 
   previousTimeStep() {
-    const timeStep = (this.props.index - (1 + this.props.values.length)) % this.props.values.length;
+    const timeStep =
+      (this.props.index - (1 + this.props.values.length)) %
+      this.props.values.length;
     this.props.setTimeStep(timeStep);
   },
 
-/* eslint-disable react/jsx-no-bind */
+  /* eslint-disable react/jsx-no-bind */
   render() {
     if (!this.session) {
       return <LoadingPanel large center />;
     }
 
     return (
-      <div className={ style.rootContainer }>
-          <Toolbar
-            breadcrumb={primaryBreadCrumbs(this.props.project._id, this.props.simulation._id)}
-            actions={[
-                { name: 'toggleMenu', icon: vizStyle.toggleMenuButton },
-                { name: 'nextTimeStep', icon: vizStyle.nextButton },
-                { name: 'togglePlay', icon: this.props.playing ? vizStyle.stopButton : vizStyle.playButton },
-                { name: 'previousTimeStep', icon: vizStyle.previousButton },
-                { name: 'resetCamera', icon: vizStyle.resetCameraButton },
-            ]}
-            onAction={ this.onAction }
-            title={ <span> <img src={projectFunctions.getIcon(this.props.project).image} height="20px" />
+      <div className={style.rootContainer}>
+        <Toolbar
+          breadcrumb={primaryBreadCrumbs(
+            this.props.project._id,
+            this.props.simulation._id
+          )}
+          actions={[
+            { name: 'toggleMenu', icon: vizStyle.toggleMenuButton },
+            { name: 'nextTimeStep', icon: vizStyle.nextButton },
+            {
+              name: 'togglePlay',
+              icon: this.props.playing
+                ? vizStyle.stopButton
+                : vizStyle.playButton,
+            },
+            { name: 'previousTimeStep', icon: vizStyle.previousButton },
+            { name: 'resetCamera', icon: vizStyle.resetCameraButton },
+          ]}
+          onAction={this.onAction}
+          title={
+            <span>
+              {' '}
+              <img
+                src={projectFunctions.getIcon(this.props.project).image}
+                height="20px"
+              />
               &nbsp;{this.props.project.name} / {this.props.simulation.name}
-              </span> }
-          />
-          <ControlPanelDef className={ this.state.menuVisible ? vizStyle.menu : vizStyle.hiddenMenu } />
-          <VtkRenderer
-            ref={(c) => { if (!ImageProviders.getImageProvider()) ImageProviders.setImageProvider(c.binaryImageStream); }}
-            className={ vizStyle.viewport }
-            client={this.client}
-            connection={this.connection}
-            session={this.session}
-          />
-      </div>);
+            </span>
+          }
+        />
+        <ControlPanelDef
+          className={
+            this.state.menuVisible ? vizStyle.menu : vizStyle.hiddenMenu
+          }
+        />
+        <VtkRenderer
+          ref={(c) => {
+            if (!ImageProviders.getImageProvider())
+              ImageProviders.setImageProvider(c.binaryImageStream);
+          }}
+          className={vizStyle.viewport}
+          client={this.client}
+          connection={this.connection}
+          session={this.session}
+        />
+      </div>
+    );
   },
 });
 
-export default connect(
-  (state) => ({
-    setTimeStep(index) {
-      dispatch(Actions.time.applyTimeStep(index, state.visualizer.active.source));
-    },
-    playTime() {
-      dispatch(Actions.time.playTime());
-    },
-    stopTime() {
-      dispatch(Actions.time.stopTime());
-    },
-    index: Time.getTimeStep(state),
-    playing: Time.isAnimationPlaying(state),
-    values: Time.getTimeValues(state),
-  })
-)(visualizer);
+export default connect((state) => ({
+  setTimeStep(index) {
+    dispatch(Actions.time.applyTimeStep(index, state.visualizer.active.source));
+  },
+  playTime() {
+    dispatch(Actions.time.playTime());
+  },
+  stopTime() {
+    dispatch(Actions.time.stopTime());
+  },
+  index: Time.getTimeStep(state),
+  playing: Time.isAnimationPlaying(state),
+  values: Time.getTimeValues(state),
+}))(visualizer);

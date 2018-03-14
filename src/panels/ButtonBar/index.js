@@ -1,7 +1,7 @@
-import React    from 'react';
+import React from 'react';
 
-import states   from 'HPCCloudStyle/States.mcss';
-import editor   from 'HPCCloudStyle/ItemEditor.mcss';
+import states from 'HPCCloudStyle/States.mcss';
+import editor from 'HPCCloudStyle/ItemEditor.mcss';
 
 // PROPS:
 // `children`: A child element to display to the left of the buttons
@@ -41,26 +41,27 @@ export default React.createClass({
     }
 
     return (
-      <div className={ editor.buttonGroup }>
-        <span>
-          { this.props.children }
-        </span>
+      <div className={editor.buttonGroup}>
+        <span>{this.props.children}</span>
         <div className={editor.buttonContainer}>
-          <span className={ (this.props.error ? editor.errorBox : states.isHidden) }>
-            { this.props.error }
+          <span
+            className={this.props.error ? editor.errorBox : states.isHidden}
+          >
+            {this.props.error}
           </span>
-          { this.props.actions.map((action, index) =>
+          {this.props.actions.map((action, index) => (
             <button
-              className={ editor.button }
+              className={editor.button}
               key={`${action.name}_${index}`}
               data-action={action.name}
               onClick={this.onAction}
               disabled={action.disabled}
             >
-              { action.label } <i className={ action.icon } />
+              {action.label} <i className={action.icon} />
             </button>
-          )}
+          ))}
         </div>
-      </div>);
+      </div>
+    );
   },
 });

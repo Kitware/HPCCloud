@@ -6,7 +6,6 @@ import FormPanel from '.';
 import style from 'HPCCloudStyle/Profile.mcss';
 
 export default React.createClass({
-
   displayName: 'FormPanel/ProfileInput',
 
   propTypes: {
@@ -83,46 +82,56 @@ export default React.createClass({
     const item = this.props.item;
 
     return (
-      <div className={ style.container }>
-        <div className={ style.header }>
-          <label
-            className={ style.label }
-            title={ item.description }
-          >{ item.label }</label>
-          <div className={ style.buttons }>
-            <i className={ style.addIcon } onClick={ this.addProfile } />
-            <i className={ style.removeIcon } onClick={ this.removeProfile } />
+      <div className={style.container}>
+        <div className={style.header}>
+          <label className={style.label} title={item.description}>
+            {item.label}
+          </label>
+          <div className={style.buttons}>
+            <i className={style.addIcon} onClick={this.addProfile} />
+            <i className={style.removeIcon} onClick={this.removeProfile} />
           </div>
         </div>
-        <div className={ style.content }>
+        <div className={style.content}>
           <ActiveList
-            className={ style.menu }
-            onActiveChange={ this.activeChange }
+            className={style.menu}
+            onActiveChange={this.activeChange}
             active={this.state.active}
-            list={ this.state.data }
+            list={this.state.data}
           />
-          <div className={ this.state.data.length ? style.subContent : style.hiddenSubContent }>
-            <section className={ this.props.style.group }>
+          <div
+            className={
+              this.state.data.length ? style.subContent : style.hiddenSubContent
+            }
+          >
+            <section className={this.props.style.group}>
               <label
-                className={ this.props.style.label }
+                className={this.props.style.label}
                 title="Name of the profile"
-              >Profile name</label>
+              >
+                Profile name
+              </label>
               <input
-                className={ this.props.style.input }
+                className={this.props.style.input}
                 type="text"
-                value={ this.state.data[this.state.active] ? this.state.data[this.state.active].name : 'No profile' }
-                onChange={ this.updateProfileName }
+                value={
+                  this.state.data[this.state.active]
+                    ? this.state.data[this.state.active].name
+                    : 'No profile'
+                }
+                onChange={this.updateProfileName}
                 required
               />
             </section>
             <FormPanel
-              config={ item.profile }
-              style={ this.props.style }
-              data={ this.state.data[this.state.active] }
-              onChange={ this.updateProfile }
+              config={item.profile}
+              style={this.props.style}
+              data={this.state.data[this.state.active]}
+              onChange={this.updateProfile}
             />
           </div>
         </div>
-      </div>);
+      </div>
+    );
   },
 });

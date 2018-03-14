@@ -1,8 +1,8 @@
 import React from 'react';
-import get   from '../../utils/get';
+import get from '../../utils/get';
 import style from 'HPCCloudStyle/Toaster.mcss';
 
-import { connect }  from 'react-redux';
+import { connect } from 'react-redux';
 import { dispatch } from '../../redux';
 import * as Actions from '../../redux/actions/network';
 
@@ -27,15 +27,21 @@ const ToastComponent = React.createClass({
   },
 
   render() {
-    return (<div className={[style.ToastContainer, (this.props.errorId ? '' : style.isHidden)].join(' ')}>
-        { this.props.message }
-        <button className={style.ToastClearButton} onClick={ this.close }>
+    return (
+      <div
+        className={[
+          style.ToastContainer,
+          this.props.errorId ? '' : style.isHidden,
+        ].join(' ')}
+      >
+        {this.props.message}
+        <button className={style.ToastClearButton} onClick={this.close}>
           <span className={style.CloseIcon} />
         </button>
-      </div>);
+      </div>
+    );
   },
 });
-
 
 export default connect(
   (state) => {
@@ -51,7 +57,9 @@ export default connect(
       } else if (get(localState, `error.${id}.resp.data`)) {
         message = localState.error[id].resp.data;
       } else {
-        message = `${localState.error[id].resp.status}: ${localState.error[id].resp.statusText}`;
+        message = `${localState.error[id].resp.status}: ${
+          localState.error[id].resp.statusText
+        }`;
       }
       // the error doesn't necessarily get logged otherwise
       console.error(localState.error[id]);
@@ -66,6 +74,7 @@ export default connect(
     };
   },
   () => ({
-    invalidateError: (id) => dispatch(Actions.invalidateError(id, 'application')),
+    invalidateError: (id) =>
+      dispatch(Actions.invalidateError(id, 'application')),
   })
 )(ToastComponent);

@@ -1,9 +1,9 @@
-import React        from 'react';
+import React from 'react';
 
-import RunCluster   from './RunCluster';
-import RunEC2       from './RunEC2';
+import RunCluster from './RunCluster';
+import RunEC2 from './RunEC2';
 
-import formStyle    from 'HPCCloudStyle/ItemEditor.mcss';
+import formStyle from 'HPCCloudStyle/ItemEditor.mcss';
 
 export default React.createClass({
   displayName: 'RunClusterForm',
@@ -20,18 +20,32 @@ export default React.createClass({
     var serverForm;
     switch (this.props.serverType) {
       case 'EC2':
-        serverForm = (<RunEC2 contents={this.props.profiles.EC2} onChange={this.props.dataChange}
-          clusterFilter={this.props.clusterFilter} />);
+        serverForm = (
+          <RunEC2
+            contents={this.props.profiles.EC2}
+            onChange={this.props.dataChange}
+            clusterFilter={this.props.clusterFilter}
+          />
+        );
         break;
       case 'Traditional':
-        serverForm = (<RunCluster contents={this.props.profiles.Traditional} onChange={this.props.dataChange}
-          clusterFilter={this.props.clusterFilter} />);
+        serverForm = (
+          <RunCluster
+            contents={this.props.profiles.Traditional}
+            onChange={this.props.dataChange}
+            clusterFilter={this.props.clusterFilter}
+          />
+        );
         break;
       default:
         serverForm = <span>no valid serverType: {this.props.serverType}</span>;
     }
 
-    const optionMapper = (el, index) => <option key={`${el}_${index}`} value={el}>{el}</option>;
+    const optionMapper = (el, index) => (
+      <option key={`${el}_${index}`} value={el}>
+        {el}
+      </option>
+    );
 
     return (
       <div>
@@ -40,16 +54,13 @@ export default React.createClass({
           <select
             className={formStyle.input}
             value={this.props.serverType}
-            onChange={ this.props.serverTypeChange }
+            onChange={this.props.serverTypeChange}
           >
-            { Object.keys(this.props.profiles).map(optionMapper) }
+            {Object.keys(this.props.profiles).map(optionMapper)}
           </select>
         </section>
-        <section>
-          {serverForm}
-        </section>
+        <section>{serverForm}</section>
       </div>
     );
   },
-
 });

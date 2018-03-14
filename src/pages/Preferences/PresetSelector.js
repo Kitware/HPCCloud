@@ -15,11 +15,19 @@ export default React.createClass({
   },
 
   render() {
-    const optionsMapper = (preset, index) => <option key={`${preset}_${index}`} value={preset}>{ preset }</option>;
+    const optionsMapper = (preset, index) => (
+      <option key={`${preset}_${index}`} value={preset}>
+        {preset}
+      </option>
+    );
     return (
-      <select onChange={this.valueChange} className={editor.input} value={this.props.value}>
+      <select
+        onChange={this.valueChange}
+        className={editor.input}
+        value={this.props.value}
+      >
         <option value={null}>Presets</option>
-        { this.props.contents.map(optionsMapper) }
+        {this.props.contents.map(optionsMapper)}
       </select>
     );
   },

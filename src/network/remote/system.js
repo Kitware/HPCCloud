@@ -1,7 +1,15 @@
-export default function ({ client, filterQuery, mustContain, busy, encodeQueryAsString }) {
+export default function({
+  client,
+  filterQuery,
+  mustContain,
+  busy,
+  encodeQueryAsString,
+}) {
   return {
     deleteSetting(key) {
-      return busy(client._.delete(`/system/setting${encodeQueryAsString({ key })}`));
+      return busy(
+        client._.delete(`/system/setting${encodeQueryAsString({ key })}`)
+      );
     },
 
     getSettings(settings) {
@@ -17,7 +25,9 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
         return { key, value };
       });
 
-      return busy(client._.put(`/system/setting${encodeQueryAsString({ list })}`));
+      return busy(
+        client._.put(`/system/setting${encodeQueryAsString({ list })}`)
+      );
     },
 
     getServerVersion() {
@@ -25,17 +35,37 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
     },
 
     listUnfinishedUpload(query = {}) {
-      const allowed = ['uploadId', 'userId', 'parentId', 'assetstoreId', 'minimumAge', 'includeUntracked', 'limit', 'offset', 'sort', 'sortdir'],
+      const allowed = [
+          'uploadId',
+          'userId',
+          'parentId',
+          'assetstoreId',
+          'minimumAge',
+          'includeUntracked',
+          'limit',
+          'offset',
+          'sort',
+          'sortdir',
+        ],
         params = filterQuery(query, ...allowed);
 
       return busy(client._.get('/system/uploads', { params }));
     },
 
     removeUnfinishedUpload(query = {}) {
-      const allowed = ['uploadId', 'userId', 'parentId', 'assetstoreId', 'minimumAge', 'includeUntracked'],
+      const allowed = [
+          'uploadId',
+          'userId',
+          'parentId',
+          'assetstoreId',
+          'minimumAge',
+          'includeUntracked',
+        ],
         params = filterQuery(query, ...allowed);
 
-      return busy(client._.delete(`/system/uploads${encodeQueryAsString(params)}`));
+      return busy(
+        client._.delete(`/system/uploads${encodeQueryAsString(params)}`)
+      );
     },
 
     listPlugins() {
@@ -43,7 +73,9 @@ export default function ({ client, filterQuery, mustContain, busy, encodeQueryAs
     },
 
     setActivePlugins(plugins) {
-      return busy(client._.put(`/system/plugins${encodeQueryAsString({ plugins })}`));
+      return busy(
+        client._.put(`/system/plugins${encodeQueryAsString({ plugins })}`)
+      );
     },
   };
 }

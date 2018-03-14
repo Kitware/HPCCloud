@@ -1,21 +1,21 @@
-import React                  from 'react';
+import React from 'react';
 
 /* eslint-disable import/extensions */
-import Simput                 from 'Simput';
+import Simput from 'Simput';
 /* eslint-enable import/extensions */
-import SimputLabels           from 'simput/src/Labels';
-import ViewMenu               from 'simput/src/ViewMenu';
-import modelGenerator         from 'simput/src/modelGenerator';
-import client                 from '../../../../network';
+import SimputLabels from 'simput/src/Labels';
+import ViewMenu from 'simput/src/ViewMenu';
+import modelGenerator from 'simput/src/modelGenerator';
+import client from '../../../../network';
 import * as simulationsHelper from '../../../../network/helpers/simulations';
-import deepClone              from 'mout/src/lang/deepClone';
+import deepClone from 'mout/src/lang/deepClone';
 
-import PropertyPanelBlock     from 'paraviewweb/src/React/Properties/PropertyPanel';
+import PropertyPanelBlock from 'paraviewweb/src/React/Properties/PropertyPanel';
 
-import { dispatch }           from '../../../../redux';
-import * as Actions           from '../../../../redux/actions/projects';
+import { dispatch } from '../../../../redux';
+import * as Actions from '../../../../redux/actions/projects';
 
-import style                  from 'HPCCloudStyle/PageWithMenu.mcss';
+import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
 // ----------------------------------------------------------------------------
 
@@ -52,7 +52,11 @@ export default class SimputReact extends React.Component {
     this.fileNameToKeyMap = {};
     this.state = {
       // Simput root data
-      jsonData: props.simputModelDecorator(props.initialDataModel, props, this.saveModel),
+      jsonData: props.simputModelDecorator(
+        props.initialDataModel,
+        props,
+        this.saveModel
+      ),
 
       // Language support
       labels: new SimputLabels(Simput.types[props.simputType], 'en'),
@@ -70,25 +74,41 @@ export default class SimputReact extends React.Component {
       this.fileContent = {};
 
       // Check if the file is part of project but not part of the simulation
-      if (this.props.project.metadata.inputFolder.files[key] && !this.props.simulation.metadata.inputFolder.files[key]) {
+      if (
+        this.props.project.metadata.inputFolder.files[key] &&
+        !this.props.simulation.metadata.inputFolder.files[key]
+      ) {
         // Any project file that can be edited in simulation should be copied
         // into simulation so local edits could be performed within a simulation
         // without changing the project.
-        promises.push(client.downloadFile(this.props.project.metadata.inputFolder.files[key], 0, null, 'inline')
-          // Upload file to simulation
-          .then((resp) => {
-            // Capture file content in case we need to parse it
-            this.fileContent[key] = resp.data;
-            return simulationsHelper.addFileForSimulationWithContents(this.props.simulation, key, name, resp.data);
-          })
-          // update file id in simulation metadata
-          .then((resp) => {
-            const _id = resp._id; // file Id, custom response
-            const newSim = deepClone(this.props.simulation);
-            newSim.metadata.inputFolder.files[key] = _id;
-            this.setState({ [key]: _id });
-            return simulationsHelper.saveSimulation(newSim);
-          }));
+        promises.push(
+          client
+            .downloadFile(
+              this.props.project.metadata.inputFolder.files[key],
+              0,
+              null,
+              'inline'
+            )
+            // Upload file to simulation
+            .then((resp) => {
+              // Capture file content in case we need to parse it
+              this.fileContent[key] = resp.data;
+              return simulationsHelper.addFileForSimulationWithContents(
+                this.props.simulation,
+                key,
+                name,
+                resp.data
+              );
+            })
+            // update file id in simulation metadata
+            .then((resp) => {
+              const _id = resp._id; // file Id, custom response
+              const newSim = deepClone(this.props.simulation);
+              newSim.metadata.inputFolder.files[key] = _id;
+              this.setState({ [key]: _id });
+              return simulationsHelper.saveSimulation(newSim);
+            })
+        );
       }
     });
 
@@ -97,16 +117,21 @@ export default class SimputReact extends React.Component {
       Promise.all(promises).then(() => {
         const inputFile = this.props.simulation.metadata.inputFolder.files[key];
         if (!inputFile) {
-          promises.push(simulationsHelper.addEmptyFileForSimulation(this.props.simulation, key, name)
-            .then((resp) => {
-              const _id = resp.data._id; // itemId
-              const newSim = deepClone(this.props.simulation);
-              newSim.metadata.inputFolder.files[key] = _id;
-              this.setState({ [key]: _id });
-              const internalPromise = simulationsHelper.saveSimulation(newSim);
-              internalPromise.then(() => this.props.updateSimulation(newSim));
-              return internalPromise;
-            }));
+          promises.push(
+            simulationsHelper
+              .addEmptyFileForSimulation(this.props.simulation, key, name)
+              .then((resp) => {
+                const _id = resp.data._id; // itemId
+                const newSim = deepClone(this.props.simulation);
+                newSim.metadata.inputFolder.files[key] = _id;
+                this.setState({ [key]: _id });
+                const internalPromise = simulationsHelper.saveSimulation(
+                  newSim
+                );
+                internalPromise.then(() => this.props.updateSimulation(newSim));
+                return internalPromise;
+              })
+          );
         } else {
           this.setState({ [key]: inputFile });
         }
@@ -117,7 +142,10 @@ export default class SimputReact extends React.Component {
     let jsonData = this.props.simulation.steps[this.props.step].metadata.model;
     if (jsonData) {
       if (typeof jsonData === 'string') {
-        this.state.jsonData = props.simputModelDecorator(JSON.parse(jsonData), props);
+        this.state.jsonData = props.simputModelDecorator(
+          JSON.parse(jsonData),
+          props
+        );
       } else {
         console.log('Can not convert jsonData (?)', jsonData);
       }
@@ -131,35 +159,59 @@ export default class SimputReact extends React.Component {
           jsonData = props.simputModelDecorator(jsonData, props);
           this.setState({ jsonData });
           // Update step metadata
-          client.updateSimulationStep(this.props.simulation._id, this.props.step, {
-            metadata: { model: JSON.stringify(jsonData) },
-          }).then((resp) => {
-            var newSim = deepClone(this.props.simulation);
-            newSim.steps[this.props.step].metadata.model = JSON.stringify(jsonData);
-            this.props.saveSimulation(newSim);
-          });
+          client
+            .updateSimulationStep(this.props.simulation._id, this.props.step, {
+              metadata: { model: JSON.stringify(jsonData) },
+            })
+            .then((resp) => {
+              var newSim = deepClone(this.props.simulation);
+              newSim.steps[this.props.step].metadata.model = JSON.stringify(
+                jsonData
+              );
+              this.props.saveSimulation(newSim);
+            });
         };
 
         // We don't have any data model but we might be able to generate one
         // by parsing data
-        if (simputModule.parse && props.inputFileKeys.filter((i) => i.parse).length) {
+        if (
+          simputModule.parse &&
+          props.inputFileKeys.filter((i) => i.parse).length
+        ) {
           // Ensure we have content for all the file we need to parse
-          props.inputFileKeys.filter((i) => i.parse).forEach(({ key, name }) => {
-            if (!this.fileContent[key] && this.props.simulation.metadata.inputFolder.files[key]) {
-              const internalPromise = client.downloadFile(this.props.simulation.metadata.inputFolder.files[key], 0, null, 'inline');
-              promises.push(internalPromise);
-              internalPromise.then((resp) => {
-                this.fileContent[key] = resp.data;
-              });
-            }
-          });
+          props.inputFileKeys
+            .filter((i) => i.parse)
+            .forEach(({ key, name }) => {
+              if (
+                !this.fileContent[key] &&
+                this.props.simulation.metadata.inputFolder.files[key]
+              ) {
+                const internalPromise = client.downloadFile(
+                  this.props.simulation.metadata.inputFolder.files[key],
+                  0,
+                  null,
+                  'inline'
+                );
+                promises.push(internalPromise);
+                internalPromise.then((resp) => {
+                  this.fileContent[key] = resp.data;
+                });
+              }
+            });
           Promise.all(promises).then(() => {
             const fileNameToContentMap = {};
-            props.inputFileKeys.filter((i) => i.parse).forEach(({ key, name }) => {
-              fileNameToContentMap[name] = this.fileContent[key];
-            });
+            props.inputFileKeys
+              .filter((i) => i.parse)
+              .forEach(({ key, name }) => {
+                fileNameToContentMap[name] = this.fileContent[key];
+              });
             try {
-              jsonData = Object.assign({}, jsonData, { data: simputModule.parse(props.simputType, fileNameToContentMap) });
+              jsonData = Object.assign({}, jsonData, {
+                data: simputModule.parse(
+                  props.simputType,
+                  fileNameToContentMap
+                ),
+              });
               updateSimulationStep();
             } catch (parseError) {
               jsonData = props.initialDataModel;
@@ -181,30 +233,37 @@ export default class SimputReact extends React.Component {
 
   saveModel() {
     // Update step metadata with the latest json data model
-    const jsonData = this.props.simputModelDecorator(this.state.jsonData, this.props);
+    const jsonData = this.props.simputModelDecorator(
+      this.state.jsonData,
+      this.props
+    );
     const model = JSON.stringify(jsonData);
-    client.updateSimulationStep(this.props.simulation._id, this.props.step, {
-      metadata: { model },
-    })
-    .then((resp) => {
-      var newSim = deepClone(this.props.simulation);
-      newSim.steps[this.props.step].metadata.model = model;
-      this.props.saveSimulation(newSim);
-    })
-    .catch((error) => {
-      console.error('problem saving model');
-    });
+    client
+      .updateSimulationStep(this.props.simulation._id, this.props.step, {
+        metadata: { model },
+      })
+      .then((resp) => {
+        var newSim = deepClone(this.props.simulation);
+        newSim.steps[this.props.step].metadata.model = model;
+        this.props.saveSimulation(newSim);
+      })
+      .catch((error) => {
+        console.error('problem saving model');
+      });
 
     // Generate new input files and update content on server
     try {
-      const convertedData = Simput.types[this.props.simputType].convert(jsonData);
+      const convertedData = Simput.types[this.props.simputType].convert(
+        jsonData
+      );
       if (!convertedData.errors || convertedData.errors.length === 0) {
         // No error in convertion
         if (this.state.__export__) {
           const fileId = this.state.__export__;
           const content = JSON.stringify(convertedData);
           const blob = new Blob([content], { type: 'text/plain' });
-          client.updateFileContent(fileId, content.length)
+          client
+            .updateFileContent(fileId, content.length)
             .then((upload) => {
               client.uploadChunk(upload.data._id, 0, blob);
             })
@@ -212,7 +271,9 @@ export default class SimputReact extends React.Component {
               console.log('Error update content __export__', err);
             });
 
-          const simulationStepIndex = this.props.simulation.disabled.indexOf(this.props.nextStep);
+          const simulationStepIndex = this.props.simulation.disabled.indexOf(
+            this.props.nextStep
+          );
           if (simulationStepIndex !== -1) {
             const newSim = deepClone(this.props.simulation);
             newSim.disabled.splice(simulationStepIndex, 1);
@@ -225,7 +286,8 @@ export default class SimputReact extends React.Component {
               const fileId = this.state[fileKey];
               const content = convertedData.results[fileName];
               const blob = new Blob([content], { type: 'text/plain' });
-              client.updateFileContent(fileId, content.length)
+              client
+                .updateFileContent(fileId, content.length)
                 .then((upload) => {
                   client.uploadChunk(upload.data._id, 0, blob);
                 })
@@ -233,14 +295,18 @@ export default class SimputReact extends React.Component {
                   console.log('Error update content', fileKey, fileName, err);
                 });
 
-              const simulationStepIndex = this.props.simulation.disabled.indexOf(this.props.nextStep);
+              const simulationStepIndex = this.props.simulation.disabled.indexOf(
+                this.props.nextStep
+              );
               if (simulationStepIndex !== -1) {
                 const newSim = deepClone(this.props.simulation);
                 newSim.disabled.splice(simulationStepIndex, 1);
                 this.props.patchSimulation(newSim);
               }
             } else {
-              console.log(`No file id associated with generated file name: ${fileName}`);
+              console.log(
+                `No file id associated with generated file name: ${fileName}`
+              );
               console.log(fileName, this.fileNameToKeyMap, this.state);
             }
           });
@@ -256,12 +322,13 @@ export default class SimputReact extends React.Component {
 
   updateActive(viewId, index) {
     const data = modelGenerator(
-        Simput.types[this.props.simputType].model,
-        this.state.jsonData,
-        viewId,
-        index,
-        this.state.labels.activeLabels.attributes,
-        this.state.help);
+      Simput.types[this.props.simputType].model,
+      this.state.jsonData,
+      viewId,
+      index,
+      this.state.labels.activeLabels.attributes,
+      this.state.help
+    );
     const viewData = this.state.jsonData.data[viewId][index];
     this.setState({ data, viewData });
     setImmediate(this.saveModel);
@@ -283,24 +350,25 @@ export default class SimputReact extends React.Component {
     }
 
     return (
-      <div className={ style.container }>
-          <ViewMenu
-            className={ style.menu20 }
-            data={ this.state.jsonData }
-            model={ Simput.types[this.props.simputType].model }
-            labels={ this.state.labels }
-            onChange={ this.updateActive }
+      <div className={style.container}>
+        <ViewMenu
+          className={style.menu20}
+          data={this.state.jsonData}
+          model={Simput.types[this.props.simputType].model}
+          labels={this.state.labels}
+          onChange={this.updateActive}
+        />
+        <div className={style.content}>
+          <PropertyPanelBlock
+            className={style.rootContainer}
+            input={this.state.data}
+            labels={this.state.labels}
+            viewData={this.state.viewData}
+            onChange={this.updateViewData}
           />
-          <div className={ style.content }>
-              <PropertyPanelBlock
-                className={ style.rootContainer }
-                input={ this.state.data }
-                labels={ this.state.labels }
-                viewData={ this.state.viewData }
-                onChange={ this.updateViewData }
-              />
-          </div>
-      </div>);
+        </div>
+      </div>
+    );
   }
 }
 

@@ -1,7 +1,6 @@
 import React from 'react';
 
 export default React.createClass({
-
   displayName: 'FormPanel/TextInput',
 
   propTypes: {
@@ -24,14 +23,17 @@ export default React.createClass({
 
     return (
       <section className={style.group}>
-        <label className={style.label} title={item.description}>{item.label}</label>
+        <label className={style.label} title={item.description}>
+          {item.label}
+        </label>
         <input
           className={style.input}
           type="text"
-          value={ value }
+          value={value}
           onChange={this.editField}
           required
         />
-      </section>);
+      </section>
+    );
   },
 });

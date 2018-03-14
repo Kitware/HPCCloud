@@ -1,4 +1,4 @@
-import React    from 'react';
+import React from 'react';
 
 export default React.createClass({
   displayName: 'ImageIcon',
@@ -16,11 +16,16 @@ export default React.createClass({
 
   render() {
     if (this.props.data && this.props.data.image) {
-      return (<img src={this.props.data.image} style={{ height: this.props.height }} />);
+      return (
+        <img
+          src={this.props.data.image}
+          style={{ height: this.props.height }}
+        />
+      );
     }
 
     if (this.props.data && this.props.data.icon) {
-      return (<i className={this.props.data.icon} />);
+      return <i className={this.props.data.icon} />;
     }
 
     return null;

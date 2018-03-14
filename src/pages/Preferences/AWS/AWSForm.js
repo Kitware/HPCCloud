@@ -1,14 +1,13 @@
-import deepEquals   from 'mout/src/lang/deepEquals';
-import React        from 'react';
+import deepEquals from 'mout/src/lang/deepEquals';
+import React from 'react';
 
-import style        from 'HPCCloudStyle/ItemEditor.mcss';
+import style from 'HPCCloudStyle/ItemEditor.mcss';
 
 function preventDefault(e) {
   e.preventDefault();
 }
 
 export default React.createClass({
-
   displayName: 'AWSForm',
 
   propTypes: {
@@ -67,7 +66,8 @@ export default React.createClass({
 
       // Need to push a new availabilityZone
       if (lastKey === 'regionName') {
-        data.availabilityZone = valueToSave + this.props.regions[valueToSave][0];
+        data.availabilityZone =
+          valueToSave + this.props.regions[valueToSave][0];
       }
 
       currentContainer[lastKey] = valueToSave;
@@ -83,7 +83,7 @@ export default React.createClass({
 
     return (
       <div>
-        <form onSubmit={ preventDefault }>
+        <form onSubmit={preventDefault}>
           <section className={style.group}>
             <label className={style.label}>Profile name</label>
             <input
@@ -93,72 +93,80 @@ export default React.createClass({
               data-key="name"
               onChange={this.formChange}
               disabled={this.state.data._id}
-              autoFocus required
-              ref={(c) => {this.nameInput = c;}}
+              autoFocus
+              required
+              ref={(c) => {
+                this.nameInput = c;
+              }}
             />
           </section>
           <section className={style.group}>
-              <label className={style.label}>Key Id</label>
+            <label className={style.label}>Key Id</label>
+            <input
+              className={style.input}
+              type="text"
+              value={this.state.data.accessKeyId}
+              data-key="accessKeyId"
+              onChange={this.formChange}
+              disabled={this.state.data._id}
+              required
+            />
+          </section>
+          {this.state.data._id ? null : (
+            <section className={style.group}>
+              <label className={style.label}>Secret Id</label>
               <input
                 className={style.input}
-                type="text"
-                value={this.state.data.accessKeyId}
-                data-key="accessKeyId"
+                type="password"
+                value={this.state.data.secretAccessKey}
+                data-key="secretAccessKey"
                 onChange={this.formChange}
                 disabled={this.state.data._id}
                 required
               />
-          </section>
-          { (this.state.data._id) ? null :
-              <section className={style.group}>
-                  <label className={style.label}>Secret Id</label>
-                  <input
-                    className={style.input}
-                    type="password"
-                    value={this.state.data.secretAccessKey}
-                    data-key="secretAccessKey"
-                    onChange={this.formChange}
-                    disabled={this.state.data._id}
-                    required
-                  />
-              </section>
-          }
+            </section>
+          )}
           <section className={style.group}>
-              <label className={style.label}>Region</label>
-              <select
-                className={style.input}
-                value={this.state.data.regionName}
-                data-key="regionName"
-                onChange={this.formChange}
-                disabled={this.state.data._id}
-                required
-              >
-                { Object.keys(this.props.regions).map((reg, index) =>
-                  (<option key={`${reg}_${index}`} value={reg}>{reg}</option>)
-                )}
-              </select>
+            <label className={style.label}>Region</label>
+            <select
+              className={style.input}
+              value={this.state.data.regionName}
+              data-key="regionName"
+              onChange={this.formChange}
+              disabled={this.state.data._id}
+              required
+            >
+              {Object.keys(this.props.regions).map((reg, index) => (
+                <option key={`${reg}_${index}`} value={reg}>
+                  {reg}
+                </option>
+              ))}
+            </select>
           </section>
           <section className={style.group}>
-              <label className={style.label}>Availability Zone</label>
-              <select
-                className={style.input}
-                value={this.state.data.availabilityZone}
-                data-key="availabilityZone"
-                onChange={this.formChange}
-                disabled={this.state.data._id}
-                required
-              >
-                { this.props.regions[this.state.data.regionName].map((zone, index) =>
+            <label className={style.label}>Availability Zone</label>
+            <select
+              className={style.input}
+              value={this.state.data.availabilityZone}
+              data-key="availabilityZone"
+              onChange={this.formChange}
+              disabled={this.state.data._id}
+              required
+            >
+              {this.props.regions[this.state.data.regionName].map(
+                (zone, index) => (
                   <option
-                    key={ `${zone}_${index}` }
+                    key={`${zone}_${index}`}
                     value={this.state.data.regionName + zone}
                   >
-                  {this.state.data.regionName + zone}
+                    {this.state.data.regionName + zone}
                   </option>
-                )}
-              </select>
+                )
+              )}
+            </select>
           </section>
         </form>
-      </div>);
+      </div>
+    );
   },
 });

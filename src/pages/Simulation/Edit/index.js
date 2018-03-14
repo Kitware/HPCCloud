@@ -1,22 +1,26 @@
 import ItemEditor from '../../../panels/ItemEditor';
-import SharePanel   from '../../../panels/SharePanel';
+import SharePanel from '../../../panels/SharePanel';
 import { userHasAccess } from '../../../utils/AccessHelper';
-import React      from 'react';
-import Workflows  from '../../../workflows';
+import React from 'react';
+import Workflows from '../../../workflows';
 
-import breadCrumbStyle  from 'HPCCloudStyle/Theme.mcss';
-import getNetworkError  from '../../../utils/getNetworkError';
+import breadCrumbStyle from 'HPCCloudStyle/Theme.mcss';
+import getNetworkError from '../../../utils/getNetworkError';
 
-import { connect }  from 'react-redux';
+import { connect } from 'react-redux';
 import { dispatch } from '../../../redux';
 import * as Actions from '../../../redux/actions/projects';
-import * as Router  from '../../../redux/actions/router';
+import * as Router from '../../../redux/actions/router';
 
 function actionsForUser(user, accessObject, props) {
   if (userHasAccess(user, accessObject, 'write')) {
     return [
       { name: 'cancel', label: 'Cancel' },
-      { name: 'delete', label: 'Delete simulation', disabled: props.simulation.metadata.status === 'running' },
+      {
+        name: 'delete',
+        label: 'Delete simulation',
+        disabled: props.simulation.metadata.status === 'running',
+      },
       { name: 'editSimulation', label: 'Save simulation' },
     ];
   }
@@ -25,7 +29,6 @@ function actionsForUser(user, accessObject, props) {
 
 /* eslint-disable no-alert */
 const SimulationEdit = React.createClass({
-
   displayName: 'Simulation/Edit',
 
   propTypes: {
@@ -54,7 +57,10 @@ const SimulationEdit = React.createClass({
     if (!confirm('Are you sure you want to delete this simulation?')) {
       return;
     }
-    this.props.onDelete(this.props.simulation, `/View/Project/${this.props.simulation.projectId}`);
+    this.props.onDelete(
+      this.props.simulation,
+      `/View/Project/${this.props.simulation.projectId}`
+    );
   },
 
   render() {
@@ -64,14 +70,24 @@ const SimulationEdit = React.createClass({
 
     const { currentUser, simulation, project, error } = this.props;
     const projectId = simulation.projectId;
-    const childComponent = project.type ? Workflows[project.type].components.EditSimulation : null;
-    const workflowAddOn = childComponent ? React.createElement(childComponent, { owner: () => this.container,
-      parentProps: this.props }) : null;
+    const childComponent = project.type
+      ? Workflows[project.type].components.EditSimulation
+      : null;
+    const workflowAddOn = childComponent
+      ? React.createElement(childComponent, {
+          owner: () => this.container,
+          parentProps: this.props,
+        })
+      : null;
 
     return (
       <ItemEditor
         breadcrumb={{
-          paths: ['/', `/View/Project/${projectId}`, `/View/Simulation/${simulation._id}`],
+          paths: [
+            '/',
+            `/View/Project/${projectId}`,
+            `/View/Simulation/${simulation._id}`,
+          ],
           icons: [
             breadCrumbStyle.breadCrumbRootIcon,
             breadCrumbStyle.breadCrumbProjectIcon,
@@ -81,20 +97,25 @@ const SimulationEdit = React.createClass({
         name={simulation.name}
         description={simulation.description}
         error={error}
-        ref={(c) => {this.container = c;}}
+        ref={(c) => {
+          this.container = c;
+        }}
         title="Edit Simulation"
         actions={actionsForUser(currentUser, simulation.access, this.props)}
-        onAction={ this.onAction }
+        onAction={this.onAction}
       >
-        { workflowAddOn }
-        { currentUser._id === this.props.simulation.userId ?
+        {workflowAddOn}
+        {currentUser._id === this.props.simulation.userId ? (
           <div>
             <SharePanel shareItem={this.props.simulation} shareToType="users" />
-            <SharePanel shareItem={this.props.simulation} shareToType="groups" />
+            <SharePanel
+              shareItem={this.props.simulation}
+              shareToType="groups"
+            />
           </div>
-          : null
-        }
-      </ItemEditor>);
+        ) : null}
+      </ItemEditor>
+    );
   },
 });
 
@@ -111,15 +132,26 @@ export default connect(
     }
     return {
       currentUser: state.auth.user,
-      error: getNetworkError(state, ['save_simulation', `delete_simulation_${props.params.id}`]),
+      error: getNetworkError(state, [
+        'save_simulation',
+        `delete_simulation_${props.params.id}`,
+      ]),
       project,
       simulation,
     };
   },
   () => {
     return {
-      onSave: (simulation) => dispatch(Actions.saveSimulation(simulation, null, `/View/Project/${simulation.projectId}`)),
-      onDelete: (simulation, location) => dispatch(Actions.deleteSimulation(simulation, location)),
+      onSave: (simulation) =>
+        dispatch(
+          Actions.saveSimulation(
+            simulation,
+            null,
+            `/View/Project/${simulation.projectId}`
+          )
+        ),
+      onDelete: (simulation, location) =>
+        dispatch(Actions.deleteSimulation(simulation, location)),
       onCancel: (path) => dispatch(Router.goBack()),
     };
   }

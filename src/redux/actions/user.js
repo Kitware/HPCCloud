@@ -22,7 +22,8 @@ export function login(username, password) {
     dispatch(authenticationPending(true));
     const action = netActions.addNetworkCall('user_login', 'Authenticate');
 
-    client.login(username, password)
+    client
+      .login(username, password)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(authenticationPending(false));
@@ -42,7 +43,8 @@ export function register(firstName, lastName, login, email, password) {
   return (dispatch) => {
     const action = netActions.addNetworkCall('user_register', 'Register user');
 
-    client.createUser({ firstName, lastName, login, email, password, admin: false })
+    client
+      .createUser({ firstName, lastName, login, email, password, admin: false })
       .then(
         (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
@@ -50,7 +52,8 @@ export function register(firstName, lastName, login, email, password) {
         },
         (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
-        });
+        }
+      );
 
     return action;
   };
@@ -61,34 +64,33 @@ export function logout() {
     dispatch(authenticationPending(false));
     const action = netActions.addNetworkCall('user_logout', 'Logout');
 
-    client.logout()
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(routingActions.replace('/'));
-        },
-        (err) => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
-          dispatch(routingActions.replace('/'));
-        });
+    client.logout().then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(routingActions.replace('/'));
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err));
+        dispatch(routingActions.replace('/'));
+      }
+    );
 
     return action;
   };
 }
 
-
 export function forgetPassword(email) {
   return (dispatch) => {
     const action = netActions.addNetworkCall('user_forget', 'Forget password');
 
-    client.resetPassword(email)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-        },
-        (err) => {
-          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-        });
+    client.resetPassword(email).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+      }
+    );
 
     return action;
   };
@@ -96,16 +98,19 @@ export function forgetPassword(email) {
 
 export function changePassword(oldPassword, newPassword) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('user_updatePassword', 'Update password');
+    const action = netActions.addNetworkCall(
+      'user_updatePassword',
+      'Update password'
+    );
 
-    client.changePassword(oldPassword, newPassword)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-        },
-        (err) => {
-          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-        });
+    client.changePassword(oldPassword, newPassword).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+      }
+    );
 
     return action;
   };
@@ -114,18 +119,21 @@ export function changePassword(oldPassword, newPassword) {
 export function updateUser(user, pushOnServer = false) {
   return (dispatch) => {
     if (pushOnServer) {
-      const action = netActions.addNetworkCall('user_update', 'Update user informations');
+      const action = netActions.addNetworkCall(
+        'user_update',
+        'Update user informations'
+      );
       const { _id, firstName, lastName, email } = user;
 
-      client.updateUser({ _id, firstName, lastName, email })
-        .then(
-          (resp) => {
-            dispatch(netActions.successNetworkCall(action.id, resp));
-            dispatch(loggedIn(resp.data));
-          },
-          (err) => {
-            dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-          });
+      client.updateUser({ _id, firstName, lastName, email }).then(
+        (resp) => {
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(loggedIn(resp.data));
+        },
+        (err) => {
+          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+        }
+      );
 
       return action;
     }
@@ -135,9 +143,13 @@ export function updateUser(user, pushOnServer = false) {
 
 export function getUsers() {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('user_updatePassword', 'Update password');
+    const action = netActions.addNetworkCall(
+      'user_updatePassword',
+      'Update password'
+    );
 
-    client.listUsers()
+    client
+      .listUsers()
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch({ type: GET_USERS, users: resp.data });
