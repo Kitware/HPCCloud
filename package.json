@@ -29,6 +29,7 @@
     "react-router-redux": "4.0.8"
   },
   "devDependencies": {
+    "wslink": "0.1.7",
     "axios": "0.18.0",
     "font-awesome": "4.7.0",
     "bootstrap": "3.3.7",

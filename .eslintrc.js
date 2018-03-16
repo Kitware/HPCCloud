@@ -24,6 +24,8 @@ module.exports = {
     'jsx-a11y/no-static-element-interactions': 0,
     'jsx-a11y/click-events-have-key-events': 0,
     'jsx-a11y/no-noninteractive-element-interactions': 0,
+    'jsx-a11y/no-autofocus': 0,
+    'jsx-a11y/anchor-is-valid': 0,
 
     // Introduced with new eslint
     // and no time to fix them...
@@ -33,6 +35,9 @@ module.exports = {
     'no-nested-ternary': 0,
     'react/forbid-prop-types': 0,
     'react/no-array-index-key': 0,
+    'no-underscore-dangle': 0,
+    'import/prefer-default-export': 0,
+    'prefer-promise-reject-errors': 0,
   },
   plugins: [
     'prettier'
