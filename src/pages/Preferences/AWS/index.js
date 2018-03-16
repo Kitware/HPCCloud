@@ -1,23 +1,26 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+
+import theme from 'HPCCloudStyle/Theme.mcss';
+import style from 'HPCCloudStyle/PageWithMenu.mcss';
+
 import AWSForm from './AWSForm';
 import ActiveList from '../../../panels/ActiveList';
 import ButtonBar from '../../../panels/ButtonBar';
 import Toolbar from '../../../panels/Toolbar';
-import React from 'react';
 import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
 import { breadcrumb } from '..';
 import getNetworkError from '../../../utils/getNetworkError';
 import get from '../../../utils/get';
 
-import theme from 'HPCCloudStyle/Theme.mcss';
-import style from 'HPCCloudStyle/PageWithMenu.mcss';
-
-import { connect } from 'react-redux';
 import * as Actions from '../../../redux/actions/aws';
 import * as NetActions from '../../../redux/actions/network';
 import { dispatch } from '../../../redux';
 
 function getActions(disabled, showSave) {
-  var ret = [
+  const ret = [
     { name: 'removeItem', label: 'Delete', icon: style.deleteIcon, disabled },
   ];
   if (showSave) {
@@ -32,42 +35,26 @@ function getActions(disabled, showSave) {
 }
 
 /* eslint-disable no-alert */
-const AWSPrefs = React.createClass({
-  displayName: 'Preferences/AWS',
-
-  propTypes: {
-    active: React.PropTypes.number,
-    list: React.PropTypes.array,
-    error: React.PropTypes.string,
-    buttonsDisabled: React.PropTypes.bool,
-    user: React.PropTypes.object,
-
-    onUpdateItem: React.PropTypes.func,
-    onActiveChange: React.PropTypes.func,
-    onAddItem: React.PropTypes.func,
-    onRemoveItem: React.PropTypes.func,
-    onMount: React.PropTypes.func,
-    invalidateErrors: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return {
-      active: 0,
-      profiles: [],
-      error: null,
-      buttonsDisabled: false,
+/* eslint-disable no-restricted-globals */
+class AWSPrefs extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      _error: null,
     };
-  },
-
-  getInitialState() {
-    return { _error: null };
-  },
+    this.changeItem = this.changeItem.bind(this);
+    this.activeChange = this.activeChange.bind(this);
+    this.addItem = this.addItem.bind(this);
+    this.removeItem = this.removeItem.bind(this);
+    this.saveItem = this.saveItem.bind(this);
+    this.formAction = this.formAction.bind(this);
+  }
 
   componentDidMount() {
     // this doesn't work without setImmediate ?!
     setImmediate(this.props.onMount);
     this.timeout = null;
-  },
+  }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState._error !== this.state._error) {
@@ -75,23 +62,23 @@ const AWSPrefs = React.createClass({
         this.setState({ _error: null });
       }, 3000);
     }
-  },
+  }
 
   componentWillUnmount() {
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
-  },
+  }
 
   changeItem(item) {
     const { active, onUpdateItem } = this.props;
     onUpdateItem(active, item);
-  },
+  }
 
   activeChange(active) {
     this.setState({ _error: null });
     this.props.onActiveChange(active);
-  },
+  }
 
   addItem() {
     if (this.props.error) {
@@ -99,7 +86,7 @@ const AWSPrefs = React.createClass({
     }
     this.setState({ _error: null });
     this.props.onAddItem();
-  },
+  }
 
   removeItem() {
     const { list, active, onRemoveItem } = this.props;
@@ -114,7 +101,7 @@ const AWSPrefs = React.createClass({
       onRemoveItem(active, profileToDelete);
     }
     this.setState({ _error: null });
-  },
+  }
 
   saveItem() {
     const { onUpdateItem, active, list } = this.props;
@@ -131,11 +118,11 @@ const AWSPrefs = React.createClass({
     }
     this.setState({ _error: null });
     onUpdateItem(active, list[active], true);
-  },
+  }
 
   formAction(action) {
     this[action]();
-  },
+  }
 
   render() {
     const { active, list, error, buttonsDisabled } = this.props;
@@ -188,8 +175,38 @@ const AWSPrefs = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
+
+AWSPrefs.propTypes = {
+  active: PropTypes.number,
+  list: PropTypes.array,
+  error: PropTypes.string,
+  buttonsDisabled: PropTypes.bool,
+  user: PropTypes.object,
+
+  onUpdateItem: PropTypes.func,
+  onActiveChange: PropTypes.func,
+  onAddItem: PropTypes.func,
+  onRemoveItem: PropTypes.func,
+  onMount: PropTypes.func,
+  invalidateErrors: PropTypes.func,
+};
+
+AWSPrefs.defaultProps = {
+  active: 0,
+  error: null,
+  buttonsDisabled: false,
+
+  list: undefined,
+  user: undefined,
+  onUpdateItem: undefined,
+  onActiveChange: undefined,
+  onAddItem: undefined,
+  onRemoveItem: undefined,
+  onMount: undefined,
+  invalidateErrors: undefined,
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */

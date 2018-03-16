@@ -1,13 +1,15 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import deepClone from 'mout/src/lang/deepClone';
 import set from 'mout/src/object/set';
-
-import React from 'react';
-import Workflows from '../../../workflows';
-import FormPanel from '../../../panels/FormPanel';
-import SchedulerConfig from '../../../panels/SchedulerConfig';
 import CollapsibleWidget from 'paraviewweb/src/React/Widgets/CollapsibleWidget';
 
 import style from 'HPCCloudStyle/ItemEditor.mcss';
+
+import Workflows from '../../../workflows';
+import FormPanel from '../../../panels/FormPanel';
+import SchedulerConfig from '../../../panels/SchedulerConfig';
 
 const preventDefault = (e) => {
   e.preventDefault();
@@ -31,19 +33,20 @@ Object.keys(Workflows).forEach((wfName) => {
   }
 });
 
-export default React.createClass({
-  displayName: 'ClusterForm',
+export default class ClusterForm extends React.Component {
+  constructor(props) {
+    super(props);
 
-  propTypes: {
-    data: React.PropTypes.object,
-    onChange: React.PropTypes.func,
-  },
+    this.formChange = this.formChange.bind(this);
+    this.updateConfig = this.updateConfig.bind(this);
+    this.mergeData = this.mergeData.bind(this);
+  }
 
   componentWillReceiveProps(nextProps) {
     if (this.nameInput && nextProps.data && !nextProps.data._id) {
       this.nameInput.focus();
     }
-  },
+  }
 
   formChange(event) {
     const propName = event.target.dataset.key;
@@ -54,7 +57,7 @@ export default React.createClass({
       set(data, propName, value);
       this.props.onChange(data);
     }
-  },
+  }
 
   updateConfig(scheduler) {
     const config = Object.assign({}, this.props.data.config, {
@@ -62,12 +65,12 @@ export default React.createClass({
     });
 
     this.mergeData({ config });
-  },
+  }
 
   mergeData(updatedData) {
     const data = Object.assign({}, this.props.data, updatedData);
     this.props.onChange(data);
-  },
+  }
 
   render() {
     if (!this.props.data) {
@@ -177,5 +180,15 @@ ssh ${this.props.data.config.ssh.user}@${this.props.data.config.host} \
         ))}
       </div>
     );
-  },
-});
+  }
+}
+
+ClusterForm.propTypes = {
+  data: PropTypes.object,
+  onChange: PropTypes.func,
+};
+
+ClusterForm.defaultProps = {
+  data: undefined,
+  onChange: undefined,
+};

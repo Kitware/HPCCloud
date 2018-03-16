@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import style from 'HPCCloudStyle/ActiveList.mcss';
 
 // Expectations:
@@ -13,24 +15,15 @@ import style from 'HPCCloudStyle/ActiveList.mcss';
 //           - item: name, label, disabled, classPrefix, classSufix
 //       - onActiveChange: Callback(activeIdx, activeItem)
 
-export default React.createClass({
-  displayName: 'ActiveList',
-
-  propTypes: {
-    active: React.PropTypes.number,
-    className: React.PropTypes.string,
-    list: React.PropTypes.array,
-    onActiveChange: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return {
-      className: '',
-    };
-  },
+export default class ActiveList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.changeActive = this.changeActive.bind(this);
+    this.itemMapper = this.itemMapper.bind(this);
+  }
 
   changeActive(event) {
-    var el = event.currentTarget;
+    const el = event.currentTarget;
 
     if (this.props.onActiveChange) {
       const newIndex = parseInt(el.dataset.index, 10);
@@ -38,10 +31,10 @@ export default React.createClass({
         this.props.onActiveChange(newIndex, this.props.list[newIndex]);
       }
     }
-  },
+  }
 
-  render() {
-    var mapper = (el, index) => (
+  itemMapper(el, index) {
+    return (
       <li
         key={`${el.name}_${index}`}
         className={
@@ -57,11 +50,27 @@ export default React.createClass({
         <i className={el.classSufix} />
       </li>
     );
+  }
 
+  render() {
     return (
       <ul className={[this.props.className, style.list].join(' ')}>
-        {this.props.list.map(mapper)}
+        {this.props.list.map(this.itemMapper)}
       </ul>
     );
-  },
-});
+  }
+}
+
+ActiveList.propTypes = {
+  active: PropTypes.number,
+  className: PropTypes.string,
+  list: PropTypes.array,
+  onActiveChange: PropTypes.func,
+};
+
+ActiveList.defaultProps = {
+  className: '',
+  active: undefined,
+  list: [],
+  onActiveChange: () => {},
+};

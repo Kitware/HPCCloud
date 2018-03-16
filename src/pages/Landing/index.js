@@ -1,29 +1,27 @@
 import React from 'react';
-import { Link } from 'react-router';
-import client from '../../network';
+import PropTypes from 'prop-types';
+
+import { Link } from 'react-router-dom';
+
 import style from 'HPCCloudStyle/Theme.mcss';
 
-export default React.createClass({
-  displayName: 'HPCCloud-Landing',
+import client from '../../network';
 
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
-
+export default class LandingPage extends React.Component {
   componentWillMount() {
     this.subscription = client.onAuthChange((loggedIn) => {
       if (loggedIn) {
-        this.context.router.replace('/');
+        this.props.history.push('/');
       }
     });
-  },
+  }
 
   componentWillUnmount() {
     if (this.subscription) {
       this.subscription.unsubscribe();
       this.subscription = null;
     }
-  },
+  }
 
   /* eslint-disable react/no-danger */
   render() {
@@ -39,6 +37,10 @@ export default React.createClass({
         </p>
       </main>
     );
-  },
+  }
   /* eslint-enable react/no-danger */
-});
+}
+
+LandingPage.propTypes = {
+  history: PropTypes.object.isRequired,
+};

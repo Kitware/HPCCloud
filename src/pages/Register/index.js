@@ -1,53 +1,43 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+
 import style from 'HPCCloudStyle/Login.mcss';
 
 import getNetworkError from '../../utils/getNetworkError';
-import { connect } from 'react-redux';
 import { dispatch } from '../../redux';
 import { register } from '../../redux/actions/user';
 
-const Register = React.createClass({
-  displayName: 'Register',
-
-  propTypes: {
-    error: React.PropTypes.string,
-    onRegister: React.PropTypes.func,
-  },
-
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
-
-  getDefaultProps() {
-    return {
-      error: '',
-      onRegister: (user) => console.log('register', user),
-    };
-  },
-
-  getInitialState() {
-    return {
+class Register extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       error: '',
       password: '',
       confirm: '',
     };
-  },
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.passwordChange = this.passwordChange.bind(this);
+    this.confirmChange = this.confirmChange.bind(this);
+    this.passwordCheck = this.passwordCheck.bind(this);
+  }
 
   componentWillReceiveProps(newProps) {
     if (newProps.error !== this.props.error) {
       this.setState({ error: newProps.error });
     }
-  },
+  }
 
   passwordChange(e) {
-    var newState = { password: e.target.value };
+    const newState = { password: e.target.value };
     this.passwordCheck(e.target.value, this.state.confirm, newState);
-  },
+  }
 
   confirmChange(e) {
-    var newState = { confirm: e.target.value };
+    const newState = { confirm: e.target.value };
     this.passwordCheck(this.state.password, e.target.value, newState);
-  },
+  }
 
   passwordCheck(password, confirm, newState) {
     if (password !== confirm) {
@@ -56,7 +46,7 @@ const Register = React.createClass({
       newState.error = false;
     }
     this.setState(newState);
-  },
+  }
 
   handleSubmit(event) {
     event.preventDefault();
@@ -65,7 +55,7 @@ const Register = React.createClass({
       user[key] = this[key].value;
     });
     this.props.onRegister(user);
-  },
+  }
 
   render() {
     return (
@@ -140,8 +130,18 @@ const Register = React.createClass({
         </form>
       </center>
     );
-  },
-});
+  }
+}
+
+Register.propTypes = {
+  error: PropTypes.string,
+  onRegister: PropTypes.func,
+};
+
+Register.defaultProps = {
+  error: '',
+  onRegister: (user) => console.log('register', user),
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */

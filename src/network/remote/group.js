@@ -17,9 +17,9 @@ export default function({
     },
 
     createGroup(group) {
-      const expected = ['name', 'description', 'public'],
-        params = filterQuery(group, ...expected),
-        { missingKeys, promise } = mustContain(params, 'name');
+      const expected = ['name', 'description', 'public'];
+      const params = filterQuery(group, ...expected);
+      const { missingKeys, promise } = mustContain(params, 'name');
 
       return missingKeys
         ? promise
@@ -39,9 +39,9 @@ export default function({
     },
 
     editGroup(group = {}) {
-      const expected = ['name', 'description', 'public'],
-        params = filterQuery(group, ...expected),
-        { missingKeys, promise } = mustContain(group, '_id');
+      const expected = ['name', 'description', 'public'];
+      const params = filterQuery(group, ...expected);
+      const { missingKeys, promise } = mustContain(group, '_id');
 
       return missingKeys
         ? promise
@@ -51,16 +51,16 @@ export default function({
     },
 
     listGroupInvitations(id, query = {}) {
-      const allowed = ['limit', 'offset', 'sort', 'sortdir'],
-        params = filterQuery(query, ...allowed);
+      const allowed = ['limit', 'offset', 'sort', 'sortdir'];
+      const params = filterQuery(query, ...allowed);
 
       return busy(client._.get(`/group/${id}/invitation`, { params }));
     },
 
     addGroupInvitation(id, options = {}) {
-      const allowed = ['userId', 'level', 'quiet', 'force'],
-        params = filterQuery(options, ...allowed),
-        { missingKeys, promise } = mustContain(params, 'userId');
+      const allowed = ['userId', 'level', 'quiet', 'force'];
+      const params = filterQuery(options, ...allowed);
+      const { missingKeys, promise } = mustContain(params, 'userId');
 
       return missingKeys
         ? promise
@@ -72,8 +72,8 @@ export default function({
     },
 
     listGroupMembers(id, query = {}) {
-      const allowed = ['limit', 'offset', 'sort', 'sortdir'],
-        params = filterQuery(query, ...allowed);
+      const allowed = ['limit', 'offset', 'sort', 'sortdir'];
+      const params = filterQuery(query, ...allowed);
 
       return busy(client._.get(`/group/${id}/member`, { params }));
     },

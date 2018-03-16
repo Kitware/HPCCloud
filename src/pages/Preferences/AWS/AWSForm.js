@@ -1,5 +1,7 @@
-import deepEquals from 'mout/src/lang/deepEquals';
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import deepEquals from 'mout/src/lang/deepEquals';
 
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 
@@ -7,40 +9,18 @@ function preventDefault(e) {
   e.preventDefault();
 }
 
-export default React.createClass({
-  displayName: 'AWSForm',
-
-  propTypes: {
-    data: React.PropTypes.object,
-    onChange: React.PropTypes.func,
-    regions: React.PropTypes.object,
-  },
-
-  getDefaultProps() {
-    return {
-      regions: {
-        'us-east-1': ['a', 'b', 'c', 'd', 'e'],
-        'us-west-1': ['a', 'b', 'c'],
-        'us-west-2': ['a', 'b', 'c'],
-        'eu-west-1': ['a', 'b', 'c'],
-        'eu-central-1': ['a', 'b'],
-        'ap-southeast-1': ['a', 'b'],
-        'ap-southeast-2': ['a', 'b'],
-        'ap-northeast-1': ['a', 'b', 'c'],
-        'sa-east-1': ['a', 'b'],
-      },
+export default class AWSForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: props.data,
     };
-  },
-
-  getInitialState() {
-    return {
-      data: this.props.data,
-    };
-  },
+    this.formChange = this.formChange.bind(this);
+  }
 
   componentWillReceiveProps(nextProps) {
-    const data = nextProps.data,
-      oldData = this.props.data;
+    const data = nextProps.data;
+    const oldData = this.props.data;
 
     if (this.nameInput && nextProps.data && !nextProps.data._id) {
       this.nameInput.focus();
@@ -49,15 +29,15 @@ export default React.createClass({
     if (!deepEquals(data, oldData)) {
       this.setState({ data });
     }
-  },
+  }
 
   formChange(event) {
-    var keyPath = event.target.dataset.key.split('.'),
-      currentContainer;
+    const keyPath = event.target.dataset.key.split('.');
+    let currentContainer;
     if (this.props.onChange) {
-      const lastKey = keyPath.pop(),
-        valueToSave = event.target.value,
-        data = this.state.data;
+      const lastKey = keyPath.pop();
+      const valueToSave = event.target.value;
+      const data = this.state.data;
 
       currentContainer = data;
       while (keyPath.length) {
@@ -74,7 +54,7 @@ export default React.createClass({
       this.setState({ data });
       this.props.onChange(data);
     }
-  },
+  }
 
   render() {
     if (!this.state.data) {
@@ -168,5 +148,27 @@ export default React.createClass({
         </form>
       </div>
     );
+  }
+}
+
+AWSForm.propTypes = {
+  data: PropTypes.object,
+  onChange: PropTypes.func,
+  regions: PropTypes.object,
+};
+
+AWSForm.defaultProps = {
+  regions: {
+    'us-east-1': ['a', 'b', 'c', 'd', 'e'],
+    'us-west-1': ['a', 'b', 'c'],
+    'us-west-2': ['a', 'b', 'c'],
+    'eu-west-1': ['a', 'b', 'c'],
+    'eu-central-1': ['a', 'b'],
+    'ap-southeast-1': ['a', 'b'],
+    'ap-southeast-2': ['a', 'b'],
+    'ap-northeast-1': ['a', 'b', 'c'],
+    'sa-east-1': ['a', 'b'],
   },
-});
+  data: undefined,
+  onChange: undefined,
+};

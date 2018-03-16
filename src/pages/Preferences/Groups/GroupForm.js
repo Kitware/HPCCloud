@@ -1,45 +1,38 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 
 import set from 'mout/src/object/set';
 import deepClone from 'mout/src/lang/deepClone';
 
-export default React.createClass({
-  displayName: 'GroupForm',
-
-  propTypes: {
-    users: React.PropTypes.object,
-    groupUsers: React.PropTypes.array,
-    data: React.PropTypes.object,
-    onChange: React.PropTypes.func,
-    onUserAdd: React.PropTypes.func,
-    onUserRemove: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return { users: {}, data: {}, groupUsers: [] };
-  },
-
-  getInitialState() {
-    return {
+export default class GroupForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       shareUsers: [],
       unShareUsers: [],
     };
-  },
+
+    this.userAdd = this.userAdd.bind(this);
+    this.userRemove = this.userRemove.bind(this);
+    this.handleUserChange = this.handleUserChange.bind(this);
+    this.formChange = this.formChange.bind(this);
+  }
 
   userAdd() {
     if (this.props.onUserAdd) {
       this.props.onUserAdd(this.state.shareUsers);
       this.setState({ shareUsers: [] });
     }
-  },
+  }
 
   userRemove() {
     if (this.props.onUserRemove) {
       this.props.onUserRemove(this.state.unShareUsers);
       this.setState({ unShareUsers: [] });
     }
-  },
+  }
 
   handleUserChange(e) {
     const which = e.target.dataset.which;
@@ -51,7 +44,7 @@ export default React.createClass({
       }
     }
     this.setState({ [which]: values });
-  },
+  }
 
   formChange(event) {
     const propName = event.target.dataset.key;
@@ -61,7 +54,7 @@ export default React.createClass({
       set(data, propName, value);
       this.props.onChange(data);
     }
-  },
+  }
 
   render() {
     const groupUsersArray = this.props.groupUsers.map((el) => el.id);
@@ -144,5 +137,23 @@ export default React.createClass({
         </section>
       </div>
     );
-  },
-});
+  }
+}
+
+GroupForm.propTypes = {
+  users: PropTypes.object,
+  groupUsers: PropTypes.array,
+  data: PropTypes.object,
+  onChange: PropTypes.func,
+  onUserAdd: PropTypes.func,
+  onUserRemove: PropTypes.func,
+};
+
+GroupForm.defaultProps = {
+  users: {},
+  data: {},
+  groupUsers: [],
+  onChange: undefined,
+  onUserAdd: undefined,
+  onUserRemove: undefined,
+};

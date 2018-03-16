@@ -38,7 +38,7 @@ const endpoints = [
   volumes,
 ];
 
-var url;
+let url;
 if (process.env.NODE_ENV === 'test') {
   url = {
     protocol: 'http:',

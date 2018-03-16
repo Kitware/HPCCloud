@@ -1,43 +1,28 @@
 import React from 'react';
-import { Link } from 'react-router';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+import get from 'mout/src/object/get';
 import SvgIconWidget from 'paraviewweb/src/React/Widgets/SvgIconWidget';
 
 import theme from 'HPCCloudStyle/Theme.mcss';
 import layout from 'HPCCloudStyle/Layout.mcss';
 import logo from 'HPCCloudStyle/logo.svg';
 
-import get from 'mout/src/object/get';
-import { connect } from 'react-redux';
 import { dispatch } from '../../redux';
 import * as NetActions from '../../redux/actions/network';
 import * as ProgressActions from '../../redux/actions/progress';
 
-const TopBar = React.createClass({
-  displayName: 'HPCCloud-TopBar',
-
-  propTypes: {
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.object,
-      React.PropTypes.array,
-    ]),
-    userName: React.PropTypes.string,
-    isBusy: React.PropTypes.bool,
-    progress: React.PropTypes.number,
-    progressReset: React.PropTypes.bool,
-    resetProgress: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return {
-      userName: null,
-      isBusy: false,
-      progress: 0,
-    };
-  },
+class TopBar extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
 
   componentWillMount() {
     this.timeout = null;
-  },
+  }
 
   componentWillReceiveProps() {
     // a delay for the progressBar to be full and then fade.
@@ -58,13 +43,13 @@ const TopBar = React.createClass({
       window.onbeforeunload = () =>
         'There is file uploading in progress. Are you sure you want to leave the page?';
     }
-  },
+  }
 
   componentWillUnmount() {
     if (this.timeout !== null) {
       clearTimeout(this.timeout);
     }
-  },
+  }
 
   render() {
     const width = `${this.props.progress}%`;
@@ -112,8 +97,26 @@ const TopBar = React.createClass({
         <div>{this.props.children}</div>
       </div>
     );
-  },
-});
+  }
+}
+
+TopBar.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  userName: PropTypes.string,
+  isBusy: PropTypes.bool,
+  progress: PropTypes.number,
+  progressReset: PropTypes.bool,
+  resetProgress: PropTypes.func,
+};
+
+TopBar.defaultProps = {
+  userName: null,
+  isBusy: false,
+  progressReset: false,
+  resetProgress: () => {},
+  progress: 0,
+  children: null,
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
@@ -128,7 +131,7 @@ export default connect((state) => {
   let resetProgress;
   if (state.progress.total === null) {
     progress = Object.keys(state.network.progress).reduce((prev, key) => {
-      var file = state.network.progress[key];
+      const file = state.network.progress[key];
       return (
         prev +
         file.current /

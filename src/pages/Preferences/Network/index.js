@@ -1,14 +1,14 @@
-// import client           from '../../../network';
-import Toolbar from '../../../panels/Toolbar';
-import OutputPanel from '../../../panels/OutputPanel';
 import React from 'react';
-import { breadcrumb } from '..';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
 
 import prefStyle from 'HPCCloudStyle/Preferences.mcss';
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
-// import get          from 'mout/src/object/get';
-import { connect } from 'react-redux';
+import Toolbar from '../../../panels/Toolbar';
+import OutputPanel from '../../../panels/OutputPanel';
+import { breadcrumb } from '..';
 
 const clusterBreadCrumb = Object.assign({}, breadcrumb, { active: 4 });
 const iconMap = {
@@ -17,40 +17,40 @@ const iconMap = {
   error: prefStyle.networkErrorIcon,
 };
 
-const StatusPage = React.createClass({
-  displayName: 'Preferences/Network',
+function networkMapper(el, index) {
+  return {
+    name: (
+      <span title={JSON.stringify(el, null, '  ')}>
+        <i className={iconMap[el.state]} /> {el.label ? el.label : '__'}
+      </span>
+    ),
+    value: <span>{el.state}</span>,
+  };
+}
 
-  propTypes: {
-    log: React.PropTypes.array,
-  },
-
-  networkMapper(el, index) {
-    return {
-      name: (
-        <span title={JSON.stringify(el, null, '  ')}>
-          <i className={iconMap[el.state]} /> {el.label ? el.label : '__'}
-        </span>
-      ),
-      value: <span>{el.state}</span>,
-    };
-  },
-
-  render() {
-    return (
-      <div className={style.rootContainer}>
-        <Toolbar breadcrumb={clusterBreadCrumb} title="Network" hasTabs />
-        <div className={style.container}>
-          <div className={style.content}>
-            <OutputPanel
-              items={this.props.log.map(this.networkMapper)}
-              title="Network log"
-            />
-          </div>
+export function StatusPage(props) {
+  return (
+    <div className={style.rootContainer}>
+      <Toolbar breadcrumb={clusterBreadCrumb} title="Network" hasTabs />
+      <div className={style.container}>
+        <div className={style.content}>
+          <OutputPanel
+            items={props.log.map(networkMapper)}
+            title="Network log"
+          />
         </div>
       </div>
-    );
-  },
-});
+    </div>
+  );
+}
+
+StatusPage.propTypes = {
+  log: PropTypes.array,
+};
+
+StatusPage.defaultProps = {
+  log: [],
+};
 
 // Binding
 

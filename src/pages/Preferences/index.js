@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import style from 'HPCCloudStyle/Preferences.mcss';
 
 export const breadcrumb = (user, page) => {
@@ -31,17 +33,14 @@ export const breadcrumb = (user, page) => {
   };
 };
 
-export default React.createClass({
-  displayName: 'Preferences',
+export default function Preferences(props) {
+  return <div>{props.children}</div>;
+}
 
-  propTypes: {
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.object,
-      React.PropTypes.array,
-    ]),
-  },
+Preferences.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+};
 
-  render() {
-    return <div>{this.props.children}</div>;
-  },
-});
+Preferences.defaultProps = {
+  children: null,
+};

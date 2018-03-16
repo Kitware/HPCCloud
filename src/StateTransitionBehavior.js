@@ -1,14 +1,13 @@
+import equals from 'mout/src/array/equals';
+import Workflows from 'workflows';
+
 import * as ProjectActions from './redux/actions/projects';
 import * as TaskflowActions from './redux/actions/taskflows';
 import * as ClusterActions from './redux/actions/clusters';
 import * as FSActions from './redux/actions/fs';
-/* eslint-disable import/extensions */
-import Workflows from 'workflows';
-/* eslint-enable import/extensions */
 
 import { userHasAccess } from './utils/AccessHelper';
 import get from './utils/get';
-import equals from 'mout/src/array/equals';
 import { dispatch } from './redux';
 
 const simulationsStatus = {};
@@ -32,8 +31,8 @@ export function handleTaskflowChange(state, taskflow) {
     return;
   }
   let primaryJob = taskflow.primaryJob;
-  let jobs = [],
-    tasks = [];
+  let jobs = [];
+  let tasks = [];
   const outputDirectory = [];
   const actions = [];
   try {
@@ -68,8 +67,8 @@ export function handleTaskflowChange(state, taskflow) {
 
     // Only allow termination if the cluster is not launching/provisioning ( we can't currently terminate a cluster in launching or provisioning )
     if (taskflow.flow.meta && taskflow.flow.meta.cluster) {
-      const tfClusterId = taskflow.flow.meta.cluster._id,
-        tfCluster = state.preferences.clusters.mapById[tfClusterId];
+      const tfClusterId = taskflow.flow.meta.cluster._id;
+      const tfCluster = state.preferences.clusters.mapById[tfClusterId];
       if (
         tfCluster &&
         ['launching', 'provisioning'].indexOf(tfCluster.status) === -1
@@ -123,8 +122,8 @@ export function handleTaskflowChange(state, taskflow) {
   // for taskflows on ec2 the meta object is not as readily available
   // this is due to fewer jobs coming through SSE which triggers a fetch for trad clusters.
   if (taskflow.flow.meta) {
-    const tfClusterId = taskflow.flow.meta.cluster._id,
-      tfCluster = state.preferences.clusters.mapById[tfClusterId];
+    const tfClusterId = taskflow.flow.meta.cluster._id;
+    const tfCluster = state.preferences.clusters.mapById[tfClusterId];
 
     // if we have no cluster in preferences, but we have an ID fetch it.
     if (

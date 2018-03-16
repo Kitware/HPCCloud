@@ -1,16 +1,14 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-export default React.createClass({
-  displayName: 'HPCCloud-auth-content',
+export default function HPCCloudAuthContent(props) {
+  return <div className="HPCCloud__content">{props.children}</div>;
+}
 
-  propTypes: {
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.object,
-      React.PropTypes.array,
-    ]),
-  },
+HPCCloudAuthContent.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+};
 
-  render() {
-    return <div className="HPCCloud__content">{this.props.children}</div>;
-  },
-});
+HPCCloudAuthContent.defaultProps = {
+  children: null,
+};

@@ -1,6 +1,12 @@
-// import client           from '../../../network';
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
 import { Link } from 'react-router';
+
+import theme from 'HPCCloudStyle/Theme.mcss';
+import style from 'HPCCloudStyle/PageWithMenu.mcss';
+
 import VolumeForm from './VolumeForm';
 import ActiveList from '../../../panels/ActiveList';
 import Toolbar from '../../../panels/Toolbar';
@@ -9,13 +15,6 @@ import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
 import { breadcrumb } from '..';
 import get from '../../../utils/get';
 
-// import getNetworkError  from '../../../utils/getNetworkError';
-
-import theme from 'HPCCloudStyle/Theme.mcss';
-import style from 'HPCCloudStyle/PageWithMenu.mcss';
-
-// import get             from 'mout/src/object/get';
-import { connect } from 'react-redux';
 import * as Actions from '../../../redux/actions/volumes';
 import * as AWSActions from '../../../redux/actions/aws';
 import * as ClusterActions from '../../../redux/actions/clusters';
@@ -40,36 +39,23 @@ function getActions(disabled, config) {
 }
 
 /* eslint-disable no-alert */
-const ClusterPrefs = React.createClass({
-  displayName: 'Preferences/Volume',
+/* eslint-disable no-restricted-globals */
+class ClusterPrefs extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      _error: null,
+    };
 
-  propTypes: {
-    active: React.PropTypes.number,
-    presetNames: React.PropTypes.array,
-    list: React.PropTypes.array,
-    profiles: React.PropTypes.array,
-    clusters: React.PropTypes.array,
-    error: React.PropTypes.string,
-    buttonsDisabled: React.PropTypes.bool,
-
-    onUpdateItem: React.PropTypes.func,
-    onActiveChange: React.PropTypes.func,
-    onAddItem: React.PropTypes.func,
-    onRemoveItem: React.PropTypes.func,
-    fetchAWS: React.PropTypes.func,
-    fetchVolumes: React.PropTypes.func,
-    fetchClusters: React.PropTypes.func,
-    attachVolume: React.PropTypes.func,
-    invalidateErrors: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return { list: [], profiles: [], clusters: [] };
-  },
-
-  getInitialState() {
-    return { _error: null };
-  },
+    this.changeItem = this.changeItem.bind(this);
+    this.activeChange = this.activeChange.bind(this);
+    this.addItem = this.addItem.bind(this);
+    this.attachVolume = this.attachVolume.bind(this);
+    this.detachVolume = this.detachVolume.bind(this);
+    this.removeItem = this.removeItem.bind(this);
+    this.saveItem = this.saveItem.bind(this);
+    this.formAction = this.formAction.bind(this);
+  }
 
   componentDidMount() {
     setImmediate(() => {
@@ -77,17 +63,17 @@ const ClusterPrefs = React.createClass({
       this.props.fetchClusters();
       this.props.fetchVolumes();
     });
-  },
+  }
 
   changeItem(item) {
     const { active, onUpdateItem } = this.props;
     onUpdateItem(active, item);
-  },
+  }
 
   activeChange(active) {
     this.setState({ _error: null });
     this.props.onActiveChange(active);
-  },
+  }
 
   addItem() {
     if (this.props.error) {
@@ -95,16 +81,17 @@ const ClusterPrefs = React.createClass({
     }
     this.setState({ _error: null });
     this.props.onAddItem(this.props.profiles[0]._id);
-  },
+  }
 
   attachVolume() {
     const { attachVolume, active, list } = this.props;
     attachVolume(list[active]._id, list[active].cluster);
-  },
+  }
 
   detachVolume() {
+    this.setState({ _error: 'Detach volume is not implemented' });
     console.log('unimplemented');
-  },
+  }
 
   removeItem(index) {
     const { list, active, onRemoveItem } = this.props;
@@ -118,7 +105,7 @@ const ClusterPrefs = React.createClass({
       onRemoveItem(active, volumeToDelete);
     }
     this.setState({ _error: null });
-  },
+  }
 
   saveItem() {
     const { onUpdateItem, active, list } = this.props;
@@ -134,11 +121,11 @@ const ClusterPrefs = React.createClass({
     }
     this.setState({ _error: null });
     onUpdateItem(active, list[active], true);
-  },
+  }
 
   formAction(action) {
     this[action]();
-  },
+  }
 
   render() {
     const { active, list, error } = this.props;
@@ -165,36 +152,31 @@ const ClusterPrefs = React.createClass({
           />
         </div>
       );
+    } else if (!this.props.profiles.length) {
+      content = (
+        <EmptyPlaceholder
+          phrase={
+            <span>
+              AWS Profile required to create volumes <br />
+              Create some under the{' '}
+              <Link to="/Preferences/AWS">
+                <span>AWS Profiles preferences page</span>
+              </Link>.
+            </span>
+          }
+        />
+      );
     } else {
-      if (!this.props.profiles.length) {
-        content = (
-          <EmptyPlaceholder
-            phrase={
-              <span>
-                AWS Profile required to create volumes <br />
-                Create some under the{' '}
-                <Link to="/Preferences/AWS">
-                  <span>AWS Profiles preferences page</span>
-                </Link>.
-              </span>
-            }
-          />
-        );
-      } else {
-        content = (
-          <EmptyPlaceholder
-            phrase={
-              <span>
-                There are no Volumes available <br />
-                You can create some with the <i
-                  className={theme.addIcon}
-                />{' '}
-                above
-              </span>
-            }
-          />
-        );
-      }
+      content = (
+        <EmptyPlaceholder
+          phrase={
+            <span>
+              There are no Volumes available <br />
+              You can create some with the <i className={theme.addIcon} /> above
+            </span>
+          }
+        />
+      );
     }
 
     let actions = [];
@@ -222,8 +204,35 @@ const ClusterPrefs = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
+
+ClusterPrefs.propTypes = {
+  active: PropTypes.number,
+  list: PropTypes.array,
+  profiles: PropTypes.array,
+  clusters: PropTypes.array,
+  error: PropTypes.string,
+
+  onUpdateItem: PropTypes.func.isRequired,
+  onActiveChange: PropTypes.func.isRequired,
+  onAddItem: PropTypes.func.isRequired,
+  onRemoveItem: PropTypes.func.isRequired,
+  fetchAWS: PropTypes.func.isRequired,
+  fetchVolumes: PropTypes.func.isRequired,
+  fetchClusters: PropTypes.func.isRequired,
+  attachVolume: PropTypes.func.isRequired,
+  invalidateErrors: PropTypes.func.isRequired,
+};
+
+ClusterPrefs.defaultProps = {
+  active: 0,
+  list: [],
+  profiles: [],
+  clusters: [],
+
+  error: undefined,
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */

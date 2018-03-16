@@ -1,13 +1,16 @@
-import ItemEditor from '../../../panels/ItemEditor';
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+
+import breadCrumbStyle from 'HPCCloudStyle/Theme.mcss';
+
+import ItemEditor from '../../../panels/ItemEditor';
 
 import Workflows from '../../../workflows';
 import getNetworkError from '../../../utils/getNetworkError';
 import get from '../../../utils/get';
 
-import breadCrumbStyle from 'HPCCloudStyle/Theme.mcss';
-
-import { connect } from 'react-redux';
 import { dispatch } from '../../../redux';
 import * as Actions from '../../../redux/actions/projects';
 import * as Router from '../../../redux/actions/router';
@@ -19,45 +22,36 @@ function getActions(disabled) {
   ];
 }
 
-const SimulationNew = React.createClass({
-  displayName: 'Simulation/New',
-
-  propTypes: {
-    params: React.PropTypes.object,
-    error: React.PropTypes.string,
-    project: React.PropTypes.object,
-    buttonsDisabled: React.PropTypes.bool,
-    onSave: React.PropTypes.func,
-    onCancel: React.PropTypes.func,
-  },
-
-  getInitialState() {
-    return {
+class SimulationNew extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       _error: null,
     };
-  },
+    this.onAction = this.onAction.bind(this);
+  }
 
   onAction(action, data, attachments) {
     this[action](data, attachments);
-  },
+  }
 
   newSimulation(data, attachments) {
-    const { name, description } = data,
-      projectId = this.props.params.projectId,
-      metadata = {},
-      stepsInfo = Workflows[this.props.project.type].steps,
-      steps = stepsInfo._initial_state,
-      disabled = stepsInfo._disabled || [],
-      active = stepsInfo._active || stepsInfo._order[0],
-      simulation = {
-        name,
-        description,
-        steps,
-        metadata,
-        projectId,
-        active,
-        disabled,
-      };
+    const { name, description } = data;
+    const projectId = this.props.params.projectId;
+    const metadata = {};
+    const stepsInfo = Workflows[this.props.project.type].steps;
+    const steps = stepsInfo._initial_state;
+    const disabled = stepsInfo._disabled || [];
+    const active = stepsInfo._active || stepsInfo._order[0];
+    const simulation = {
+      name,
+      description,
+      steps,
+      metadata,
+      projectId,
+      active,
+      disabled,
+    };
 
     // simulation name is always required.
     if (!name || !name.length) {
@@ -74,10 +68,7 @@ const SimulationNew = React.createClass({
     ) {
       const reqAttachments =
         Workflows[this.props.project.type].requiredAttachments.simulation;
-      if (
-        !attachments ||
-        !reqAttachments.every((el) => attachments.hasOwnProperty(el))
-      ) {
+      if (!attachments || !reqAttachments.every((el) => el in attachments)) {
         // ['this', 'that', 'other'] => '"this", "that" and "other"'
         const reqAttachmentsStr = reqAttachments
           .map((el) => `"${el}"`)
@@ -93,11 +84,11 @@ const SimulationNew = React.createClass({
     }
 
     this.props.onSave(simulation, attachments);
-  },
+  }
 
   cancel() {
     this.props.onCancel(`/View/Project/${this.props.params.projectId}`);
-  },
+  }
 
   render() {
     if (!this.props.project) {
@@ -135,8 +126,17 @@ const SimulationNew = React.createClass({
         {workflowAddOn}
       </ItemEditor>
     );
-  },
-});
+  }
+}
+
+SimulationNew.propTypes = {
+  params: PropTypes.object.isRequired,
+  error: PropTypes.string.isRequired,
+  project: PropTypes.object.isRequired,
+  buttonsDisabled: PropTypes.bool.isRequired,
+  onSave: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
