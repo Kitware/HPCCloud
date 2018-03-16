@@ -9,13 +9,11 @@ function getUnauthenticatedPromise(client) {
     return null;
   }
 
-  return new Promise((ok, ko) =>
-    ko({
-      data: {
-        message: 'Must be logged in.',
-      },
-    })
-  );
+  return Promise.reject({
+    data: {
+      message: 'Must be logged in.',
+    },
+  });
 }
 
 export default function({ client, filterQuery, mustContain, busy }) {

@@ -114,7 +114,7 @@ export function moveFilesOffline(items) {
         dispatch(
           progressActions.setupProgress(
             files.reduce((prev, cur) => {
-              var curSize = cur.data.reduce((p, c) => p + c.size, 0);
+              const curSize = cur.data.reduce((p, c) => p + c.size, 0);
               return prev + curSize;
             }, 0)
           )

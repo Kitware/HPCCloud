@@ -10,14 +10,9 @@ const EVENT_TOPIC = 'girder.notification';
 class Observable {}
 Monologue.mixInto(Observable);
 
-const _LOGIN_PROMISE = () =>
-  new Promise((resolve, reject) => {
-    resolve();
-  });
-const _LOGOUT_PROMISE = () =>
-  new Promise((resolve, reject) => {
-    reject();
-  });
+const _LOGIN_PROMISE = () => Promise.resolve('login');
+const _LOGOUT_PROMISE = () => Promise.reject('logout');
+
 // ----------------------------------------------------------------------------
 
 function encodeQueryAsString(query = {}) {
@@ -42,8 +37,8 @@ function filterQuery(query = {}, ...keys) {
 // ----------------------------------------------------------------------------
 
 function mustContain(object = {}, ...keys) {
-  var missingKeys = [],
-    promise;
+  let missingKeys = [];
+  let promise;
   keys.forEach((key) => {
     if (object[key] === undefined) {
       missingKeys.push(key);
@@ -51,11 +46,9 @@ function mustContain(object = {}, ...keys) {
   });
   if (missingKeys.length === 0) {
     missingKeys = undefined;
-    promise = new Promise((resolve, reject) => resolve());
+    promise = Promise.resolve(true);
   } else {
-    promise = new Promise((resolve, reject) =>
-      reject(`Missing keys ${missingKeys.join(', ')}`)
-    );
+    promise = Promise.reject(`Missing keys ${missingKeys.join(', ')}`);
   }
 
   return {
@@ -66,139 +59,138 @@ function mustContain(object = {}, ...keys) {
 
 // ----------------------------------------------------------------------------
 
-export function build(config = location, ...extensions) {
-  var userData,
-    token,
-    loginPromise,
-    isAuthenticated = false,
-    eventSource = null,
-    busyCounter = 0;
+export function build(config = window.location, ...extensions) {
+  let userData;
+  let token;
+  let loginPromise;
+  let isAuthenticated = false;
+  let eventSource = null;
+  let busyCounter = 0;
 
-  const client = {}, // Must be const otherwise the created closure will fail
-    notification = new Observable(),
-    idle = () => {
-      busyCounter -= 1;
-      notification.emit(BUSY_TOPIC, busyCounter);
-    },
-    busy = (promise) => {
-      busyCounter += 1;
-      notification.emit(BUSY_TOPIC, busyCounter);
-      promise.then(idle);
-      return promise;
-    },
-    { protocol, hostname, port, basepath = '/api/v1' } = config,
-    baseURL = `${protocol}//${hostname}:${port}${basepath}`,
-    connectToNotificationStream = () => {
-      if (EventSource) {
-        eventSource = new EventSource(`${baseURL}/notification/stream`);
-        eventSource.onmessage = (e) => {
-          var parsed = JSON.parse(e.data);
-          notification.emit(EVENT_TOPIC, parsed);
-        };
+  const client = {}; // Must be const otherwise the created closure will fail
+  const notification = new Observable();
+  const idle = () => {
+    busyCounter -= 1;
+    notification.emit(BUSY_TOPIC, busyCounter);
+  };
+  const busy = (promise) => {
+    busyCounter += 1;
+    notification.emit(BUSY_TOPIC, busyCounter);
+    promise.then(idle);
+    return promise;
+  };
+  const { protocol, hostname, port, basepath = '/api/v1' } = config;
+  const baseURL = `${protocol}//${hostname}:${port}${basepath}`;
+  const connectToNotificationStream = () => {
+    if (EventSource) {
+      eventSource = new EventSource(`${baseURL}/notification/stream`);
+      eventSource.onmessage = (e) => {
+        const parsed = JSON.parse(e.data);
+        notification.emit(EVENT_TOPIC, parsed);
+      };
 
-        eventSource.onerror = (e) => {
-          // Wait 2 seconds if the browser hasn't reconnected then reinitialize.
-          setTimeout(() => {
-            if (eventSource && eventSource.readyState === EventSource.CLOSED) {
-              connectToNotificationStream();
-            } else {
-              eventSource.close();
-              eventSource = null;
-              connectToNotificationStream();
-            }
-          }, 2000);
-        };
-      }
-    },
-    { extractLocalToken, updateGirderInstance, updateAuthenticationState } = {
-      extractLocalToken() {
-        try {
-          return document.cookie
-            .split('girderToken=')[1]
-            .split(';')[0]
-            .trim();
-        } catch (e) {
-          return undefined;
-        }
-      },
-      updateGirderInstance() {
-        const timeout = 60000;
-        const headers = {};
-
-        if (token) {
-          headers['Girder-Token'] = token;
-        }
-
-        client._ = {};
-
-        const methods = axios.create({
-          baseURL,
-          timeout,
-          headers,
-        });
-
-        // wrap xhr requests so we can give a cancel to each,
-        // we need to make a new cancel token for each request.
-        ['get', 'delete', 'head'].forEach((req) => {
-          client._[req] = (url, conf) => {
-            const cSource = CancelToken.source();
-            client.cancel = cSource.cancel;
-            return methods[req](
-              url,
-              Object.assign({}, conf, {
-                cancelToken: cSource.token,
-              })
-            );
-          };
-        });
-
-        ['post', 'put', 'patch'].forEach((req) => {
-          client._[req] = (url, data, conf) => {
-            const cSource = CancelToken.source();
-            client.cancel = cSource.cancel;
-            return methods[req](
-              url,
-              data,
-              Object.assign({}, conf, {
-                cancelToken: cSource.token,
-              })
-            );
-          };
-        });
-      },
-      updateAuthenticationState(state) {
-        if (isAuthenticated !== !!state) {
-          // Clear cache data if not logged-in
-          if (!state) {
-            userData = undefined;
-            token = undefined;
-            // Update userData for external modules
-            client.user = userData;
-            client.token = undefined;
-          }
-
-          // Update internal state
-          isAuthenticated = !!state;
-          updateGirderInstance();
-
-          // Broadcast information
-          /* eslint-disable babel/new-cap */
-          loginPromise = state ? _LOGIN_PROMISE() : _LOGOUT_PROMISE();
-          /* eslint-enable babel/new-cap */
-          notification.emit(AUTH_CHANGE_TOPIC, isAuthenticated);
-          if (isAuthenticated && eventSource === null) {
+      eventSource.onerror = (e) => {
+        // Wait 2 seconds if the browser hasn't reconnected then reinitialize.
+        setTimeout(() => {
+          if (eventSource && eventSource.readyState === EventSource.CLOSED) {
+            connectToNotificationStream();
+          } else {
+            eventSource.close();
+            eventSource = null;
             connectToNotificationStream();
           }
-        }
-      },
-    },
-    progress = (id, current, total = 1) => {
-      notification.emit(PROGRESS_TOPIC, {
-        id,
-        current,
-        total,
-      });
-    };
+        }, 2000);
+      };
+    }
+  };
+
+  function extractLocalToken() {
+    try {
+      return document.cookie
+        .split('girderToken=')[1]
+        .split(';')[0]
+        .trim();
+    } catch (e) {
+      return undefined;
+    }
+  }
+  function updateGirderInstance() {
+    const timeout = 60000;
+    const headers = {};
+
+    if (token) {
+      headers['Girder-Token'] = token;
+    }
+
+    client._ = {};
+
+    const methods = axios.create({
+      baseURL,
+      timeout,
+      headers,
+    });
+
+    // wrap xhr requests so we can give a cancel to each,
+    // we need to make a new cancel token for each request.
+    ['get', 'delete', 'head'].forEach((req) => {
+      client._[req] = (url, conf) => {
+        const cSource = CancelToken.source();
+        client.cancel = cSource.cancel;
+        return methods[req](
+          url,
+          Object.assign({}, conf, {
+            cancelToken: cSource.token,
+          })
+        );
+      };
+    });
+
+    ['post', 'put', 'patch'].forEach((req) => {
+      client._[req] = (url, data, conf) => {
+        const cSource = CancelToken.source();
+        client.cancel = cSource.cancel;
+        return methods[req](
+          url,
+          data,
+          Object.assign({}, conf, {
+            cancelToken: cSource.token,
+          })
+        );
+      };
+    });
+  }
+  function updateAuthenticationState(state) {
+    if (isAuthenticated !== !!state) {
+      // Clear cache data if not logged-in
+      if (!state) {
+        userData = undefined;
+        token = undefined;
+        // Update userData for external modules
+        client.user = userData;
+        client.token = undefined;
+      }
+
+      // Update internal state
+      isAuthenticated = !!state;
+      updateGirderInstance();
+
+      // Broadcast information
+      /* eslint-disable babel/new-cap */
+      loginPromise = state ? _LOGIN_PROMISE() : _LOGOUT_PROMISE();
+      /* eslint-enable babel/new-cap */
+      notification.emit(AUTH_CHANGE_TOPIC, isAuthenticated);
+      if (isAuthenticated && eventSource === null) {
+        connectToNotificationStream();
+      }
+    }
+  }
+  function progress(id, current, total = 1) {
+    notification.emit(PROGRESS_TOPIC, {
+      id,
+      current,
+      total,
+    });
+  }
 
   // Fill up public object
   const publicObject = {
@@ -223,7 +215,7 @@ export function build(config = location, ...extensions) {
             })
             .catch((err) => {
               updateAuthenticationState(false);
-              reject();
+              reject(err);
             })
         );
       });
@@ -296,7 +288,7 @@ export function build(config = location, ...extensions) {
           if (!resp.data) {
             updateAuthenticationState(false);
             userData = null;
-            reject();
+            reject(resp);
             return;
           }
           // Update userData for external modules
@@ -308,10 +300,10 @@ export function build(config = location, ...extensions) {
         })
         .catch((errResp) => {
           updateAuthenticationState(false);
-          reject();
+          reject(errResp);
         });
     } else {
-      reject();
+      reject('No token');
     }
   });
 

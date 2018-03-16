@@ -1,49 +1,35 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+
+import style from 'HPCCloudStyle/PageWithMenu.mcss';
+
 import ChangeInfo from './ChangeInfo';
 import ChangePassword from './ChangePassword';
 import ActiveList from '../../../panels/ActiveList';
 import Toolbar from '../../../panels/Toolbar';
-import React from 'react';
+
 import { breadcrumb } from '..';
 
-import style from 'HPCCloudStyle/PageWithMenu.mcss';
-import { connect } from 'react-redux';
-
-const UserPref = React.createClass({
-  displayName: 'Preferences/User',
-
-  propTypes: {
-    menu: React.PropTypes.array,
-    user: React.PropTypes.object,
-  },
-
-  getDefaultProps() {
-    return {
-      menu: [
-        {
-          name: 'Change Password',
-          component: ChangePassword,
-        },
-        {
-          name: 'Change Info',
-          component: ChangeInfo,
-        },
-      ],
-    };
-  },
-
-  getInitialState() {
-    return {
+class UserPref extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       active: 0,
     };
-  },
+
+    this.activeChange = this.activeChange.bind(this);
+    this.formAction = this.formAction.bind(this);
+  }
 
   activeChange(active) {
     this.setState({ active });
-  },
+  }
 
   formAction(actionName) {
     this[actionName]();
-  },
+  }
 
   render() {
     const userBreadCrumb = breadcrumb(this.props.user, 'User');
@@ -63,8 +49,27 @@ const UserPref = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
+
+UserPref.propTypes = {
+  menu: PropTypes.array,
+  user: PropTypes.object,
+};
+
+UserPref.defaultProps = {
+  menu: [
+    {
+      name: 'Change Password',
+      component: ChangePassword,
+    },
+    {
+      name: 'Change Info',
+      component: ChangeInfo,
+    },
+  ],
+  user: undefined,
+};
 
 export default connect(
   (state) => ({

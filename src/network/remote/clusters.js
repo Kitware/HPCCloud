@@ -47,9 +47,9 @@ export default function({
     // patch /clusters/{id}
     //     Update the cluster
     updateCluster(cluster) {
-      const editableCluster = deepClone(cluster),
-        allowed = ['name', 'type', 'config', '_id'],
-        params = filterQuery(editableCluster, ...allowed.slice(0, 3));
+      const editableCluster = deepClone(cluster);
+      const allowed = ['name', 'type', 'config', '_id'];
+      const params = filterQuery(editableCluster, ...allowed.slice(0, 3));
 
       // Remove read only fields if any
       if (editableCluster.config.ssh && editableCluster.config.ssh.user) {

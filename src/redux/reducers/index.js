@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
-import { routerReducer } from 'react-router-redux';
+
+import visualizer from 'pvw-visualizer/src/redux/reducers';
 
 import auth from './auth';
 import fs from './fs';
@@ -11,8 +12,6 @@ import projects from './projects';
 import simulations from './simulations';
 import taskflows from './taskflows';
 
-import visualizer from 'pvw-visualizer/src/redux/reducers';
-
 export default combineReducers({
   auth,
   fs,
@@ -23,7 +22,5 @@ export default combineReducers({
   projects,
   simulations,
   taskflows,
-
-  routing: routerReducer,
   visualizer,
 });

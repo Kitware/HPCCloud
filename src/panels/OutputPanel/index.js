@@ -11,47 +11,34 @@ name2      someItem   someValue
 name3      someItem   someValue
 */
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import style from 'HPCCloudStyle/JobMonitor.mcss';
 
-export default React.createClass({
-  displayName: 'OutputPanel',
-  propTypes: {
-    advanced: React.PropTypes.bool,
-    table: React.PropTypes.bool,
-    // if table, headers is an array of strings, these function as header values an keys
-    headers: React.PropTypes.array,
-    // if table, items is an array of objects with keys that match the headers array and an _id
-    items: React.PropTypes.array,
-    title: React.PropTypes.string,
-    subtitle: React.PropTypes.string,
-  },
-  getDefaultProps() {
-    return {
-      advanced: false,
-      table: false,
-      headers: [],
-      items: [],
-      title: '',
-      subtitle: '',
+export default class OutputPanel extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: !props.advanced,
     };
-  },
-  getInitialState() {
-    return {
-      open: !this.props.advanced,
-    };
-  },
+    this.toggleAdvanced = this.toggleAdvanced.bind(this);
+    this.tableMapper = this.tableMapper.bind(this);
+  }
+
   toggleAdvanced() {
     this.setState({ open: !this.state.open });
-  },
+  }
+
   tableMapper(el, i) {
     return (
       <tr key={el._id}>
         {this.props.headers.map((h) => <td key={`${el._id}_${h}`}>{el[h]}</td>)}
       </tr>
     );
-  },
+  }
+
   render() {
-    var advancedControl = null;
+    let advancedControl = null;
     if (this.props.advanced) {
       advancedControl = (
         <div className={style.buttons}>
@@ -119,5 +106,25 @@ export default React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
+
+OutputPanel.propTypes = {
+  advanced: PropTypes.bool,
+  table: PropTypes.bool,
+  // if table, headers is an array of strings, these function as header values an keys
+  headers: PropTypes.array,
+  // if table, items is an array of objects with keys that match the headers array and an _id
+  items: PropTypes.array,
+  title: PropTypes.string,
+  subtitle: PropTypes.string,
+};
+
+OutputPanel.defaultProps = {
+  advanced: false,
+  table: false,
+  headers: [],
+  items: [],
+  title: '',
+  subtitle: '',
+};

@@ -1,35 +1,32 @@
-import ItemEditor from '../../../panels/ItemEditor';
 import React from 'react';
-import Workflows from '../../../workflows';
-import getNetworkError from '../../../utils/getNetworkError';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 
-import { connect } from 'react-redux';
+import ItemEditor from '../../../panels/ItemEditor';
+import Workflows from '../../../workflows';
+import getNetworkError from '../../../utils/getNetworkError';
+
 import { dispatch } from '../../../redux';
 import * as Actions from '../../../redux/actions/projects';
-import * as Router from '../../../redux/actions/router';
 
-const ProjectNew = React.createClass({
-  displayName: 'Project/New',
-
-  propTypes: {
-    workflowNames: React.PropTypes.array,
-    error: React.PropTypes.string,
-    onSave: React.PropTypes.func,
-    onCancel: React.PropTypes.func,
-  },
-
-  getInitialState() {
-    return {
+class ProjectNew extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       _error: null,
       type: this.props.workflowNames[0].value,
     };
-  },
+    this.onAction = this.onAction.bind(this);
+    this.updateForm = this.updateForm.bind(this);
+  }
 
   componentDidMount() {
     this.timeout = null;
-  },
+  }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState._error !== this.state._error) {
@@ -37,32 +34,32 @@ const ProjectNew = React.createClass({
         this.setState({ _error: null });
       }, 3000);
     }
-  },
+  }
 
   componentWillUnmount() {
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
-  },
+  }
 
   onAction(action, data, attachments) {
     this[action](data, attachments);
-  },
+  }
 
   updateForm(e) {
-    var key = e.target.dataset.name,
-      value = e.target.value;
+    const key = e.target.dataset.name;
+    const value = e.target.value;
 
     this.setState({ [key]: value });
-  },
+  }
 
   newProject(data, attachments) {
-    const { name, description } = data,
-      type = this.state.type,
-      orders = Workflows[type].steps._order,
-      steps = Array.isArray(orders) ? orders : orders.default,
-      metadata = data.metadata || {},
-      project = { name, description, type, steps, metadata };
+    const { name, description } = data;
+    const type = this.state.type;
+    const orders = Workflows[type].steps._order;
+    const steps = Array.isArray(orders) ? orders : orders.default;
+    const metadata = data.metadata || {};
+    const project = { name, description, type, steps, metadata };
 
     if (!name || !name.length) {
       this.setState({ _error: 'The project needs to have a name' });
@@ -76,10 +73,7 @@ const ProjectNew = React.createClass({
     ) {
       const reqAttachments =
         Workflows[this.state.type].requiredAttachments.project;
-      if (
-        !attachments ||
-        !reqAttachments.every((el) => attachments.hasOwnProperty(el))
-      ) {
+      if (!attachments || !reqAttachments.every((el) => el in attachments)) {
         // ['this', 'that', 'other'] => '"this", "that" and "other"'
         const reqAttachmentsStr = reqAttachments
           .map((el) => `"${el}"`)
@@ -95,11 +89,11 @@ const ProjectNew = React.createClass({
     }
 
     this.props.onSave(project, attachments);
-  },
+  }
 
   cancel() {
     this.props.onCancel();
-  },
+  }
 
   render() {
     const childComponent = this.state.type
@@ -143,24 +137,33 @@ const ProjectNew = React.createClass({
         {workflowAddOn}
       </ItemEditor>
     );
-  },
-});
+  }
+}
+
+ProjectNew.propTypes = {
+  workflowNames: PropTypes.array.isRequired,
+  error: PropTypes.string.isRequired,
+  onSave: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
 
-export default connect(
-  (state) => {
-    return {
-      workflowNames: state.projects.workflowNames,
-      error: getNetworkError(state, 'save_project'),
-    };
-  },
-  () => {
-    return {
-      onSave: (project, attachments) =>
-        dispatch(Actions.saveProject(project, attachments)),
-      onCancel: () => dispatch(Router.replace('/')),
-    };
-  }
-)(ProjectNew);
+export default withRouter(
+  connect(
+    (state, props) => {
+      return {
+        workflowNames: state.projects.workflowNames,
+        error: getNetworkError(state, 'save_project'),
+        onCancel: () => props.history.replace('/'),
+      };
+    },
+    () => {
+      return {
+        onSave: (project, attachments) =>
+          dispatch(Actions.saveProject(project, attachments)),
+      };
+    }
+  )(ProjectNew)
+);

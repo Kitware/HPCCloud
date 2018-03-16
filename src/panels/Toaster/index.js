@@ -1,30 +1,24 @@
 import React from 'react';
-import get from '../../utils/get';
-import style from 'HPCCloudStyle/Toaster.mcss';
+import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
+
+import style from 'HPCCloudStyle/Toaster.mcss';
+
+import get from '../../utils/get';
+
 import { dispatch } from '../../redux';
 import * as Actions from '../../redux/actions/network';
 
-const ToastComponent = React.createClass({
-  displayName: 'Toaster',
-
-  propTypes: {
-    errorId: React.PropTypes.string,
-    message: React.PropTypes.string,
-    invalidateError: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return {
-      errorId: null,
-      message: '',
-    };
-  },
+class ToastComponent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.close = this.close.bind(this);
+  }
 
   close() {
     this.props.invalidateError(this.props.errorId);
-  },
+  }
 
   render() {
     return (
@@ -40,8 +34,19 @@ const ToastComponent = React.createClass({
         </button>
       </div>
     );
-  },
-});
+  }
+}
+
+ToastComponent.propTypes = {
+  errorId: PropTypes.string,
+  message: PropTypes.string,
+  invalidateError: PropTypes.func.isRequired,
+};
+
+ToastComponent.defaultProps = {
+  errorId: null,
+  message: '',
+};
 
 export default connect(
   (state) => {

@@ -1,38 +1,26 @@
 import React from 'react';
-import { Link } from 'react-router';
+import PropTypes from 'prop-types';
+
+import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import get from 'mout/src/object/get';
 
 import style from 'HPCCloudStyle/Login.mcss';
 import layout from 'HPCCloudStyle/Layout.mcss';
 
-import get from 'mout/src/object/get';
-import { connect } from 'react-redux';
 import { dispatch } from '../../redux';
 import { login } from '../../redux/actions/user';
 
-const Login = React.createClass({
-  displayName: 'Login',
-
-  propTypes: {
-    error: React.PropTypes.bool,
-    onLogin: React.PropTypes.func,
-  },
-
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
-
-  getDefaultProps() {
-    return {
-      error: false,
-      onLogin: (username, password) =>
-        console.log('login', username, '...password'),
-    };
-  },
+class Login extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
 
   handleSubmit(event) {
     event.preventDefault();
     this.props.onLogin(this.login.value, this.pass.value);
-  },
+  }
 
   render() {
     return (
@@ -65,7 +53,7 @@ const Login = React.createClass({
               Login <i className={style.sendIcon} />
             </button>
             <div className={style.forgotPassword}>
-              <Link to={'/Forgot'}>Forget password?</Link>
+              <Link to="/Forgot">Forget password?</Link>
             </div>
           </div>
           {this.props.error && (
@@ -74,8 +62,19 @@ const Login = React.createClass({
         </form>
       </div>
     );
-  },
-});
+  }
+}
+
+Login.propTypes = {
+  error: PropTypes.bool,
+  onLogin: PropTypes.func,
+};
+
+Login.defaultProps = {
+  error: false,
+  onLogin: (username, password) =>
+    console.log('login', username, '...password'),
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */

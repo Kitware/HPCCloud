@@ -1,10 +1,10 @@
 import React from 'react';
+import { connect } from 'react-redux';
+
 import RuntimeBackend from '../../panels/RuntimeBackend';
 import JobSubmission from '../../../../generic/components/steps/JobSubmission';
 
 import getNetworkError from '../../../../../utils/getNetworkError';
-
-import { connect } from 'react-redux';
 
 // ----------------------------------------------------------------------------
 

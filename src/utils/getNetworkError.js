@@ -10,6 +10,9 @@ function getNetworkErrorWithId(state, id) {
     if (get(state, `network.error.${id}.resp.data.message`)) {
       // resp.data.message
       return get(state, `network.error.${id}.resp.data.message`);
+    } else if (get(state, `network.error.${id}.resp.response.data.message`)) {
+      // resp.response.data.message
+      return get(state, `network.error.${id}.resp.response.data.message`);
     } else if (get(state, `network.error.${id}.resp.message`)) {
       // resp.message
       return get(state, `network.error.${id}.resp.message`);

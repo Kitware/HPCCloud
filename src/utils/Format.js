@@ -1,10 +1,10 @@
 // this formatter takes a decimal that represents time in unix seconds
 export function formatTime(time) {
-  var date = new Date(time * 1000),
-    hours = date.getHours().toString(),
-    minutes = date.getMinutes().toString(),
-    seconds = date.getSeconds().toString(),
-    ms = date.getMilliseconds().toString();
+  const date = new Date(time * 1000);
+  let hours = date.getHours().toString();
+  let minutes = date.getMinutes().toString();
+  let seconds = date.getSeconds().toString();
+  let ms = date.getMilliseconds().toString();
 
   hours = hours.length === 1 ? `0${hours}` : hours;
   minutes = minutes.length === 1 ? `0${minutes}` : minutes;
@@ -17,14 +17,15 @@ export function formatTime(time) {
 }
 
 export function formatFileSize(bytes, precision = 1) {
-  if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) {
+  const nBytes = Number(bytes);
+  if (Number.isNaN(nBytes) || !Number.isFinite(nBytes)) {
     return 'unknown size';
-  } else if (bytes === 0) {
+  } else if (nBytes === 0) {
     return '0 bytes';
   }
-  const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'],
-    number = Math.floor(Math.log(bytes) / Math.log(1024));
-  return `${(bytes / Math.pow(1024, Math.floor(number))).toFixed(precision)} ${
+  const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+  const number = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / 1024 ** Math.floor(number)).toFixed(precision)} ${
     units[number]
   }`;
 }

@@ -1,11 +1,13 @@
+import deepClone from 'mout/src/lang/deepClone';
+import { connect } from 'react-redux';
+import queryString from 'query-string';
+
 import JobMonitoring from '../../../../generic/components/steps/JobMonitoring';
 
 import getNetworkError from '../../../../../utils/getNetworkError';
 import { getDisabledButtons } from '../../../../../utils/getDisabledButtons';
 import get from '../../../../../utils/get';
-import deepClone from 'mout/src/lang/deepClone';
 
-import { connect } from 'react-redux';
 import { dispatch } from '../../../../../redux';
 import * as SimActions from '../../../../../redux/actions/projects';
 
@@ -25,7 +27,11 @@ function getActions(props) {
 function onVisualize(props) {
   const location = {
     pathname: `View/Simulation/${props.simulation._id}/Visualization`,
-    query: Object.assign({}, props.location.query, { view: 'default' }),
+    search: queryString.stringify(
+      Object.assign({}, queryString.parse(props.location.search), {
+        view: 'default',
+      })
+    ),
     state: props.location.state,
   };
   const newSimState = deepClone(props.simulation);
@@ -44,7 +50,7 @@ function onVisualize(props) {
 // ----------------------------------------------------------------------------
 
 export default connect((state, props) => {
-  var taskflowId = null;
+  let taskflowId = null;
   const activeProject = state.projects.active;
   const activeSimulation = activeProject
     ? state.projects.simulations[activeProject].active

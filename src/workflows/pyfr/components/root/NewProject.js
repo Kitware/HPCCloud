@@ -1,5 +1,7 @@
 /* global Simput */
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import { FileUploadEntry } from '../../../../panels/ItemEditor';
 
 import { dispatch } from '../../../../redux';
@@ -15,11 +17,11 @@ function onParseError(message) {
 
 function extractPhysicalNames(file) {
   return new Promise((accept, reject) => {
-    var reader = new FileReader();
-    var boundaries = [];
+    const reader = new FileReader();
+    const boundaries = [];
 
     reader.onload = function onLoad(e) {
-      var keepLooking = true;
+      let keepLooking = true;
       const text = reader.result;
       const lines = text.split(/[\r\n]+/g);
       const nbLines = lines.length;
@@ -46,7 +48,7 @@ function extractPhysicalNames(file) {
 
 function parseAndValidate(file, owner) {
   return new Promise((accept, reject) => {
-    var reader = new FileReader();
+    const reader = new FileReader();
     reader.onloadend = () => {
       if (reader.readyState !== FileReader.DONE) {
         this.props.onParseError('Ini file is invalid');
@@ -92,5 +94,9 @@ export default function pyFrNewProject(props) {
 // ----------------------------------------------------------------------------
 
 pyFrNewProject.propTypes = {
-  owner: React.PropTypes.func,
+  owner: PropTypes.func,
+};
+
+pyFrNewProject.defaultProps = {
+  owner: undefined,
 };

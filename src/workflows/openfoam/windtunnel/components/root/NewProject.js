@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import { FileUploadEntry } from '../../../../../panels/ItemEditor';
 
 function extractFileName(name) {
@@ -23,5 +25,9 @@ export default function newProject(props) {
 }
 
 newProject.propTypes = {
-  owner: React.PropTypes.func,
+  owner: PropTypes.func,
+};
+
+newProject.defaultProps = {
+  owner: undefined,
 };

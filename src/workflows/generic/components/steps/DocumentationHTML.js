@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 /* eslint-disable react/no-danger */
 export default function renderHTML(props) {
@@ -7,7 +8,7 @@ export default function renderHTML(props) {
 /* eslint-enable react/no-danger */
 
 renderHTML.propTypes = {
-  staticContent: React.PropTypes.string,
+  staticContent: PropTypes.string,
 };
 
 renderHTML.defaultProps = {

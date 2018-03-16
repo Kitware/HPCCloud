@@ -11,8 +11,8 @@ export default function({ client, filterQuery, mustContain, busy }) {
     },
 
     createProject(project) {
-      const expected = ['name', 'type', 'steps', 'metadata'],
-        { missingKeys, promise } = mustContain(project, ...expected);
+      const expected = ['name', 'type', 'steps', 'metadata'];
+      const { missingKeys, promise } = mustContain(project, ...expected);
       return missingKeys ? promise : busy(client._.post('/projects', project));
     },
 
@@ -21,9 +21,9 @@ export default function({ client, filterQuery, mustContain, busy }) {
     },
 
     updateProject(project) {
-      const expected = ['name', 'description', 'metadata', '_id'],
-        pfiltered = filterQuery(project, ...expected.slice(0, 3)), // Remove '_id'
-        { missingKeys, promise } = mustContain(project, ...expected);
+      const expected = ['name', 'description', 'metadata', '_id'];
+      const pfiltered = filterQuery(project, ...expected.slice(0, 3)); // Remove '_id'
+      const { missingKeys, promise } = mustContain(project, ...expected);
 
       return missingKeys
         ? promise
@@ -80,8 +80,8 @@ export default function({ client, filterQuery, mustContain, busy }) {
     // post /projects/{id}/simulations
     // Create a simulation associated with a project
     createSimulation(projectId, simualtion) {
-      const expected = ['name', 'description', 'steps', 'active', 'disabled'],
-        sfiltered = filterQuery(simualtion, ...expected);
+      const expected = ['name', 'description', 'steps', 'active', 'disabled'];
+      const sfiltered = filterQuery(simualtion, ...expected);
 
       return busy(
         client._.post(`/projects/${projectId}/simulations`, sfiltered, {

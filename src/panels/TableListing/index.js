@@ -1,9 +1,12 @@
 import React from 'react';
-import Toolbar from '../../panels/Toolbar';
-import merge from 'mout/src/object/merge';
+import PropTypes from 'prop-types';
+
+import queryString from 'query-string';
 
 // Styles
 import style from 'HPCCloudStyle/TableListing.mcss';
+
+import Toolbar from '../../panels/Toolbar';
 
 // Filter helper
 import { updateQuery, itemFilter } from '../../utils/Filters';
@@ -13,42 +16,21 @@ const TOOLBAR_ACTIONS = {
   delete: { name: 'deleteItems', icon: style.deleteIcon },
 };
 
-export default React.createClass({
-  displayName: 'TableListing',
-
-  propTypes: {
-    hasAccess: React.PropTypes.bool.isRequired,
-    accessHelper: React.PropTypes.object,
-    breadcrumb: React.PropTypes.object,
-    items: React.PropTypes.array,
-    location: React.PropTypes.object,
-    onAction: React.PropTypes.func,
-    title: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.object,
-    ]),
-    placeholder: React.PropTypes.object,
-  },
-
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
-
-  getDefaultProps() {
-    return {
-      title: 'Items',
-      hasAccess: false,
-    };
-  },
-
-  getInitialState() {
-    return {
+export default class TableListing extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       selected: [],
-      actions: this.props.hasAccess ? [TOOLBAR_ACTIONS.add] : [],
+      actions: props.hasAccess ? [TOOLBAR_ACTIONS.add] : [],
       sortKey: '',
       sortReverse: false,
     };
-  },
+    this.getSorter = this.getSorter.bind(this);
+    this.toolbarAction = this.toolbarAction.bind(this);
+    this.lineAction = this.lineAction.bind(this);
+    this.itemClicked = this.itemClicked.bind(this);
+    this.sortBy = this.sortBy.bind(this);
+  }
 
   getSorter() {
     const helper = this.props.accessHelper;
@@ -72,7 +54,7 @@ export default React.createClass({
       helper,
       fnIndex,
     };
-  },
+  }
 
   toolbarAction(action) {
     if (this.props.onAction) {
@@ -90,21 +72,21 @@ export default React.createClass({
         actions: this.props.hasAccess ? [TOOLBAR_ACTIONS.add] : [],
       });
     }
-  },
+  }
 
   lineAction(action) {
     const [name, id] = action.split(':');
     this.props.onAction(name, id);
-  },
+  }
 
   itemClicked(e) {
-    var selectedIndex = -1;
+    let selectedIndex = -1;
     const filter = '';
 
     // item was selected
     if (this.props.hasAccess && (e.metaKey || e.ctrlKey) && e.target) {
       let trEl = e.target;
-      while (!trEl.dataset.index) {
+      while (!trEl.dataset.link) {
         trEl = trEl.parentNode;
       }
       const selected = this.state.selected;
@@ -133,16 +115,20 @@ export default React.createClass({
         trEl = trEl.parentNode;
       }
       const linkToGo = trEl.dataset.link;
-      const id = this.props.items[parseInt(trEl.dataset.index, 10)]._id;
+      const id = trEl.dataset.id;
 
       const location = {
         pathname: linkToGo,
-        query: merge(this.props.location.query, { filter }),
+        search: queryString.stringify(
+          Object.assign({}, queryString.parse(this.props.location.search), {
+            filter,
+          })
+        ),
         state: this.props.location.state,
       };
       this.props.onAction('click', { location, id });
     }
-  },
+  }
 
   sortBy(e) {
     const sortKey = e.currentTarget.dataset.title;
@@ -153,16 +139,16 @@ export default React.createClass({
       sortReverse = !this.state.sortReverse;
     }
     this.setState({ sortKey, sortReverse });
-  },
+  }
 
   render() {
     let content = null;
     const { helper, sorter, fnIndex } = this.getSorter();
 
-    updateQuery(this.props.location.query.filter);
+    updateQuery(queryString.parse(this.props.location.search).filter);
     const filteredList = this.props.items.filter(itemFilter).sort(sorter);
     if (this.state.sortReverse) {
-      filteredList.reverse(); // modifies filteredList in place, odd that const doesn't guard that
+      filteredList.reverse();
     }
 
     const columnMapper = (title, index) => {
@@ -203,6 +189,7 @@ export default React.createClass({
                 key={`${item._id}_${index}`}
                 data-link={helper.viewLink(item)}
                 data-index={index}
+                data-id={item._id}
                 className={
                   this.state.selected.indexOf(index) !== -1
                     ? style.selected
@@ -231,7 +218,6 @@ export default React.createClass({
     return (
       <div className={style.container}>
         <Toolbar
-          location={this.props.location}
           title={this.props.title}
           breadcrumb={this.props.breadcrumb}
           actions={this.state.actions}
@@ -241,5 +227,26 @@ export default React.createClass({
         {content}
       </div>
     );
-  },
-});
+  }
+}
+
+TableListing.propTypes = {
+  location: PropTypes.object.isRequired,
+
+  hasAccess: PropTypes.bool,
+  accessHelper: PropTypes.object.isRequired,
+  breadcrumb: PropTypes.object,
+  items: PropTypes.array,
+  onAction: PropTypes.func,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  placeholder: PropTypes.object,
+};
+
+TableListing.defaultProps = {
+  title: 'Items',
+  hasAccess: false,
+  breadcrumb: undefined,
+  items: [],
+  onAction: undefined,
+  placeholder: undefined,
+};

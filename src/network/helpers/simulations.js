@@ -7,8 +7,8 @@ function createItemForSimulation(simulation, name, file) {
     .createItem(simulation.metadata.inputFolder._id, name)
     .then((resp) => {
       // fill item with file
-      const itemId = resp.data._id,
-        params = {};
+      const itemId = resp.data._id;
+      const params = {};
       params.parentType = 'item';
       params.parentId = itemId;
       params.name = file.name;
@@ -77,7 +77,7 @@ export function addEmptyFileForSimulation(simulation, itemName, fileName) {
 // if there's not a sim.id, create a sim with two folders input and output
 // otherwise update simulation
 export function saveSimulation(simulation_, attachments) {
-  var simulation = simulation_;
+  let simulation = simulation_;
   if (!simulation._id) {
     let folder;
     let outputFolder;

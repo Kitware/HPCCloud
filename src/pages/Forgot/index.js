@@ -1,39 +1,27 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+import get from 'mout/src/object/get';
+
 import style from 'HPCCloudStyle/Login.mcss';
 import layout from 'HPCCloudStyle/Layout.mcss';
 
-import get from 'mout/src/object/get';
 import getNetworkError from '../../utils/getNetworkError';
 
-import { connect } from 'react-redux';
 import { forgetPassword } from '../../redux/actions/user';
 import { dispatch } from '../../redux';
 
-const ForgotPassword = React.createClass({
-  displayName: 'ForgotPassword',
-
-  propTypes: {
-    error: React.PropTypes.string,
-    success: React.PropTypes.string,
-    onResetPassword: React.PropTypes.func,
-  },
-
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
-
-  getDefaultProps() {
-    return {
-      error: null,
-      success: null,
-      onResetPassword: () => {},
-    };
-  },
+class ForgotPassword extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
 
   handleSubmit(event) {
     event.preventDefault();
     this.props.onResetPassword(this.email.value);
-  },
+  }
 
   render() {
     return (
@@ -66,8 +54,20 @@ const ForgotPassword = React.createClass({
         </form>
       </div>
     );
-  },
-});
+  }
+}
+
+ForgotPassword.propTypes = {
+  error: PropTypes.string,
+  success: PropTypes.string,
+  onResetPassword: PropTypes.func,
+};
+
+ForgotPassword.defaultProps = {
+  error: null,
+  success: null,
+  onResetPassword: () => {},
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */

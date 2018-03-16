@@ -1,14 +1,17 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
 import ItemEditor from '../../../panels/ItemEditor';
 import SharePanel from '../../../panels/SharePanel';
 import { userHasAccess } from '../../../utils/AccessHelper';
-import React from 'react';
 
 import Workflows from '../../../workflows';
 import getNetworkError from '../../../utils/getNetworkError';
 
-import { connect } from 'react-redux';
 import { dispatch } from '../../../redux';
-import * as Router from '../../../redux/actions/router';
 import * as Actions from '../../../redux/actions/projects';
 
 function actionsForUser(user, accessObject) {
@@ -23,36 +26,31 @@ function actionsForUser(user, accessObject) {
 }
 
 /* eslint-disable no-alert */
-const ProjectEdit = React.createClass({
-  displayName: 'Project/Edit',
-
-  propTypes: {
-    error: React.PropTypes.string,
-    project: React.PropTypes.object,
-    currentUser: React.PropTypes.object,
-    onSave: React.PropTypes.func,
-    onDelete: React.PropTypes.func,
-    onCancel: React.PropTypes.func,
-  },
+/* eslint-disable no-restricted-globals */
+class ProjectEdit extends React.Component {
+  constructor(props) {
+    super(props);
+    this.onAction = this.onAction.bind(this);
+  }
 
   onAction(action, data, attachment) {
     this[action](data, attachment);
-  },
+  }
 
   editProject(data, attachment) {
     this.props.onSave(Object.assign({}, this.props.project, data));
-  },
+  }
 
   cancel() {
     this.props.onCancel('/');
-  },
+  }
 
   delete() {
     if (!confirm('Are you sure you want to delete this project?')) {
       return;
     }
     this.props.onDelete(this.props.project);
-  },
+  }
 
   render() {
     const { currentUser, project, error } = this.props;
@@ -91,30 +89,41 @@ const ProjectEdit = React.createClass({
         ) : null}
       </ItemEditor>
     );
-  },
-});
+  }
+}
+
+ProjectEdit.propTypes = {
+  error: PropTypes.string.isRequired,
+  project: PropTypes.object.isRequired,
+  currentUser: PropTypes.object.isRequired,
+  onSave: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
 
-export default connect(
-  (state, props) => {
-    return {
-      currentUser: state.auth.user,
-      project: state.projects.mapById[props.params.id],
-      error: getNetworkError(state, [
-        'save_project',
-        'delete_project',
-        'share_project',
-        'unshare_project',
-      ]),
-    };
-  },
-  () => {
-    return {
-      onSave: (project) => dispatch(Actions.saveProject(project)),
-      onDelete: (project) => dispatch(Actions.deleteProject(project)),
-      onCancel: (path) => dispatch(Router.goBack()),
-    };
-  }
-)(ProjectEdit);
+export default withRouter(
+  connect(
+    (state, props) => {
+      return {
+        currentUser: state.auth.user,
+        project: state.projects.mapById[props.match.params.id],
+        error: getNetworkError(state, [
+          'save_project',
+          'delete_project',
+          'share_project',
+          'unshare_project',
+        ]),
+        onCancel: () => props.history.goBack(),
+      };
+    },
+    () => {
+      return {
+        onSave: (project) => dispatch(Actions.saveProject(project)),
+        onDelete: (project) => dispatch(Actions.deleteProject(project)),
+      };
+    }
+  )(ProjectEdit)
+);

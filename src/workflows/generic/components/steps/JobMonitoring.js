@@ -1,4 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import queryString from 'query-string';
+
 import ButtonBar from '../../../../panels/ButtonBar';
 import JobMonitor from '../../../../panels/JobMonitor';
 import FileListing from '../../../../panels/FileListing';
@@ -36,7 +39,11 @@ export function onRerun(props) {
   delete stepData.metadata.sessionKey;
   const location = {
     pathname: props.location.pathname,
-    query: { view: 'default' },
+    search: queryString.stringify(
+      Object.assign({}, queryString.parse(props.location.search), {
+        view: 'default',
+      })
+    ),
     state: props.location.state,
   };
   dispatch(
@@ -144,26 +151,26 @@ export default class JobMonitoring extends React.Component {
 /* eslint-disable react/no-unused-prop-types */
 
 JobMonitoring.propTypes = {
-  getActions: React.PropTypes.func,
-  actionFunctions: React.PropTypes.object, // onDeleteCluster, onVisualize, onRerun
+  getActions: PropTypes.func,
+  actionFunctions: PropTypes.object, // onDeleteCluster, onVisualize, onRerun
 
-  location: React.PropTypes.object,
-  project: React.PropTypes.object,
-  simulation: React.PropTypes.object,
-  step: React.PropTypes.string,
-  taskFlowName: React.PropTypes.string,
-  primaryJob: React.PropTypes.string,
-  view: React.PropTypes.string,
+  location: PropTypes.object,
+  project: PropTypes.object,
+  simulation: PropTypes.object,
+  step: PropTypes.string,
+  taskFlowName: PropTypes.string,
+  primaryJob: PropTypes.string,
+  view: PropTypes.string,
 
-  onRerun: React.PropTypes.func,
-  onTerminate: React.PropTypes.func,
-  onTerminateInstance: React.PropTypes.func,
+  onRerun: PropTypes.func,
+  onTerminate: PropTypes.func,
+  onTerminateInstance: PropTypes.func,
 
-  taskflowId: React.PropTypes.string,
-  taskflow: React.PropTypes.object,
-  cluster: React.PropTypes.object,
-  disabledButtons: React.PropTypes.object,
-  error: React.PropTypes.string,
+  taskflowId: PropTypes.string,
+  taskflow: PropTypes.object,
+  cluster: PropTypes.object,
+  disabledButtons: PropTypes.object,
+  error: PropTypes.string,
 };
 
 JobMonitoring.defaultProps = {
@@ -172,4 +179,18 @@ JobMonitoring.defaultProps = {
   onRerun,
   onTerminate,
   onTerminateInstance,
+
+  location: undefined,
+  project: undefined,
+  simulation: undefined,
+  step: undefined,
+  taskFlowName: undefined,
+  primaryJob: undefined,
+  view: undefined,
+
+  taskflowId: undefined,
+  taskflow: undefined,
+  cluster: undefined,
+  disabledButtons: undefined,
+  error: undefined,
 };

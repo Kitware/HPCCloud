@@ -37,7 +37,7 @@ export function invalidateErrors(ids, errType = 'application') {
 }
 
 export function errorNetworkCall(id, resp, errType = 'application') {
-  var errorTimeout = setTimeout(() => {
+  const errorTimeout = setTimeout(() => {
     dispatch(invalidateError(id));
   }, 5000);
   return { type: ERROR_NETWORK_CALL, id, resp, errorTimeout, errType };

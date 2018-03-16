@@ -1,21 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 
-export default React.createClass({
-  displayName: 'SchedulerConfig/SLURM',
-
-  propTypes: {
-    config: React.PropTypes.object,
-    max: React.PropTypes.object,
-    onChange: React.PropTypes.func,
-    runtime: React.PropTypes.bool,
-  },
+export default class SchedulerConfigSLURM extends React.Component {
+  constructor(props) {
+    super(props);
+    this.updateConfig = this.updateConfig.bind(this);
+  }
 
   updateConfig(event) {
     if (this.props.onChange) {
       this.props.onChange(event);
     }
-  },
+  }
 
   render() {
     return (
@@ -70,5 +68,19 @@ export default React.createClass({
         </section>
       </div>
     );
-  },
-});
+  }
+}
+
+SchedulerConfigSLURM.propTypes = {
+  config: PropTypes.object,
+  max: PropTypes.object,
+  onChange: PropTypes.func,
+  runtime: PropTypes.bool,
+};
+
+SchedulerConfigSLURM.defaultProps = {
+  config: undefined,
+  max: undefined,
+  onChange: undefined,
+  runtime: undefined,
+};

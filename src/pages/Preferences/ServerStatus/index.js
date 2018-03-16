@@ -1,15 +1,16 @@
-// import client           from '../../../network';
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+
+import style from 'HPCCloudStyle/JobMonitor.mcss';
+
 import ClusterStatus from './ClusterStatus';
 import OutputPanel from '../../../panels/OutputPanel';
 import Toolbar from '../../../panels/Toolbar';
 import { getDisabledButtons } from '../../../utils/getDisabledButtons';
 import { breadcrumb } from '..';
 
-import style from 'HPCCloudStyle/JobMonitor.mcss';
-
-// import get          from 'mout/src/object/get';
-import { connect } from 'react-redux';
 import { dispatch } from '../../../redux';
 import * as ClusterActions from '../../../redux/actions/clusters';
 import * as VolumeActions from '../../../redux/actions/volumes';
@@ -26,40 +27,32 @@ function matchIdInArray(_id, arr, key = 'name') {
   return '';
 }
 
-const StatusPage = React.createClass({
-  displayName: 'Preferences/Status',
+function profileMapper(el, index) {
+  return {
+    _id: el._id,
+    Name: el.name,
+    Region: el.regionName,
+    Status: el.status,
+  };
+}
 
-  propTypes: {
-    ec2: React.PropTypes.array,
-    volumes: React.PropTypes.array,
-    volumeLogs: React.PropTypes.object,
-    ec2Clusters: React.PropTypes.array,
-    tradClusters: React.PropTypes.array,
-    network: React.PropTypes.object,
-    user: React.PropTypes.object,
+class StatusPage extends React.Component {
+  constructor(props) {
+    super(props);
 
-    getClusterLog: React.PropTypes.func,
-    terminateCluster: React.PropTypes.func,
-    deleteCluster: React.PropTypes.func,
-    fetchClusters: React.PropTypes.func,
-    fetchServers: React.PropTypes.func,
-    fetchVolumes: React.PropTypes.func,
-    getVolumeLog: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return {
-      ec2: [],
-      clusters: [],
-      volumeLogs: {},
-    };
-  },
+    this.logToggle = this.logToggle.bind(this);
+    this.volumeLogToggle = this.volumeLogToggle.bind(this);
+    this.volumesMapper = this.volumesMapper.bind(this);
+    this.ec2Mapper = this.ec2Mapper.bind(this);
+    this.tradClusterMapper = this.tradClusterMapper.bind(this);
+    this.volumeMapper = this.volumeMapper.bind(this);
+  }
 
   componentDidMount() {
     this.props.fetchClusters();
     this.props.fetchServers();
     this.props.fetchVolumes();
-  },
+  }
 
   logToggle(id, offset) {
     return (open) => {
@@ -67,7 +60,7 @@ const StatusPage = React.createClass({
         this.props.getClusterLog(id, offset);
       }
     };
-  },
+  }
 
   volumeLogToggle(id, offset) {
     return (open) => {
@@ -75,16 +68,7 @@ const StatusPage = React.createClass({
         this.props.getVolumeLog(id, offset);
       }
     };
-  },
-
-  profileMapper(el, index) {
-    return {
-      _id: el._id,
-      Name: el.name,
-      Region: el.regionName,
-      Status: el.status,
-    };
-  },
+  }
 
   volumesMapper(el, index) {
     return {
@@ -95,7 +79,7 @@ const StatusPage = React.createClass({
       Cluster: matchIdInArray(el.clusterId, this.props.ec2Clusters),
       Profile: matchIdInArray(el.profileId, this.props.ec2),
     };
-  },
+  }
 
   ec2Mapper(el, index) {
     const offset = el.log ? el.log.length : 0;
@@ -116,7 +100,7 @@ const StatusPage = React.createClass({
         disabledButtons={getDisabledButtons(this.props.network, el.taskflow)}
       />
     );
-  },
+  }
 
   tradClusterMapper(el, index) {
     const offset = el.log ? el.log.length : 0;
@@ -137,7 +121,7 @@ const StatusPage = React.createClass({
         noControls
       />
     );
-  },
+  }
 
   volumeMapper(el, index) {
     const log = this.props.volumeLogs[el._id] || [];
@@ -152,7 +136,7 @@ const StatusPage = React.createClass({
         noControls
       />
     );
-  },
+  }
 
   render() {
     const clusterBreadCrumb = breadcrumb(this.props.user, 'Status');
@@ -170,7 +154,7 @@ const StatusPage = React.createClass({
             table
             title="AWS Profiles"
             headers={['Name', 'Region', 'Status']}
-            items={this.props.ec2.map(this.profileMapper)}
+            items={this.props.ec2.map(profileMapper)}
           />
 
           {/* EC2 Clusters */}
@@ -202,15 +186,38 @@ const StatusPage = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
+
+StatusPage.propTypes = {
+  ec2: PropTypes.array,
+  volumes: PropTypes.array.isRequired,
+  volumeLogs: PropTypes.object,
+  ec2Clusters: PropTypes.array.isRequired,
+  tradClusters: PropTypes.array.isRequired,
+  network: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
+
+  getClusterLog: PropTypes.func.isRequired,
+  terminateCluster: PropTypes.func.isRequired,
+  deleteCluster: PropTypes.func.isRequired,
+  fetchClusters: PropTypes.func.isRequired,
+  fetchServers: PropTypes.func.isRequired,
+  fetchVolumes: PropTypes.func.isRequired,
+  getVolumeLog: PropTypes.func.isRequired,
+};
+
+StatusPage.defaultProps = {
+  ec2: [],
+  volumeLogs: {},
+};
 
 // Binding
 export default connect(
   (state) => {
     const localState = state.preferences;
-    var ec2Clusters = [],
-      tradClusters = [];
+    const ec2Clusters = [];
+    const tradClusters = [];
     Object.keys(localState.clusters.mapById).forEach((key, index) => {
       const cluster = localState.clusters.mapById[key];
       (cluster.type === 'ec2' ? ec2Clusters : tradClusters).push(cluster);

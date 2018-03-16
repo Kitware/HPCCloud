@@ -5,8 +5,8 @@ function createItemForProject(project, name, file) {
     .createItem(project.metadata.inputFolder._id, name)
     .then((resp) => {
       // fill item with file
-      const itemId = resp.data._id,
-        params = {};
+      const itemId = resp.data._id;
+      const params = {};
       params.parentType = 'item';
       params.parentId = itemId;
       params.name = file.name;
@@ -26,7 +26,7 @@ function createItemForProject(project, name, file) {
 }
 
 export function saveProject(project_, attachments) {
-  var project = project_;
+  let project = project_;
   if (!project._id) {
     let folder;
     let outputFolder;

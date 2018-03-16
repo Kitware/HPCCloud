@@ -1,38 +1,24 @@
 import React from 'react';
-import ButtonBar from '../../../panels/ButtonBar';
+import PropTypes from 'prop-types';
+
+import get from 'mout/src/object/get';
+import { connect } from 'react-redux';
 
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 
+import ButtonBar from '../../../panels/ButtonBar';
 import getNetworkError from '../../../utils/getNetworkError';
-import get from 'mout/src/object/get';
-import { connect } from 'react-redux';
+
 import * as Actions from '../../../redux/actions/user';
 import { dispatch } from '../../../redux';
 
-const ChangeInfo = React.createClass({
-  displayName: 'User/ChangeInfo',
+class ChangeInfo extends React.Component {
+  constructor(props) {
+    super(props);
 
-  propTypes: {
-    buttons: React.PropTypes.array,
-    className: React.PropTypes.string,
-    error: React.PropTypes.string,
-    user: React.PropTypes.object,
-    onUpdateUser: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return {
-      buttons: [
-        {
-          name: 'updateUser',
-          label: 'Save',
-        },
-      ],
-      error: null,
-      success: false,
-      user: {},
-    };
-  },
+    this.changeForm = this.changeForm.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
 
   changeForm(event) {
     const key = event.target.dataset.key;
@@ -40,14 +26,14 @@ const ChangeInfo = React.createClass({
     this.props.onUpdateUser(
       Object.assign({}, this.props.user, { [key]: value })
     );
-  },
+  }
 
   handleSubmit(event) {
     if (event && event.preventDefault) {
       event.preventDefault();
     }
     this.props.onUpdateUser(this.props.user, true);
-  },
+  }
 
   render() {
     return (
@@ -97,8 +83,28 @@ const ChangeInfo = React.createClass({
         />
       </div>
     );
-  },
-});
+  }
+}
+
+ChangeInfo.propTypes = {
+  buttons: PropTypes.array,
+  className: PropTypes.string,
+  error: PropTypes.string,
+  user: PropTypes.object,
+  onUpdateUser: PropTypes.func.isRequired,
+};
+
+ChangeInfo.defaultProps = {
+  className: '',
+  buttons: [
+    {
+      name: 'updateUser',
+      label: 'Save',
+    },
+  ],
+  error: null,
+  user: {},
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */

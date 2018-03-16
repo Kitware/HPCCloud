@@ -1,7 +1,7 @@
 import client from '../../network';
 import * as netActions from './network';
-import * as routingActions from './router';
 import { dispatch } from '..';
+import history from './history';
 
 export const LOGGED_IN = 'LOGGED_IN';
 export const AUTH_PENDING = 'AUTH_PENDING';
@@ -28,7 +28,7 @@ export function login(username, password) {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(authenticationPending(false));
         dispatch(loggedIn(client.getLoggedInUser()));
-        dispatch(routingActions.replace('/'));
+        history.replace('/');
       })
       .catch((err) => {
         dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
@@ -48,7 +48,7 @@ export function register(firstName, lastName, login, email, password) {
       .then(
         (resp) => {
           dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(routingActions.replace('/Login'));
+          history.replace('/Login');
         },
         (error) => {
           dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
@@ -67,11 +67,11 @@ export function logout() {
     client.logout().then(
       (resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
-        dispatch(routingActions.replace('/'));
+        history.replace('/');
       },
       (err) => {
         dispatch(netActions.errorNetworkCall(action.id, err));
-        dispatch(routingActions.replace('/'));
+        history.replace('/');
       }
     );
 

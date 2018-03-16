@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import AttachedFileListing from './AttachedFileListing';
 
 // ----------------------------------------------------------------------------
@@ -16,6 +18,11 @@ export default function editSimulationWithFiles(props) {
 // ----------------------------------------------------------------------------
 
 editSimulationWithFiles.propTypes = {
-  owner: React.PropTypes.func,
-  parentProps: React.PropTypes.object,
+  owner: PropTypes.func,
+  parentProps: PropTypes.object,
+};
+
+editSimulationWithFiles.defaultProps = {
+  owner: undefined,
+  parentProps: undefined,
 };

@@ -17,7 +17,7 @@ export function updateList(state, itemList, idKey = '_id') {
 }
 
 export function removeItem(state, id) {
-  var mapById = state.mapById;
+  let mapById = state.mapById;
   if (mapById && mapById[id]) {
     mapById = Object.assign({}, state.mapById);
     delete mapById[id];

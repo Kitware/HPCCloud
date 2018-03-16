@@ -4,31 +4,25 @@
 // the action of changing the active one.
 
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import { withRouter } from 'react-router-dom';
+import style from 'HPCCloudStyle/PageWithMenu.mcss';
+
 import ActiveList from '../../../../panels/ActiveList';
 import { activateSimulationStep } from '../../../../network/helpers/simulations';
 
-import style from 'HPCCloudStyle/PageWithMenu.mcss';
-
-export default React.createClass({
-  displayName: 'GenericViewSimulation',
-
-  propTypes: {
-    module: React.PropTypes.object,
-    simulation: React.PropTypes.object,
-    user: React.PropTypes.object,
-    step: React.PropTypes.string,
-    view: React.PropTypes.string,
-  },
-
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
+export class GenericViewSimulation extends React.Component {
+  constructor(props) {
+    super(props);
+    this.updateActiveStep = this.updateActiveStep.bind(this);
+  }
 
   updateActiveStep(idx, item) {
     const stepName = this.props.module.steps._order[idx];
     activateSimulationStep(this.props.user, this.props.simulation, stepName)
       .then((resp) =>
-        this.context.router.replace(
+        this.props.history.replace(
           ['/View/Simulation', this.props.simulation._id, stepName].join('/')
         )
       )
@@ -36,7 +30,7 @@ export default React.createClass({
         console.log('Update active error for', stepName);
         console.log(err);
       });
-  },
+  }
 
   render() {
     const module = this.props.module;
@@ -68,5 +62,25 @@ export default React.createClass({
         <div className={style.content}>{component}</div>
       </div>
     );
-  },
-});
+  }
+}
+
+GenericViewSimulation.propTypes = {
+  history: PropTypes.object.isRequired,
+
+  module: PropTypes.object,
+  simulation: PropTypes.object,
+  user: PropTypes.object,
+  step: PropTypes.string,
+  view: PropTypes.string,
+};
+
+GenericViewSimulation.defaultProps = {
+  module: undefined,
+  simulation: undefined,
+  user: undefined,
+  step: undefined,
+  view: undefined,
+};
+
+export default withRouter(GenericViewSimulation);

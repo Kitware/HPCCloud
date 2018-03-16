@@ -1,28 +1,24 @@
 import React from 'react';
-import { Link } from 'react-router';
+import PropTypes from 'prop-types';
 
-export default React.createClass({
-  displayName: 'LinkIcon',
+import { Link } from 'react-router-dom';
 
-  propTypes: {
-    className: React.PropTypes.string,
-    icon: React.PropTypes.string,
-    to: React.PropTypes.string,
-    title: React.PropTypes.string,
-  },
+export default function LinkIcon(props) {
+  return (
+    <Link to={props.to} title={props.title}>
+      <i className={[props.icon, props.className].join(' ')} />
+    </Link>
+  );
+}
 
-  getDefaultProps() {
-    return {
-      className: '',
-      title: null,
-    };
-  },
+LinkIcon.propTypes = {
+  className: PropTypes.string,
+  icon: PropTypes.string.isRequired,
+  to: PropTypes.string.isRequired,
+  title: PropTypes.string,
+};
 
-  render() {
-    return (
-      <Link to={this.props.to} title={this.props.title}>
-        <i className={[this.props.icon, this.props.className].join(' ')} />
-      </Link>
-    );
-  },
-});
+LinkIcon.defaultProps = {
+  className: '',
+  title: null,
+};

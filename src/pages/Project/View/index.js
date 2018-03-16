@@ -1,4 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+import theme from 'HPCCloudStyle/Theme.mcss';
+
 import {
   projectFunctions,
   SimulationHelper,
@@ -7,37 +14,28 @@ import {
 import TableListing from '../../../panels/TableListing';
 import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
 import { primaryBreadCrumbs } from '../../../utils/Constants';
-import theme from 'HPCCloudStyle/Theme.mcss';
 
-import { connect } from 'react-redux';
 import { dispatch } from '../../../redux';
 import * as Actions from '../../../redux/actions/projects';
-import * as Router from '../../../redux/actions/router';
 
-const ProjectView = React.createClass({
-  displayName: 'Project/View',
-
-  propTypes: {
-    location: React.PropTypes.object,
-    params: React.PropTypes.object,
-    project: React.PropTypes.object,
-    simulations: React.PropTypes.array,
-    onActivate: React.PropTypes.func,
-    onLocationChange: React.PropTypes.func,
-    onDelete: React.PropTypes.func,
-    hasAccess: React.PropTypes.bool,
-  },
+class ProjectView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.onAction = this.onAction.bind(this);
+  }
 
   onAction(action, arg) {
     this[action](arg);
-  },
+  }
 
   addItem() {
-    this.props.onLocationChange(`/New/Simulation/${this.props.params.id}`);
-  },
+    console.log('add item', `/New/Simulation/${this.props.match.params.id}`);
+    this.props.history.push(`/New/Simulation/${this.props.match.params.id}`);
+  }
 
   deleteItems(items) {
     /* eslint-disable no-alert */
+    /* eslint-disable no-restricted-globals */
     if (items.some((sim) => sim.metadata.status === 'running')) {
       alert(
         'You cannot delete a running simulation, terminate it and try again.'
@@ -55,20 +53,21 @@ const ProjectView = React.createClass({
       return;
     }
     items.forEach((item) => this.props.onDelete(item));
-  },
+  }
 
   edit(id) {
-    this.props.onLocationChange(`/Edit/Simulation/${id}`);
-  },
+    console.log('edit item', `/Edit/Simulation/${id}`);
+    this.props.history.push(`/Edit/Simulation/${id}`);
+  }
 
   click({ id, location }) {
     this.props.onActivate(id, location);
-  },
+  }
 
   render() {
     return (
       <TableListing
-        breadcrumb={primaryBreadCrumbs(this.props.params.id)}
+        breadcrumb={primaryBreadCrumbs(this.props.match.params.id)}
         location={this.props.location}
         accessHelper={SimulationHelper}
         items={this.props.simulations}
@@ -78,6 +77,7 @@ const ProjectView = React.createClass({
           <span>
             {' '}
             <img
+              alt={this.props.project.type}
               src={projectFunctions.getIcon(this.props.project).image}
               height="20px"
             />{' '}
@@ -96,41 +96,54 @@ const ProjectView = React.createClass({
         }
       />
     );
-  },
-});
+  }
+}
+
+ProjectView.propTypes = {
+  location: PropTypes.object.isRequired,
+  match: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
+  project: PropTypes.object.isRequired,
+  simulations: PropTypes.array.isRequired,
+  onActivate: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  hasAccess: PropTypes.bool.isRequired,
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
 
-export default connect(
-  (state, props) => {
-    const project =
-      state.projects.mapById[state.projects.active || props.params.id];
-    if (!project) {
+export default withRouter(
+  connect(
+    (state, props) => {
+      const project =
+        state.projects.mapById[state.projects.active || props.match.params.id];
+      if (!project) {
+        return {
+          project: { name: 'No project found' },
+          simulations: [],
+          error: 'No project found',
+        };
+      }
+      const projectSims = state.projects.simulations[project._id];
+      const simulations = projectSims
+        ? projectSims.list
+            .map((id) => state.simulations.mapById[id])
+            .filter((i) => !!i)
+        : [];
       return {
-        project: { name: 'No project found' },
-        simulations: [],
-        error: 'No project found',
+        hasAccess: userHasAccess(state.auth.user, project.access, 'write'),
+        project,
+        simulations,
+      };
+    },
+    () => {
+      return {
+        onActivate: (id, location) =>
+          dispatch(Actions.setActiveSimulation(id, location)),
+        onDelete: (simulation) =>
+          dispatch(Actions.deleteSimulation(simulation)),
       };
     }
-    const projectSims = state.projects.simulations[project._id];
-    const simulations = projectSims
-      ? projectSims.list
-          .map((id) => state.simulations.mapById[id])
-          .filter((i) => !!i)
-      : [];
-    return {
-      hasAccess: userHasAccess(state.auth.user, project.access, 'write'),
-      project,
-      simulations,
-    };
-  },
-  () => {
-    return {
-      onActivate: (id, location) =>
-        dispatch(Actions.setActiveSimulation(id, location)),
-      onLocationChange: (location) => dispatch(Router.push(location)),
-      onDelete: (simulation) => dispatch(Actions.deleteSimulation(simulation)),
-    };
-  }
-)(ProjectView);
+  )(ProjectView)
+);

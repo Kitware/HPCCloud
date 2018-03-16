@@ -1,5 +1,6 @@
-import * as Actions from '../actions/volumes';
 import deepClone from 'mout/src/lang/deepClone';
+
+import * as Actions from '../actions/volumes';
 
 export const initialState = {
   list: [],

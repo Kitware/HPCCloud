@@ -1,27 +1,21 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import style from 'HPCCloudStyle/JobMonitor.mcss';
 import state from 'HPCCloudStyle/States.mcss';
 
-export default React.createClass({
-  displayName: 'LogFold',
-
-  propTypes: {
-    header: React.PropTypes.string.isRequired,
-    content: React.PropTypes.string.isRequired,
-    color: React.PropTypes.string,
-  },
-
-  getDefaultProps() {
-    return { color: '' };
-  },
-
-  getInitialState() {
-    return { open: false };
-  },
+export default class LogFold extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: false,
+    };
+    this.toggleOpen = this.toggleOpen.bind(this);
+  }
 
   toggleOpen() {
     this.setState({ open: !this.state.open });
-  },
+  }
 
   render() {
     return (
@@ -37,5 +31,15 @@ export default React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
+
+LogFold.propTypes = {
+  header: PropTypes.string.isRequired,
+  content: PropTypes.string.isRequired,
+  color: PropTypes.string,
+};
+
+LogFold.defaultProps = {
+  color: '',
+};

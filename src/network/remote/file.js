@@ -58,13 +58,12 @@ export default function({
     return new Promise((resolve, reject) => {
       busy(client._.post(`/file${encodeQueryAsString(params)}`))
         .then((upload) => {
-          var chunkSize = 10 * 1024 * 1024,
-            uploadNextChunk;
+          const chunkSize = 10 * 1024 * 1024;
           // i = 0,
           // chunks = Math.floor(file.size / chunkSize);
 
-          uploadNextChunk = (offset) => {
-            var blob;
+          const uploadNextChunk = (offset) => {
+            let blob;
             progress(fileId, offset, file.size);
             if (offset + chunkSize >= file.size) {
               blob = file.slice(offset);
@@ -138,9 +137,9 @@ export default function({
     },
 
     editFile(file) {
-      const expected = ['name', 'mimeType'],
-        params = filterQuery(file, ...expected),
-        { missingKeys, promise } = mustContain(file, '_id');
+      const expected = ['name', 'mimeType'];
+      const params = filterQuery(file, ...expected);
+      const { missingKeys, promise } = mustContain(file, '_id');
 
       return missingKeys
         ? promise
@@ -157,20 +156,20 @@ export default function({
 
     newFile(file) {
       const expected = [
-          'parentType',
-          'parentId',
-          'name',
-          'size',
-          'mimeType',
-          'linkUrl',
-        ],
-        params = filterQuery(file, ...expected),
-        { missingKeys, promise } = mustContain(
-          file,
-          'parentType',
-          'parentId',
-          'name'
-        );
+        'parentType',
+        'parentId',
+        'name',
+        'size',
+        'mimeType',
+        'linkUrl',
+      ];
+      const params = filterQuery(file, ...expected);
+      const { missingKeys, promise } = mustContain(
+        file,
+        'parentType',
+        'parentId',
+        'name'
+      );
 
       return missingKeys
         ? promise

@@ -1,18 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import editor from 'HPCCloudStyle/ItemEditor.mcss';
 
-export default React.createClass({
-  propTypes: {
-    contents: React.PropTypes.array,
-    onChange: React.PropTypes.func,
-    value: React.PropTypes.string,
-  },
+export default class PresetSelector extends React.Component {
+  constructor(props) {
+    super(props);
+    this.valueChange = this.valueChange.bind(this);
+  }
 
   valueChange(e) {
     if (this.props.onChange) {
       this.props.onChange(e.target.value);
     }
-  },
+  }
 
   render() {
     const optionsMapper = (preset, index) => (
@@ -30,5 +31,17 @@ export default React.createClass({
         {this.props.contents.map(optionsMapper)}
       </select>
     );
-  },
-});
+  }
+}
+
+PresetSelector.propTypes = {
+  contents: PropTypes.array,
+  onChange: PropTypes.func,
+  value: PropTypes.string,
+};
+
+PresetSelector.defaultProps = {
+  contents: [],
+  onChange: () => {},
+  value: '',
+};

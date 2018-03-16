@@ -1,61 +1,40 @@
 import React from 'react';
-import Breadcrumb from '../../panels/Breadcrumb';
-import merge from 'mout/src/object/merge';
+import PropTypes from 'prop-types';
+
+import queryString from 'query-string';
+import { withRouter } from 'react-router-dom';
+
 import style from 'HPCCloudStyle/Toolbar.mcss';
 import states from 'HPCCloudStyle/States.mcss';
 
-export default React.createClass({
-  displayName: 'PreferenceSubBar',
+import Breadcrumb from '../../panels/Breadcrumb';
 
-  propTypes: {
-    actions: React.PropTypes.array,
-    breadcrumb: React.PropTypes.object,
-    hasTabs: React.PropTypes.bool,
-    filter: React.PropTypes.bool,
-    hidden: React.PropTypes.bool,
-    location: React.PropTypes.object,
-    onAction: React.PropTypes.func,
-    title: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.object,
-    ]),
-  },
-
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
-
-  getDefaultProps() {
-    return {
-      filter: false,
-      actions: [],
-      title: '',
-      breadcrumb: {
-        paths: [],
-        icons: [],
-        titles: [],
-      },
-      hasTabs: false,
-      hidden: false,
-    };
-  },
+export class PreferenceSubBar extends React.Component {
+  constructor(props) {
+    super(props);
+    this.onAction = this.onAction.bind(this);
+    this.updateFilter = this.updateFilter.bind(this);
+  }
 
   onAction(event) {
     const action = event.target.dataset.action;
     if (this.props.onAction) {
       this.props.onAction(action);
     }
-  },
+  }
 
   updateFilter(e) {
     const filter = e.target.value;
-
-    this.context.router.replace({
+    this.props.history.replace({
       pathname: this.props.location.pathname,
-      query: merge(this.props.location.query, { filter }),
+      search: `?${queryString.stringify(
+        Object.assign({}, queryString.parse(this.props.location.search), {
+          filter,
+        })
+      )}`,
       state: this.props.location.state,
     });
-  },
+  }
 
   render() {
     return (
@@ -91,12 +70,43 @@ export default React.createClass({
               type="text"
               className={style.filter}
               placeholder="filter"
-              value={this.props.location.query.filter || ''}
+              value={queryString.parse(this.props.location.search).filter || ''}
               onChange={this.updateFilter}
             />
           ) : null}
         </div>
       </nav>
     );
+  }
+}
+
+PreferenceSubBar.propTypes = {
+  actions: PropTypes.array,
+  breadcrumb: PropTypes.object,
+  hasTabs: PropTypes.bool,
+  filter: PropTypes.bool,
+  hidden: PropTypes.bool,
+  location: PropTypes.object,
+  onAction: PropTypes.func,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+
+  history: PropTypes.object,
+};
+
+PreferenceSubBar.defaultProps = {
+  filter: false,
+  actions: [],
+  title: '',
+  breadcrumb: {
+    paths: [],
+    icons: [],
+    titles: [],
   },
-});
+  hasTabs: false,
+  hidden: false,
+  history: undefined,
+  location: undefined, // FIXME router handler...
+  onAction: undefined,
+};
+
+export default withRouter(PreferenceSubBar);

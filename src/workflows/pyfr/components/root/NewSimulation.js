@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 /* eslint-disable import/extensions */
 import Simput from 'Simput';
 /* eslint-enable import/extensions */
@@ -17,7 +19,7 @@ function onParseError(message) {
 
 function parseAndValidate(file, owner) {
   return new Promise((accept, reject) => {
-    var reader = new FileReader();
+    const reader = new FileReader();
     reader.onloadend = () => {
       if (reader.readyState !== FileReader.DONE) {
         onParseError('Ini file is invalid');
@@ -59,5 +61,9 @@ export default function pyFrNewSimulation(props) {
 // ----------------------------------------------------------------------------
 
 pyFrNewSimulation.propTypes = {
-  owner: React.PropTypes.func,
+  owner: PropTypes.func,
+};
+
+pyFrNewSimulation.defaultProps = {
+  owner: undefined,
 };

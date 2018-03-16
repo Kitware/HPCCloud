@@ -1,15 +1,11 @@
+import { createStore } from 'redux';
+
 import reducers from './reducers';
-import { createStore, applyMiddleware } from 'redux';
-import { hashHistory } from 'react-router';
-import { syncHistoryWithStore, routerMiddleware } from 'react-router-redux';
 
-const routingMiddleware = routerMiddleware(hashHistory);
-
-const store = createStore(reducers, applyMiddleware(routingMiddleware));
-const history = syncHistoryWithStore(hashHistory, store);
+const store = createStore(reducers);
 
 function dispatch(action) {
-  var currentAction = action;
+  let currentAction = action;
   while (typeof currentAction === 'function') {
     currentAction = action(dispatch);
   }
@@ -18,4 +14,4 @@ function dispatch(action) {
 
 export default store;
 
-export { store, dispatch, history };
+export { store, dispatch };

@@ -1,21 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 
-export default React.createClass({
-  displayName: 'SchedulerConfig/SGE',
-
-  propTypes: {
-    config: React.PropTypes.object,
-    max: React.PropTypes.object,
-    onChange: React.PropTypes.func,
-    runtime: React.PropTypes.bool,
-  },
+export default class SchedulerConfigSGE extends React.Component {
+  constructor(props) {
+    super(props);
+    this.updateConfig = this.updateConfig.bind(this);
+  }
 
   updateConfig(event) {
     if (this.props.onChange) {
       this.props.onChange(event);
     }
-  },
+  }
 
   render() {
     return (
@@ -65,5 +63,19 @@ export default React.createClass({
         </section>
       </div>
     );
-  },
-});
+  }
+}
+
+SchedulerConfigSGE.propTypes = {
+  config: PropTypes.object,
+  max: PropTypes.object,
+  onChange: PropTypes.func,
+  runtime: PropTypes.bool,
+};
+
+SchedulerConfigSGE.defaultProps = {
+  config: undefined,
+  max: undefined,
+  onChange: undefined,
+  runtime: undefined,
+};

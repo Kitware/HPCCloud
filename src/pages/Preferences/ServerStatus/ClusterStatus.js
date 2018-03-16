@@ -1,42 +1,35 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import CollapsibleWidget from 'paraviewweb/src/React/Widgets/CollapsibleWidget';
+
+import style from 'HPCCloudStyle/JobMonitor.mcss';
+
 import ExecutionUnit from '../../../panels/JobMonitor/ExecutionUnit';
 import ButtonBar from '../../../panels/ButtonBar';
 import { getActions } from '../../../utils/getDisabledButtons';
-import style from 'HPCCloudStyle/JobMonitor.mcss';
 
-export default React.createClass({
-  displayName: 'ClusterStatus',
+export default class ClusterStatus extends React.Component {
+  constructor(props) {
+    super(props);
 
-  propTypes: {
-    title: React.PropTypes.string,
-    status: React.PropTypes.string,
-    simulation: React.PropTypes.object,
-    clusterId: React.PropTypes.string,
-    log: React.PropTypes.array,
-    logToggle: React.PropTypes.func.isRequired,
-    terminateCluster: React.PropTypes.func,
-    deleteCluster: React.PropTypes.func,
-    disabledButtons: React.PropTypes.object,
-    noControls: React.PropTypes.bool,
-  },
-
-  getDefaultProps() {
-    return { disabledButtons: {} };
-  },
+    this.onTerminateInstance = this.onTerminateInstance.bind(this);
+    this.onDeleteCluster = this.onDeleteCluster.bind(this);
+    this.barAction = this.barAction.bind(this);
+  }
 
   onTerminateInstance() {
     this.props.terminateCluster(this.props.clusterId);
-  },
+  }
 
   onDeleteCluster() {
     this.props.logToggle(false);
     this.props.deleteCluster(this.props.clusterId);
-  },
+  }
 
   barAction(action) {
     this[action]();
-  },
+  }
 
   render() {
     let actions = [];
@@ -81,5 +74,30 @@ export default React.createClass({
         </CollapsibleWidget>
       </div>
     );
-  },
-});
+  }
+}
+
+ClusterStatus.propTypes = {
+  title: PropTypes.string,
+  status: PropTypes.string,
+  simulation: PropTypes.object,
+  clusterId: PropTypes.string,
+  log: PropTypes.array,
+  logToggle: PropTypes.func.isRequired,
+  terminateCluster: PropTypes.func,
+  deleteCluster: PropTypes.func,
+  disabledButtons: PropTypes.object,
+  noControls: PropTypes.bool,
+};
+
+ClusterStatus.defaultProps = {
+  title: undefined,
+  status: undefined,
+  simulation: undefined,
+  clusterId: undefined,
+  log: [],
+  terminateCluster: undefined,
+  deleteCluster: undefined,
+  disabledButtons: {},
+  noControls: false,
+};

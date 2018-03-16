@@ -24,8 +24,8 @@ function ec2ClusterPayload(
     throw Error('An EC2 instance with this name already exists');
   }
 
-  let _clusterSize = parseFloat(clusterSize);
-  if (isNaN(_clusterSize)) {
+  let _clusterSize = Number(clusterSize);
+  if (Number.isNaN(_clusterSize)) {
     _clusterSize = 1;
   } else if (clusterSize <= 0) {
     throw Error('Cluster must be greater than zero');

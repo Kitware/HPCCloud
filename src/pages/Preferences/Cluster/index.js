@@ -1,5 +1,12 @@
-// import client           from '../../../network';
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import get from 'mout/src/object/get';
+import { connect } from 'react-redux';
+
+import theme from 'HPCCloudStyle/Theme.mcss';
+import style from 'HPCCloudStyle/PageWithMenu.mcss';
+
 import ClusterForm from './ClusterForm';
 import ActiveList from '../../../panels/ActiveList';
 import Toolbar from '../../../panels/Toolbar';
@@ -9,11 +16,6 @@ import PresetSelector from '../PresetSelector';
 import { breadcrumb } from '..';
 import getNetworkError from '../../../utils/getNetworkError';
 
-import theme from 'HPCCloudStyle/Theme.mcss';
-import style from 'HPCCloudStyle/PageWithMenu.mcss';
-
-import get from 'mout/src/object/get';
-import { connect } from 'react-redux';
 import * as Actions from '../../../redux/actions/clusters';
 import * as NetActions from '../../../redux/actions/network';
 import { dispatch } from '../../../redux';
@@ -33,43 +35,22 @@ function getActions(disabled, test) {
 }
 
 /* eslint-disable no-alert */
-const ClusterPrefs = React.createClass({
-  displayName: 'Preferences/Cluster',
+/* eslint-disable no-restricted-globals */
+export class ClusterPrefs extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { _error: null };
 
-  propTypes: {
-    active: React.PropTypes.number,
-    presetNames: React.PropTypes.array,
-    list: React.PropTypes.array,
-    error: React.PropTypes.string,
-    simulations: React.PropTypes.object,
-    taskflows: React.PropTypes.array,
-    buttonsDisabled: React.PropTypes.bool,
-    user: React.PropTypes.object,
-
-    onUpdateItem: React.PropTypes.func,
-    onActiveChange: React.PropTypes.func,
-    onApplyPreset: React.PropTypes.func,
-    onAddItem: React.PropTypes.func,
-    onRemoveItem: React.PropTypes.func,
-    onTestCluster: React.PropTypes.func,
-    fetchPresets: React.PropTypes.func,
-    fetchClusters: React.PropTypes.func,
-    invalidateErrors: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return {
-      error: null,
-      active: 0,
-      list: [],
-      buttonsDisabled: false,
-      presetNames: [],
-    };
-  },
-
-  getInitialState() {
-    return { _error: null };
-  },
+    this.changeItem = this.changeItem.bind(this);
+    this.activeChange = this.activeChange.bind(this);
+    this.presetChange = this.presetChange.bind(this);
+    this.clusterHasSimulation = this.clusterHasSimulation.bind(this);
+    this.addItem = this.addItem.bind(this);
+    this.removeItem = this.removeItem.bind(this);
+    this.saveItem = this.saveItem.bind(this);
+    this.testCluster = this.testCluster.bind(this);
+    this.formAction = this.formAction.bind(this);
+  }
 
   componentDidMount() {
     if (!this.props.presetNames.length) {
@@ -77,7 +58,7 @@ const ClusterPrefs = React.createClass({
       this.props.fetchClusters();
     }
     this.timeout = null;
-  },
+  }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState._error !== this.state._error) {
@@ -85,21 +66,21 @@ const ClusterPrefs = React.createClass({
         this.setState({ _error: null });
       }, 3000);
     }
-  },
+  }
 
   changeItem(item) {
     const { active, onUpdateItem } = this.props;
     onUpdateItem(active, item);
-  },
+  }
 
   activeChange(active) {
     this.setState({ _error: null });
     this.props.onActiveChange(active);
-  },
+  }
 
   presetChange(presetName) {
     this.props.onApplyPreset(this.props.active, presetName);
-  },
+  }
 
   clusterHasSimulation(id) {
     for (let i = 0; i < this.props.taskflows.length; i++) {
@@ -112,7 +93,7 @@ const ClusterPrefs = React.createClass({
     }
 
     return false;
-  },
+  }
 
   addItem() {
     if (this.props.error) {
@@ -120,7 +101,7 @@ const ClusterPrefs = React.createClass({
     }
     this.setState({ _error: null });
     this.props.onAddItem();
-  },
+  }
 
   removeItem() {
     const { list, active, onRemoveItem } = this.props;
@@ -143,23 +124,23 @@ const ClusterPrefs = React.createClass({
     }
 
     this.setState({ _error: null });
-  },
+  }
 
   saveItem() {
     const { onUpdateItem, active, list } = this.props;
     this.setState({ _error: null });
     onUpdateItem(active, list[active], true);
-  },
+  }
 
   testCluster() {
     const { onTestCluster, list, active } = this.props;
     this.setState({ _error: null });
     onTestCluster(active, list[active]);
-  },
+  }
 
   formAction(action) {
     this[action]();
-  },
+  }
 
   render() {
     const { active, list, error, buttonsDisabled, presetNames } = this.props;
@@ -186,7 +167,7 @@ const ClusterPrefs = React.createClass({
             <PresetSelector
               contents={presetNames}
               onChange={this.presetChange}
-              value={''}
+              value=""
             />
           </ButtonBar>
         </div>
@@ -224,8 +205,51 @@ const ClusterPrefs = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
+
+ClusterPrefs.propTypes = {
+  active: PropTypes.number,
+  presetNames: PropTypes.array,
+  list: PropTypes.array,
+  error: PropTypes.string,
+  simulations: PropTypes.object,
+  taskflows: PropTypes.array,
+  buttonsDisabled: PropTypes.bool,
+  user: PropTypes.object,
+
+  onUpdateItem: PropTypes.func,
+  onActiveChange: PropTypes.func,
+  onApplyPreset: PropTypes.func,
+  onAddItem: PropTypes.func,
+  onRemoveItem: PropTypes.func,
+  onTestCluster: PropTypes.func,
+  fetchPresets: PropTypes.func,
+  fetchClusters: PropTypes.func,
+  invalidateErrors: PropTypes.func,
+};
+
+ClusterPrefs.defaultProps = {
+  error: null,
+  active: 0,
+  list: [],
+  buttonsDisabled: false,
+  presetNames: [],
+
+  simulations: undefined,
+  taskflows: undefined,
+  user: undefined,
+
+  onUpdateItem: undefined,
+  onActiveChange: undefined,
+  onApplyPreset: undefined,
+  onAddItem: undefined,
+  onRemoveItem: undefined,
+  onTestCluster: undefined,
+  fetchPresets: undefined,
+  fetchClusters: undefined,
+  invalidateErrors: undefined,
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */

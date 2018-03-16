@@ -19,7 +19,6 @@ notifications:
     email:
         recipients:
             - sebastien.jourdain@kitware.com
-            - tristan.wright@kitware.com
             - chris.harris@kitware.com
         on_success: change
         on_failure: always
@@ -53,7 +52,7 @@ before_install:
     # Install CMake
     - CACHE=$HOME/.cache CMAKE_VERSION=3.1.0 CMAKE_SHORT_VERSION=3.1 source $HOME/build/girder/scripts/install_cmake.sh
     # Install Node
-    - sudo curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+    - sudo curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
     - sudo apt-get install -y nodejs
 
 install:
