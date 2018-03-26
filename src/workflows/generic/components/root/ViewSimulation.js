@@ -4,25 +4,18 @@
 // the action of changing the active one.
 
 import React from 'react';
-import ActiveList from '../../../../panels/ActiveList';
-import { activateSimulationStep } from '../../../../network/helpers/simulations';
+import PropTypes from 'prop-types';
 
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
-export default React.createClass({
-  displayName: 'GenericViewSimulation',
+import ActiveList from '../../../../panels/ActiveList';
+import { activateSimulationStep } from '../../../../network/helpers/simulations';
 
-  propTypes: {
-    module: React.PropTypes.object,
-    simulation: React.PropTypes.object,
-    user: React.PropTypes.object,
-    step: React.PropTypes.string,
-    view: React.PropTypes.string,
-  },
-
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
+export default class GenericViewSimulation extends React.Component {
+  constructor(props) {
+    super(props);
+    this.updateActiveStep = this.updateActiveStep.bind(this);
+  }
 
   updateActiveStep(idx, item) {
     const stepName = this.props.module.steps._order[idx];
@@ -36,7 +29,7 @@ export default React.createClass({
         console.log('Update active error for', stepName);
         console.log(err);
       });
-  },
+  }
 
   render() {
     const module = this.props.module;
@@ -68,5 +61,21 @@ export default React.createClass({
         <div className={style.content}>{component}</div>
       </div>
     );
-  },
-});
+  }
+}
+
+GenericViewSimulation.propTypes = {
+  module: PropTypes.object,
+  simulation: PropTypes.object,
+  user: PropTypes.object,
+  step: PropTypes.string,
+  view: PropTypes.string,
+};
+
+GenericViewSimulation.defaultProps = {
+  module: undefined,
+  simulation: undefined,
+  user: undefined,
+  step: undefined,
+  view: undefined,
+};

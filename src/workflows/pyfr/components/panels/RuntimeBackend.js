@@ -1,6 +1,9 @@
 import React from 'react';
-import get from '../../../../utils/get';
+import PropTypes from 'prop-types';
+
 import formStyle from 'HPCCloudStyle/ItemEditor.mcss';
+
+import get from '../../../../utils/get';
 
 const TYPES = {
   cuda: 'Cuda',
@@ -8,28 +11,21 @@ const TYPES = {
   openmp: 'OpenMP',
 };
 
-export default React.createClass({
-  displayName: 'pyfr-exec/RuntimeBackend',
-
-  propTypes: {
-    owner: React.PropTypes.func,
-    parentState: React.PropTypes.object,
-    /* eslint-disable react/no-unused-prop-types */
-    parentProps: React.PropTypes.object,
-    /* eslint-emable react/no-unused-prop-types */
-  },
-
-  getInitialState() {
-    const state = Object.assign(
+export default class PyFrRuntimeBackend extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = Object.assign(
       { cuda: 'round-robin', active: '', openmp: '', opencl: '', options: [] },
       this.getStateFromProps(this.props)
     );
-    return state;
-  },
+
+    this.updateActiveType = this.updateActiveType.bind(this);
+    this.updateActiveProfile = this.updateActiveProfile.bind(this);
+  }
 
   componentWillReceiveProps(nextProps) {
     this.setState(this.getStateFromProps(nextProps));
-  },
+  }
 
   // Automatically update backend when needed
   componentDidUpdate() {
@@ -55,7 +51,7 @@ export default React.createClass({
       this.lastPush = lastPush;
       this.props.owner().setState({ backend });
     }
-  },
+  }
 
   getStateFromProps(props) {
     const newState = Object.assign(
@@ -94,18 +90,18 @@ export default React.createClass({
     }
 
     return newState;
-  },
+  }
 
   updateActiveType(event) {
     const active = event.target.value;
     this.setState({ active });
-  },
+  }
 
   updateActiveProfile(event) {
     const active = this.state.active;
     const value = event.target.value;
     this.setState({ [active]: value });
-  },
+  }
 
   render() {
     if (this.props.parentState.serverType !== 'Traditional') {
@@ -172,5 +168,19 @@ export default React.createClass({
         </section>
       </div>
     );
-  },
-});
+  }
+}
+
+PyFrRuntimeBackend.propTypes = {
+  owner: PropTypes.func,
+  parentState: PropTypes.object,
+  /* eslint-disable react/no-unused-prop-types */
+  parentProps: PropTypes.object,
+  /* eslint-enable react/no-unused-prop-types */
+};
+
+PyFrRuntimeBackend.defaultProps = {
+  owner: undefined,
+  parentState: undefined,
+  parentProps: undefined,
+};

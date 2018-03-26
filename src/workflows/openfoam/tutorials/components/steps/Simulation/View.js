@@ -1,11 +1,12 @@
+import deepClone from 'mout/src/lang/deepClone';
+import { connect } from 'react-redux';
+
 import JobMonitoring from '../../../../../generic/components/steps/JobMonitoring';
 
 import getNetworkError from '../../../../../../utils/getNetworkError';
 import { getDisabledButtons } from '../../../../../../utils/getDisabledButtons';
 import get from '../../../../../../utils/get';
-import deepClone from 'mout/src/lang/deepClone';
 
-import { connect } from 'react-redux';
 import { dispatch } from '../../../../../../redux';
 import * as SimActions from '../../../../../../redux/actions/projects';
 
@@ -43,7 +44,7 @@ function onVisualize(props) {
 // ----------------------------------------------------------------------------
 
 export default connect((state, props) => {
-  var taskflowId = null;
+  let taskflowId = null;
   const activeProject = state.projects.active;
   const activeSimulation = activeProject
     ? state.projects.simulations[activeProject].active

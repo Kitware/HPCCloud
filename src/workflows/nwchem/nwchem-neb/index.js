@@ -7,9 +7,11 @@ import stepSimulationStart from '../common/steps/Simulation/Start';
 import stepSimulationView from './components/steps/SimulationView';
 import stepVisualization from './components/steps/Visualization';
 
+import logo from './logo.png';
+
 export default {
   name: 'NWChem - Nudged Elastic Band (NEB) method',
-  logo: require('./logo.png'),
+  logo,
   requiredAttachments: {
     project: ['startGeometry', 'endGeometry'],
     simulation: [],

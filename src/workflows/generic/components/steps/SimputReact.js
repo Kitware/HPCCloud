@@ -1,4 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import deepClone from 'mout/src/lang/deepClone';
+import PropertyPanelBlock from 'paraviewweb/src/React/Properties/PropertyPanel';
 
 /* eslint-disable import/extensions */
 import Simput from 'Simput';
@@ -6,16 +10,14 @@ import Simput from 'Simput';
 import SimputLabels from 'simput/src/Labels';
 import ViewMenu from 'simput/src/ViewMenu';
 import modelGenerator from 'simput/src/modelGenerator';
+
+import style from 'HPCCloudStyle/PageWithMenu.mcss';
+
 import client from '../../../../network';
 import * as simulationsHelper from '../../../../network/helpers/simulations';
-import deepClone from 'mout/src/lang/deepClone';
-
-import PropertyPanelBlock from 'paraviewweb/src/React/Properties/PropertyPanel';
 
 import { dispatch } from '../../../../redux';
 import * as Actions from '../../../../redux/actions/projects';
-
-import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
 // ----------------------------------------------------------------------------
 
@@ -164,7 +166,7 @@ export default class SimputReact extends React.Component {
               metadata: { model: JSON.stringify(jsonData) },
             })
             .then((resp) => {
-              var newSim = deepClone(this.props.simulation);
+              const newSim = deepClone(this.props.simulation);
               newSim.steps[this.props.step].metadata.model = JSON.stringify(
                 jsonData
               );
@@ -243,7 +245,7 @@ export default class SimputReact extends React.Component {
         metadata: { model },
       })
       .then((resp) => {
-        var newSim = deepClone(this.props.simulation);
+        const newSim = deepClone(this.props.simulation);
         newSim.steps[this.props.step].metadata.model = model;
         this.props.saveSimulation(newSim);
       })
@@ -373,18 +375,18 @@ export default class SimputReact extends React.Component {
 }
 
 SimputReact.propTypes = {
-  simputType: React.PropTypes.string,
-  inputFileKeys: React.PropTypes.array, // [{ key: 'sh', name: 'run.sh', parse: false }, ...]
-  initialDataModel: React.PropTypes.object,
-  nextStep: React.PropTypes.string,
-  simputModelDecorator: React.PropTypes.func,
+  simputType: PropTypes.string,
+  inputFileKeys: PropTypes.array, // [{ key: 'sh', name: 'run.sh', parse: false }, ...]
+  initialDataModel: PropTypes.object,
+  nextStep: PropTypes.string,
+  simputModelDecorator: PropTypes.func,
 
-  project: React.PropTypes.object,
-  simulation: React.PropTypes.object,
-  step: React.PropTypes.string,
-  saveSimulation: React.PropTypes.func,
-  updateSimulation: React.PropTypes.func,
-  patchSimulation: React.PropTypes.func,
+  project: PropTypes.object.isRequired,
+  simulation: PropTypes.object.isRequired,
+  step: PropTypes.string.isRequired,
+  saveSimulation: PropTypes.func,
+  updateSimulation: PropTypes.func,
+  patchSimulation: PropTypes.func,
 };
 
 SimputReact.defaultProps = {

@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import { FileUploadEntry } from '../../../../../panels/ItemEditor';
 
 // ----------------------------------------------------------------------------
@@ -25,5 +27,9 @@ export default function newSimulation(props) {
 // ----------------------------------------------------------------------------
 
 newSimulation.propTypes = {
-  owner: React.PropTypes.func,
+  owner: PropTypes.func,
+};
+
+newSimulation.defaultProps = {
+  owner: undefined,
 };

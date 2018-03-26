@@ -11,9 +11,11 @@ import stepSimulationView from './components/steps/Simulation/View';
 import stepVisualizationStart from './components/steps/Visualization/Start';
 import stepVisualizationView from './components/steps/Visualization/View';
 
+import logo from './logo.png';
+
 export default {
   name: 'PyFR',
-  logo: require('./logo.png'),
+  logo,
   requiredAttachments: {
     project: ['mesh'],
     simulation: [],

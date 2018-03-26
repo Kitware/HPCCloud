@@ -1,6 +1,9 @@
 import React from 'react';
-import client from '../../../../network';
+import PropTypes from 'prop-types';
+
 import style from 'HPCCloudStyle/ItemEditor.mcss';
+
+import client from '../../../../network';
 
 // ----------------------------------------------------------------------------
 
@@ -60,6 +63,11 @@ export default class AttachedFileListing extends React.Component {
 // ----------------------------------------------------------------------------
 
 AttachedFileListing.propTypes = {
-  parentProps: React.PropTypes.object,
-  containerName: React.PropTypes.string,
+  parentProps: PropTypes.object,
+  containerName: PropTypes.string,
+};
+
+AttachedFileListing.defaultProps = {
+  parentProps: undefined,
+  containerName: undefined,
 };

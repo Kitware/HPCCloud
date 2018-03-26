@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import candela from 'candela';
 import client from '../../../../../network';
 import LoadingPanel from '../../../../../panels/LoadingPanel';
@@ -12,7 +13,7 @@ const y = 'Energy (kcal/mol)';
 // ----------------------------------------------------------------------------
 
 function extractEnergies(energyData) {
-  var energies = [];
+  let energies = [];
   energyData.split('\n').forEach((line) => {
     const trimmedLine = line.trim();
     if (!trimmedLine.startsWith('#') && trimmedLine.length > 0) {
@@ -97,12 +98,14 @@ export default class VisualizationView extends React.Component {
     return (
       <div
         style={{ width: '100%', height: '100%', padding: 10 }}
-        ref={(c) => (this.container = c)}
+        ref={(c) => {
+          this.container = c;
+        }}
       />
     );
   }
 }
 
 VisualizationView.propTypes = {
-  simulation: React.PropTypes.object,
+  simulation: PropTypes.object.isRequired,
 };

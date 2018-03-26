@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import vtk from 'vtk.js/Sources/vtk';
 import 'vtk.js/Sources/Common/Core/Points';
@@ -14,11 +15,12 @@ import vtkRenderer from 'vtk.js/Sources/Rendering/Core/Renderer';
 import vtkRenderWindow from 'vtk.js/Sources/Rendering/Core/RenderWindow';
 import vtkRenderWindowInteractor from 'vtk.js/Sources/Rendering/Core/RenderWindowInteractor';
 
+import style from 'HPCCloudStyle/PageWithMenu.mcss';
+
 import { dispatch } from '../../../../../../redux';
 import * as Actions from '../../../../../../redux/actions/projects';
 import client from '../../../../../../network';
 
-import style from 'HPCCloudStyle/PageWithMenu.mcss';
 import localStyle from './Geometry.mcss';
 
 const BOUNDS_MAPPING = [0, 3, 1, 4, 2, 5];
@@ -498,25 +500,34 @@ export default class GeometryViewer extends React.Component {
             </div>
           </div>
         </div>
-        <div className={localStyle.view} ref={(c) => (this.container = c)} />
+        <div
+          className={localStyle.view}
+          ref={(c) => {
+            this.container = c;
+          }}
+        />
       </div>
     );
   }
 }
 
+/* eslint-disable react/no-unused-prop-types */
 GeometryViewer.propTypes = {
-  nextStep: React.PropTypes.string,
-
-  project: React.PropTypes.object,
-  simulation: React.PropTypes.object,
-  step: React.PropTypes.string,
-  saveSimulation: React.PropTypes.func,
-  updateSimulation: React.PropTypes.func,
-  patchSimulation: React.PropTypes.func,
+  project: PropTypes.object,
+  simulation: PropTypes.object,
+  step: PropTypes.string,
+  saveSimulation: PropTypes.func,
+  updateSimulation: PropTypes.func,
+  patchSimulation: PropTypes.func,
 };
+/* eslint-enable */
 
 GeometryViewer.defaultProps = {
   saveSimulation,
   updateSimulation,
   patchSimulation,
+
+  project: undefined,
+  simulation: undefined,
+  step: undefined,
 };
