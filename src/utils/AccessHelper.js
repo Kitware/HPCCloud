@@ -1,11 +1,15 @@
 import React from 'react';
+
+import style from 'HPCCloudStyle/Theme.mcss';
+
 import ImageIcon from '../panels/ImageIcon';
 import IconActionList from '../panels/IconActionList';
 
-import style from 'HPCCloudStyle/Theme.mcss';
+import wf from '../workflows';
+
 let Workflow;
 if (process.env.NODE_ENV !== 'test') {
-  Workflow = require('../workflows').default;
+  Workflow = wf;
 } else {
   Workflow = { test: { name: 'test', logo: 'my-logo' } };
 }

@@ -27,7 +27,7 @@ export const volumeTypes = {
 };
 
 export function primaryBreadCrumbs(projectId = null, simulationId = null) {
-  var ret = {
+  const ret = {
     paths: ['/'],
     icons: [breadCrumbStyle.breadCrumbRootIcon],
     titles: ['Home'],

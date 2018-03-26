@@ -1,6 +1,7 @@
+import Theme from 'HPCCloudStyle/Theme.mcss';
+
 import get from './get';
 import { taskflowActions } from './Constants';
-import Theme from 'HPCCloudStyle/Theme.mcss';
 
 // actionsList is an array of strings,
 // disabled is an object for each action either undefined or with a boolean
