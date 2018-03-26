@@ -8,9 +8,11 @@ const vtkjsRules = require('./config/rules-vtkjs.js');
 const wslinkRules = require('./config/rules-wslink.js');
 const simputRules = require('./config/rules-simput.js');
 
+const entry = path.join(__dirname, 'src/app.js');
+
 module.exports = {
   plugins: [],
-  entry: path.join(__dirname, './src/app.js'),
+  entry,
   output: {
     path: path.join(__dirname, './dist'),
     filename: 'HPCCloud.js',
@@ -18,7 +20,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: require.resolve('./src/app.js'),
+        test: entry,
         loader: 'expose-loader?HPCCloud',
       },
     ].concat(
@@ -49,12 +51,6 @@ module.exports = {
   devServer: {
     contentBase: './dist/',
     port: 9999,
-    hot: true,
-    quiet: false,
-    noInfo: false,
-    stats: {
-      colors: true,
-    },
     proxy: {
       '/api*': 'http://localhost:8080',
       '/static/*': 'http://localhost:8080',

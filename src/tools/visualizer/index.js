@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
 
@@ -25,32 +26,22 @@ import { dispatch, store } from '../../redux';
 
 setVisualizerActiveStore(store);
 
-const visualizer = React.createClass({
-  displayName: 'Visualization',
-
-  propTypes: {
-    location: React.PropTypes.object,
-    project: React.PropTypes.object,
-    simulation: React.PropTypes.object,
-    step: React.PropTypes.string,
-
-    index: React.PropTypes.number,
-    playing: React.PropTypes.bool,
-    values: React.PropTypes.array,
-    setTimeStep: React.PropTypes.func,
-  },
-
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
-
-  getInitialState() {
-    return {
+class Visualization extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       menuVisible: true,
-      timeStep: 0,
-      timeValues: [],
+      // timeStep: 0,
+      // timeValues: [],
     };
-  },
+
+    this.onAction = this.onAction.bind(this);
+    this.toggleMenu = this.toggleMenu.bind(this);
+    this.resetCamera = this.resetCamera.bind(this);
+    this.nextTimeStep = this.nextTimeStep.bind(this);
+    this.togglePlay = this.togglePlay.bind(this);
+    this.previousTimeStep = this.previousTimeStep.bind(this);
+  }
 
   componentDidMount() {
     network.onReady(() => {
@@ -79,7 +70,7 @@ const visualizer = React.createClass({
       .catch((err) => {
         console.log(err);
       });
-  },
+  }
 
   componentWillUnmount() {
     // trash visualizer state here
@@ -90,35 +81,37 @@ const visualizer = React.createClass({
 
     // Close ws without exiting server
     network.exit(-1);
-  },
+  }
 
   onAction(name) {
     this[name]();
-  },
+  }
 
   toggleMenu() {
     this.setState({ menuVisible: !this.state.menuVisible });
-  },
+  }
 
+  /* eslint-disable */
   resetCamera() {
     dispatch(Actions.view.resetCamera());
-  },
+  }
+  /* eslint-enable */
 
   nextTimeStep() {
     const timeStep = (this.props.index + 1) % this.props.values.length;
     this.props.setTimeStep(timeStep);
-  },
+  }
 
   togglePlay() {
     this.props[this.props.playing ? 'stopTime' : 'playTime']();
-  },
+  }
 
   previousTimeStep() {
     const timeStep =
       (this.props.index - (1 + this.props.values.length)) %
       this.props.values.length;
     this.props.setTimeStep(timeStep);
-  },
+  }
 
   /* eslint-disable react/jsx-no-bind */
   render() {
@@ -175,8 +168,27 @@ const visualizer = React.createClass({
         />
       </div>
     );
-  },
-});
+  }
+}
+
+Visualization.propTypes = {
+  location: PropTypes.object,
+  project: PropTypes.object,
+  simulation: PropTypes.object,
+  step: PropTypes.string,
+
+  index: PropTypes.number.isRequired,
+  playing: PropTypes.bool.isRequired,
+  values: PropTypes.array.isRequired,
+  setTimeStep: PropTypes.func.isRequired,
+};
+
+Visualization.defaultProps = {
+  location: undefined,
+  project: undefined,
+  simulation: undefined,
+  step: undefined,
+};
 
 export default connect((state) => ({
   setTimeStep(index) {
@@ -191,4 +203,4 @@ export default connect((state) => ({
   index: Time.getTimeStep(state),
   playing: Time.isAnimationPlaying(state),
   values: Time.getTimeValues(state),
-}))(visualizer);
+}))(Visualization);
