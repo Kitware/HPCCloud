@@ -1,50 +1,31 @@
 import React from 'react';
-import ExecutionUnit from './ExecutionUnit';
-import style from 'HPCCloudStyle/JobMonitor.mcss';
+import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
+
+import style from 'HPCCloudStyle/JobMonitor.mcss';
+
+import ExecutionUnit from './ExecutionUnit';
+
 import { dispatch } from '../../redux';
 import * as ClusterActions from '../../redux/actions/clusters';
 import * as VolumeActions from '../../redux/actions/volumes';
 
-const JobMonitor = React.createClass({
-  displayName: 'JobMonitor',
-
-  propTypes: {
-    tasks: React.PropTypes.array,
-    jobs: React.PropTypes.array,
-    user: React.PropTypes.object,
-
-    taskflowLog: React.PropTypes.array,
-    taskflowStatus: React.PropTypes.string,
-    taskStatusCount: React.PropTypes.object,
-
-    clusterId: React.PropTypes.string,
-    clusterOwner: React.PropTypes.string,
-    clusterLog: React.PropTypes.array,
-    clusterName: React.PropTypes.string,
-    clusterStatus: React.PropTypes.string,
-
-    volumeId: React.PropTypes.string,
-    volumeName: React.PropTypes.string,
-    volumeStatus: React.PropTypes.string,
-    volumeLog: React.PropTypes.array,
-
-    getClusterLog: React.PropTypes.func,
-    getVolumeLog: React.PropTypes.func,
-    restrictedClusterLog: React.PropTypes.func,
-  },
-
-  getInitialState() {
-    return {
+class JobMonitor extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       advanced: process.env.NODE_ENV === 'development',
     };
-  },
+    this.toggleAdvanced = this.toggleAdvanced.bind(this);
+    this.clusterLogOpen = this.clusterLogOpen.bind(this);
+    this.volumeLogOpen = this.volumeLogOpen.bind(this);
+  }
 
   toggleAdvanced() {
     const advanced = !this.state.advanced;
     this.setState({ advanced });
-  },
+  }
 
   clusterLogOpen(open) {
     if (open && this.props.user._id === this.props.clusterOwner) {
@@ -53,14 +34,14 @@ const JobMonitor = React.createClass({
     } else if (open && this.props.user._id !== this.props.clusterOwner) {
       this.props.restrictedClusterLog(this.props.clusterId);
     }
-  },
+  }
 
   volumeLogOpen(open) {
     if (open) {
       const offset = this.props.volumeLog.length;
       this.props.getVolumeLog(this.props.volumeId, offset);
     }
-  },
+  }
 
   render() {
     return (
@@ -162,8 +143,58 @@ const JobMonitor = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
+
+JobMonitor.propTypes = {
+  tasks: PropTypes.array,
+  jobs: PropTypes.array,
+  user: PropTypes.object,
+
+  taskflowLog: PropTypes.array,
+  taskflowStatus: PropTypes.string,
+  taskStatusCount: PropTypes.object,
+
+  clusterId: PropTypes.string,
+  clusterOwner: PropTypes.string,
+  clusterLog: PropTypes.array,
+  clusterName: PropTypes.string,
+  clusterStatus: PropTypes.string,
+
+  volumeId: PropTypes.string,
+  volumeName: PropTypes.string,
+  volumeStatus: PropTypes.string,
+  volumeLog: PropTypes.array,
+
+  getClusterLog: PropTypes.func,
+  getVolumeLog: PropTypes.func,
+  restrictedClusterLog: PropTypes.func,
+};
+
+JobMonitor.defaultProps = {
+  tasks: undefined,
+  jobs: undefined,
+  user: undefined,
+
+  taskflowLog: undefined,
+  taskflowStatus: undefined,
+  taskStatusCount: undefined,
+
+  clusterId: undefined,
+  clusterOwner: undefined,
+  clusterLog: undefined,
+  clusterName: undefined,
+  clusterStatus: undefined,
+
+  volumeId: undefined,
+  volumeName: undefined,
+  volumeStatus: undefined,
+  volumeLog: undefined,
+
+  getClusterLog: undefined,
+  getVolumeLog: undefined,
+  restrictedClusterLog: undefined,
+};
 
 // manipulates target's status count
 function statusCounter(source, target) {
@@ -190,15 +221,15 @@ export default connect(
       ? state.preferences.clusters.mapById[clusterId]
       : null;
     const taskStatusCount = {};
-    var taskflowStatus = '';
-    var taskflowLog = [];
-    var clusterOwner = '';
-    var clusterLog = [];
-    var clusterName = '';
-    var clusterStatus = '';
-    var volumeName = '';
-    var volumeStatus = '';
-    var volumeLog = [];
+    let taskflowStatus = '';
+    let taskflowLog = [];
+    let clusterOwner = '';
+    let clusterLog = [];
+    let clusterName = '';
+    let clusterStatus = '';
+    let volumeName = '';
+    let volumeStatus = '';
+    let volumeLog = [];
 
     // get tasks and jobs
     if (taskflow && taskflow.taskMapById && taskflow.jobMapById) {

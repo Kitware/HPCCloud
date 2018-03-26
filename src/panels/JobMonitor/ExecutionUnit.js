@@ -1,8 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import CollapsibleWidget from 'paraviewweb/src/React/Widgets/CollapsibleWidget';
+
+import style from 'HPCCloudStyle/JobMonitor.mcss';
+
 import LogFold from './LogFold';
 import { formatTime } from '../../utils/Format';
-import style from 'HPCCloudStyle/JobMonitor.mcss';
 import get from '../../utils/get';
 
 // takes log array -> jsx lines, or if there's more information LogFold
@@ -60,31 +64,14 @@ function logMapper(entry, index) {
   );
 }
 
-export default React.createClass({
-  displayName: 'ExecutionUnit',
-
-  propTypes: {
-    unit: React.PropTypes.object.isRequired,
-    // optionals
-    onToggle: React.PropTypes.func,
-    alwaysShowLogToggle: React.PropTypes.bool,
-    inline: React.PropTypes.bool,
-    logOnly: React.PropTypes.bool,
-    open: React.PropTypes.bool,
-  },
-
-  getDefaultProps() {
-    return {
-      alwaysShowLogToggle: false,
-      inline: false,
-      logOnly: false,
-      open: false,
+export default class ExecutionUnit extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: props.open,
     };
-  },
-
-  getInitialState() {
-    return { open: this.props.open };
-  },
+    this.onToggle = this.onToggle.bind(this);
+  }
 
   componentWillUpdate(nextProps, nextState) {
     // we want to update other stuff, but if the unit log is empty, ignore it.
@@ -95,21 +82,21 @@ export default React.createClass({
         nextProps.unit.log
       );
     }
-  },
+  }
 
   componentDidUpdate(prevProps, prevState) {
     // the <pre> needs to be rendered open to have scrollHeight, then it scrolls
     if (this.state.open && this.log) {
       this.log.scrollTop = this.log.scrollHeight;
     }
-  },
+  }
 
   onToggle(open) {
     this.setState({ open });
     if (this.props.onToggle) {
       this.props.onToggle(open);
     }
-  },
+  }
 
   render() {
     const title = this.props.unit.name
@@ -156,5 +143,24 @@ export default React.createClass({
         </CollapsibleWidget>
       </section>
     );
-  },
-});
+  }
+}
+
+ExecutionUnit.propTypes = {
+  unit: PropTypes.object.isRequired,
+  // optionals
+  onToggle: PropTypes.func,
+  alwaysShowLogToggle: PropTypes.bool,
+  inline: PropTypes.bool,
+  logOnly: PropTypes.bool,
+  open: PropTypes.bool,
+};
+
+ExecutionUnit.defaultProps = {
+  alwaysShowLogToggle: false,
+  inline: false,
+  logOnly: false,
+  open: false,
+
+  onToggle: undefined,
+};

@@ -1,9 +1,12 @@
 import React from 'react';
-import Toolbar from '../../panels/Toolbar';
+import PropTypes from 'prop-types';
+
 import merge from 'mout/src/object/merge';
 
 // Styles
 import style from 'HPCCloudStyle/TableListing.mcss';
+
+import Toolbar from '../../panels/Toolbar';
 
 // Filter helper
 import { updateQuery, itemFilter } from '../../utils/Filters';
@@ -13,42 +16,21 @@ const TOOLBAR_ACTIONS = {
   delete: { name: 'deleteItems', icon: style.deleteIcon },
 };
 
-export default React.createClass({
-  displayName: 'TableListing',
-
-  propTypes: {
-    hasAccess: React.PropTypes.bool.isRequired,
-    accessHelper: React.PropTypes.object,
-    breadcrumb: React.PropTypes.object,
-    items: React.PropTypes.array,
-    location: React.PropTypes.object,
-    onAction: React.PropTypes.func,
-    title: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.object,
-    ]),
-    placeholder: React.PropTypes.object,
-  },
-
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
-
-  getDefaultProps() {
-    return {
-      title: 'Items',
-      hasAccess: false,
-    };
-  },
-
-  getInitialState() {
-    return {
+export default class TableListing extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       selected: [],
-      actions: this.props.hasAccess ? [TOOLBAR_ACTIONS.add] : [],
+      actions: props.hasAccess ? [TOOLBAR_ACTIONS.add] : [],
       sortKey: '',
       sortReverse: false,
     };
-  },
+    this.getSorter = this.getSorter.bind(this);
+    this.toolbarAction = this.toolbarAction.bind(this);
+    this.lineAction = this.lineAction.bind(this);
+    this.itemClicked = this.itemClicked.bind(this);
+    this.sortBy = this.sortBy.bind(this);
+  }
 
   getSorter() {
     const helper = this.props.accessHelper;
@@ -72,7 +54,7 @@ export default React.createClass({
       helper,
       fnIndex,
     };
-  },
+  }
 
   toolbarAction(action) {
     if (this.props.onAction) {
@@ -90,15 +72,15 @@ export default React.createClass({
         actions: this.props.hasAccess ? [TOOLBAR_ACTIONS.add] : [],
       });
     }
-  },
+  }
 
   lineAction(action) {
     const [name, id] = action.split(':');
     this.props.onAction(name, id);
-  },
+  }
 
   itemClicked(e) {
-    var selectedIndex = -1;
+    let selectedIndex = -1;
     const filter = '';
 
     // item was selected
@@ -142,7 +124,7 @@ export default React.createClass({
       };
       this.props.onAction('click', { location, id });
     }
-  },
+  }
 
   sortBy(e) {
     const sortKey = e.currentTarget.dataset.title;
@@ -153,7 +135,7 @@ export default React.createClass({
       sortReverse = !this.state.sortReverse;
     }
     this.setState({ sortKey, sortReverse });
-  },
+  }
 
   render() {
     let content = null;
@@ -241,5 +223,26 @@ export default React.createClass({
         {content}
       </div>
     );
-  },
-});
+  }
+}
+
+TableListing.propTypes = {
+  hasAccess: PropTypes.bool,
+  accessHelper: PropTypes.object.isRequired,
+  breadcrumb: PropTypes.object,
+  items: PropTypes.array,
+  location: PropTypes.object,
+  onAction: PropTypes.func,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  placeholder: PropTypes.object,
+};
+
+TableListing.defaultProps = {
+  title: 'Items',
+  hasAccess: false,
+  breadcrumb: undefined,
+  items: [],
+  onAction: undefined,
+  placeholder: undefined,
+  location: undefined, // FIXME router handler...
+};

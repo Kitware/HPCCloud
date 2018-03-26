@@ -1,10 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import deepEquals from 'mout/src/lang/deepEquals';
+
+import style from 'HPCCloudStyle/ItemEditor.mcss';
+
 import SGE from './SGE';
 import SLURM from './SLURM';
 import PBS from './PBS';
-
-import style from 'HPCCloudStyle/ItemEditor.mcss';
 
 const typeMapping = {
   sge: SGE,
@@ -37,46 +40,33 @@ function addDefaults(config) {
   );
 }
 
-export default React.createClass({
-  displayName: 'SchedulerConfig',
-
-  propTypes: {
-    config: React.PropTypes.object,
-    max: React.PropTypes.object,
-    onChange: React.PropTypes.func,
-    runtime: React.PropTypes.bool,
-  },
-
-  getDefaultProps() {
-    return {
-      runtime: false,
+export default class SchedulerConfig extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      config: addDefaults(props.config),
     };
-  },
-
-  getInitialState() {
-    return {
-      config: addDefaults(this.props.config),
-    };
-  },
+    this.updateConfig = this.updateConfig.bind(this);
+  }
 
   componentWillReceiveProps(nextProps) {
-    const config = nextProps.config,
-      oldConfig = this.props.config;
+    const config = nextProps.config;
+    const oldConfig = this.props.config;
 
     if (!deepEquals(config, oldConfig)) {
       this.setState({ config: addDefaults(config) });
       this.props.onChange(addDefaults(config));
     }
-  },
+  }
 
   updateConfig(event) {
-    var keyPath = event.target.dataset.key.split('.');
-    var currentContainer;
+    const keyPath = event.target.dataset.key.split('.');
+    let currentContainer;
 
     if (this.props.onChange) {
-      const lastKey = keyPath.pop(),
-        valueToSave = event.target.value,
-        config = this.state.config;
+      const lastKey = keyPath.pop();
+      const valueToSave = event.target.value;
+      const config = this.state.config;
 
       currentContainer = config;
       while (keyPath.length) {
@@ -91,7 +81,7 @@ export default React.createClass({
       this.setState({ config });
       this.props.onChange(config);
     }
-  },
+  }
 
   render() {
     const SubConfig = typeMapping[this.state.config.type || 'sge'];
@@ -163,5 +153,19 @@ export default React.createClass({
         </section>
       </div>
     );
-  },
-});
+  }
+}
+
+SchedulerConfig.propTypes = {
+  config: PropTypes.object,
+  max: PropTypes.object,
+  onChange: PropTypes.func,
+  runtime: PropTypes.bool,
+};
+
+SchedulerConfig.defaultProps = {
+  runtime: false,
+  config: undefined,
+  max: undefined,
+  onChange: undefined,
+};

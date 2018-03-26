@@ -1,36 +1,25 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 
 const permissionLevels = ['Read', 'Write', 'Admin'];
 
-export default React.createClass({
-  displayName: 'PermissionPanel',
-
-  propTypes: {
-    items: React.PropTypes.array,
-    permissions: React.PropTypes.array,
-    shareType: React.PropTypes.oneOf(['users', 'groups']).isRequired,
-    selected: React.PropTypes.array,
-    showAdmin: React.PropTypes.bool,
-    onSelect: React.PropTypes.func,
-    onPermissionChange: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return {
-      showAdmin: false,
-      items: [],
-      selected: [],
-    };
-  },
-
-  getInitialState() {
-    return {
-      nameKey: this.props.shareType === 'users' ? 'login' : 'name',
+export default class PermissionPanel extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      nameKey: props.shareType === 'users' ? 'login' : 'name',
       focused: false,
     };
-  },
+    this.onSelect = this.onSelect.bind(this);
+    this.onPermissionChange = this.onPermissionChange.bind(this);
+    this.onFocus = this.onFocus.bind(this);
+    this.onBlur = this.onBlur.bind(this);
+
+    this.optionMapper = this.optionMapper.bind(this);
+    this.rowMapper = this.rowMapper.bind(this);
+  }
 
   // this replicates the behavior of <select multiple>
   onSelect(e) {
@@ -51,22 +40,22 @@ export default React.createClass({
       event.selected = tmp;
     }
     this.props.onSelect(event);
-  },
+  }
 
   onPermissionChange(e) {
     this.props.onPermissionChange(
       e.target.parentElement.dataset.id,
       e.target.value
     );
-  },
+  }
 
   onFocus() {
     this.setState({ focused: true });
-  },
+  }
 
   onBlur() {
     this.setState({ focused: false });
-  },
+  }
 
   optionMapper(el, i, arr) {
     // skip the first item, or the last one if !showAdmin
@@ -79,7 +68,7 @@ export default React.createClass({
         {el}
       </option>
     );
-  },
+  }
 
   rowMapper(el, i) {
     if (!el) {
@@ -109,8 +98,10 @@ export default React.createClass({
         </select>
       </div>
     );
-  },
+  }
 
+  /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
+  /* eslint-disable jsx-a11y/tabindex-no-positive */
   render() {
     return (
       <div
@@ -125,5 +116,25 @@ export default React.createClass({
         {this.props.items.map(this.rowMapper)}
       </div>
     );
-  },
-});
+  }
+}
+
+PermissionPanel.propTypes = {
+  items: PropTypes.array,
+  permissions: PropTypes.array,
+  shareType: PropTypes.oneOf(['users', 'groups']).isRequired,
+  selected: PropTypes.array,
+  showAdmin: PropTypes.bool,
+  onSelect: PropTypes.func,
+  onPermissionChange: PropTypes.func,
+};
+
+PermissionPanel.defaultProps = {
+  showAdmin: false,
+  items: [],
+  selected: [],
+
+  permissions: undefined,
+  onSelect: undefined,
+  onPermissionChange: undefined,
+};

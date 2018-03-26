@@ -1,33 +1,29 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-export default React.createClass({
-  displayName: 'ImageIcon',
+export default function ImageIcon(props) {
+  if (props.data && props.data.image) {
+    return (
+      <img
+        alt={props.data.alt || 'ImageIcon'}
+        src={props.data.image}
+        style={{ height: props.height }}
+      />
+    );
+  }
 
-  propTypes: {
-    data: React.PropTypes.object,
-    height: React.PropTypes.string,
-  },
+  if (props.data && props.data.icon) {
+    return <i className={props.data.icon} />;
+  }
 
-  getDefaultProps() {
-    return {
-      height: '1.5em',
-    };
-  },
+  return null;
+}
 
-  render() {
-    if (this.props.data && this.props.data.image) {
-      return (
-        <img
-          src={this.props.data.image}
-          style={{ height: this.props.height }}
-        />
-      );
-    }
+ImageIcon.propTypes = {
+  data: PropTypes.object.isRequired,
+  height: PropTypes.string,
+};
 
-    if (this.props.data && this.props.data.icon) {
-      return <i className={this.props.data.icon} />;
-    }
-
-    return null;
-  },
-});
+ImageIcon.defaultProps = {
+  height: '1.5em',
+};

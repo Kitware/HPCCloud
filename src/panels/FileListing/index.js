@@ -1,9 +1,13 @@
-import { formatFileSize } from '../../utils/Format';
 import React from 'react';
-import FilePreview from './FilePreview';
-import style from 'HPCCloudStyle/JobMonitor.mcss';
+import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
+
+import style from 'HPCCloudStyle/JobMonitor.mcss';
+
+import { formatFileSize } from '../../utils/Format';
+import FilePreview from './FilePreview';
+
 import { dispatch } from '../../redux';
 import * as Actions from '../../redux/actions/fs';
 
@@ -42,61 +46,52 @@ function buildFolders(fs, id, container = {}, depth = -1) {
   return container;
 }
 
-const FileListing = React.createClass({
-  displayName: 'FileListing',
-
-  propTypes: {
-    folderId: React.PropTypes.string.isRequired,
-    title: React.PropTypes.string.isRequired,
-    selection: React.PropTypes.array,
-    folders: React.PropTypes.object, // { [id]: { children: [..], depth: 0 } }
-    actionsDisabled: React.PropTypes.bool, // if true you cannot download or preview files
-    toggleOpenFolder: React.PropTypes.func,
-    onFileSelection: React.PropTypes.func,
-    clearFileSelection: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return {
-      title: '',
-    };
-  },
-
-  getInitialState() {
-    return {
+class FileListing extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       opened: [], // list of folderId's which are open
       open: false,
-      actionsDisabled: false,
       previewOpen: false,
       previewTitle: '',
       previewId: '',
     };
-  },
+
+    this.togglePreview = this.togglePreview.bind(this);
+    this.closePreview = this.closePreview.bind(this);
+    this.toggleSelection = this.toggleSelection.bind(this);
+    this.fileMapper = this.fileMapper.bind(this);
+    this.folderMapper = this.folderMapper.bind(this);
+    this.openFolderMapper = this.openFolderMapper.bind(this);
+    this.superMapper = this.superMapper.bind(this);
+    this.toggleAdvanced = this.toggleAdvanced.bind(this);
+    this.openFolder = this.openFolder.bind(this);
+  }
 
   componentWillUnmount() {
     this.props.clearFileSelection();
-  },
+  }
 
   togglePreview(e) {
     const previewId = e.currentTarget.dataset.id;
     const previewTitle = e.currentTarget.dataset.name;
     this.setState({ previewOpen: this.state.open, previewTitle, previewId });
-  },
+  }
 
   closePreview() {
     this.setState({ previewOpen: false });
-  },
+  }
 
   toggleSelection(e) {
     const fileId = e.target.dataset.fileId;
     this.props.onFileSelection(fileId);
-  },
+  }
 
   fileMapper(file, index) {
-    var value,
-      depth = this.props.folders[file.folderId]
-        ? this.props.folders[file.folderId].depth + 1
-        : 0;
+    let value;
+    const depth = this.props.folders[file.folderId]
+      ? this.props.folders[file.folderId].depth + 1
+      : 0;
 
     // size === 0 ? file size : file size and download button
     if (file.size === 0) {
@@ -164,10 +159,10 @@ const FileListing = React.createClass({
         <span>{value}</span>
       </section>
     );
-  },
+  }
 
   folderMapper(folder, index) {
-    var depth = this.props.folders[folder._id].depth;
+    const depth = this.props.folders[folder._id].depth;
     return (
       <section
         key={`${folder._id}_${index}`}
@@ -184,10 +179,10 @@ const FileListing = React.createClass({
         <span>...</span>
       </section>
     );
-  },
+  }
 
   openFolderMapper(folder, index) {
-    var depth = this.props.folders[folder._id].depth;
+    const depth = this.props.folders[folder._id].depth;
     return (
       <div key={`${folder._id}_${index}`}>
         <section
@@ -206,7 +201,7 @@ const FileListing = React.createClass({
         {this.props.folders[folder._id].children.map(this.superMapper)}
       </div>
     );
-  },
+  }
 
   superMapper(el, index) {
     if (!el) {
@@ -221,11 +216,11 @@ const FileListing = React.createClass({
       return this.folderMapper(el, index);
     }
     return null;
-  },
+  }
 
   toggleAdvanced() {
     this.setState({ open: !this.state.open });
-  },
+  }
 
   openFolder(e) {
     const id = e.currentTarget.dataset.folderId;
@@ -238,7 +233,7 @@ const FileListing = React.createClass({
 
     this.setState({ opened });
     this.props.toggleOpenFolder(id, !this.props.folders[id].open);
-  },
+  }
 
   render() {
     // if folderId is not provided just render the toolbar
@@ -263,9 +258,11 @@ const FileListing = React.createClass({
         <div className={style.toolbar}>
           <div className={style.title}>{this.props.title}</div>
           <div className={style.buttons}>
-            <span className={style.count}>{`files(${
-              this.props.folders[this.props.folderId].children.length
-            })`}</span>
+            <span className={style.count}>
+              {`files(${
+                this.props.folders[this.props.folderId].children.length
+              })`}
+            </span>
             <i
               className={
                 this.state.open ? style.advancedIconOn : style.advancedIconOff
@@ -291,8 +288,25 @@ const FileListing = React.createClass({
         ) : null}
       </div>
     );
-  },
-});
+  }
+}
+
+FileListing.propTypes = {
+  folderId: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  selection: PropTypes.array,
+  folders: PropTypes.object, // { [id]: { children: [..], depth: 0 } }
+  actionsDisabled: PropTypes.bool, // if true you cannot download or preview files
+  toggleOpenFolder: PropTypes.func.isRequired,
+  onFileSelection: PropTypes.func.isRequired,
+  clearFileSelection: PropTypes.func.isRequired,
+};
+
+FileListing.defaultProps = {
+  selection: [],
+  folders: {},
+  actionsDisabled: false,
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */

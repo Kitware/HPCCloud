@@ -1,25 +1,23 @@
 import React from 'react';
-import LoadingPanel from '../LoadingPanel';
-import client from '../../network';
+import PropTypes from 'prop-types';
+
 import style from 'HPCCloudStyle/Modal.mcss';
 import theme from 'HPCCloudStyle/Theme.mcss';
 
-export default React.createClass({
-  displayName: 'FilePreview',
+import LoadingPanel from '../LoadingPanel';
+import client from '../../network';
 
-  propTypes: {
-    fileId: React.PropTypes.string.isRequired,
-    title: React.PropTypes.string.isRequired,
-    closer: React.PropTypes.func.isRequired,
-  },
-
-  getInitialState() {
-    return {
+export default class FilePreview extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       loading: true,
       fullscreen: false,
       contents: '',
     };
-  },
+    this.keyPressed = this.keyPressed.bind(this);
+    this.toggleFullscreen = this.toggleFullscreen.bind(this);
+  }
 
   componentDidMount() {
     document.addEventListener('keyup', this.keyPressed);
@@ -31,22 +29,22 @@ export default React.createClass({
       .catch((err) => {
         console.log(err);
       });
-  },
+  }
 
   componentWillUnmount() {
     client.cancel();
     document.removeEventListener('keyup', this.keyPressed);
-  },
+  }
 
   keyPressed(e) {
     if (e.key === 'Escape') {
       this.props.closer();
     }
-  },
+  }
 
   toggleFullscreen(e) {
     this.setState({ fullscreen: !this.state.fullscreen });
-  },
+  }
 
   render() {
     return (
@@ -65,5 +63,11 @@ export default React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
+
+FilePreview.propTypes = {
+  fileId: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  closer: PropTypes.func.isRequired,
+};

@@ -1,44 +1,30 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+
+import style from 'HPCCloudStyle/ItemEditor.mcss';
+
 import PermissionPanel from './PermissionPanel';
 
 import * as ProjActions from '../../redux/actions/projects';
 import * as AuthActions from '../../redux/actions/user';
 import * as GroupActions from '../../redux/actions/groups';
 
-import { connect } from 'react-redux';
 import { dispatch } from '../../redux';
 
-import style from 'HPCCloudStyle/ItemEditor.mcss';
-
-const SharePanel = React.createClass({
-  displayName: 'SharePanel',
-
-  propTypes: {
-    shareToType: React.PropTypes.oneOf(['users', 'groups']).isRequired,
-    shareItem: React.PropTypes.object.isRequired, // project or simulation object
-    currentUser: React.PropTypes.object,
-    targetMap: React.PropTypes.object,
-    // many functions for a component that can work with simulations or projects
-    fetchUsers: React.PropTypes.func,
-    fetchGroups: React.PropTypes.func,
-    shareProject: React.PropTypes.func,
-    shareSimulation: React.PropTypes.func,
-    updateProjectPermission: React.PropTypes.func,
-    updateSimulationPermission: React.PropTypes.func,
-    unShareProject: React.PropTypes.func,
-    unShareSimulation: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return { targetMap: {} };
-  },
-
-  getInitialState() {
-    return {
+class SharePanel extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       shareIds: [],
       unShareIds: [],
     };
-  },
+    this.handleChange = this.handleChange.bind(this);
+    this.shareAction = this.shareAction.bind(this);
+    this.unShareAction = this.unShareAction.bind(this);
+    this.handlePermissionUpdate = this.handlePermissionUpdate.bind(this);
+  }
 
   componentDidMount() {
     if (this.props.shareToType === 'users') {
@@ -46,7 +32,7 @@ const SharePanel = React.createClass({
     } else {
       this.props.fetchGroups();
     }
-  },
+  }
 
   handleChange(e) {
     // DOM event
@@ -66,7 +52,7 @@ const SharePanel = React.createClass({
       const selected = e.selected;
       this.setState({ [which]: selected });
     }
-  },
+  }
 
   shareAction(e) {
     let shareIds;
@@ -81,7 +67,7 @@ const SharePanel = React.createClass({
       this.props.shareProject(this.props.shareItem, ...shareIds);
     }
     this.setState({ shareIds: [] });
-  },
+  }
 
   unShareAction(e) {
     let unShareIds;
@@ -106,7 +92,7 @@ const SharePanel = React.createClass({
       this.props.unShareProject(this.props.shareItem, ...unShareIds);
     }
     this.setState({ unShareIds: [] });
-  },
+  }
 
   handlePermissionUpdate(memberId, level) {
     let permIds;
@@ -122,7 +108,7 @@ const SharePanel = React.createClass({
       this.props.updateProjectPermission(this.props.shareItem, ...permIds);
     }
     this.setState({ unShareIds: [] });
-  },
+  }
 
   render() {
     const hasContents = Object.keys(this.props.targetMap).length;
@@ -188,8 +174,28 @@ const SharePanel = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
+
+SharePanel.propTypes = {
+  shareToType: PropTypes.oneOf(['users', 'groups']).isRequired,
+  shareItem: PropTypes.object.isRequired, // project or simulation object
+  currentUser: PropTypes.object.isRequired,
+  targetMap: PropTypes.object,
+  // many functions for a component that can work with simulations or projects
+  fetchUsers: PropTypes.func.isRequired,
+  fetchGroups: PropTypes.func.isRequired,
+  shareProject: PropTypes.func.isRequired,
+  shareSimulation: PropTypes.func.isRequired,
+  updateProjectPermission: PropTypes.func.isRequired,
+  updateSimulationPermission: PropTypes.func.isRequired,
+  unShareProject: PropTypes.func.isRequired,
+  unShareSimulation: PropTypes.func.isRequired,
+};
+
+SharePanel.defaultProps = {
+  targetMap: {},
+};
 
 export default connect(
   (state, props) => ({

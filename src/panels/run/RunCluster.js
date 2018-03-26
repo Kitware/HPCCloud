@@ -1,11 +1,14 @@
-import client from '../../network';
 import React from 'react';
-import deepClone from 'mout/src/lang/deepClone';
-import SchedulerConfig from '../SchedulerConfig';
+import PropTypes from 'prop-types';
+
 import { Link } from 'react-router';
+import deepClone from 'mout/src/lang/deepClone';
 
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 import theme from 'HPCCloudStyle/Theme.mcss';
+
+import client from '../../network';
+import SchedulerConfig from '../SchedulerConfig';
 
 function isEmptyWallTime(walltime) {
   if (!walltime) {
@@ -24,26 +27,31 @@ function isEmptyWallTime(walltime) {
   return undefinedKeys.length === 3;
 }
 
-export default React.createClass({
-  displayName: 'panels/run/RunCluster',
+function optionMapper(el, index) {
+  return (
+    <option key={`${el.name}_${index}`} value={el._id}>
+      {el.name}
+    </option>
+  );
+}
 
-  propTypes: {
-    contents: React.PropTypes.object,
-    onChange: React.PropTypes.func,
-    clusterFilter: React.PropTypes.func,
-  },
-
-  getInitialState() {
-    return {
+/* eslint-disable react/no-unused-state */
+export default class RunCluster extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       busy: false,
       profiles: [],
       profile: {},
     };
-  },
+    this.updateState = this.updateState.bind(this);
+    this.dataChange = this.dataChange.bind(this);
+    this.updateRuntimeConfig = this.updateRuntimeConfig.bind(this);
+  }
 
   componentDidMount() {
     this.updateState();
-  },
+  }
 
   updateState() {
     this.setState({ busy: true });
@@ -71,7 +79,7 @@ export default React.createClass({
         console.log('Error: Sim/RunCluster', err);
         this.setState({ busy: false });
       });
-  },
+  }
 
   dataChange(event) {
     if (this.props.onChange) {
@@ -81,7 +89,7 @@ export default React.createClass({
         'Traditional'
       );
     }
-  },
+  }
 
   updateRuntimeConfig(config) {
     const runtime = Object.assign({}, config);
@@ -96,15 +104,9 @@ export default React.createClass({
     }
 
     this.props.onChange('runtime', runtime, 'Traditional');
-  },
+  }
 
   render() {
-    var optionMapper = (el, index) => (
-      <option key={`${el.name}_${index}`} value={el._id}>
-        {el.name}
-      </option>
-    );
-
     if (this.state.profiles.length === 0) {
       return this.state.busy ? null : (
         <div className={[style.container, theme.warningBox].join(' ')}>
@@ -147,5 +149,17 @@ export default React.createClass({
         />
       </div>
     );
-  },
-});
+  }
+}
+
+RunCluster.propTypes = {
+  contents: PropTypes.object,
+  onChange: PropTypes.func,
+  clusterFilter: PropTypes.func,
+};
+
+RunCluster.defaultProps = {
+  contents: undefined,
+  onChange: undefined,
+  clusterFilter: undefined,
+};

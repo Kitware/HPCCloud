@@ -1,26 +1,21 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-export default React.createClass({
-  displayName: 'FormPanel/EnumInput',
-
-  propTypes: {
-    id: React.PropTypes.string,
-    item: React.PropTypes.object,
-    value: React.PropTypes.string,
-    style: React.PropTypes.object,
-    onChange: React.PropTypes.func,
-  },
+export default class FormPanelEnumInput extends React.Component {
+  constructor(props) {
+    super(props);
+    this.editField = this.editField.bind(this);
+  }
 
   editField(event) {
     const value = event.target.value;
     if (this.props.onChange) {
       this.props.onChange(this.props.id, value);
     }
-  },
+  }
 
   render() {
     const { style, item, value } = this.props;
-
     return (
       <section className={style.group}>
         <label className={style.label} title={item.description}>
@@ -35,5 +30,21 @@ export default React.createClass({
         </select>
       </section>
     );
-  },
-});
+  }
+}
+
+FormPanelEnumInput.propTypes = {
+  id: PropTypes.string,
+  item: PropTypes.object,
+  value: PropTypes.string,
+  style: PropTypes.object,
+  onChange: PropTypes.func,
+};
+
+FormPanelEnumInput.defaultProps = {
+  id: undefined,
+  item: undefined,
+  value: '',
+  style: {},
+  onChange: undefined,
+};

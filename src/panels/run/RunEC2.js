@@ -1,10 +1,13 @@
-import client from '../../network';
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import { Link } from 'react-router';
-// import { volumeTypes }    from '../../utils/Constants';
 
 import theme from 'HPCCloudStyle/Theme.mcss';
 import style from 'HPCCloudStyle/ItemEditor.mcss';
+
+import client from '../../network';
+// import { volumeTypes }    from '../../utils/Constants';
 
 // render mappers
 const optionMapper = (el, index) => (
@@ -25,20 +28,11 @@ const machineMapper = (machine, index) => (
   </option>
 );
 
-export default React.createClass({
-  displayName: 'panels/run/RunEC2',
-
-  propTypes: {
-    contents: React.PropTypes.object,
-    onChange: React.PropTypes.func,
-    clusterFilter: React.PropTypes.func,
-    clusterNames: React.PropTypes.array,
-    volumeNames: React.PropTypes.array,
-    onFormError: React.PropTypes.func,
-  },
-
-  getInitialState() {
-    return {
+/* eslint-disable react/no-unused-state */
+export default class RunEC2 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       busy: false,
 
       clusters: [],
@@ -53,18 +47,20 @@ export default React.createClass({
 
       volumes: [],
     };
-  },
+    this.updateState = this.updateState.bind(this);
+    this.dataChange = this.dataChange.bind(this);
+  }
 
   componentDidMount() {
     this.updateState();
-  },
+  }
 
   componentWillUnmount() {
     this.dataChange({
       currentTarget: { dataset: { key: 'name' } },
       target: { value: '' },
     });
-  },
+  }
 
   updateState() {
     this.setState({ busy: true });
@@ -114,11 +110,11 @@ export default React.createClass({
         console.log('Error: Sim/RunEC2', err);
         this.setState({ busy: false });
       });
-  },
+  }
 
   dataChange(event) {
-    var key = event.currentTarget.dataset.key,
-      value = event.target.value;
+    const key = event.currentTarget.dataset.key;
+    let value = event.target.value;
     switch (key) {
       case 'profile':
         value = this.state.profiles[value];
@@ -155,7 +151,7 @@ export default React.createClass({
     if (this.props.onChange) {
       this.props.onChange(key, value, 'EC2');
     }
-  },
+  }
 
   render() {
     if (this.state.profiles.length === 0) {
@@ -321,5 +317,15 @@ export default React.createClass({
           */}
       </div>
     );
-  },
-});
+  }
+}
+
+RunEC2.propTypes = {
+  contents: PropTypes.object,
+  onChange: PropTypes.func,
+};
+
+RunEC2.defaultProps = {
+  contents: undefined,
+  onChange: undefined,
+};

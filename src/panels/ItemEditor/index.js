@@ -1,38 +1,34 @@
 import React from 'react';
-import Toolbar from '../Toolbar';
-import ButtonBar from '../ButtonBar';
+import PropTypes from 'prop-types';
 
 import style from 'HPCCloudStyle/ItemEditor.mcss';
+
+import Toolbar from '../Toolbar';
+import ButtonBar from '../ButtonBar';
 
 function NoOp() {}
 
 /* eslint-disable react/no-multi-comp */
-const FileUploadEntry = React.createClass({
-  displayName: 'ItemEditor/FileUploadEntry',
 
-  propTypes: {
-    accept: React.PropTypes.string,
-    label: React.PropTypes.string,
-    name: React.PropTypes.string,
-    owner: React.PropTypes.func,
-    postProcess: React.PropTypes.func,
-  },
+// ----------------------------------------------------------------------------
+// FileUploadEntry
+// ----------------------------------------------------------------------------
 
-  getDefaultProps() {
-    return {
-      accept: '*',
-    };
-  },
+class FileUploadEntry extends React.Component {
+  constructor(props) {
+    super(props);
+    this.processFile = this.processFile.bind(this);
+  }
 
   componentWillUnmount() {
     if (this.props.owner()) {
       this.props.owner().removeMetadata();
       this.props.owner().removeAttachments();
     }
-  },
+  }
 
   processFile(event) {
-    var file;
+    let file;
     if (event.target.files.length) {
       file = event.target.files[0];
     } else if (event.dataTransfer.files.length) {
@@ -64,7 +60,7 @@ const FileUploadEntry = React.createClass({
           this.input.value = '';
         });
     }
-  },
+  }
 
   render() {
     return (
@@ -82,35 +78,48 @@ const FileUploadEntry = React.createClass({
         />
       </div>
     );
-  },
-});
+  }
+}
 
-const TextEntry = React.createClass({
-  displayName: 'ItemEditor/TextEntry',
+FileUploadEntry.propTypes = {
+  accept: PropTypes.string,
+  label: PropTypes.string,
+  name: PropTypes.string,
+  owner: PropTypes.func,
+  postProcess: PropTypes.func,
+};
 
-  propTypes: {
-    default: React.PropTypes.string,
-    label: React.PropTypes.string,
-    name: React.PropTypes.string,
-    owner: React.PropTypes.func,
-  },
+FileUploadEntry.defaultProps = {
+  accept: '*',
+  label: undefined,
+  name: undefined,
+  owner: undefined,
+  postProcess: undefined,
+};
 
-  getInitialState() {
-    return {
-      [this.props.name]: this.props.default || '',
+// ----------------------------------------------------------------------------
+// TextEntry
+// ----------------------------------------------------------------------------
+
+class TextEntry extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      [props.name]: props.default || '',
     };
-  },
+    this.updateMetadata = this.updateMetadata.bind(this);
+  }
 
   updateMetadata(event) {
-    const name = event.target.dataset.name,
-      value = event.target.value;
+    const name = event.target.dataset.name;
+    const value = event.target.value;
 
     this.setState({ [name]: value });
 
     if (this.props.owner && name) {
       this.props.owner().addMetadata(name, value);
     }
-  },
+  }
 
   render() {
     return (
@@ -125,74 +134,70 @@ const TextEntry = React.createClass({
         />
       </div>
     );
-  },
-});
+  }
+}
+
+TextEntry.propTypes = {
+  default: PropTypes.string,
+  label: PropTypes.string,
+  name: PropTypes.string,
+  owner: PropTypes.func,
+};
+
+TextEntry.defaultProps = {
+  default: undefined,
+  label: undefined,
+  name: undefined,
+  owner: undefined,
+};
+
+// ----------------------------------------------------------------------------
+// ItemEditor
+// ----------------------------------------------------------------------------
 
 export { FileUploadEntry, TextEntry };
 
-export default React.createClass({
-  displayName: 'ItemEditor',
-
-  propTypes: {
-    actions: React.PropTypes.array,
-    breadcrumb: React.PropTypes.object,
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.object,
-      React.PropTypes.array,
-    ]),
-    description: React.PropTypes.string,
-    error: React.PropTypes.string,
-    name: React.PropTypes.string,
-    onAction: React.PropTypes.func,
-    title: React.PropTypes.oneOfType([
-      React.PropTypes.object,
-      React.PropTypes.string,
-    ]),
-  },
-
-  getDefaultProps() {
-    return {
-      actions: [],
-      description: '',
-      error: '',
-      name: '',
-      onAction: NoOp,
-      title: 'Item editor',
+export default class ItemEditor extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: props.name,
+      description: props.description,
     };
-  },
 
-  getInitialState() {
-    return {
-      name: this.props.name,
-      description: this.props.description,
-    };
-  },
+    this.onAction = this.onAction.bind(this);
+    this.addAttachment = this.addAttachment.bind(this);
+    this.addMetadata = this.addMetadata.bind(this);
+    this.removeAttachments = this.removeAttachments.bind(this);
+    this.removeMetadata = this.removeMetadata.bind(this);
+    this.updateForm = this.updateForm.bind(this);
+  }
 
   componentDidMount() {
     this.attachment = {};
-  },
+  }
 
   onAction(action) {
     if (this.props.onAction) {
       this.props.onAction(action, this.state, this.attachment);
     }
-  },
+  }
 
   addAttachment(name, file) {
     const attachment = this.attachment || {};
     attachment[name] = file;
     this.attachment = attachment;
-  },
+  }
 
   addMetadata(name, value) {
     const metadata = Object.assign({}, this.state.metadata);
     metadata[name] = value;
     this.setState({ metadata });
-  },
+  }
 
   removeAttachments() {
     this.attachment = {};
-  },
+  }
 
   removeMetadata(key = null) {
     if (key) {
@@ -212,14 +217,14 @@ export default React.createClass({
       });
     }
     this.setState({ metadata });
-  },
+  }
 
   updateForm(e) {
-    var key = e.target.dataset.name,
-      value = e.target.value;
+    const key = e.target.dataset.name;
+    const value = e.target.value;
 
     this.setState({ [key]: value });
-  },
+  }
 
   render() {
     return (
@@ -260,7 +265,29 @@ export default React.createClass({
         />
       </div>
     );
-  },
-});
+  }
+}
+
+ItemEditor.propTypes = {
+  actions: PropTypes.array,
+  breadcrumb: PropTypes.object,
+  children: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  description: PropTypes.string,
+  error: PropTypes.string,
+  name: PropTypes.string,
+  onAction: PropTypes.func,
+  title: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+};
+
+ItemEditor.defaultProps = {
+  actions: [],
+  description: '',
+  error: '',
+  name: '',
+  onAction: NoOp,
+  title: 'Item editor',
+  children: undefined,
+  breadcrumb: undefined,
+};
 
 /* eslint-enable react/no-multi-comp */
