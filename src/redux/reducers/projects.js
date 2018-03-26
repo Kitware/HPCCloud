@@ -1,8 +1,9 @@
-import * as Actions from '../actions/projects';
-import * as Helper from './ListActiveMapByIdHelper';
 /* eslint-disable import/extensions */
 import { workflowNames } from 'workflows'; // alias
 /* eslint-enable import/extensions */
+
+import * as Actions from '../actions/projects';
+import * as Helper from './ListActiveMapByIdHelper';
 
 export const initialState = {
   list: [],

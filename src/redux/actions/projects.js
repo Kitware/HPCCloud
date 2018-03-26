@@ -1,3 +1,5 @@
+import values from 'mout/src/object/values';
+
 import client from '../../network';
 import * as SimulationHelper from '../../network/helpers/simulations';
 import * as ProjectHelper from '../../network/helpers/projects';
@@ -5,7 +7,6 @@ import * as netActions from './network';
 import * as taskflowActions from './taskflows';
 import * as router from './router';
 import get from '../../utils/get';
-import values from 'mout/src/object/values';
 import { store, dispatch } from '../';
 
 export const FETCH_PROJECT_LIST = 'FETCH_PROJECT_LIST';

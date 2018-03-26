@@ -1,7 +1,9 @@
-import * as Actions from '../actions/clusters';
 import deepClone from 'mout/src/lang/deepClone';
 import set from 'mout/src/object/set';
+
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
+
+import * as Actions from '../actions/clusters';
 
 export const initialState = {
   list: [],

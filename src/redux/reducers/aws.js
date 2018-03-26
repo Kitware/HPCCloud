@@ -1,5 +1,6 @@
-import * as Actions from '../actions/aws';
 import deepClone from 'mout/src/lang/deepClone';
+
+import * as Actions from '../actions/aws';
 
 export const initialState = {
   list: [],
