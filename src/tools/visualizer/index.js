@@ -1,24 +1,27 @@
 import React from 'react';
-import Toolbar from '../../panels/Toolbar';
-import LoadingPanel from '../../panels/LoadingPanel';
-import network from 'pvw-visualizer/src/network';
+
+import { connect } from 'react-redux';
+
 // ControlPanel is also an exported component from this file, we want the default though
 import ControlPanelDef from 'pvw-visualizer/src/panels/ControlPanel';
 import VtkRenderer from 'paraviewweb/src/React/Renderers/VtkRenderer';
-import client from '../../network';
-import { projectFunctions } from '../../utils/AccessHelper';
-import { primaryBreadCrumbs } from '../../utils/Constants';
-
-import style from 'HPCCloudStyle/PageWithMenu.mcss';
-import vizStyle from 'HPCCloudStyle/Visualizer.mcss';
-
-import { connect } from 'react-redux';
-import { dispatch, store } from '../../redux';
 import { setVisualizerActiveStore } from 'pvw-visualizer/src/redux';
 import Actions from 'pvw-visualizer/src/redux/actions';
 import * as Time from 'pvw-visualizer/src/redux/selectors/time';
 import setup from 'pvw-visualizer/src/setup';
 import ImageProviders from 'pvw-visualizer/src/ImageProviders';
+import network from 'pvw-visualizer/src/network';
+
+import style from 'HPCCloudStyle/PageWithMenu.mcss';
+import vizStyle from 'HPCCloudStyle/Visualizer.mcss';
+
+import Toolbar from '../../panels/Toolbar';
+import LoadingPanel from '../../panels/LoadingPanel';
+import client from '../../network';
+import { projectFunctions } from '../../utils/AccessHelper';
+import { primaryBreadCrumbs } from '../../utils/Constants';
+
+import { dispatch, store } from '../../redux';
 
 setVisualizerActiveStore(store);
 
@@ -147,6 +150,7 @@ const visualizer = React.createClass({
             <span>
               {' '}
               <img
+                alt={this.props.project.type}
                 src={projectFunctions.getIcon(this.props.project).image}
                 height="20px"
               />
