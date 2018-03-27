@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import queryString from 'query-string';
 
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
@@ -47,11 +49,13 @@ class SimulationView extends React.Component {
     if (!this.props.simulation || !this.props.project) {
       return <LoadingPanel />;
     }
-
-    const { project, simulation, user } = this.props;
+    const { project, simulation, user, location } = this.props;
     const wfModule = Workflows[project.type];
+    const query = queryString.parse(location.search);
     const step =
-      this.props.params.step || simulation.active || wfModule.steps._order[0];
+      this.props.match.params.step ||
+      simulation.active ||
+      wfModule.steps._order[0];
     const taskFlowName =
       wfModule.taskFlows && wfModule.taskFlows[step]
         ? wfModule.taskFlows[step]
@@ -61,9 +65,7 @@ class SimulationView extends React.Component {
         ? wfModule.primaryJobs[step]
         : null;
     const viewName =
-      this.props.location.query.view ||
-      this.props.simulation.steps[step].view ||
-      'default';
+      query.view || this.props.simulation.steps[step].view || 'default';
     const ChildComponent = tools[viewName]
       ? tools[viewName].view
       : wfModule.components.ViewSimulation;
@@ -115,7 +117,8 @@ class SimulationView extends React.Component {
 
 SimulationView.propTypes = {
   location: PropTypes.object.isRequired,
-  params: PropTypes.object.isRequired,
+  match: PropTypes.object.isRequired,
+
   simulation: PropTypes.object,
   project: PropTypes.object,
   onMount: PropTypes.func.isRequired,
@@ -132,26 +135,28 @@ SimulationView.defaultProps = {
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
 
-export default connect(
-  (state) => {
-    const project = state.projects.mapById[state.projects.active];
-    const simulations = state.projects.simulations[state.projects.active];
-    const simulation = simulations
-      ? state.simulations.mapById[simulations.active]
-      : null;
+export default withRouter(
+  connect(
+    (state) => {
+      const project = state.projects.mapById[state.projects.active];
+      const simulations = state.projects.simulations[state.projects.active];
+      const simulation = simulations
+        ? state.simulations.mapById[simulations.active]
+        : null;
 
-    return {
-      project,
-      simulation,
-      user: state.auth.user,
-    };
-  },
-  () => {
-    return {
-      onMount: (simulation) =>
-        dispatch(Actions.updateTaskflowFromSimulation(simulation)),
-      fetchClusters: () => dispatch(fetchClusters()),
-      fetchVolumes: () => dispatch(fetchVolumes()),
-    };
-  }
-)(SimulationView);
+      return {
+        project,
+        simulation,
+        user: state.auth.user,
+      };
+    },
+    () => {
+      return {
+        onMount: (simulation) =>
+          dispatch(Actions.updateTaskflowFromSimulation(simulation)),
+        fetchClusters: () => dispatch(fetchClusters()),
+        fetchVolumes: () => dispatch(fetchVolumes()),
+      };
+    }
+  )(SimulationView)
+);

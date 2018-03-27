@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 import theme from 'HPCCloudStyle/Theme.mcss';
 
@@ -16,7 +17,6 @@ import { primaryBreadCrumbs } from '../../../utils/Constants';
 
 import { dispatch } from '../../../redux';
 import * as Actions from '../../../redux/actions/projects';
-import * as Router from '../../../redux/actions/router';
 
 class ProjectView extends React.Component {
   constructor(props) {
@@ -29,7 +29,8 @@ class ProjectView extends React.Component {
   }
 
   addItem() {
-    this.props.onLocationChange(`/New/Simulation/${this.props.params.id}`);
+    console.log('add item', `/New/Simulation/${this.props.match.params.id}`);
+    this.props.history.push(`/New/Simulation/${this.props.match.params.id}`);
   }
 
   deleteItems(items) {
@@ -55,7 +56,8 @@ class ProjectView extends React.Component {
   }
 
   edit(id) {
-    this.props.onLocationChange(`/Edit/Simulation/${id}`);
+    console.log('edit item', `/Edit/Simulation/${id}`);
+    this.props.history.push(`/Edit/Simulation/${id}`);
   }
 
   click({ id, location }) {
@@ -65,7 +67,7 @@ class ProjectView extends React.Component {
   render() {
     return (
       <TableListing
-        breadcrumb={primaryBreadCrumbs(this.props.params.id)}
+        breadcrumb={primaryBreadCrumbs(this.props.match.params.id)}
         location={this.props.location}
         accessHelper={SimulationHelper}
         items={this.props.simulations}
@@ -98,18 +100,12 @@ class ProjectView extends React.Component {
 }
 
 ProjectView.propTypes = {
-  // FIXME ROUTER LOCATION HANDLING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  // FIXME ROUTER LOCATION HANDLING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  // FIXME ROUTER LOCATION HANDLING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   location: PropTypes.object.isRequired,
-  params: PropTypes.object.isRequired,
-  // FIXME ROUTER LOCATION HANDLING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  // FIXME ROUTER LOCATION HANDLING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  // FIXME ROUTER LOCATION HANDLING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  match: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
   project: PropTypes.object.isRequired,
   simulations: PropTypes.array.isRequired,
   onActivate: PropTypes.func.isRequired,
-  onLocationChange: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   hasAccess: PropTypes.bool.isRequired,
 };
@@ -117,41 +113,37 @@ ProjectView.propTypes = {
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
 
-export default connect(
-  (state, props) => {
-    const project =
-      state.projects.mapById[state.projects.active || props.params.id];
-    if (!project) {
+export default withRouter(
+  connect(
+    (state, props) => {
+      const project =
+        state.projects.mapById[state.projects.active || props.match.params.id];
+      if (!project) {
+        return {
+          project: { name: 'No project found' },
+          simulations: [],
+          error: 'No project found',
+        };
+      }
+      const projectSims = state.projects.simulations[project._id];
+      const simulations = projectSims
+        ? projectSims.list
+            .map((id) => state.simulations.mapById[id])
+            .filter((i) => !!i)
+        : [];
       return {
-        project: { name: 'No project found' },
-        simulations: [],
-        error: 'No project found',
+        hasAccess: userHasAccess(state.auth.user, project.access, 'write'),
+        project,
+        simulations,
+      };
+    },
+    () => {
+      return {
+        onActivate: (id, location) =>
+          dispatch(Actions.setActiveSimulation(id, location)),
+        onDelete: (simulation) =>
+          dispatch(Actions.deleteSimulation(simulation)),
       };
     }
-    const projectSims = state.projects.simulations[project._id];
-    const simulations = projectSims
-      ? projectSims.list
-          .map((id) => state.simulations.mapById[id])
-          .filter((i) => !!i)
-      : [];
-    return {
-      hasAccess: userHasAccess(state.auth.user, project.access, 'write'),
-      project,
-      simulations,
-    };
-  },
-  () => {
-    return {
-      onActivate: (id, location) =>
-        dispatch(Actions.setActiveSimulation(id, location)),
-      // FIXME ROUTER LOCATION HANDLING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      // FIXME ROUTER LOCATION HANDLING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      // FIXME ROUTER LOCATION HANDLING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      onLocationChange: (location) => dispatch(Router.push(location)),
-      // FIXME ROUTER LOCATION HANDLING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      // FIXME ROUTER LOCATION HANDLING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      // FIXME ROUTER LOCATION HANDLING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      onDelete: (simulation) => dispatch(Actions.deleteSimulation(simulation)),
-    };
-  }
-)(ProjectView);
+  )(ProjectView)
+);

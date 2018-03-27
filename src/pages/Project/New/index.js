@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 
@@ -11,7 +12,6 @@ import getNetworkError from '../../../utils/getNetworkError';
 
 import { dispatch } from '../../../redux';
 import * as Actions from '../../../redux/actions/projects';
-import * as Router from '../../../redux/actions/router';
 
 class ProjectNew extends React.Component {
   constructor(props) {
@@ -150,18 +150,20 @@ ProjectNew.propTypes = {
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
 
-export default connect(
-  (state) => {
-    return {
-      workflowNames: state.projects.workflowNames,
-      error: getNetworkError(state, 'save_project'),
-    };
-  },
-  () => {
-    return {
-      onSave: (project, attachments) =>
-        dispatch(Actions.saveProject(project, attachments)),
-      onCancel: () => dispatch(Router.replace('/')),
-    };
-  }
-)(ProjectNew);
+export default withRouter(
+  connect(
+    (state, props) => {
+      return {
+        workflowNames: state.projects.workflowNames,
+        error: getNetworkError(state, 'save_project'),
+        onCancel: () => props.history.replace('/'),
+      };
+    },
+    () => {
+      return {
+        onSave: (project, attachments) =>
+          dispatch(Actions.saveProject(project, attachments)),
+      };
+    }
+  )(ProjectNew)
+);

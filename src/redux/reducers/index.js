@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux';
-import { routerReducer } from 'react-router-redux';
 
 import visualizer from 'pvw-visualizer/src/redux/reducers';
 
@@ -23,7 +22,5 @@ export default combineReducers({
   projects,
   simulations,
   taskflows,
-
-  routing: routerReducer,
   visualizer,
 });

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 import breadCrumbStyle from 'HPCCloudStyle/Theme.mcss';
 
@@ -13,7 +14,6 @@ import get from '../../../utils/get';
 
 import { dispatch } from '../../../redux';
 import * as Actions from '../../../redux/actions/projects';
-import * as Router from '../../../redux/actions/router';
 
 function getActions(disabled) {
   return [
@@ -37,7 +37,7 @@ class SimulationNew extends React.Component {
 
   newSimulation(data, attachments) {
     const { name, description } = data;
-    const projectId = this.props.params.projectId;
+    const projectId = this.props.match.params.projectId;
     const metadata = {};
     const stepsInfo = Workflows[this.props.project.type].steps;
     const steps = stepsInfo._initial_state;
@@ -87,7 +87,7 @@ class SimulationNew extends React.Component {
   }
 
   cancel() {
-    this.props.onCancel(`/View/Project/${this.props.params.projectId}`);
+    this.props.onCancel(`/View/Project/${this.props.match.params.projectId}`);
   }
 
   render() {
@@ -130,7 +130,8 @@ class SimulationNew extends React.Component {
 }
 
 SimulationNew.propTypes = {
-  params: PropTypes.object.isRequired,
+  match: PropTypes.object.isRequired,
+
   error: PropTypes.string.isRequired,
   project: PropTypes.object.isRequired,
   buttonsDisabled: PropTypes.bool.isRequired,
@@ -141,25 +142,27 @@ SimulationNew.propTypes = {
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
 
-export default connect(
-  (state, props) => {
-    return {
-      project: state.projects.mapById[props.params.projectId],
-      buttonsDisabled: !!get(state, 'network.pending.save_simulation'),
-      error: getNetworkError(state, 'save_simulation'),
-    };
-  },
-  () => {
-    return {
-      onSave: (simulation, attachments) =>
-        dispatch(
-          Actions.saveSimulation(
-            simulation,
-            attachments,
-            `/View/Project/${simulation.projectId}`
-          )
-        ),
-      onCancel: (location) => dispatch(Router.replace(location)),
-    };
-  }
-)(SimulationNew);
+export default withRouter(
+  connect(
+    (state, props) => {
+      return {
+        project: state.projects.mapById[props.match.params.projectId],
+        buttonsDisabled: !!get(state, 'network.pending.save_simulation'),
+        error: getNetworkError(state, 'save_simulation'),
+        onCancel: (location) => props.history.replace(location),
+      };
+    },
+    () => {
+      return {
+        onSave: (simulation, attachments) =>
+          dispatch(
+            Actions.saveSimulation(
+              simulation,
+              attachments,
+              `/View/Project/${simulation.projectId}`
+            )
+          ),
+      };
+    }
+  )(SimulationNew)
+);

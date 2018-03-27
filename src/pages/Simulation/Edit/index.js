@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 import breadCrumbStyle from 'HPCCloudStyle/Theme.mcss';
 
@@ -14,7 +15,6 @@ import getNetworkError from '../../../utils/getNetworkError';
 
 import { dispatch } from '../../../redux';
 import * as Actions from '../../../redux/actions/projects';
-import * as Router from '../../../redux/actions/router';
 
 function actionsForUser(user, accessObject, props) {
   if (userHasAccess(user, accessObject, 'write')) {
@@ -130,37 +130,39 @@ SimulationEdit.propTypes = {
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
 
-export default connect(
-  (state, props) => {
-    const simId = props.params.id;
-    const simulation = state.simulations.mapById[simId];
-    let project = {};
-    if (simulation && simulation.projectId) {
-      project = state.projects.mapById[simulation.projectId];
+export default withRouter(
+  connect(
+    (state, props) => {
+      const simId = props.match.params.id;
+      const simulation = state.simulations.mapById[simId];
+      let project = {};
+      if (simulation && simulation.projectId) {
+        project = state.projects.mapById[simulation.projectId];
+      }
+      return {
+        currentUser: state.auth.user,
+        error: getNetworkError(state, [
+          'save_simulation',
+          `delete_simulation_${props.match.params.id}`,
+        ]),
+        project,
+        simulation,
+        onCancel: (path) => props.history.goBack(),
+      };
+    },
+    () => {
+      return {
+        onSave: (simulation) =>
+          dispatch(
+            Actions.saveSimulation(
+              simulation,
+              null,
+              `/View/Project/${simulation.projectId}`
+            )
+          ),
+        onDelete: (simulation, location) =>
+          dispatch(Actions.deleteSimulation(simulation, location)),
+      };
     }
-    return {
-      currentUser: state.auth.user,
-      error: getNetworkError(state, [
-        'save_simulation',
-        `delete_simulation_${props.params.id}`,
-      ]),
-      project,
-      simulation,
-    };
-  },
-  () => {
-    return {
-      onSave: (simulation) =>
-        dispatch(
-          Actions.saveSimulation(
-            simulation,
-            null,
-            `/View/Project/${simulation.projectId}`
-          )
-        ),
-      onDelete: (simulation, location) =>
-        dispatch(Actions.deleteSimulation(simulation, location)),
-      onCancel: (path) => dispatch(Router.goBack()),
-    };
-  }
-)(SimulationEdit);
+  )(SimulationEdit)
+);

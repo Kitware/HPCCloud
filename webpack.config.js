@@ -52,7 +52,7 @@ module.exports = {
     contentBase: './dist/',
     port: 9999,
     proxy: {
-      '/api*': 'http://localhost:8080',
+      '/api/*': 'http://localhost:8080',
       '/static/*': 'http://localhost:8080',
     },
   },

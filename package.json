@@ -26,7 +26,7 @@
     "redux": "3.7.2",
     "reselect": "3.0.1",
     "react-router-dom": "4.2.2",
-    "react-router-redux": "4.0.8"
+    "query-string": "6.0.0"
   },
   "devDependencies": {
     "wslink": "0.1.7",

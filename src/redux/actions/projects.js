@@ -5,9 +5,8 @@ import * as SimulationHelper from '../../network/helpers/simulations';
 import * as ProjectHelper from '../../network/helpers/projects';
 import * as netActions from './network';
 import * as taskflowActions from './taskflows';
-import * as router from './router';
 import get from '../../utils/get';
-import { store, dispatch } from '../';
+import { store, dispatch, history } from '../';
 
 export const FETCH_PROJECT_LIST = 'FETCH_PROJECT_LIST';
 export const UPDATE_PROJECT_LIST = 'UPDATE_PROJECT_LIST';
@@ -89,7 +88,7 @@ export function deleteProject(project) {
       (resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch({ type: REMOVE_PROJECT, project });
-        dispatch(router.push('/'));
+        history.push('/');
       },
       (error) => {
         dispatch(netActions.errorNetworkCall(action.id, error));
@@ -105,8 +104,7 @@ export function setActiveProject(id, location) {
     const updateActive = { type: UPDATE_ACTIVE_PROJECT, id };
 
     if (location) {
-      dispatch(updateActive);
-      return router.push(location);
+      history.push(location);
     }
     return updateActive;
   };
@@ -215,12 +213,12 @@ export function saveProject(project, attachments) {
         dispatch(updateProject(respWithProj.data));
         if (attachments && Object.keys(attachments).length) {
           setTimeout(() => {
-            dispatch(router.push(`/View/Project/${respWithProj.data._id}`));
+            history.push(`/View/Project/${respWithProj.data._id}`);
           }, 1500);
         } else if (project._id) {
-          dispatch(router.push('/'));
+          history.push('/');
         } else {
-          dispatch(router.push(`/View/Project/${respWithProj.data._id}`));
+          history.push(`/View/Project/${respWithProj.data._id}`);
         }
       })
       .catch((error) => {
@@ -258,11 +256,11 @@ export function saveSimulation(simulation, attachments, location) {
         if (location && attachments && Object.keys(attachments).length) {
           // in this 1.5s gap the progressBar will appear complete, and fade on the new page
           setTimeout(() => {
-            dispatch(router.push(location));
+            history.push(location);
           }, 1500);
         } else if (location) {
           // `/View/Project/${respWithSim.data.projectId}`
-          dispatch(router.push(location));
+          history.push(location);
         }
       },
       (error) => {
@@ -295,7 +293,7 @@ export function deleteSimulation(simulation, location) {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch({ type: REMOVE_SIMULATION, simulation });
         if (location) {
-          dispatch(router.replace(location));
+          history.replace(location);
         }
         if (simStepTaskflows.length) {
           simStepTaskflows.forEach((taskflowId) => {
@@ -336,8 +334,7 @@ export function setActiveSimulation(id, location) {
     const updateActive = { type: UPDATE_ACTIVE_SIMULATION, id };
 
     if (location) {
-      dispatch(updateActive);
-      return router.push(location);
+      history.push(location);
     }
     return updateActive;
   };
@@ -365,7 +362,7 @@ export function updateSimulationStep(id, stepName, data, location) {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateSimulation(resp.data));
         if (location) {
-          dispatch(router.replace(location));
+          history.replace(location);
         }
       })
       .catch((error) => {

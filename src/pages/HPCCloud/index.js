@@ -15,11 +15,6 @@ import * as NetActions from '../../redux/actions/network';
 import * as ProgressActions from '../../redux/actions/progress';
 
 class TopBar extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
   componentWillMount() {
     this.timeout = null;
   }

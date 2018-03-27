@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import merge from 'mout/src/object/merge';
+import queryString from 'query-string';
+import { withRouter } from 'react-router-dom';
+
 import style from 'HPCCloudStyle/Toolbar.mcss';
 import states from 'HPCCloudStyle/States.mcss';
 
 import Breadcrumb from '../../panels/Breadcrumb';
 
-export default class PreferenceSubBar extends React.Component {
+export class PreferenceSubBar extends React.Component {
   constructor(props) {
     super(props);
     this.onAction = this.onAction.bind(this);
@@ -23,10 +25,13 @@ export default class PreferenceSubBar extends React.Component {
 
   updateFilter(e) {
     const filter = e.target.value;
-
-    this.context.router.replace({
+    this.props.history.replace({
       pathname: this.props.location.pathname,
-      query: merge(this.props.location.query, { filter }),
+      search: `?${queryString.stringify(
+        Object.assign({}, queryString.parse(this.props.location.search), {
+          filter,
+        })
+      )}`,
       state: this.props.location.state,
     });
   }
@@ -65,7 +70,7 @@ export default class PreferenceSubBar extends React.Component {
               type="text"
               className={style.filter}
               placeholder="filter"
-              value={this.props.location.query.filter || ''}
+              value={queryString.parse(this.props.location.search).filter || ''}
               onChange={this.updateFilter}
             />
           ) : null}
@@ -84,6 +89,8 @@ PreferenceSubBar.propTypes = {
   location: PropTypes.object,
   onAction: PropTypes.func,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+
+  history: PropTypes.object,
 };
 
 PreferenceSubBar.defaultProps = {
@@ -97,6 +104,9 @@ PreferenceSubBar.defaultProps = {
   },
   hasTabs: false,
   hidden: false,
+  history: undefined,
   location: undefined, // FIXME router handler...
   onAction: undefined,
 };
+
+export default withRouter(PreferenceSubBar);

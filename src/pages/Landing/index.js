@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 
 import style from 'HPCCloudStyle/Theme.mcss';
 
 import client from '../../network';
 
-export default class LandingPage extends React.Component {
+export class LandingPage extends React.Component {
   componentWillMount() {
     this.subscription = client.onAuthChange((loggedIn) => {
       if (loggedIn) {
@@ -44,3 +44,5 @@ export default class LandingPage extends React.Component {
 LandingPage.propTypes = {
   history: PropTypes.object.isRequired,
 };
+
+export default withRouter(LandingPage);

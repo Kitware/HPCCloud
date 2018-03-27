@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 import ItemEditor from '../../../panels/ItemEditor';
 import SharePanel from '../../../panels/SharePanel';
@@ -11,7 +12,6 @@ import Workflows from '../../../workflows';
 import getNetworkError from '../../../utils/getNetworkError';
 
 import { dispatch } from '../../../redux';
-import * as Router from '../../../redux/actions/router';
 import * as Actions from '../../../redux/actions/projects';
 
 function actionsForUser(user, accessObject) {
@@ -104,24 +104,26 @@ ProjectEdit.propTypes = {
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
 
-export default connect(
-  (state, props) => {
-    return {
-      currentUser: state.auth.user,
-      project: state.projects.mapById[props.params.id],
-      error: getNetworkError(state, [
-        'save_project',
-        'delete_project',
-        'share_project',
-        'unshare_project',
-      ]),
-    };
-  },
-  () => {
-    return {
-      onSave: (project) => dispatch(Actions.saveProject(project)),
-      onDelete: (project) => dispatch(Actions.deleteProject(project)),
-      onCancel: (path) => dispatch(Router.goBack()),
-    };
-  }
-)(ProjectEdit);
+export default withRouter(
+  connect(
+    (state, props) => {
+      return {
+        currentUser: state.auth.user,
+        project: state.projects.mapById[props.match.params.id],
+        error: getNetworkError(state, [
+          'save_project',
+          'delete_project',
+          'share_project',
+          'unshare_project',
+        ]),
+        onCancel: () => props.history.goBack(),
+      };
+    },
+    () => {
+      return {
+        onSave: (project) => dispatch(Actions.saveProject(project)),
+        onDelete: (project) => dispatch(Actions.deleteProject(project)),
+      };
+    }
+  )(ProjectEdit)
+);

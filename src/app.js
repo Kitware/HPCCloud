@@ -5,24 +5,21 @@ import 'HPCCloudStyle/global.mcss';
 
 import React from 'react';
 import { render } from 'react-dom';
-import {
-  HashRouter as Router,
-  Route,
-  IndexRoute,
-  withRouter,
-} from 'react-router-dom';
+import { Router, Route, Redirect, Switch, withRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
 import { updateVisualizerStateAccessor } from 'pvw-visualizer/src/redux/selectors/stateAccessor';
 
 import { baseURL } from './utils/Constants';
 
-import { store, history, dispatch } from './redux';
+import { store, history, dispatch } from './redux'; // history
 import * as ProjectActions from './redux/actions/projects';
 import * as TaskflowActions from './redux/actions/taskflows';
 import * as NetworkActions from './redux/actions/network';
 import * as Behavior from './StateTransitionBehavior';
 import Toaster from './panels/Toaster';
+
+import client from './network';
 
 // Pages ----------------------------------------------------------------------
 // import AuthMainPage from './pages/AuthContent';
@@ -52,27 +49,16 @@ import SimulationView from './pages/Simulation/View';
 // Meta containers with routing behavior
 // ----------------------------------------------------------------------------
 
-function redirectToHome(comp) {
-  // Should redirect to home if not authenticated
-  console.log('redirectToHome...');
-  return withRouter(comp);
+function loggedIn() {
+  return !!client.getLoggedInUser();
 }
 
-function redirectToLogin(comp) {
-  // Should redirect to login if not authenticated
-  console.log('redirectToLogin...');
-  return withRouter(comp);
-}
-
-function adminOnly(comp, redirectPath) {
-  // Should redirect to login if not authenticated
-  console.log('adminOnly...', redirectPath);
-  return withRouter(comp);
-}
-function authSwitch(anonymous, authenticated) {
-  // Should redirect to login if not authenticated
-  console.log('authSwitch...', anonymous, authenticated);
-  return withRouter(anonymous);
+function isAdmin() {
+  if (loggedIn()) {
+    const user = client.getLoggedInUser();
+    return user.admin;
+  }
+  return false;
 }
 
 // ----------------------------------------------------------------------------
@@ -86,78 +72,150 @@ export function configure(config = { girderAPI: baseURL }) {
     <Provider store={store}>
       <main>
         <Router history={history}>
-          <Route path="/" component={withRouter(RootContainer)}>
-            <IndexRoute component={authSwitch(Landing, ProjectAll)} />
-            <Route path="/Logout" component={withRouter(Logout)} />
-            <Route path="/Register" component={redirectToHome(Register)} />
-            <Route path="/Forgot" component={withRouter(Forgot)} />
-            <Route path="/Login" component={redirectToHome(Login)} />
-            <Route path="/New">
+          <RootContainer>
+            <Switch>
               <Route
-                path="/New/Project"
-                component={redirectToLogin(ProjectNew)}
+                exact
+                path="/"
+                render={() => (loggedIn() ? <ProjectAll /> : <Landing />)}
               />
+              <Route path="/Logout" component={withRouter(Logout)} />
               <Route
-                path="/New/Simulation/:projectId"
-                component={redirectToLogin(SimulationNew)}
+                path="/Register"
+                render={() => (loggedIn() ? <Redirect to="/" /> : <Register />)}
               />
-            </Route>
-            <Route path="/Edit">
+              <Route path="/Forgot" component={withRouter(Forgot)} />
               <Route
-                path="/Edit/Project/:id"
-                component={redirectToLogin(ProjectEdit)}
+                path="/Login"
+                render={() => (loggedIn() ? <Redirect to="/" /> : <Login />)}
               />
-              <Route
-                path="/Edit/Simulation/:id"
-                component={redirectToLogin(SimulationEdit)}
-              />
-            </Route>
-            <Route path="/View">
-              <Route
-                path="/View/Project/:id"
-                component={redirectToLogin(ProjectView)}
-              />
-              <Route
-                path="/View/Simulation/:id"
-                component={redirectToLogin(SimulationView)}
-              />
-              <Route
-                path="/View/Simulation/:id/:step"
-                component={redirectToLogin(SimulationView)}
-              />
-            </Route>
-            <Route path="/Preferences" component={redirectToLogin(Preferences)}>
-              <IndexRoute component={redirectToLogin(PreferencesUser)} />
-              <Route
-                path="/Preferences/User"
-                component={redirectToLogin(PreferencesUser)}
-              />
-              <Route
-                path="/Preferences/Groups"
-                component={adminOnly(PreferencesGroups, '/Preferences/User')}
-              />
-              <Route
-                path="/Preferences/AWS"
-                component={redirectToLogin(PreferencesAWS)}
-              />
-              <Route
-                path="/Preferences/Cluster"
-                component={redirectToLogin(PreferencesCluster)}
-              />
-              <Route
-                path="/Preferences/Volumes"
-                component={redirectToLogin(PreferencesVolumes)}
-              />
-              <Route
-                path="/Preferences/Status"
-                component={redirectToLogin(PreferencesStatus)}
-              />
-              <Route
-                path="/Preferences/Network"
-                component={redirectToLogin(PreferencesNetwork)}
-              />
-            </Route>
-          </Route>
+              <Route path="/New">
+                <Switch>
+                  <Route
+                    path="/New/Project"
+                    render={() =>
+                      loggedIn() ? <ProjectNew /> : <Redirect to="/" />
+                    }
+                  />
+                  <Route
+                    path="/New/Simulation/:projectId"
+                    render={() =>
+                      loggedIn() ? <SimulationNew /> : <Redirect to="/" />
+                    }
+                  />
+                </Switch>
+              </Route>
+              <Route path="/Edit">
+                <Switch>
+                  <Route
+                    path="/Edit/Project/:id"
+                    render={() =>
+                      loggedIn() ? <ProjectEdit /> : <Redirect to="/" />
+                    }
+                  />
+                  <Route
+                    path="/Edit/Simulation/:id"
+                    render={() =>
+                      loggedIn() ? <SimulationEdit /> : <Redirect to="/" />
+                    }
+                  />
+                </Switch>
+              </Route>
+              <Route path="/View">
+                <Switch>
+                  <Route
+                    path="/View/Project/:id"
+                    render={() =>
+                      loggedIn() ? <ProjectView /> : <Redirect to="/" />
+                    }
+                  />
+                  <Route
+                    path="/View/Simulation/:id"
+                    render={() =>
+                      loggedIn() ? <SimulationView /> : <Redirect to="/" />
+                    }
+                  />
+                  <Route
+                    path="/View/Simulation/:id/:step"
+                    render={() =>
+                      loggedIn() ? <SimulationView /> : <Redirect to="/" />
+                    }
+                  />
+                </Switch>
+              </Route>
+              <Route path="/Preferences">
+                <Preferences>
+                  <Switch>
+                    <Route
+                      exact
+                      path="/Preferences"
+                      render={() =>
+                        loggedIn() ? <PreferencesUser /> : <Redirect to="/" />
+                      }
+                    />
+                    <Route
+                      path="/Preferences/User"
+                      render={() =>
+                        loggedIn() ? <PreferencesUser /> : <Redirect to="/" />
+                      }
+                    />
+                    <Route
+                      path="/Preferences/Groups"
+                      render={() =>
+                        isAdmin() ? (
+                          <PreferencesGroups />
+                        ) : (
+                          <Redirect to="/Preferences/User" />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/Preferences/AWS"
+                      render={() =>
+                        loggedIn() ? <PreferencesAWS /> : <Redirect to="/" />
+                      }
+                    />
+                    <Route
+                      path="/Preferences/Cluster"
+                      render={() =>
+                        loggedIn() ? (
+                          <PreferencesCluster />
+                        ) : (
+                          <Redirect to="/" />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/Preferences/Volumes"
+                      render={() =>
+                        loggedIn() ? (
+                          <PreferencesVolumes />
+                        ) : (
+                          <Redirect to="/" />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/Preferences/Status"
+                      render={() =>
+                        loggedIn() ? <PreferencesStatus /> : <Redirect to="/" />
+                      }
+                    />
+                    <Route
+                      path="/Preferences/Network"
+                      render={() =>
+                        loggedIn() ? (
+                          <PreferencesNetwork />
+                        ) : (
+                          <Redirect to="/" />
+                        )
+                      }
+                    />
+                  </Switch>
+                </Preferences>
+              </Route>
+            </Switch>
+          </RootContainer>
         </Router>
         <Toaster />
       </main>

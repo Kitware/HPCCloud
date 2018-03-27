@@ -1,13 +1,10 @@
-import { createStore, applyMiddleware } from 'redux';
-import { hashHistory } from 'react-router';
-import { syncHistoryWithStore, routerMiddleware } from 'react-router-redux';
+import { createStore } from 'redux';
+import { createHashHistory } from 'history';
 
 import reducers from './reducers';
 
-const routingMiddleware = routerMiddleware(hashHistory);
-
-const store = createStore(reducers, applyMiddleware(routingMiddleware));
-const history = syncHistoryWithStore(hashHistory, store);
+const store = createStore(reducers);
+const history = createHashHistory();
 
 function dispatch(action) {
   let currentAction = action;

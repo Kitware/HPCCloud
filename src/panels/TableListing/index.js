@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import merge from 'mout/src/object/merge';
+import queryString from 'query-string';
 
 // Styles
 import style from 'HPCCloudStyle/TableListing.mcss';
@@ -119,7 +119,11 @@ export default class TableListing extends React.Component {
 
       const location = {
         pathname: linkToGo,
-        query: merge(this.props.location.query, { filter }),
+        search: queryString.stringify(
+          Object.assign({}, queryString.parse(this.props.location.search), {
+            filter,
+          })
+        ),
         state: this.props.location.state,
       };
       this.props.onAction('click', { location, id });
@@ -141,7 +145,7 @@ export default class TableListing extends React.Component {
     let content = null;
     const { helper, sorter, fnIndex } = this.getSorter();
 
-    updateQuery(this.props.location.query.filter);
+    updateQuery(queryString.parse(this.props.location.search).filter);
     const filteredList = this.props.items.filter(itemFilter).sort(sorter);
     if (this.state.sortReverse) {
       filteredList.reverse(); // modifies filteredList in place, odd that const doesn't guard that
@@ -213,7 +217,6 @@ export default class TableListing extends React.Component {
     return (
       <div className={style.container}>
         <Toolbar
-          location={this.props.location}
           title={this.props.title}
           breadcrumb={this.props.breadcrumb}
           actions={this.state.actions}
@@ -227,11 +230,12 @@ export default class TableListing extends React.Component {
 }
 
 TableListing.propTypes = {
+  location: PropTypes.object.isRequired,
+
   hasAccess: PropTypes.bool,
   accessHelper: PropTypes.object.isRequired,
   breadcrumb: PropTypes.object,
   items: PropTypes.array,
-  location: PropTypes.object,
   onAction: PropTypes.func,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   placeholder: PropTypes.object,
@@ -244,5 +248,4 @@ TableListing.defaultProps = {
   items: [],
   onAction: undefined,
   placeholder: undefined,
-  location: undefined, // FIXME router handler...
 };
