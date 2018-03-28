@@ -23,7 +23,6 @@ class TopBar extends React.Component {
     // Handle history to dispatch actions
     setHistory(this.props.history);
     this.unlisten = this.props.history.listen((location) => {
-      console.log('history change => dispatch', location.pathname);
       const path = location.pathname.split('/');
 
       // Remove any nested path => [ 'View|Edit', 'Project|Simulation', '${ID}']
@@ -80,7 +79,6 @@ class TopBar extends React.Component {
   }
 
   render() {
-    console.log('=========== render ===========');
     const width = `${this.props.progress}%`;
     const opacity = this.props.progress === 100 ? '0' : '1.0';
     const display = this.props.progressReset ? 'none' : null;

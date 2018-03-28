@@ -25,7 +25,6 @@ export class LandingPage extends React.Component {
 
   /* eslint-disable react/no-danger */
   render() {
-    console.log('render landing');
     return (
       <main style={{ margin: 'auto', textAlign: 'center' }}>
         <br />

@@ -86,7 +86,7 @@ export default class TableListing extends React.Component {
     // item was selected
     if (this.props.hasAccess && (e.metaKey || e.ctrlKey) && e.target) {
       let trEl = e.target;
-      while (!trEl.dataset.index) {
+      while (!trEl.dataset.link) {
         trEl = trEl.parentNode;
       }
       const selected = this.state.selected;
@@ -115,7 +115,7 @@ export default class TableListing extends React.Component {
         trEl = trEl.parentNode;
       }
       const linkToGo = trEl.dataset.link;
-      const id = this.props.items[parseInt(trEl.dataset.index, 10)]._id;
+      const id = trEl.dataset.id;
 
       const location = {
         pathname: linkToGo,
@@ -148,7 +148,7 @@ export default class TableListing extends React.Component {
     updateQuery(queryString.parse(this.props.location.search).filter);
     const filteredList = this.props.items.filter(itemFilter).sort(sorter);
     if (this.state.sortReverse) {
-      filteredList.reverse(); // modifies filteredList in place, odd that const doesn't guard that
+      filteredList.reverse();
     }
 
     const columnMapper = (title, index) => {
@@ -189,6 +189,7 @@ export default class TableListing extends React.Component {
                 key={`${item._id}_${index}`}
                 data-link={helper.viewLink(item)}
                 data-index={index}
+                data-id={item._id}
                 className={
                   this.state.selected.indexOf(index) !== -1
                     ? style.selected

@@ -62,7 +62,6 @@ class ProjectAll extends React.Component {
   }
 
   render() {
-    console.log('render project all');
     return (
       <TableListing
         breadcrumb={primaryBreadCrumbs()}

@@ -21,6 +21,8 @@ import { store, dispatch } from './redux';
 import * as TaskflowActions from './redux/actions/taskflows';
 import * as Behavior from './StateTransitionBehavior';
 import Toaster from './panels/Toaster';
+import Condition from './panels/Switch';
+import AuthRoute from './panels/AuthRoute';
 
 import client from './network';
 
@@ -53,16 +55,7 @@ import SimulationView from './pages/Simulation/View';
 // ----------------------------------------------------------------------------
 
 function loggedIn() {
-  console.log('is loggedIn', !!client.getLoggedInUser());
   return !!client.getLoggedInUser();
-}
-
-function isAdmin() {
-  if (loggedIn()) {
-    const user = client.getLoggedInUser();
-    return user.admin;
-  }
-  return false;
 }
 
 // ----------------------------------------------------------------------------
@@ -81,151 +74,113 @@ export function configure(config = { girderAPI: baseURL }) {
               <Route
                 exact
                 path="/"
-                render={() => {
-                  console.log('render home route');
-                  return loggedIn() ? <ProjectAll /> : <Landing />;
-                }}
+                render={(props) => (
+                  <Condition
+                    if={loggedIn}
+                    then={ProjectAll}
+                    else={Landing}
+                    {...props}
+                  />
+                )}
               />
               <Route path="/Logout" component={Logout} />
               <Route
                 path="/Register"
-                render={() => (loggedIn() ? <Redirect to="/" /> : <Register />)}
+                render={(props) => (
+                  <Condition
+                    if={loggedIn}
+                    then={Redirect}
+                    thenProps={{ to: '/' }}
+                    else={Register}
+                    {...props}
+                  />
+                )}
               />
               <Route path="/Forgot" component={Forgot} />
               <Route
                 path="/Login"
-                render={() => (loggedIn() ? <Redirect to="/" /> : <Login />)}
+                render={(props) => (
+                  <Condition
+                    if={loggedIn}
+                    then={Redirect}
+                    thenProps={{ to: '/' }}
+                    else={Login}
+                    {...props}
+                  />
+                )}
               />
               <Route path="/New">
                 <Switch>
-                  <Route
-                    path="/New/Project"
-                    render={() =>
-                      loggedIn() ? <ProjectNew /> : <Redirect to="/" />
-                    }
-                  />
-                  <Route
+                  <AuthRoute path="/New/Project" component={ProjectNew} />
+                  <AuthRoute
                     path="/New/Simulation/:projectId"
-                    render={() =>
-                      loggedIn() ? <SimulationNew /> : <Redirect to="/" />
-                    }
+                    component={SimulationNew}
                   />
                 </Switch>
               </Route>
               <Route path="/Edit">
                 <Switch>
-                  <Route
-                    path="/Edit/Project/:id"
-                    render={() =>
-                      loggedIn() ? <ProjectEdit /> : <Redirect to="/" />
-                    }
-                  />
-                  <Route
+                  <AuthRoute path="/Edit/Project/:id" component={ProjectEdit} />
+                  <AuthRoute
                     path="/Edit/Simulation/:id"
-                    render={() =>
-                      loggedIn() ? <SimulationEdit /> : <Redirect to="/" />
-                    }
+                    component={SimulationEdit}
                   />
                 </Switch>
               </Route>
               <Route path="/View">
                 <Switch>
-                  <Route
-                    path="/View/Project/:id"
-                    render={() =>
-                      loggedIn() ? <ProjectView /> : <Redirect to="/" />
-                    }
-                  />
-                  <Route
+                  <AuthRoute path="/View/Project/:id" component={ProjectView} />
+                  <AuthRoute
                     path="/View/Simulation/:id"
-                    render={() =>
-                      loggedIn() ? <SimulationView /> : <Redirect to="/" />
-                    }
+                    component={SimulationView}
                   />
-                  <Route
+                  <AuthRoute
                     path="/View/Simulation/:id/:step"
-                    render={() =>
-                      loggedIn() ? <SimulationView /> : <Redirect to="/" />
-                    }
+                    component={SimulationView}
                   />
                 </Switch>
               </Route>
               <Route path="/Preferences">
                 <Preferences>
                   <Switch>
-                    <Route
+                    <AuthRoute
                       exact
                       path="/Preferences"
-                      render={() =>
-                        loggedIn() ? <PreferencesUser /> : <Redirect to="/" />
-                      }
+                      component={PreferencesUser}
                     />
-                    <Route
+                    <AuthRoute
                       path="/Preferences/User"
-                      render={() =>
-                        loggedIn() ? <PreferencesUser /> : <Redirect to="/" />
-                      }
+                      component={PreferencesUser}
                     />
-                    <Route
+                    <AuthRoute
                       path="/Preferences/Groups"
-                      render={() =>
-                        isAdmin() ? (
-                          <PreferencesGroups />
-                        ) : (
-                          <Redirect to="/Preferences/User" />
-                        )
-                      }
+                      component={PreferencesGroups}
+                      admin
+                      redirectTo="/Preferences/User"
                     />
-                    <Route
+                    <AuthRoute
                       path="/Preferences/AWS"
-                      render={() =>
-                        loggedIn() ? <PreferencesAWS /> : <Redirect to="/" />
-                      }
+                      component={PreferencesAWS}
                     />
-                    <Route
+                    <AuthRoute
                       path="/Preferences/Cluster"
-                      render={() =>
-                        loggedIn() ? (
-                          <PreferencesCluster />
-                        ) : (
-                          <Redirect to="/" />
-                        )
-                      }
+                      component={PreferencesCluster}
                     />
-                    <Route
+                    <AuthRoute
                       path="/Preferences/Volumes"
-                      render={() =>
-                        loggedIn() ? (
-                          <PreferencesVolumes />
-                        ) : (
-                          <Redirect to="/" />
-                        )
-                      }
+                      component={PreferencesVolumes}
                     />
-                    <Route
+                    <AuthRoute
                       path="/Preferences/Status"
-                      render={() =>
-                        loggedIn() ? <PreferencesStatus /> : <Redirect to="/" />
-                      }
+                      component={PreferencesStatus}
                     />
-                    <Route
+                    <AuthRoute
                       path="/Preferences/Network"
-                      render={() =>
-                        loggedIn() ? (
-                          <PreferencesNetwork />
-                        ) : (
-                          <Redirect to="/" />
-                        )
-                      }
+                      component={PreferencesNetwork}
                     />
                   </Switch>
                 </Preferences>
               </Route>
-              <Route
-                render={({ location }) => (
-                  <div>No route for {location.pathname}</div>
-                )}
-              />
             </Switch>
           </RootContainer>
         </Router>
