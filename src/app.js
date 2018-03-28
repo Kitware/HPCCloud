@@ -5,17 +5,20 @@ import 'HPCCloudStyle/global.mcss';
 
 import React from 'react';
 import { render } from 'react-dom';
-import { Router, Route, Redirect, Switch, withRouter } from 'react-router-dom';
+import {
+  HashRouter as Router,
+  Route,
+  Redirect,
+  Switch,
+} from 'react-router-dom';
 import { Provider } from 'react-redux';
 
 import { updateVisualizerStateAccessor } from 'pvw-visualizer/src/redux/selectors/stateAccessor';
 
 import { baseURL } from './utils/Constants';
 
-import { store, history, dispatch } from './redux'; // history
-import * as ProjectActions from './redux/actions/projects';
+import { store, dispatch } from './redux';
 import * as TaskflowActions from './redux/actions/taskflows';
-import * as NetworkActions from './redux/actions/network';
 import * as Behavior from './StateTransitionBehavior';
 import Toaster from './panels/Toaster';
 
@@ -50,6 +53,7 @@ import SimulationView from './pages/Simulation/View';
 // ----------------------------------------------------------------------------
 
 function loggedIn() {
+  console.log('is loggedIn', !!client.getLoggedInUser());
   return !!client.getLoggedInUser();
 }
 
@@ -71,20 +75,23 @@ export function configure(config = { girderAPI: baseURL }) {
   render(
     <Provider store={store}>
       <main>
-        <Router history={history}>
+        <Router>
           <RootContainer>
             <Switch>
               <Route
                 exact
                 path="/"
-                render={() => (loggedIn() ? <ProjectAll /> : <Landing />)}
+                render={() => {
+                  console.log('render home route');
+                  return loggedIn() ? <ProjectAll /> : <Landing />;
+                }}
               />
-              <Route path="/Logout" component={withRouter(Logout)} />
+              <Route path="/Logout" component={Logout} />
               <Route
                 path="/Register"
                 render={() => (loggedIn() ? <Redirect to="/" /> : <Register />)}
               />
-              <Route path="/Forgot" component={withRouter(Forgot)} />
+              <Route path="/Forgot" component={Forgot} />
               <Route
                 path="/Login"
                 render={() => (loggedIn() ? <Redirect to="/" /> : <Login />)}
@@ -214,6 +221,11 @@ export function configure(config = { girderAPI: baseURL }) {
                   </Switch>
                 </Preferences>
               </Route>
+              <Route
+                render={({ location }) => (
+                  <div>No route for {location.pathname}</div>
+                )}
+              />
             </Switch>
           </RootContainer>
         </Router>
@@ -245,29 +257,3 @@ store.subscribe(() => {
     }, 1500);
   }
 });
-
-if (history) {
-  history.listen((location) => {
-    const path = location.pathname.split('/');
-
-    // Remove any nested path => [ 'View|Edit', 'Project|Simulation', '${ID}']
-    while (path.length > 4) {
-      path.pop();
-    }
-
-    // Extract id / type
-    const id = path.pop();
-    const type = path.pop();
-
-    // Activate the proper type
-    if (type === 'Simulation') {
-      dispatch(ProjectActions.setActiveSimulation(id));
-    }
-    if (type === 'Project') {
-      dispatch(ProjectActions.setActiveProject(id));
-    }
-
-    // invalidate all errors on a page change
-    dispatch(NetworkActions.invalidateErrors('*'));
-  });
-}

@@ -6,7 +6,8 @@ import * as ProjectHelper from '../../network/helpers/projects';
 import * as netActions from './network';
 import * as taskflowActions from './taskflows';
 import get from '../../utils/get';
-import { store, dispatch, history } from '../';
+import { store, dispatch } from '../';
+import history from './history';
 
 export const FETCH_PROJECT_LIST = 'FETCH_PROJECT_LIST';
 export const UPDATE_PROJECT_LIST = 'UPDATE_PROJECT_LIST';

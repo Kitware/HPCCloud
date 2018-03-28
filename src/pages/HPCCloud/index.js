@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import get from 'mout/src/object/get';
 import SvgIconWidget from 'paraviewweb/src/React/Widgets/SvgIconWidget';
 
@@ -11,12 +11,41 @@ import layout from 'HPCCloudStyle/Layout.mcss';
 import logo from 'HPCCloudStyle/logo.svg';
 
 import { dispatch } from '../../redux';
-import * as NetActions from '../../redux/actions/network';
+import { setHistory } from '../../redux/actions/history';
+import * as NetworkActions from '../../redux/actions/network';
 import * as ProgressActions from '../../redux/actions/progress';
+import * as ProjectActions from '../../redux/actions/projects';
 
 class TopBar extends React.Component {
   componentWillMount() {
     this.timeout = null;
+
+    // Handle history to dispatch actions
+    setHistory(this.props.history);
+    this.unlisten = this.props.history.listen((location) => {
+      console.log('history change => dispatch', location.pathname);
+      const path = location.pathname.split('/');
+
+      // Remove any nested path => [ 'View|Edit', 'Project|Simulation', '${ID}']
+      while (path.length > 4) {
+        path.pop();
+      }
+
+      // Extract id / type
+      const id = path.pop();
+      const type = path.pop();
+
+      // Activate the proper type
+      if (type === 'Simulation') {
+        dispatch(ProjectActions.setActiveSimulation(id));
+      }
+      if (type === 'Project') {
+        dispatch(ProjectActions.setActiveProject(id));
+      }
+
+      // invalidate all errors on a page change
+      dispatch(NetworkActions.invalidateErrors('*'));
+    });
   }
 
   componentWillReceiveProps() {
@@ -44,9 +73,14 @@ class TopBar extends React.Component {
     if (this.timeout !== null) {
       clearTimeout(this.timeout);
     }
+    if (this.unlisten) {
+      this.unlisten();
+      this.unlisten = null;
+    }
   }
 
   render() {
+    console.log('=========== render ===========');
     const width = `${this.props.progress}%`;
     const opacity = this.props.progress === 100 ? '0' : '1.0';
     const display = this.props.progressReset ? 'none' : null;
@@ -96,6 +130,7 @@ class TopBar extends React.Component {
 }
 
 TopBar.propTypes = {
+  history: PropTypes.object.isRequired,
   children: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   userName: PropTypes.string,
   isBusy: PropTypes.bool,
@@ -116,37 +151,39 @@ TopBar.defaultProps = {
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
 
-export default connect((state) => {
-  const firstName = get(state, 'auth.user.firstName');
-  const lastName = get(state, 'auth.user.lastName');
-  const pendingRequests = get(state, 'network.pending') || {};
-  const numberOfPendingRequest = Object.keys(pendingRequests).length;
-  let progress;
-  let progressReset;
-  let resetProgress;
-  if (state.progress.total === null) {
-    progress = Object.keys(state.network.progress).reduce((prev, key) => {
-      const file = state.network.progress[key];
-      return (
-        prev +
-        file.current /
-          file.total *
-          100 /
-          Object.keys(state.network.progress).length
-      );
-    }, 0);
-    progressReset = get(state, 'network.progressReset');
-    resetProgress = (val) => dispatch(NetActions.resetProgress(val));
-  } else {
-    progress = state.progress.current / state.progress.total * 100;
-    progressReset = state.progress.progressReset;
-    resetProgress = (val) => dispatch(ProgressActions.resetProgress(val));
-  }
-  return {
-    userName: firstName ? `${firstName} ${lastName}` : null,
-    isBusy: !!numberOfPendingRequest,
-    progress: progress || 0,
-    progressReset,
-    resetProgress,
-  };
-})(TopBar);
+export default withRouter(
+  connect((state) => {
+    const firstName = get(state, 'auth.user.firstName');
+    const lastName = get(state, 'auth.user.lastName');
+    const pendingRequests = get(state, 'network.pending') || {};
+    const numberOfPendingRequest = Object.keys(pendingRequests).length;
+    let progress;
+    let progressReset;
+    let resetProgress;
+    if (state.progress.total === null) {
+      progress = Object.keys(state.network.progress).reduce((prev, key) => {
+        const file = state.network.progress[key];
+        return (
+          prev +
+          file.current /
+            file.total *
+            100 /
+            Object.keys(state.network.progress).length
+        );
+      }, 0);
+      progressReset = get(state, 'network.progressReset');
+      resetProgress = (val) => dispatch(NetworkActions.resetProgress(val));
+    } else {
+      progress = state.progress.current / state.progress.total * 100;
+      progressReset = state.progress.progressReset;
+      resetProgress = (val) => dispatch(ProgressActions.resetProgress(val));
+    }
+    return {
+      userName: firstName ? `${firstName} ${lastName}` : null,
+      isBusy: !!numberOfPendingRequest,
+      progress: progress || 0,
+      progressReset,
+      resetProgress,
+    };
+  })(TopBar)
+);

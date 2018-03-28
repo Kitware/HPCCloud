@@ -1,6 +1,7 @@
 import client from '../../network';
 import * as netActions from './network';
-import { dispatch, history } from '..';
+import { dispatch } from '..';
+import history from './history';
 
 export const LOGGED_IN = 'LOGGED_IN';
 export const AUTH_PENDING = 'AUTH_PENDING';

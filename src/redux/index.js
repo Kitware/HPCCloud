@@ -1,10 +1,8 @@
 import { createStore } from 'redux';
-import { createHashHistory } from 'history';
 
 import reducers from './reducers';
 
 const store = createStore(reducers);
-const history = createHashHistory();
 
 function dispatch(action) {
   let currentAction = action;
@@ -16,4 +14,4 @@ function dispatch(action) {
 
 export default store;
 
-export { store, dispatch, history };
+export { store, dispatch };

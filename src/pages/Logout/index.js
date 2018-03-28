@@ -7,8 +7,12 @@ export default class Logout extends React.Component {
   componentDidMount() {
     client
       .logout()
-      .then(() => this.props.history.push('/'))
-      .catch(() => this.props.history.push('/'));
+      .then(() => {
+        this.props.history.push('/');
+      })
+      .catch(() => {
+        this.props.history.push('/');
+      });
   }
 
   render() {
