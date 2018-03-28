@@ -10,14 +10,9 @@ const EVENT_TOPIC = 'girder.notification';
 class Observable {}
 Monologue.mixInto(Observable);
 
-const _LOGIN_PROMISE = () =>
-  new Promise((resolve, reject) => {
-    resolve();
-  });
-const _LOGOUT_PROMISE = () =>
-  new Promise((resolve, reject) => {
-    reject();
-  });
+const _LOGIN_PROMISE = () => Promise.resolve('login');
+const _LOGOUT_PROMISE = () => Promise.reject('logout');
+
 // ----------------------------------------------------------------------------
 
 function encodeQueryAsString(query = {}) {
@@ -220,7 +215,7 @@ export function build(config = window.location, ...extensions) {
             })
             .catch((err) => {
               updateAuthenticationState(false);
-              reject();
+              reject(err);
             })
         );
       });
@@ -293,7 +288,7 @@ export function build(config = window.location, ...extensions) {
           if (!resp.data) {
             updateAuthenticationState(false);
             userData = null;
-            reject();
+            reject(resp);
             return;
           }
           // Update userData for external modules
@@ -305,10 +300,10 @@ export function build(config = window.location, ...extensions) {
         })
         .catch((errResp) => {
           updateAuthenticationState(false);
-          reject();
+          reject(errResp);
         });
     } else {
-      reject();
+      reject('No token');
     }
   });
 
