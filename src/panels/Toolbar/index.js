@@ -5,7 +5,6 @@ import queryString from 'query-string';
 import { withRouter } from 'react-router-dom';
 
 import style from 'HPCCloudStyle/Toolbar.mcss';
-import states from 'HPCCloudStyle/States.mcss';
 
 import Breadcrumb from '../../panels/Breadcrumb';
 
@@ -37,13 +36,11 @@ export class PreferenceSubBar extends React.Component {
   }
 
   render() {
+    if (this.props.hidden) {
+      return null;
+    }
     return (
-      <nav
-        className={[
-          style.container,
-          this.props.hidden ? states.isHidden : '',
-        ].join(' ')}
-      >
+      <nav className={style.container}>
         <Breadcrumb
           className={this.props.hasTabs ? style.toolbarTab : style.breadcrumb}
           paths={this.props.breadcrumb.paths}

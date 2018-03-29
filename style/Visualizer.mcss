@@ -38,6 +38,13 @@
     padding-left: 0;
 }
 
+.busy {
+  composes: button;
+  composes: fa-spinner from 'font-awesome/css/font-awesome.css';
+  composes: fa-pulse from 'font-awesome/css/font-awesome.css';
+  padding: 0;
+}
+
 .menu {
     position: absolute;
     top: 2.2em;

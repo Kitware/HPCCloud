@@ -131,10 +131,12 @@ export function configure(config = { girderAPI: baseURL }) {
                 <Switch>
                   <AuthRoute path="/View/Project/:id" component={ProjectView} />
                   <AuthRoute
+                    exact
                     path="/View/Simulation/:id"
                     component={SimulationView}
                   />
                   <AuthRoute
+                    exact
                     path="/View/Simulation/:id/:step"
                     component={SimulationView}
                   />
