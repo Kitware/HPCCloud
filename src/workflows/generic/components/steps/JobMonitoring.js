@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import queryString from 'query-string';
 
 import ButtonBar from '../../../../panels/ButtonBar';
 import JobMonitor from '../../../../panels/JobMonitor';
@@ -38,7 +39,11 @@ export function onRerun(props) {
   delete stepData.metadata.sessionKey;
   const location = {
     pathname: props.location.pathname,
-    query: { view: 'default' },
+    search: queryString.stringify(
+      Object.assign({}, queryString.parse(props.location.search), {
+        view: 'default',
+      })
+    ),
     state: props.location.state,
   };
   dispatch(

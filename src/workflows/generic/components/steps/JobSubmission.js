@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import queryString from 'query-string';
 
 import values from 'mout/src/object/values';
 
@@ -158,9 +159,11 @@ export default class JobSubmission extends React.Component {
       {
         // new location
         pathname: this.props.location.pathname,
-        query: Object.assign({}, this.props.location.query, {
-          view: this.props.nextView,
-        }),
+        search: queryString.stringify(
+          Object.assign({}, queryString.parse(this.props.location.search), {
+            view: this.props.nextView,
+          })
+        ),
         state: this.props.location.state,
       }
     );

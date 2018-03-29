@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import queryString from 'query-string';
 
 import JobMonitoring from '../../../../generic/components/steps/JobMonitoring';
 
@@ -41,7 +42,11 @@ function getActions(props) {
 function onVisualize(props) {
   const location = {
     pathname: props.location.pathname,
-    query: Object.assign({}, props.location.query, { view: 'visualizer' }),
+    search: queryString.stringify(
+      Object.assign({}, queryString.parse(props.location.search), {
+        view: 'visualizer',
+      })
+    ),
     state: props.location.state,
   };
   dispatch(SimActions.saveSimulation(props.simulation, null, location));

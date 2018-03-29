@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import deepClone from 'mout/src/lang/deepClone';
+import queryString from 'query-string';
 
 import JobMonitoring from '../../../../generic/components/steps/JobMonitoring';
 
@@ -30,7 +31,11 @@ function getActions(props) {
 export function onVisualize(props) {
   const location = {
     pathname: `View/Simulation/${props.simulation._id}/Visualization`,
-    query: Object.assign({}, props.location.query, { view: 'default' }),
+    search: queryString.stringify(
+      Object.assign({}, queryString.parse(props.location.search), {
+        view: 'default',
+      })
+    ),
     state: props.location.state,
   };
   const newSimState = deepClone(props.simulation);
