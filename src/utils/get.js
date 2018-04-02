@@ -1,26 +1,28 @@
-/* eslint-disable */
+/* eslint-disable no-cond-assign */
 export default function get(obj, prop) {
-  var parts = prop.split('.'),
-    last = parts.pop(),
-    falseyReturn = parts[parts.length - 1] === 'length' ? 0 : false;
+  let container = obj;
+  let propName = prop;
+  const parts = prop.split('.');
+  const last = parts.pop();
+  const falseyReturn = last === 'length' ? 0 : false;
 
-  if (!obj) {
+  if (!container) {
     return falseyReturn;
   }
 
-  while ((prop = parts.shift())) {
-    obj = obj[prop];
-    if (obj == null) {
+  while ((propName = parts.shift())) {
+    container = container[propName];
+    if (container == null) {
       return falseyReturn;
     }
   }
 
   // we don't want to return undefined
-  if (obj[last] == null) {
+  if (container[last] == null) {
     return falseyReturn;
   }
 
-  return obj[last];
+  return container[last];
 }
 
 /* we use `get` a lot to check for objects' contents,
