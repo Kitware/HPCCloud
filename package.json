@@ -38,7 +38,7 @@
     "karma-coverage": "1.1.1",
     "karma-electron": "5.2.2",
     "karma-tap": "4.1.0",
-    "karma-tap-pretty-reporter": "3.0.5",
+    "karma-spec-reporter": "0.0.32",
     "karma-webpack": "2.0.9",
     "tap-spec": "4.1.1",
     "tap-markdown": "1.2.1",

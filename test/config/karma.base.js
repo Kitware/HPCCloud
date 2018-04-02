@@ -8,11 +8,11 @@ module.exports = {
   },
   singleRun: true,
   frameworks: ['jasmine'],
-  browsers: ['PhantomJS'],
+  browsers: ['ChromeHeadless'],
   reporters: ['spec', 'coverage'],
   plugins: [
     'karma-jasmine',
-    'karma-phantomjs-launcher',
+    'karma-chrome-launcher',
     'karma-spec-reporter',
     'karma-webpack',
     'karma-coverage',

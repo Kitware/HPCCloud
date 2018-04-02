@@ -1,34 +1,33 @@
 // webpack for redux tests
-var webpack = require('webpack'),
-  path = require('path'),
-  loaders = require('paraviewweb/config/webpack.loaders.js');
+const webpack = require('webpack');
+const path = require('path');
 
-function nodeEnv() {
-  if (process.env.NODE_ENV) {
-    return '\'' + process.env.NODE_ENV + '\'';
-  }
-  return '\'development\'';
-}
-
-const definePlugin = new webpack.DefinePlugin({
-  'process.env.NODE_ENV': nodeEnv(),
-});
+const appRules = require('../../config/rules-hpccloud.js');
+const linterRules = require('../../config/rules-linter.js');
+const pvwRules = require('../../config/rules-pvw.js');
+const visualizerRules = require('../../config/rules-visualizer.js');
+const vtkjsRules = require('../../config/rules-vtkjs.js');
+const wslinkRules = require('../../config/rules-wslink.js');
+const simputRules = require('../../config/rules-simput.js');
 
 module.exports = {
-  plugins: [
-    definePlugin,
-  ],
   module: {
-    loaders: loaders.concat([
-      { test: /\.js$/, include: /node_modules\/pvw-visualizer\//, loader: 'babel?presets[]=es2015,presets[]=react' },
-    ]),
-    postLoaders: [
+    rules: [
       {
         test: /\.js$/,
         exclude: /node_modules|test/,
-        loader: 'istanbul-instrumenter',
+        loader: 'istanbul-instrumenter-loader',
+        enforce: 'post',
       },
-    ],
+    ].concat(
+      linterRules,
+      appRules,
+      pvwRules,
+      visualizerRules,
+      vtkjsRules,
+      wslinkRules,
+      simputRules
+    ),
   },
   resolve: {
     alias: {
