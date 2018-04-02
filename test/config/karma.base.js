@@ -4,7 +4,7 @@ module.exports = {
   basePath: '..',
   client: {
     // set to true if you're trying to read some console.log statement
-    captureConsole: false
+    captureConsole: false,
   },
   singleRun: true,
   frameworks: ['jasmine'],
@@ -22,22 +22,23 @@ module.exports = {
     'tests.webpack.js': ['webpack', 'sourcemap'],
   },
   webpackMiddleware: {
-      noInfo: true,
-      stats: {
-          chunks: false
-      }
+    noInfo: true,
+    stats: {
+      chunks: false,
+    },
   },
   coverageReporter: {
     reporters: [
       {
         type: 'html',
         dir: 'coverage/',
-        subdir: 'html'
-      }, {
+        subdir: 'html',
+      },
+      {
         type: 'lcovonly',
         dir: 'coverage',
-        subdir: 'lcov'
+        subdir: 'lcov',
       },
-    ]
-  }
+    ],
+  },
 };

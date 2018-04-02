@@ -1,10 +1,11 @@
-
 function isObject(val) {
-  return typeof val === 'object' &&
+  return (
+    typeof val === 'object' &&
     !Array.isArray(val) &&
     !(val instanceof RegExp) &&
     !(val instanceof String) &&
-    !(val instanceof Number);
+    !(val instanceof Number)
+  );
 }
 
 export default function deepFreeze(obj) {

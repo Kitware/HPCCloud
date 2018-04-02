@@ -1,23 +1,22 @@
 import { handleTaskflowChange } from '../../src/StateTransitionBehavior';
 
-import * as ProjectActions  from '../../src/redux/actions/projects';
+import * as ProjectActions from '../../src/redux/actions/projects';
 import * as TaskflowActions from '../../src/redux/actions/taskflows';
-import * as ClusterActions  from '../../src/redux/actions/clusters';
-import * as FSActions       from '../../src/redux/actions/fs';
+import * as ClusterActions from '../../src/redux/actions/clusters';
+import * as FSActions from '../../src/redux/actions/fs';
 
 // a full redux state, mostly empty, 1 project with two simulations
 import basicFullState from '../sampleData/basicFullState';
 import taskflowState from '../sampleData/basicTaskflowState';
 
 import { registerAssertions } from 'redux-actions-assertions/jasmine';
-import deepClone    from 'mout/src/lang/deepClone';
+import deepClone from 'mout/src/lang/deepClone';
 /* global describe expect it beforeEach beforeAll afterEach afterAll spyOn */
 
 // we spy on redux actions here, and they just need to return an action with some type
 const emptyAction = { type: 'NO-OP' };
 function setSpy(target, method, data) {
-  spyOn(target, method)
-    .and.returnValue(data);
+  spyOn(target, method).and.returnValue(data);
 }
 
 describe('StateTransitionBehavior', () => {
@@ -32,11 +31,13 @@ describe('StateTransitionBehavior', () => {
     fullState = deepClone(basicFullState);
     fullState.taskflows = deepClone(taskflowState);
     taskflow = deepClone(fullState.taskflows.mapById[taskflowId]);
-    simulation = deepClone(fullState.simulations.mapById['574c8aa00640fd3f1a3b379f']);
+    simulation = deepClone(
+      fullState.simulations.mapById['574c8aa00640fd3f1a3b379f']
+    );
     metadata = Object.assign({}, simulation.metadata, { status: 'complete' });
   }
 
-  it('does nothing if there\'s no taskflow', () => {
+  it("does nothing if there's no taskflow", () => {
     expect(handleTaskflowChange({})).toBe(undefined);
   });
 
@@ -76,8 +77,13 @@ describe('StateTransitionBehavior', () => {
       taskflow.allComplete = false;
       metadata.status = 'terminated';
       handleTaskflowChange(fullState, taskflow);
-      expect(ProjectActions.saveSimulation).toHaveBeenCalledWith(Object.assign({}, simulation, { metadata }));
-      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(taskflowId, newMeta); // actions: ['rerun']
+      expect(ProjectActions.saveSimulation).toHaveBeenCalledWith(
+        Object.assign({}, simulation, { metadata })
+      );
+      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(
+        taskflowId,
+        newMeta
+      ); // actions: ['rerun']
     });
 
     it('sets status to running, terminate in actions', () => {
@@ -85,11 +91,17 @@ describe('StateTransitionBehavior', () => {
       taskflow.jobMapById = { someId: { _id: 'someId', status: 'running' } };
       taskflow.allComplete = false;
       metadata.status = 'running';
-      fullState.preferences.clusters.mapById[clusterId] = taskflow.flow.meta.cluster;
+      fullState.preferences.clusters.mapById[clusterId] =
+        taskflow.flow.meta.cluster;
       handleTaskflowChange(fullState, taskflow);
-      expect(ProjectActions.saveSimulation).toHaveBeenCalledWith(Object.assign({}, simulation, { metadata }));
+      expect(ProjectActions.saveSimulation).toHaveBeenCalledWith(
+        Object.assign({}, simulation, { metadata })
+      );
       newMeta.actions = ['terminate'];
-      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(taskflowId, newMeta);
+      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(
+        taskflowId,
+        newMeta
+      );
     });
 
     it('sets cluster status to launching, terminate not in actions', () => {
@@ -101,9 +113,14 @@ describe('StateTransitionBehavior', () => {
       cluster.status = 'launching';
       fullState.preferences.clusters.mapById[clusterId] = cluster;
       handleTaskflowChange(fullState, taskflow);
-      expect(ProjectActions.saveSimulation).toHaveBeenCalledWith(Object.assign({}, simulation, { metadata }));
+      expect(ProjectActions.saveSimulation).toHaveBeenCalledWith(
+        Object.assign({}, simulation, { metadata })
+      );
       newMeta.actions = [];
-      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(taskflowId, newMeta);
+      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(
+        taskflowId,
+        newMeta
+      );
     });
 
     it('sets cluster status to provisioning, terminate not in actions', () => {
@@ -115,11 +132,15 @@ describe('StateTransitionBehavior', () => {
       cluster.status = 'provisioning';
       fullState.preferences.clusters.mapById[clusterId] = cluster;
       handleTaskflowChange(fullState, taskflow);
-      expect(ProjectActions.saveSimulation).toHaveBeenCalledWith(Object.assign({}, simulation, { metadata }));
+      expect(ProjectActions.saveSimulation).toHaveBeenCalledWith(
+        Object.assign({}, simulation, { metadata })
+      );
       newMeta.actions = [];
-      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(taskflowId, newMeta);
+      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(
+        taskflowId,
+        newMeta
+      );
     });
-
 
     it('sets status to complete, allComplete is true, actions is empty', () => {
       // if every job and task is complete, status is complete
@@ -128,11 +149,16 @@ describe('StateTransitionBehavior', () => {
       taskflow.allComplete = false;
       metadata.status = 'complete';
       handleTaskflowChange(fullState, taskflow);
-      expect(ProjectActions.saveSimulation).toHaveBeenCalledWith(Object.assign({}, simulation, { metadata }));
+      expect(ProjectActions.saveSimulation).toHaveBeenCalledWith(
+        Object.assign({}, simulation, { metadata })
+      );
       // view page in workflows handles actions to take it to the next step.
       newMeta.actions = [];
       newMeta.allComplete = true;
-      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(taskflowId, newMeta);
+      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(
+        taskflowId,
+        newMeta
+      );
     });
 
     it('adds the "terminate instance" button', () => {
@@ -147,7 +173,10 @@ describe('StateTransitionBehavior', () => {
       newMeta.actions = ['terminateInstance'];
 
       handleTaskflowChange(fullState, taskflow);
-      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(taskflowId, newMeta);
+      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(
+        taskflowId,
+        newMeta
+      );
     });
   });
 
@@ -157,7 +186,7 @@ describe('StateTransitionBehavior', () => {
       setSpy(ClusterActions, 'updateCluster', emptyAction);
     });
 
-    it('not update the cluster if there\'s no cluster in state', () => {
+    it("not update the cluster if there's no cluster in state", () => {
       handleTaskflowChange(fullState, taskflow);
       expect(ClusterActions.updateCluster).not.toHaveBeenCalled();
     });
@@ -188,11 +217,21 @@ describe('StateTransitionBehavior', () => {
     });
 
     it('updates outputDirectory', () => {
-      taskflow.jobMapById = { someId: { _id: 'someId', name: 'pyfr_run', status: 'complete', dir: '/my/dir' } };
+      taskflow.jobMapById = {
+        someId: {
+          _id: 'someId',
+          name: 'pyfr_run',
+          status: 'complete',
+          dir: '/my/dir',
+        },
+      };
       taskflow.allComplete = false;
       metadata.status = 'complete';
       handleTaskflowChange(fullState, taskflow);
-      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(taskflowId, newMeta);
+      expect(TaskflowActions.updateTaskflowMetadata).toHaveBeenCalledWith(
+        taskflowId,
+        newMeta
+      );
     });
   });
 
@@ -216,9 +255,15 @@ describe('StateTransitionBehavior', () => {
       taskflow.allComplete = false;
 
       handleTaskflowChange(fullState, taskflow);
-      expect(FSActions.fetchFolder).toHaveBeenCalledWith(simulation.metadata.inputFolder._id);
-      expect(FSActions.fetchFolder).toHaveBeenCalledWith(simulation.metadata.outputFolder._id);
-      expect(FSActions.fetchFolder).toHaveBeenCalledWith(simulation.steps[simulation.active].folderId);
+      expect(FSActions.fetchFolder).toHaveBeenCalledWith(
+        simulation.metadata.inputFolder._id
+      );
+      expect(FSActions.fetchFolder).toHaveBeenCalledWith(
+        simulation.metadata.outputFolder._id
+      );
+      expect(FSActions.fetchFolder).toHaveBeenCalledWith(
+        simulation.steps[simulation.active].folderId
+      );
       expect(fsSpy.calls.count()).toEqual(3);
     });
 
@@ -234,8 +279,12 @@ describe('StateTransitionBehavior', () => {
       };
 
       handleTaskflowChange(fullState, taskflow);
-      expect(FSActions.fetchFolder).toHaveBeenCalledWith(simulation.metadata.inputFolder._id);
-      expect(FSActions.fetchFolder).toHaveBeenCalledWith(simulation.steps[simulation.active].folderId);
+      expect(FSActions.fetchFolder).toHaveBeenCalledWith(
+        simulation.metadata.inputFolder._id
+      );
+      expect(FSActions.fetchFolder).toHaveBeenCalledWith(
+        simulation.steps[simulation.active].folderId
+      );
       expect(fsSpy.calls.count()).toEqual(2);
     });
   });

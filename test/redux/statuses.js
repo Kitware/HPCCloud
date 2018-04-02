@@ -1,5 +1,7 @@
 import * as Actions from '../../src/redux/actions/statuses';
-import statusesReducer, { initialState } from '../../src/redux/reducers/statuses';
+import statusesReducer, {
+  initialState,
+} from '../../src/redux/reducers/statuses';
 import client from '../../src/network';
 
 import expect from 'expect';
@@ -15,8 +17,7 @@ registerAssertions();
 Object.freeze(initialState);
 
 function setSpy(target, method, data) {
-  expect.spyOn(target, method)
-    .andReturn(Promise.resolve({ data }));
+  expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
 }
 
 describe('status', () => {
@@ -24,24 +25,30 @@ describe('status', () => {
   describe('simple actions', () => {
     it('should update cluster list', (done) => {
       const expectedAction = { type: Actions.UPDATE_CLUSTERS_LIST, list };
-      expect(Actions.updateClusterList(list))
-        .toDispatchActions(expectedAction, complete(done));
+      expect(Actions.updateClusterList(list)).toDispatchActions(
+        expectedAction,
+        complete(done)
+      );
 
       const expectedState = Object.assign({}, initialState);
       expectedState.clusters = list;
-      expect(statusesReducer(initialState, expectedAction))
-        .toEqual(expectedState);
+      expect(statusesReducer(initialState, expectedAction)).toEqual(
+        expectedState
+      );
     });
 
     it('should update ec2 list', (done) => {
       const expectedAction = { type: Actions.UPDATE_EC2_LIST, list };
-      expect(Actions.updateEC2List(list))
-        .toDispatchActions(expectedAction, complete(done));
+      expect(Actions.updateEC2List(list)).toDispatchActions(
+        expectedAction,
+        complete(done)
+      );
 
       const expectedState = Object.assign({}, initialState);
       expectedState.ec2 = list;
-      expect(statusesReducer(initialState, expectedAction))
-        .toEqual(expectedState);
+      expect(statusesReducer(initialState, expectedAction)).toEqual(
+        expectedState
+      );
     });
   });
 
@@ -57,8 +64,10 @@ describe('status', () => {
       ];
       setSpy(client, 'listClusters', list);
       setSpy(client, 'listAWSProfiles', list);
-      expect(Actions.fetchServers())
-        .toDispatchActions(expectedActions, complete(done));
+      expect(Actions.fetchServers()).toDispatchActions(
+        expectedActions,
+        complete(done)
+      );
     });
   });
 });
