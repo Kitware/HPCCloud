@@ -58,7 +58,7 @@
     "simput": "1.5.0",
     "candela": "0.19.1",
     "kw-doc": "1.1.1",
-    "kw-web-suite": "5.0.1"
+    "kw-web-suite": "6.0.1"
   },
   "scripts": {
     "validate": "prettier --config ./prettier.config.js --list-different \"src/**/*.js\"",
@@ -74,9 +74,9 @@
     "doc:www": "kw-doc -c ./docs/config.js -s",
     "doc:publish": "kw-doc -c ./docs/config.js -p",
     "prebuild": "npm run check",
-    "build": "webpack --progress --colors",
-    "build:debug": "webpack --display-modules",
-    "build:release": "webpack -p --progress --colors",
+    "build": "webpack --progress --colors --mode development",
+    "build:debug": "webpack --display-modules --mode development",
+    "build:release": "webpack --progress --colors --mode production",
     "start": "webpack-dev-server --progress --open",
     "test": "NODE_ENV='test' karma start test/karma.all.js",
     "test:redux": "NODE_ENV='test' karma start test/karma.redux.js",
