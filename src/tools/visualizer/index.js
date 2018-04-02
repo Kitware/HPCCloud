@@ -7,13 +7,11 @@ import { connect } from 'react-redux';
 import ControlPanelDef from 'pvw-visualizer/src/panels/ControlPanel';
 import VtkRenderer from 'paraviewweb/src/React/Renderers/VtkRenderer';
 import VtkGeometryRenderer from 'paraviewweb/src/React/Renderers/VtkGeometryRenderer';
-import InlineSvgIconWidget from 'paraviewweb/src/React/Widgets/InlineSvgIconWidget';
 import { selectors, setVisualizerActiveStore } from 'pvw-visualizer/src/redux';
 import Actions from 'pvw-visualizer/src/redux/actions';
 import setup from 'pvw-visualizer/src/setup';
 import ImageProviders from 'pvw-visualizer/src/ImageProviders';
 import network from 'pvw-visualizer/src/network';
-import logo from 'pvw-visualizer/src/logo.isvg';
 import LocalRenderingImageProvider from 'pvw-visualizer/src/LocalRenderingImageProvider';
 
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
@@ -120,7 +118,9 @@ class Visualization extends React.Component {
   }
 
   onAction(name) {
-    this[name]();
+    if (this[name]) {
+      this[name]();
+    }
   }
 
   setImageProvider() {
@@ -184,6 +184,21 @@ class Visualization extends React.Component {
       ? VtkRenderer
       : VtkGeometryRenderer;
 
+    const actions = [
+      { name: 'toggleMenu', icon: vizStyle.toggleMenuButton },
+      { name: 'nextTimeStep', icon: vizStyle.nextButton },
+      {
+        name: 'togglePlay',
+        icon: this.props.playing ? vizStyle.stopButton : vizStyle.playButton,
+      },
+      { name: 'previousTimeStep', icon: vizStyle.previousButton },
+      { name: 'resetCamera', icon: vizStyle.resetCameraButton },
+    ];
+
+    if (this.props.pendingCount || this.state.isRendererBusy) {
+      actions.push({ name: 'busy', icon: vizStyle.busy });
+    }
+
     return (
       <div className={style.rootContainer}>
         <Toolbar
@@ -191,18 +206,7 @@ class Visualization extends React.Component {
             this.props.project._id,
             this.props.simulation._id
           )}
-          actions={[
-            { name: 'toggleMenu', icon: vizStyle.toggleMenuButton },
-            { name: 'nextTimeStep', icon: vizStyle.nextButton },
-            {
-              name: 'togglePlay',
-              icon: this.props.playing
-                ? vizStyle.stopButton
-                : vizStyle.playButton,
-            },
-            { name: 'previousTimeStep', icon: vizStyle.previousButton },
-            { name: 'resetCamera', icon: vizStyle.resetCameraButton },
-          ]}
+          actions={actions}
           onAction={this.onAction}
           title={
             <span>
