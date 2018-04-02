@@ -39,7 +39,10 @@ module.exports = {
         './node_modules/simput/style/PropertyPanel.mcss'
       ),
       PVWStyle: path.join(__dirname, './node_modules/paraviewweb/style'),
-      VisualizerStyle: path.join(__dirname, './node_modules/pvw-visualizer/style'),
+      VisualizerStyle: path.join(
+        __dirname,
+        './node_modules/pvw-visualizer/style'
+      ),
       SimputStyle: path.resolve('./node_modules/simput/style'),
       HPCCloudStyle: path.resolve('./style'),
       workflows: path.resolve('./src/workflows'),
