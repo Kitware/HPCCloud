@@ -1,10 +1,11 @@
 import expect from 'expect';
 import React from 'react';
-import TestUtils from 'react-addons-test-utils';
-import ExecutionUnit from '../../src/panels/JobMonitor/ExecutionUnit';
-import LogFold from '../../src/panels/JobMonitor/LogFold';
+import TestUtils from 'react-dom/test-utils';
 
 import style from 'HPCCloudStyle/JobMonitor.mcss';
+
+import ExecutionUnit from '../../src/panels/JobMonitor/ExecutionUnit';
+import LogFold from '../../src/panels/JobMonitor/LogFold';
 
 /* global describe it */
 

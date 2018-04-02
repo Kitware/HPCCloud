@@ -1,3 +1,9 @@
+import expect, { spyOn } from 'expect';
+import thunk from 'redux-thunk';
+import { registerMiddlewares } from 'redux-actions-assertions';
+import { registerAssertions } from 'redux-actions-assertions/expect';
+import deepClone from 'mout/src/lang/deepClone';
+
 import * as Actions from '../../src/redux/actions/aws';
 import awsReducer, {
   awsTemplate,
@@ -7,19 +13,15 @@ import client from '../../src/network';
 
 import awsState from '../sampleData/awsState';
 
-import expect from 'expect';
-import thunk from 'redux-thunk';
 import complete from '../helpers/complete';
-import { registerMiddlewares } from 'redux-actions-assertions';
-import { registerAssertions } from 'redux-actions-assertions/expect';
-import deepClone from 'mout/src/lang/deepClone';
+
 /* global describe it afterEach */
 
 registerMiddlewares([thunk]);
 registerAssertions();
 
 function setSpy(target, method, data) {
-  expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
+  spyOn(target, method).andReturn(Promise.resolve({ data }));
 }
 
 describe('aws', () => {
@@ -78,7 +80,7 @@ describe('aws', () => {
 
   describe('async actions', () => {
     afterEach(() => {
-      expect.restoreSpies();
+      // expect.restoreSpies();
     });
 
     it('should fetch aws profiles', (done) => {
@@ -91,7 +93,7 @@ describe('aws', () => {
     });
 
     it('should remove aws profile', (done) => {
-      var expectedAction = { type: Actions.UPDATE_AWS_PROFILES, profiles };
+      let expectedAction = { type: Actions.UPDATE_AWS_PROFILES, profiles };
       setSpy(client, 'deleteAWSProfile', null);
       setSpy(client, 'listAWSProfiles', profiles);
       expect(Actions.removeAWSProfile(0, profile)).toDispatchActions(
@@ -109,7 +111,7 @@ describe('aws', () => {
     it('should update aws profile', (done) => {
       setSpy(client, 'listAWSProfiles', awsState.list);
       setSpy(client, 'createAWSProfile', profile);
-      var expectedAction = {
+      let expectedAction = {
         type: Actions.UPDATE_AWS_PROFILES,
         profiles: [profile],
       };
@@ -121,7 +123,7 @@ describe('aws', () => {
       expectedAction = {
         type: Actions.SAVE_AWS_PROFILE,
         index: 0,
-        profile: profile,
+        profile,
       };
       expect(Actions.updateAWSProfile(0, profile, false)).toDispatchActions(
         expectedAction,

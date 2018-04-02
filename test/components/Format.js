@@ -1,5 +1,8 @@
 import expect from 'expect';
+
 import { formatFileSize, formatTime } from '../../src/utils/Format';
+
+/* global describe it */
 
 describe('formatTime', () => {
   it('formats time to hh:mm:ss.ms', () => {

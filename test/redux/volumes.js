@@ -1,3 +1,10 @@
+import expect, { spyOn } from 'expect';
+import thunk from 'redux-thunk';
+
+import { registerMiddlewares } from 'redux-actions-assertions';
+import { registerAssertions } from 'redux-actions-assertions/expect';
+import deepClone from 'mout/src/lang/deepClone';
+
 import * as Actions from '../../src/redux/actions/volumes';
 import volumeReducer, {
   volumeTemplate,
@@ -5,19 +12,15 @@ import volumeReducer, {
 } from '../../src/redux/reducers/volumes';
 import client from '../../src/network';
 
-import expect from 'expect';
-import thunk from 'redux-thunk';
 import complete from '../helpers/complete';
-import { registerMiddlewares } from 'redux-actions-assertions';
-import { registerAssertions } from 'redux-actions-assertions/expect';
-import deepClone from 'mout/src/lang/deepClone';
+
 /* global describe it afterEach */
 
 registerMiddlewares([thunk]);
 registerAssertions();
 
 function setSpy(target, method, data) {
-  return expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
+  return spyOn(target, method).andReturn(Promise.resolve({ data }));
 }
 
 describe('volumes', () => {

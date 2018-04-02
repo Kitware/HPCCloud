@@ -1,3 +1,7 @@
+import expect, { spyOn } from 'expect';
+import { registerAssertions } from 'redux-actions-assertions/jasmine';
+import deepClone from 'mout/src/lang/deepClone';
+
 import { handleTaskflowChange } from '../../src/StateTransitionBehavior';
 
 import * as ProjectActions from '../../src/redux/actions/projects';
@@ -9,9 +13,7 @@ import * as FSActions from '../../src/redux/actions/fs';
 import basicFullState from '../sampleData/basicFullState';
 import taskflowState from '../sampleData/basicTaskflowState';
 
-import { registerAssertions } from 'redux-actions-assertions/jasmine';
-import deepClone from 'mout/src/lang/deepClone';
-/* global describe expect it beforeEach beforeAll afterEach afterAll spyOn */
+/* global describe it beforeEach afterAll */
 
 // we spy on redux actions here, and they just need to return an action with some type
 const emptyAction = { type: 'NO-OP' };
@@ -25,7 +27,10 @@ describe('StateTransitionBehavior', () => {
   const taskflowId = '574c9d900640fd6e133b4b57';
   const taskId = '574c9f350640fd6e13b11e39';
   const clusterId = '574c9d920640fd6e133b4b60';
-  let fullState, taskflow, simulation, metadata;
+  let fullState;
+  let taskflow;
+  let simulation;
+  let metadata;
 
   function setupState() {
     fullState = deepClone(basicFullState);

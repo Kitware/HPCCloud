@@ -1,6 +1,6 @@
 import expect from 'expect';
 import React from 'react';
-import TestUtils from 'react-addons-test-utils';
+import TestUtils from 'react-dom/test-utils';
 import ButtonBar from '../../src/panels/ButtonBar';
 
 /* global describe it */
@@ -33,10 +33,9 @@ describe('ButtonBar', () => {
       { name: 'Reset', disabled: false },
       { name: 'Submit', disabled: false },
     ];
-    var renderer = TestUtils.createRenderer(),
-      result;
+    const renderer = TestUtils.createRenderer();
     renderer.render(<ButtonBar visible={false} actions={actions} />);
-    result = renderer.getRenderOutput();
+    const result = renderer.getRenderOutput();
     expect(result).toEqual(null); // when not visible it renders null
   });
 });

@@ -1,13 +1,16 @@
+import expect, { spyOn } from 'expect';
+import thunk from 'redux-thunk';
+
+import { registerMiddlewares } from 'redux-actions-assertions';
+import { registerAssertions } from 'redux-actions-assertions/expect';
+
 import * as Actions from '../../src/redux/actions/user';
-import * as routingActions from '../../src/redux/actions/router';
+import history from '../../src/redux/actions/history';
 import usersReducer, { initialState } from '../../src/redux/reducers/auth';
 import client from '../../src/network';
 
-import expect from 'expect';
-import thunk from 'redux-thunk';
 import complete from '../helpers/complete';
-import { registerMiddlewares } from 'redux-actions-assertions';
-import { registerAssertions } from 'redux-actions-assertions/expect';
+
 /* global describe it afterEach */
 
 registerMiddlewares([thunk]);
@@ -17,9 +20,9 @@ Object.freeze(initialState);
 
 function setSpy(target, method, data, raw = false) {
   if (raw) {
-    expect.spyOn(target, method).andReturn(data);
+    spyOn(target, method).andReturn(data);
   } else {
-    expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
+    spyOn(target, method).andReturn(Promise.resolve({ data }));
   }
 }
 
@@ -47,7 +50,7 @@ describe('user', () => {
     it('should login user', (done) => {
       const expectedActions = [
         { type: Actions.LOGGED_IN, user },
-        routingActions.replace('/'),
+        history.replace('/'),
       ];
       setSpy(client, 'login', user);
       setSpy(client, 'getLoggedInUser', user, true);
@@ -60,7 +63,7 @@ describe('user', () => {
     it('should logout user', (done) => {
       setSpy(client, 'logout', user);
       expect(Actions.logout()).toDispatchActions(
-        routingActions.replace('/'),
+        history.replace('/'),
         complete(done)
       );
       expect(client.logout).toHaveBeenCalled();
@@ -70,7 +73,7 @@ describe('user', () => {
       setSpy(client, 'createUser', user);
       expect(
         Actions.register('Tom', 'Bob', 'tbob11', 'test@wow.com', 'my-password')
-      ).toDispatchActions(routingActions.replace('/Login'), complete(done));
+      ).toDispatchActions(history.replace('/Login'), complete(done));
       expect(client.createUser).toHaveBeenCalled();
     });
   });

@@ -1,6 +1,8 @@
 import expect from 'expect';
 import get from '../../src/utils/get';
 
+/* global describe it */
+
 describe('get', () => {
   const obj = {
     prop1: {

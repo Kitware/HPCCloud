@@ -1,3 +1,10 @@
+import expect, { spyOn } from 'expect';
+import thunk from 'redux-thunk';
+
+import { registerMiddlewares } from 'redux-actions-assertions';
+import { registerAssertions } from 'redux-actions-assertions/expect';
+import deepClone from 'mout/src/lang/deepClone';
+
 import * as Actions from '../../src/redux/actions/fs';
 import fsReducer, {
   folderInitialState,
@@ -5,19 +12,15 @@ import fsReducer, {
 } from '../../src/redux/reducers/fs';
 import client from '../../src/network';
 
-import expect from 'expect';
-import thunk from 'redux-thunk';
 import complete from '../helpers/complete';
-import { registerMiddlewares } from 'redux-actions-assertions';
-import { registerAssertions } from 'redux-actions-assertions/expect';
-import deepClone from 'mout/src/lang/deepClone';
+
 /* global describe it afterEach */
 
 registerMiddlewares([thunk]);
 registerAssertions();
 
 function setSpy(target, method, data) {
-  expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
+  spyOn(target, method).andReturn(Promise.resolve({ data }));
 }
 
 Object.freeze(initialState);

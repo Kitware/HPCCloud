@@ -1,19 +1,21 @@
 import expect from 'expect';
 import React from 'react';
-import TestUtils from 'react-addons-test-utils';
+import TestUtils from 'react-dom/test-utils';
+
+import deepClone from 'mout/src/lang/deepClone';
+
+import style from 'HPCCloudStyle/ItemEditor.mcss';
+
 import client from '../../src/network';
 import RunForm from '../../src/panels/run';
 import RunEC2 from '../../src/panels/run/RunEC2';
 import RunCluster from '../../src/panels/run/RunCluster';
-
-import style from 'HPCCloudStyle/ItemEditor.mcss';
 
 import sampleData from '../sampleData/runFormState';
 import machines from '../sampleData/machines';
 import awsClusters from '../sampleData/awsClusters';
 import awsState from '../sampleData/awsState';
 
-import deepClone from 'mout/src/lang/deepClone';
 /* global describe it */
 
 function setSpy(target, method, data) {
@@ -67,7 +69,7 @@ describe('RunForm', () => {
       const el = TestUtils.renderIntoDocument(
         <RunEC2 contents={sampleData.EC2} onChange={blankFunc} />
       );
-      var noClusters = deepClone(formState);
+      const noClusters = deepClone(formState);
       delete noClusters.clusters;
       el.setState(noClusters);
       expect(
