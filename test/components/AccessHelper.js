@@ -1,8 +1,9 @@
 import expect from 'expect';
 import * as AccessHelper from '../../src/utils/AccessHelper';
 
-describe('userHasAccess', () => {
+/* global describe it */
 
+describe('userHasAccess', () => {
   // levels -> 0: READ,  1: WRITE,  2: ADMIN
   it('rejects users without sufficient access', () => {
     const user = { _id: 'abc123', groups: ['abc', 'def', 'ghi'] };

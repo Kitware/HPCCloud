@@ -1,34 +1,41 @@
+os: linux
 sudo: required
+dist: trusty
+group: travis_lts
+
 language: python
 python:
-    - "2.7"
-    - "3.4"
+  - "2.7"
+  - "3.4"
 
 env:
-    - CXX=g++-4.8
+  - CXX=g++-4.8
 
 addons:
-    apt:
-        sources:
-            - ubuntu-toolchain-r-test
-        packages:
-            - g++-4.8
-            - libgif-dev
+  chrome: stable
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+      - libgif-dev
 
 notifications:
-    email:
-        recipients:
-            - sebastien.jourdain@kitware.com
-            - chris.harris@kitware.com
-        on_success: change
-        on_failure: always
+  email:
+    recipients:
+      - sebastien.jourdain@kitware.com
+      - chris.harris@kitware.com
+    on_success: change
+    on_failure: always
+
 cache:
-    directories:
-        - node_modules
-        - $HOME/.cache
+  directories:
+    - node_modules
+    - $HOME/.cache
 
 compiler:
     - gcc
+
 before_install:
     # Update pip
     - pip install -U pip virtualenv
