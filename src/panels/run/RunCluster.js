@@ -109,7 +109,10 @@ export default class RunCluster extends React.Component {
   render() {
     if (this.state.profiles.length === 0) {
       return this.state.busy ? null : (
-        <div className={[style.container, theme.warningBox].join(' ')}>
+        <div
+          className={[style.container, theme.warningBox].join(' ')}
+          style={{ margin: '15px' }}
+        >
           <span>
             There are no Traditional Clusters defined with the required
             configuration. Add some on&nbsp;
