@@ -29,6 +29,7 @@
     "query-string": "6.0.0"
   },
   "devDependencies": {
+    "react-test-renderer": "16.2.0",
     "wslink": "0.1.7",
     "axios": "0.18.0",
     "font-awesome": "4.7.0",

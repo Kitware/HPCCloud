@@ -20,6 +20,7 @@ plugins.push(
 
 module.exports = {
   plugins,
+  devtool: 'cheap-module-source-map',
   mode: 'development',
   module: {
     rules: [

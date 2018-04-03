@@ -4,6 +4,8 @@ import TestUtils from 'react-dom/test-utils';
 
 import deepClone from 'mout/src/lang/deepClone';
 
+import { HashRouter as Router } from 'react-router-dom';
+
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 
 import client from '../../src/network';
@@ -43,12 +45,14 @@ describe('RunForm', () => {
 
     it('renders EC2 form', () => {
       const el = TestUtils.renderIntoDocument(
-        <RunForm
-          serverType="EC2"
-          profiles={sampleData}
-          onChange={blankFunc}
-          serverTypeChange={blankFunc}
-        />
+        <Router>
+          <RunForm
+            serverType="EC2"
+            profiles={sampleData}
+            onChange={blankFunc}
+            serverTypeChange={blankFunc}
+          />
+        </Router>
       );
       expect(
         TestUtils.scryRenderedComponentsWithType(el, RunEC2).length
@@ -57,7 +61,9 @@ describe('RunForm', () => {
 
     it('should have a cluster list if there are clusters', () => {
       const el = TestUtils.renderIntoDocument(
-        <RunEC2 contents={sampleData.EC2} onChange={blankFunc} />
+        <Router>
+          <RunEC2 contents={sampleData.EC2} onChange={blankFunc} />
+        </Router>
       );
       el.setState(formState);
       expect(
@@ -67,7 +73,9 @@ describe('RunForm', () => {
 
     it('should not have a cluster list when there are no clusters', () => {
       const el = TestUtils.renderIntoDocument(
-        <RunEC2 contents={sampleData.EC2} onChange={blankFunc} />
+        <Router>
+          <RunEC2 contents={sampleData.EC2} onChange={blankFunc} />
+        </Router>
       );
       const noClusters = deepClone(formState);
       delete noClusters.clusters;
@@ -83,12 +91,14 @@ describe('RunForm', () => {
       setSpy(client, 'listClusters', []);
 
       const el = TestUtils.renderIntoDocument(
-        <RunForm
-          serverType="Traditional"
-          profiles={sampleData}
-          onChange={blankFunc}
-          serverTypeChange={blankFunc}
-        />
+        <Router>
+          <RunForm
+            serverType="Traditional"
+            profiles={sampleData}
+            onChange={blankFunc}
+            serverTypeChange={blankFunc}
+          />
+        </Router>
       );
       expect(
         TestUtils.scryRenderedComponentsWithType(el, RunCluster).length

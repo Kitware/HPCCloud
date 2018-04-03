@@ -1,6 +1,7 @@
 import expect from 'expect';
 import React from 'react';
 import TestUtils from 'react-dom/test-utils';
+import ShallowRenderer from 'react-test-renderer/shallow';
 import ButtonBar from '../../src/panels/ButtonBar';
 
 /* global describe it */
@@ -33,7 +34,7 @@ describe('ButtonBar', () => {
       { name: 'Reset', disabled: false },
       { name: 'Submit', disabled: false },
     ];
-    const renderer = TestUtils.createRenderer();
+    const renderer = new ShallowRenderer();
     renderer.render(<ButtonBar visible={false} actions={actions} />);
     const result = renderer.getRenderOutput();
     expect(result).toEqual(null); // when not visible it renders null
