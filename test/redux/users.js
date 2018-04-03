@@ -1,16 +1,14 @@
-import expect, { spyOn } from 'expect';
+import expect from 'expect';
 import thunk from 'redux-thunk';
 
 import { registerMiddlewares } from 'redux-actions-assertions';
 import { registerAssertions } from 'redux-actions-assertions/expect';
 
 import * as Actions from '../../src/redux/actions/user';
-import history from '../../src/redux/actions/history';
 import usersReducer, { initialState } from '../../src/redux/reducers/auth';
 import client from '../../src/network';
 
 import complete from '../helpers/complete';
-
 /* global describe it afterEach */
 
 registerMiddlewares([thunk]);
@@ -20,9 +18,9 @@ Object.freeze(initialState);
 
 function setSpy(target, method, data, raw = false) {
   if (raw) {
-    spyOn(target, method).andReturn(data);
+    expect.spyOn(target, method).andReturn(data);
   } else {
-    spyOn(target, method).andReturn(Promise.resolve({ data }));
+    expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
   }
 }
 
@@ -48,10 +46,7 @@ describe('user', () => {
     });
 
     it('should login user', (done) => {
-      const expectedActions = [
-        { type: Actions.LOGGED_IN, user },
-        history.replace('/'),
-      ];
+      const expectedActions = [{ type: Actions.LOGGED_IN, user }];
       setSpy(client, 'login', user);
       setSpy(client, 'getLoggedInUser', user, true);
       expect(Actions.login('Tom', 'my-password')).toDispatchActions(
@@ -60,21 +55,22 @@ describe('user', () => {
       );
     });
 
-    it('should logout user', (done) => {
-      setSpy(client, 'logout', user);
-      expect(Actions.logout()).toDispatchActions(
-        history.replace('/'),
-        complete(done)
-      );
-      expect(client.logout).toHaveBeenCalled();
-    });
+    // Work at the render layer now
+    // it('should logout user', (done) => {
+    //   setSpy(client, 'logout', user);
+    //   expect(Actions.logout()).toDispatchActions(
+    //     routingActions.replace('/'),
+    //     complete(done)
+    //   );
+    //   expect(client.logout).toHaveBeenCalled();
+    // });
 
-    it('should register user', (done) => {
-      setSpy(client, 'createUser', user);
-      expect(
-        Actions.register('Tom', 'Bob', 'tbob11', 'test@wow.com', 'my-password')
-      ).toDispatchActions(history.replace('/Login'), complete(done));
-      expect(client.createUser).toHaveBeenCalled();
-    });
+    // it('should register user', (done) => {
+    //   setSpy(client, 'createUser', user);
+    //   expect(
+    //     Actions.register('Tom', 'Bob', 'tbob11', 'test@wow.com', 'my-password')
+    //   ).toDispatchActions(routingActions.replace('/Login'), complete(done));
+    //   expect(client.createUser).toHaveBeenCalled();
+    // });
   });
 });

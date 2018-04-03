@@ -1,4 +1,3 @@
-import expect, { spyOn } from 'expect';
 import deepClone from 'mout/src/lang/deepClone';
 import { registerAssertions } from 'redux-actions-assertions/jasmine';
 
@@ -17,7 +16,7 @@ import * as SimulationHelper from '../../src/network/helpers/simulations';
 import projectsData from '../sampleData/projectsData';
 import simulationData from '../sampleData/simulationsForProj1';
 
-/* global describe it beforeEach */
+/* global describe expect it beforeEach spyOn */
 
 function setSpy(target, method, data) {
   spyOn(target, method).and.returnValue(Promise.resolve({ data }));

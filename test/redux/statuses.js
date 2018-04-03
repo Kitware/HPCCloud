@@ -1,4 +1,4 @@
-import expect, { spyOn } from 'expect';
+import expect from 'expect';
 import thunk from 'redux-thunk';
 
 import { registerMiddlewares } from 'redux-actions-assertions';
@@ -11,6 +11,7 @@ import statusesReducer, {
 import client from '../../src/network';
 
 import complete from '../helpers/complete';
+
 /* global describe it afterEach */
 
 registerMiddlewares([thunk]);
@@ -19,7 +20,7 @@ registerAssertions();
 Object.freeze(initialState);
 
 function setSpy(target, method, data) {
-  spyOn(target, method).andReturn(Promise.resolve({ data }));
+  expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
 }
 
 describe('status', () => {

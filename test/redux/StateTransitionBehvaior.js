@@ -1,4 +1,3 @@
-import expect, { spyOn } from 'expect';
 import { registerAssertions } from 'redux-actions-assertions/jasmine';
 import deepClone from 'mout/src/lang/deepClone';
 
@@ -13,7 +12,7 @@ import * as FSActions from '../../src/redux/actions/fs';
 import basicFullState from '../sampleData/basicFullState';
 import taskflowState from '../sampleData/basicTaskflowState';
 
-/* global describe it beforeEach afterAll */
+/* global describe expect it beforeEach afterAll spyOn */
 
 // we spy on redux actions here, and they just need to return an action with some type
 const emptyAction = { type: 'NO-OP' };

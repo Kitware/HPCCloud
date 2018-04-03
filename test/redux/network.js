@@ -1,5 +1,6 @@
 import expect from 'expect';
 import thunk from 'redux-thunk';
+
 import { registerMiddlewares } from 'redux-actions-assertions';
 import { registerAssertions } from 'redux-actions-assertions/expect';
 import deepClone from 'mout/src/lang/deepClone';

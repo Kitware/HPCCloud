@@ -1,4 +1,4 @@
-import expect, { spyOn } from 'expect';
+import expect from 'expect';
 import thunk from 'redux-thunk';
 
 import { registerMiddlewares } from 'redux-actions-assertions';
@@ -20,7 +20,7 @@ registerMiddlewares([thunk]);
 registerAssertions();
 
 function setSpy(target, method, data) {
-  spyOn(target, method).andReturn(Promise.resolve({ data }));
+  expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
 }
 
 Object.freeze(initialState);

@@ -1,8 +1,8 @@
+import expect from 'expect';
+import thunk from 'redux-thunk';
 import { registerMiddlewares } from 'redux-actions-assertions';
 import { registerAssertions } from 'redux-actions-assertions/expect';
 import deepClone from 'mout/src/lang/deepClone';
-import expect, { spyOn } from 'expect';
-import thunk from 'redux-thunk';
 
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
@@ -13,6 +13,7 @@ import clustersReducer, {
 } from '../../src/redux/reducers/clusters';
 import client from '../../src/network';
 import * as ClusterHelpers from '../../src/network/helpers/clusters';
+
 import complete from '../helpers/complete';
 
 /* global describe it afterEach */
@@ -21,7 +22,7 @@ registerMiddlewares([thunk]);
 registerAssertions();
 
 function setSpy(target, method, data) {
-  spyOn(target, method).andReturn(Promise.resolve({ data }));
+  expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
 }
 
 Object.freeze(initialState);

@@ -1,4 +1,3 @@
-import expect, { spyOn } from 'expect';
 import { registerAssertions } from 'redux-actions-assertions/jasmine';
 import deepClone from 'mout/src/lang/deepClone';
 
@@ -9,7 +8,7 @@ import groupsReducer, {
 } from '../../src/redux/reducers/groups';
 import client from '../../src/network';
 
-/* global jasmine describe it beforeEach */
+/* global jasmine describe expect it beforeEach spyOn */
 
 function setSpy(target, method, data) {
   spyOn(target, method).and.returnValue(Promise.resolve({ data }));
