@@ -1,5 +1,6 @@
 // webpack for redux tests
 const path = require('path');
+const webpack = require('webpack');
 
 const appRules = require('../../config/rules-hpccloud.js');
 const pvwRules = require('../../config/rules-pvw.js');
@@ -9,8 +10,17 @@ const wslinkRules = require('../../config/rules-wslink.js');
 const simputRules = require('../../config/rules-simput.js');
 
 const eslintrcPath = path.join(__dirname, '../../.eslintrc.js');
+const plugins = [];
+
+plugins.push(
+  new webpack.DefinePlugin({
+    KARMA_TEST_RUNNER: JSON.stringify(true),
+  })
+);
 
 module.exports = {
+  plugins,
+  mode: 'development',
   module: {
     rules: [
       {

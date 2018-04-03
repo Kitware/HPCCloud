@@ -336,8 +336,9 @@ export function build(config = window.location, ...extensions) {
   processExtension(extensions);
 
   // Return the newly composed object
-  // if env === test, return an unfrozen version so we can spy on it
-  if (process.env.NODE_ENV === 'test') {
+  // if karma, return an unfrozen version so we can spy on it
+  /* global KARMA_TEST_RUNNER */
+  if (KARMA_TEST_RUNNER) {
     return publicObject;
   }
   return Object.freeze(publicObject);

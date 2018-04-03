@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 const appRules = require('./config/rules-hpccloud.js');
 const linterRules = require('./config/rules-linter.js');
@@ -9,9 +10,16 @@ const wslinkRules = require('./config/rules-wslink.js');
 const simputRules = require('./config/rules-simput.js');
 
 const entry = path.join(__dirname, 'src/app.js');
+const plugins = [];
+
+plugins.push(
+  new webpack.DefinePlugin({
+    KARMA_TEST_RUNNER: JSON.stringify(false),
+  })
+);
 
 module.exports = {
-  plugins: [],
+  plugins,
   entry,
   output: {
     path: path.join(__dirname, './dist'),

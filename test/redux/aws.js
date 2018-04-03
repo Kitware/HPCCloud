@@ -1,4 +1,4 @@
-import expect, { spyOn } from 'expect';
+import expect from 'expect';
 import thunk from 'redux-thunk';
 import { registerMiddlewares } from 'redux-actions-assertions';
 import { registerAssertions } from 'redux-actions-assertions/expect';
@@ -21,7 +21,7 @@ registerMiddlewares([thunk]);
 registerAssertions();
 
 function setSpy(target, method, data) {
-  spyOn(target, method).andReturn(Promise.resolve({ data }));
+  expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
 }
 
 describe('aws', () => {
@@ -80,7 +80,7 @@ describe('aws', () => {
 
   describe('async actions', () => {
     afterEach(() => {
-      // expect.restoreSpies();
+      expect.restoreSpies();
     });
 
     it('should fetch aws profiles', (done) => {
