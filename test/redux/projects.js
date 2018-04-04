@@ -1,5 +1,9 @@
+import expect from 'expect';
 import deepClone from 'mout/src/lang/deepClone';
-import { registerAssertions } from 'redux-actions-assertions/jasmine';
+import thunk from 'redux-thunk';
+
+import { registerMiddlewares } from 'redux-actions-assertions';
+import { registerAssertions } from 'redux-actions-assertions/expect';
 
 import * as Actions from '../../src/redux/actions/projects';
 import projectsReducer, {
@@ -16,17 +20,29 @@ import * as SimulationHelper from '../../src/network/helpers/simulations';
 import projectsData from '../sampleData/projectsData';
 import simulationData from '../sampleData/simulationsForProj1';
 
-/* global describe expect it beforeEach spyOn */
+/* global describe it afterEach */
+
+const allSpies = [];
 
 function setSpy(target, method, data) {
-  spyOn(target, method).and.returnValue(Promise.resolve({ data }));
+  const spy = expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
+  allSpies.push(spy);
+  return spy;
 }
+
+function restoreSpies() {
+  while (allSpies.length) {
+    allSpies.pop().restore();
+  }
+}
+
+registerMiddlewares([thunk]);
+registerAssertions();
 
 Object.freeze(initialState);
 Object.freeze(projectsData);
 
 describe('project actions', () => {
-  beforeEach(registerAssertions);
   // ----------------------------------------------------------------------------
   // SIMPLE ACTIONS
   // ----------------------------------------------------------------------------
@@ -89,6 +105,8 @@ describe('project actions', () => {
   // AYSYNCHRONUS ACTIONS
   // ----------------------------------------------------------------------------
   describe('async actions', () => {
+    afterEach(restoreSpies);
+
     it('should get projects', (done) => {
       setSpy(client, 'listProjects', projectsData);
       expect(Actions.fetchProjectList()).toDispatchActions(
@@ -176,7 +194,7 @@ describe('project actions', () => {
 // ----------------------------------------------------------------------------
 
 describe('simulation actions', () => {
-  beforeEach(registerAssertions);
+  afterEach(restoreSpies);
   describe('simple actions', () => {
     it('should update Simulation', (done) => {
       const projId = projectsData[0]._id;
@@ -203,6 +221,7 @@ describe('simulation actions', () => {
   });
 
   describe('async actions', () => {
+    afterEach(restoreSpies);
     it('should save simulation', (done) => {
       const expectedSim = Object.assign({}, simulationData[0]);
       const expectedAction = {

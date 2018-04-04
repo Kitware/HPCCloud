@@ -1,3 +1,4 @@
+import expect from 'expect';
 import { registerAssertions } from 'redux-actions-assertions/jasmine';
 import deepClone from 'mout/src/lang/deepClone';
 
@@ -8,10 +9,10 @@ import groupsReducer, {
 } from '../../src/redux/reducers/groups';
 import client from '../../src/network';
 
-/* global jasmine describe expect it beforeEach spyOn */
+/* global jasmine describe it beforeEach */
 
 function setSpy(target, method, data) {
-  spyOn(target, method).and.returnValue(Promise.resolve({ data }));
+  expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
 }
 
 Object.freeze(initialState);
@@ -151,9 +152,9 @@ describe('group actions', () => {
       );
 
       // should only be updated remotely once
-      expect(client.editGroup).not.toHaveBeenCalled();
+      expect(client.editGroup).toNotHaveBeenCalled();
       jasmine.clock().tick(800);
-      expect(client.editGroup.calls.count()).toEqual(1);
+      expect(client.editGroup.calls.length).toEqual(1);
       expect(client.editGroup).toHaveBeenCalledWith(someGroup);
       jasmine.clock().uninstall();
     });
@@ -161,7 +162,7 @@ describe('group actions', () => {
     it('adds users to a group', (done) => {
       setSpy(client, 'addGroupInvitation', someGroup);
       expect(Actions.addToGroup('123', 'abc')).toDispatchActions([], done);
-      expect(client.addGroupInvitation.calls.count()).toEqual(1);
+      expect(client.addGroupInvitation.calls.length).toEqual(1);
       expect(client.addGroupInvitation).toHaveBeenCalledWith('123', {
         userId: 'abc',
         level: 2,
@@ -171,18 +172,18 @@ describe('group actions', () => {
       expect(
         Actions.addToGroup('123', ['abc', 'def', 'ghi'])
       ).toDispatchActions([], done);
-      expect(client.addGroupInvitation.calls.count()).toEqual(4);
+      expect(client.addGroupInvitation.calls.length).toEqual(4);
     });
 
     it('removes users from a group', (done) => {
       setSpy(client, 'removeUserFromGroup', null);
       expect(Actions.removeFromGroup('123', 'abc')).toDispatchActions([], done);
-      expect(client.removeUserFromGroup.calls.count()).toEqual(1);
+      expect(client.removeUserFromGroup.calls.length).toEqual(1);
 
       expect(
         Actions.removeFromGroup('123', ['abc', 'def', 'ghi'])
       ).toDispatchActions([], done);
-      expect(client.removeUserFromGroup.calls.count()).toEqual(4);
+      expect(client.removeUserFromGroup.calls.length).toEqual(4);
     });
 
     it('deletes a group', (done) => {

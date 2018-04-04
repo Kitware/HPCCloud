@@ -4,7 +4,7 @@ import TestUtils from 'react-dom/test-utils';
 
 import deepClone from 'mout/src/lang/deepClone';
 
-import { HashRouter as Router } from 'react-router-dom';
+import { HashRouter as Router, Route } from 'react-router-dom';
 
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 
@@ -46,12 +46,14 @@ describe('RunForm', () => {
     it('renders EC2 form', () => {
       const el = TestUtils.renderIntoDocument(
         <Router>
-          <RunForm
-            serverType="EC2"
-            profiles={sampleData}
-            onChange={blankFunc}
-            serverTypeChange={blankFunc}
-          />
+          <Route>
+            <RunForm
+              serverType="EC2"
+              profiles={sampleData}
+              onChange={blankFunc}
+              serverTypeChange={blankFunc}
+            />
+          </Route>
         </Router>
       );
       expect(
@@ -60,26 +62,45 @@ describe('RunForm', () => {
     });
 
     it('should have a cluster list if there are clusters', () => {
+      let ec2 = null;
       const el = TestUtils.renderIntoDocument(
         <Router>
-          <RunEC2 contents={sampleData.EC2} onChange={blankFunc} />
+          <Route>
+            <RunEC2
+              ref={(c) => {
+                ec2 = c;
+              }}
+              contents={sampleData.EC2}
+              onChange={blankFunc}
+            />
+          </Route>
         </Router>
       );
-      el.setState(formState);
+      ec2.setState(formState);
+
       expect(
         TestUtils.scryRenderedDOMComponentsWithClass(el, style.group).length
       ).toEqual(9);
     });
 
     it('should not have a cluster list when there are no clusters', () => {
+      let ec2 = null;
       const el = TestUtils.renderIntoDocument(
         <Router>
-          <RunEC2 contents={sampleData.EC2} onChange={blankFunc} />
+          <Route>
+            <RunEC2
+              ref={(c) => {
+                ec2 = c;
+              }}
+              contents={sampleData.EC2}
+              onChange={blankFunc}
+            />
+          </Route>
         </Router>
       );
       const noClusters = deepClone(formState);
       delete noClusters.clusters;
-      el.setState(noClusters);
+      ec2.setState(noClusters);
       expect(
         TestUtils.scryRenderedDOMComponentsWithClass(el, style.group).length
       ).toEqual(8);

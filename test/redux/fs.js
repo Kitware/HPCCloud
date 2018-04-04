@@ -20,7 +20,7 @@ registerMiddlewares([thunk]);
 registerAssertions();
 
 function setSpy(target, method, data) {
-  expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
+  return expect.spyOn(target, method).andReturn(Promise.resolve({ data }));
 }
 
 Object.freeze(initialState);
