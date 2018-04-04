@@ -83,7 +83,9 @@
     "test:redux": "karma start test/karma.redux.js",
     "test:component": "karma start test/karma.component.js",
     "test:debug": "karma start test/karma.all.js --no-single-run --browsers Chrome",
-    "codecov": "cat coverage/lcov/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js"
+    "codecov": "cat coverage/lcov/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js",
+    "commit": "git cz",
+    "semantic-release": "semantic-release"
   },
   "bin": {
     "HPCCloud": "./bin/hpc-cloud-cli.js"
