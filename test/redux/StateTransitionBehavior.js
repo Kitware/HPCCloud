@@ -183,21 +183,22 @@ describe('StateTransitionBehavior', () => {
       metadata.status = 'complete';
       const expectedArg = Object.assign({}, simulation, { metadata });
       handleTaskflowChange(fullState, taskflow);
-      expect(ProjectActions.saveSimulation.calls[0].arguments[0]).toEqual(
-        expectedArg
-      );
-      // view page in workflows handles actions to take it to the next step.
-      newMeta.actions = [];
-      newMeta.allComplete = true;
-      expect(
-        TaskflowActions.updateTaskflowMetadata.calls[0].arguments[1].actions
-          .length
-      ).toEqual(0);
-      expect(
-        TaskflowActions.updateTaskflowMetadata.calls[0].arguments[1].allComplete
-      ).toBe(true);
+      setTimeout(() => {
+        expect(ProjectActions.saveSimulation.calls[0].arguments[0]).toEqual(
+          expectedArg
+        );
+        // view page in workflows handles actions to take it to the next step.
+        expect(
+          TaskflowActions.updateTaskflowMetadata.calls[0].arguments[1].actions
+            .length
+        ).toEqual(0);
+        expect(
+          TaskflowActions.updateTaskflowMetadata.calls[0].arguments[1]
+            .allComplete
+        ).toEqual(true);
 
-      done();
+        done();
+      }, 100);
     });
 
     it('adds the "terminate instance" button', (done) => {
