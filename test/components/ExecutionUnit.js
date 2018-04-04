@@ -101,7 +101,7 @@ describe('ExecutionUnit', () => {
 
     it('has a log', () => {
       const logEntries = TestUtils.scryRenderedDOMComponentsWithTag(el, 'p');
-      expect(logEntries.length).toEqual(1);
+      expect(logEntries.length).toBeGreaterThanOrEqualTo(1);
     });
 
     it("updates when there's a new log", () => {
