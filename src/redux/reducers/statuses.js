@@ -8,16 +8,10 @@ export const initialState = {
 export default function statusesReducer(state = initialState, action) {
   switch (action.type) {
     case Actions.UPDATE_EC2_LIST: {
-      return Object.assign(
-        {},
-        state,
-        { ec2: action.list });
+      return Object.assign({}, state, { ec2: action.list });
     }
     case Actions.UPDATE_CLUSTERS_LIST: {
-      return Object.assign(
-        {},
-        state,
-        { clusters: action.list });
+      return Object.assign({}, state, { clusters: action.list });
     }
     default:
       return state;

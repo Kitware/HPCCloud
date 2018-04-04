@@ -1,6 +1,8 @@
 /* global Simput */
-import React                from 'react';
-import { FileUploadEntry }  from '../../../../panels/ItemEditor';
+import React from 'react';
+import PropTypes from 'prop-types';
+
+import { FileUploadEntry } from '../../../../panels/ItemEditor';
 
 import { dispatch } from '../../../../redux';
 import * as NetActions from '../../../../redux/actions/network';
@@ -15,17 +17,17 @@ function onParseError(message) {
 
 function extractPhysicalNames(file) {
   return new Promise((accept, reject) => {
-    var reader = new FileReader();
-    var boundaries = [];
+    const reader = new FileReader();
+    const boundaries = [];
 
     reader.onload = function onLoad(e) {
-      var keepLooking = true;
+      let keepLooking = true;
       const text = reader.result;
       const lines = text.split(/[\r\n]+/g);
       const nbLines = lines.length;
 
       for (let i = 0; keepLooking && i < nbLines; i++) {
-        keepLooking = (lines[i].indexOf('PhysicalNames') === -1);
+        keepLooking = lines[i].indexOf('PhysicalNames') === -1;
         if (!keepLooking) {
           const nbNames = Number(lines[i + 1]);
           for (let nIdx = 0; nIdx < nbNames; nIdx++) {
@@ -46,7 +48,7 @@ function extractPhysicalNames(file) {
 
 function parseAndValidate(file, owner) {
   return new Promise((accept, reject) => {
-    var reader = new FileReader();
+    const reader = new FileReader();
     reader.onloadend = () => {
       if (reader.readyState !== FileReader.DONE) {
         this.props.onParseError('Ini file is invalid');
@@ -71,13 +73,30 @@ function parseAndValidate(file, owner) {
 export default function pyFrNewProject(props) {
   return (
     <div>
-      <FileUploadEntry name="mesh" label="Mesh (msh, pyfrm)" accept=".msh,.pyfrm" owner={props.owner} postProcess={extractPhysicalNames} />
-      <FileUploadEntry name="ini" label="Ini file" accept=".ini" owner={props.owner} postProcess={parseAndValidate} />
-    </div>);
+      <FileUploadEntry
+        name="mesh"
+        label="Mesh (msh, pyfrm)"
+        accept=".msh,.pyfrm"
+        owner={props.owner}
+        postProcess={extractPhysicalNames}
+      />
+      <FileUploadEntry
+        name="ini"
+        label="Ini file"
+        accept=".ini"
+        owner={props.owner}
+        postProcess={parseAndValidate}
+      />
+    </div>
+  );
 }
 
 // ----------------------------------------------------------------------------
 
 pyFrNewProject.propTypes = {
-  owner: React.PropTypes.func,
+  owner: PropTypes.func,
+};
+
+pyFrNewProject.defaultProps = {
+  owner: undefined,
 };

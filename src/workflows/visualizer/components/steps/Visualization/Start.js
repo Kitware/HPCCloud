@@ -1,15 +1,21 @@
-import React           from 'react';
-import JobSubmission   from '../../../../generic/components/steps/JobSubmission';
+import React from 'react';
+import JobSubmission from '../../../../generic/components/steps/JobSubmission';
 
 // ----------------------------------------------------------------------------
 
-const actionList = [{ name: 'prepareJob', label: 'Start Visualization', icon: '' }];
+const actionList = [
+  { name: 'prepareJob', label: 'Start Visualization', icon: '' },
+];
 
 // ----------------------------------------------------------------------------
 
 function clusterFilter(cluster) {
-  return 'config' in cluster && 'paraview' in cluster.config &&
-    'installDir' in cluster.config.paraview && cluster.config.paraview.installDir;
+  return (
+    'config' in cluster &&
+    'paraview' in cluster.config &&
+    'installDir' in cluster.config.paraview &&
+    cluster.config.paraview.installDir
+  );
 }
 
 // ----------------------------------------------------------------------------
@@ -48,10 +54,10 @@ export default function openFoamStart(props) {
   return (
     <JobSubmission
       {...props}
-
       actionList={actionList}
       clusterFilter={clusterFilter}
       getTaskflowMetaData={getTaskflowMetaData}
       getPayload={getPayload}
-    />);
+    />
+  );
 }

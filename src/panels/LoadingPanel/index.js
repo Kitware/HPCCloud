@@ -1,38 +1,39 @@
 import React from 'react';
-import Theme  from 'HPCCloudStyle/Theme.mcss';
+import PropTypes from 'prop-types';
+
+import Theme from 'HPCCloudStyle/Theme.mcss';
 import Layout from 'HPCCloudStyle/Layout.mcss';
 
-export default React.createClass({
-  displayName: 'LoadingPanel',
+export default function LoadingPanel(props) {
+  const layoutClasses = [Layout.verticalFlexContainer];
 
-  propTypes: {
-    center: React.PropTypes.bool,
-    large: React.PropTypes.bool,
-  },
+  if (props.center) {
+    layoutClasses.push(Layout.horizontalCenter);
+    layoutClasses.push(Layout.verticalCenter);
+  }
 
-  getDefaultProps() {
-    return { center: false, large: false };
-  },
+  if (props.large) {
+    layoutClasses.push(Theme.largeText);
+  }
 
-  render() {
-    var layoutClasses = [Layout.verticalFlexContainer];
+  return (
+    <div
+      className={layoutClasses.join(' ')}
+      style={{ marginTop: props.large ? '2em' : 'auto' }}
+    >
+      <span style={{ margin: '15px' }}>
+        <i className={Theme.loadingIcon} />&nbsp; Loading...
+      </span>
+    </div>
+  );
+}
 
-    if (this.props.center) {
-      layoutClasses.push(Layout.horizontalCenter);
-      layoutClasses.push(Layout.verticalCenter);
-    }
+LoadingPanel.propTypes = {
+  center: PropTypes.bool,
+  large: PropTypes.bool,
+};
 
-    if (this.props.large) {
-      layoutClasses.push(Theme.largeText);
-    }
-
-    return (
-      <div className={layoutClasses.join(' ')} style={{ marginTop: this.props.large ? '2em' : 'auto' }}>
-        <span style={{ margin: '15px' }}>
-          <i className={Theme.loadingIcon} />&nbsp;
-          Loading...
-        </span>
-      </div>
-    );
-  },
-});
+LoadingPanel.defaultProps = {
+  center: false,
+  large: false,
+};

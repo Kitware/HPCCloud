@@ -23,9 +23,13 @@ function removeGroup(index, group) {
 }
 
 export function getGroupUsers(id) {
-  const action = netActions.addNetworkCall('group_access', `List group access ${id}`);
-  return dispatch => {
-    client.getGroupAccess(id)
+  const action = netActions.addNetworkCall(
+    'group_access',
+    `List group access ${id}`
+  );
+  return (dispatch) => {
+    client
+      .getGroupAccess(id)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(listUsers(id, resp.data.access.users));
@@ -46,23 +50,23 @@ export function pendingNetworkCall(pending = true) {
 }
 
 export function getGroups() {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('get_groups', 'get groups');
     dispatch(pendingNetworkCall(true));
-    client.getGroups()
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch({ type: GET_GROUPS, groups: resp.data });
-          if (resp.data.length) {
-            dispatch(getGroupUsers(resp.data[0]._id));
-          }
-          dispatch(pendingNetworkCall(false));
-        },
-        (err) => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
-          dispatch(pendingNetworkCall(false));
-        });
+    client.getGroups().then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch({ type: GET_GROUPS, groups: resp.data });
+        if (resp.data.length) {
+          dispatch(getGroupUsers(resp.data[0]._id));
+        }
+        dispatch(pendingNetworkCall(false));
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err));
+        dispatch(pendingNetworkCall(false));
+      }
+    );
 
     return action;
   };
@@ -77,18 +81,18 @@ export function updateLocalGroup(index, group) {
 }
 
 export function saveGroup(index, group) {
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('save_group', 'Save group');
-    client.createGroup(group)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(updateLocalGroup(index, resp.data));
-          dispatch(getGroupUsers(resp.data._id));
-        },
-        (err) => {
-          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-        });
+    client.createGroup(group).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(updateLocalGroup(index, resp.data));
+        dispatch(getGroupUsers(resp.data._id));
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+      }
+    );
     return action;
   };
 }
@@ -97,7 +101,8 @@ let debounce = null;
 
 function pushGroup(index, group) {
   const action = netActions.addNetworkCall('edit_group', 'Edit group');
-  client.editGroup(group)
+  client
+    .editGroup(group)
     .then((resp) => {
       dispatch(netActions.successNetworkCall(action.id, resp));
     })
@@ -124,9 +129,10 @@ export function deleteGroup(index, group) {
     return { type: REMOVE_GROUP, index, group };
   }
 
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('delete_group', 'Delete group');
-    client.deleteGroup(group._id)
+    client
+      .deleteGroup(group._id)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(removeGroup(index, group));
@@ -139,15 +145,26 @@ export function deleteGroup(index, group) {
 }
 
 export function addToGroup(groupId, userId) {
-  return dispatch => {
-    const action = netActions.addNetworkCall('add_to_group', 'Add user(s) to group');
+  return (dispatch) => {
+    const action = netActions.addNetworkCall(
+      'add_to_group',
+      'Add user(s) to group'
+    );
     const addPromises = [];
     if (Array.isArray(userId) && userId.length) {
       userId.forEach((id) => {
-        addPromises.push(client.addGroupInvitation(groupId, { userId: id, level: 2, force: true }));
+        addPromises.push(
+          client.addGroupInvitation(groupId, {
+            userId: id,
+            level: 2,
+            force: true,
+          })
+        );
       });
     } else {
-      addPromises.push(client.addGroupInvitation(groupId, { userId, level: 2, force: true }));
+      addPromises.push(
+        client.addGroupInvitation(groupId, { userId, level: 2, force: true })
+      );
     }
     Promise.all(addPromises)
       .then((resp) => {
@@ -162,8 +179,11 @@ export function addToGroup(groupId, userId) {
 }
 
 export function removeFromGroup(groupId, userId) {
-  return dispatch => {
-    const action = netActions.addNetworkCall('remove_from_group', 'Remove user(s) from group');
+  return (dispatch) => {
+    const action = netActions.addNetworkCall(
+      'remove_from_group',
+      'Remove user(s) from group'
+    );
     const removePromises = [];
     if (Array.isArray(userId) && userId.length) {
       userId.forEach((id) => {

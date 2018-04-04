@@ -1,8 +1,8 @@
-import * as netActions       from './network';
-import * as TaskflowActions  from './taskflows';
-import client                from '../../network';
-import * as ClusterHelper    from '../../network/helpers/clusters';
-import { store, dispatch }   from '..';
+import * as netActions from './network';
+import * as TaskflowActions from './taskflows';
+import client from '../../network';
+import * as ClusterHelper from '../../network/helpers/clusters';
+import { store, dispatch } from '..';
 
 export const ADD_CLUSTER = 'ADD_CLUSTER';
 export const ADD_EXISTING_CLUSTER = 'ADD_EXISTING_CLUSTER';
@@ -93,17 +93,25 @@ function updateTaskflowActionsForClusterEvent(cluster, status) {
 export function updateClusterStatus(id, status) {
   // for taskflows on ec2 the meta object is not as readily available
   // this is due to fewer jobs coming through SSE which triggers a fetch for trad clusters.
-  updateTaskflowActionsForClusterEvent(store.getState().preferences.clusters.mapById[id], status);
+  updateTaskflowActionsForClusterEvent(
+    store.getState().preferences.clusters.mapById[id],
+    status
+  );
   return { type: UPDATE_CLUSTER_STATUS, id, status };
 }
 
 export function getClusterLog(id, offset) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall(`cluster_log_${id}`, 'Check cluster log');
-    client.getClusterLog(id, offset)
+    const action = netActions.addNetworkCall(
+      `cluster_log_${id}`,
+      'Check cluster log'
+    );
+    client
+      .getClusterLog(id, offset)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
-        if (!offset) { // offset is 0 or undefined
+        if (!offset) {
+          // offset is 0 or undefined
           dispatch(updateClusterLog(id, resp.data.log));
         } else {
           dispatch(appendToClusterLog(id, resp.data.log));
@@ -118,19 +126,22 @@ export function getClusterLog(id, offset) {
 
 export function fetchCluster(id, taskflowIdToUpdate = '') {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('fetch_cluster', 'Retreive cluster');
-    client.getCluster(id)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(addExistingCluster(resp.data));
-          if (taskflowIdToUpdate.length) {
-            dispatch(TaskflowActions.triggerUpdate(taskflowIdToUpdate));
-          }
-        },
-        (err) => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
-        });
+    const action = netActions.addNetworkCall(
+      'fetch_cluster',
+      'Retreive cluster'
+    );
+    client.getCluster(id).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(addExistingCluster(resp.data));
+        if (taskflowIdToUpdate.length) {
+          dispatch(TaskflowActions.triggerUpdate(taskflowIdToUpdate));
+        }
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err));
+      }
+    );
 
     return action;
   };
@@ -142,19 +153,22 @@ export function fetchClusters(type) {
     return { type: 'NOOP' };
   }
   return (dispatch) => {
-    const action = netActions.addNetworkCall('fetch_clusters', 'Retreive clusters');
+    const action = netActions.addNetworkCall(
+      'fetch_clusters',
+      'Retreive clusters'
+    );
     dispatch(pendingNetworkCall(true));
-    client.listClusters(type)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(updateClusters(resp.data));
-          dispatch(pendingNetworkCall(false));
-        },
-        (err) => {
-          dispatch(netActions.errorNetworkCall(action.id, err));
-          dispatch(pendingNetworkCall(false));
-        });
+    client.listClusters(type).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(updateClusters(resp.data));
+        dispatch(pendingNetworkCall(false));
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err));
+        dispatch(pendingNetworkCall(false));
+      }
+    );
 
     return action;
   };
@@ -162,16 +176,19 @@ export function fetchClusters(type) {
 
 export function fetchClusterPresets() {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('fetch_cluster_presets', 'Retreive cluster presets');
-    client.getClusterPresets()
-      .then(
-        (presets) => {
-          dispatch(netActions.successNetworkCall(action.id, presets));
-          dispatch(updateClusterPresets(presets.data));
-        },
-        (error) => {
-          dispatch(netActions.errorNetworkCall(action.id, error));
-        });
+    const action = netActions.addNetworkCall(
+      'fetch_cluster_presets',
+      'Retreive cluster presets'
+    );
+    client.getClusterPresets().then(
+      (presets) => {
+        dispatch(netActions.successNetworkCall(action.id, presets));
+        dispatch(updateClusterPresets(presets.data));
+      },
+      (error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error));
+      }
+    );
 
     return action;
   };
@@ -184,17 +201,20 @@ export function removeCluster(index, cluster) {
   }
 
   return (dispatch) => {
-    const action = netActions.addNetworkCall('remove_cluster', 'Remove cluster');
+    const action = netActions.addNetworkCall(
+      'remove_cluster',
+      'Remove cluster'
+    );
 
-    client.deleteCluster(cluster._id)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(fetchClusters());
-        },
-        (err) => {
-          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-        });
+    client.deleteCluster(cluster._id).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(fetchClusters());
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+      }
+    );
 
     return action;
   };
@@ -203,17 +223,20 @@ export function removeCluster(index, cluster) {
 // deletes a cluster by id, different from removeCluster(index, cluster) above
 export function deleteCluster(id) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall('delete_cluster', 'Delete cluster');
+    const action = netActions.addNetworkCall(
+      'delete_cluster',
+      'Delete cluster'
+    );
 
-    client.deleteCluster(id)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(removeClusterById(id));
-        },
-        (err) => {
-          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-        });
+    client.deleteCluster(id).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(removeClusterById(id));
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+      }
+    );
 
     return action;
   };
@@ -223,14 +246,14 @@ export function saveCluster(index, cluster, pushToServer = false) {
   const saveAction = { type: SAVE_CLUSTER, index, cluster };
   if (pushToServer) {
     const action = netActions.addNetworkCall('save_cluster', 'Save cluster');
-    ClusterHelper.saveCluster(cluster)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-        },
-        (err) => {
-          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-        });
+    ClusterHelper.saveCluster(cluster).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+      }
+    );
   }
   return saveAction;
 }
@@ -238,7 +261,8 @@ export function saveCluster(index, cluster, pushToServer = false) {
 export function updateCluster(cluster) {
   return (dispatch) => {
     const action = netActions.addNetworkCall('save_cluster', 'Save cluster');
-    client.updateCluster(cluster)
+    client
+      .updateCluster(cluster)
       .then((resp) => {
         dispatch(updateExistingCluster(resp.data));
         dispatch(netActions.successNetworkCall(action.id, resp));
@@ -258,22 +282,26 @@ export function testCluster(index, cluster) {
   return (dispatch) => {
     const action = netActions.addNetworkCall('test_cluster', 'Test cluster');
     dispatch({ type: TESTING_CLUSTER, index });
-    client.testCluster(cluster._id)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-        },
-        (error) => {
-          dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
-        });
+    client.testCluster(cluster._id).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+      },
+      (error) => {
+        dispatch(netActions.errorNetworkCall(action.id, error, 'form'));
+      }
+    );
     return action;
   };
 }
 
 export function terminateCluster(id) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall(`terminate_cluster_${id}`, 'terminate cluster');
-    client.terminateCluster(id)
+    const action = netActions.addNetworkCall(
+      `terminate_cluster_${id}`,
+      'terminate cluster'
+    );
+    client
+      .terminateCluster(id)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
       })

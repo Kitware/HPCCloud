@@ -1,4 +1,4 @@
-import React       from 'react';
+import React from 'react';
 import SimputReact from '../../../../../generic/components/steps/SimputReact';
 
 // ----------------------------------------------------------------------------
@@ -45,14 +45,15 @@ function simputModelDecorator(model, props) {
 export default (props) => (
   <SimputReact
     {...props}
-
     simputType="openfoam-windtunnel"
-    inputFileKeys={[{ key: '__export__', name: 'input-deck.json', parse: false }]}
+    inputFileKeys={[
+      { key: '__export__', name: 'input-deck.json', parse: false },
+    ]}
     initialDataModel={{
       data: {},
       type: 'openfoam-windtunnel',
       hideViews: [],
     }}
-
     simputModelDecorator={simputModelDecorator}
-  />);
+  />
+);

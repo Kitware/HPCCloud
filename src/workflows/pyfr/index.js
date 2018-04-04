@@ -1,19 +1,21 @@
-import rootNewProject         from './components/root/NewProject';
-import rootEditProject        from '../generic/components/root/EditProjectWithFileListing';
-import rootNewSimulation      from './components/root/NewSimulation';
-import rootEditSimulation     from '../generic/components/root/EditSimulationWithFileListing';
-import rootViewSimulation     from '../generic/components/root/ViewSimulation';
+import rootNewProject from './components/root/NewProject';
+import rootEditProject from '../generic/components/root/EditProjectWithFileListing';
+import rootNewSimulation from './components/root/NewSimulation';
+import rootEditSimulation from '../generic/components/root/EditSimulationWithFileListing';
+import rootViewSimulation from '../generic/components/root/ViewSimulation';
 
-import stepIntroduction       from './components/steps/Introduction';
-import stepInput              from './components/steps/Input';
-import stepSimulationStart    from './components/steps/Simulation/Start';
-import stepSimulationView     from './components/steps/Simulation/View';
+import stepIntroduction from './components/steps/Introduction';
+import stepInput from './components/steps/Input';
+import stepSimulationStart from './components/steps/Simulation/Start';
+import stepSimulationView from './components/steps/Simulation/View';
 import stepVisualizationStart from './components/steps/Visualization/Start';
-import stepVisualizationView  from './components/steps/Visualization/View';
+import stepVisualizationView from './components/steps/Visualization/View';
+
+import logo from './logo.png';
 
 export default {
   name: 'PyFR',
-  logo: require('./logo.png'),
+  logo,
   requiredAttachments: {
     project: ['mesh'],
     simulation: [],
@@ -40,7 +42,8 @@ export default {
       'config.pyfr.opencl': {
         type: 'profile',
         label: 'OpenCL configurations',
-        description: 'Set of options that can be used with the OpenCL backend for PyFR',
+        description:
+          'Set of options that can be used with the OpenCL backend for PyFR',
         profile: {
           'platform-id': {
             type: 'text',
@@ -63,7 +66,8 @@ export default {
       'config.pyfr.openmp': {
         type: 'profile',
         label: 'OpenMP configurations',
-        description: 'Set of options that can be used with the OpenMP backend for PyFR',
+        description:
+          'Set of options that can be used with the OpenMP backend for PyFR',
         profile: {
           cc: {
             type: 'text',

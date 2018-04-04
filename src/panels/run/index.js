@@ -1,55 +1,71 @@
-import React        from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import RunCluster   from './RunCluster';
-import RunEC2       from './RunEC2';
+import formStyle from 'HPCCloudStyle/ItemEditor.mcss';
 
-import formStyle    from 'HPCCloudStyle/ItemEditor.mcss';
+import RunCluster from './RunCluster';
+import RunEC2 from './RunEC2';
 
-export default React.createClass({
-  displayName: 'RunClusterForm',
+export default function RunClusterForm(props) {
+  let serverForm = null;
+  switch (props.serverType) {
+    case 'EC2':
+      serverForm = (
+        <RunEC2
+          contents={props.profiles.EC2}
+          onChange={props.dataChange}
+          clusterFilter={props.clusterFilter}
+        />
+      );
+      break;
+    case 'Traditional':
+      serverForm = (
+        <RunCluster
+          contents={props.profiles.Traditional}
+          onChange={props.dataChange}
+          clusterFilter={props.clusterFilter}
+        />
+      );
+      break;
+    default:
+      serverForm = <span>no valid serverType: {props.serverType}</span>;
+  }
 
-  propTypes: {
-    serverType: React.PropTypes.string,
-    serverTypeChange: React.PropTypes.func,
-    profiles: React.PropTypes.object,
-    dataChange: React.PropTypes.func,
-    clusterFilter: React.PropTypes.func,
-  },
+  const optionMapper = (el, index) => (
+    <option key={`${el}_${index}`} value={el}>
+      {el}
+    </option>
+  );
 
-  render() {
-    var serverForm;
-    switch (this.props.serverType) {
-      case 'EC2':
-        serverForm = (<RunEC2 contents={this.props.profiles.EC2} onChange={this.props.dataChange}
-          clusterFilter={this.props.clusterFilter} />);
-        break;
-      case 'Traditional':
-        serverForm = (<RunCluster contents={this.props.profiles.Traditional} onChange={this.props.dataChange}
-          clusterFilter={this.props.clusterFilter} />);
-        break;
-      default:
-        serverForm = <span>no valid serverType: {this.props.serverType}</span>;
-    }
+  return (
+    <div>
+      <section className={formStyle.group}>
+        <label className={formStyle.label}>Server Type</label>
+        <select
+          className={formStyle.input}
+          value={props.serverType}
+          onChange={props.serverTypeChange}
+        >
+          {Object.keys(props.profiles).map(optionMapper)}
+        </select>
+      </section>
+      <section>{serverForm}</section>
+    </div>
+  );
+}
 
-    const optionMapper = (el, index) => <option key={`${el}_${index}`} value={el}>{el}</option>;
+RunClusterForm.propTypes = {
+  serverType: PropTypes.string,
+  serverTypeChange: PropTypes.func,
+  profiles: PropTypes.object,
+  dataChange: PropTypes.func,
+  clusterFilter: PropTypes.func,
+};
 
-    return (
-      <div>
-        <section className={formStyle.group}>
-          <label className={formStyle.label}>Server Type</label>
-          <select
-            className={formStyle.input}
-            value={this.props.serverType}
-            onChange={ this.props.serverTypeChange }
-          >
-            { Object.keys(this.props.profiles).map(optionMapper) }
-          </select>
-        </section>
-        <section>
-          {serverForm}
-        </section>
-      </div>
-    );
-  },
-
-});
+RunClusterForm.defaultProps = {
+  serverType: undefined,
+  serverTypeChange: undefined,
+  profiles: undefined,
+  dataChange: undefined,
+  clusterFilter: undefined,
+};

@@ -1,4 +1,4 @@
-export default function ({ client, busy }) {
+export default function({ client, busy }) {
   return {
     getTask(id) {
       return busy(client._.get(`/tasks/${id}`));

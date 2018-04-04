@@ -1,4 +1,4 @@
-export default function ({ client, filterQuery, mustContain, busy }) {
+export default function({ client, filterQuery, mustContain, busy }) {
   return {
     // GET /jobs List all jobs for a given user
     getJobs(offset, limit) {
@@ -44,7 +44,9 @@ export default function ({ client, filterQuery, mustContain, busy }) {
     // GET /jobs/{id}/output Get output entries for job
     getJobOutput(id, path, offset) {
       if (offset) {
-        return busy(client._.get(`/jobs/${id}/output?path=${path}&offset=${offset}`));
+        return busy(
+          client._.get(`/jobs/${id}/output?path=${path}&offset=${offset}`)
+        );
       }
       return busy(client._.get(`/jobs/${id}/output?path=${path}`));
     },

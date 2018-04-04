@@ -96,6 +96,18 @@ This can be adjusted in the following file (replace: HOSTNAME_OR_VALID_IP by the
 }
 ```
 
+
+Same for girder so `http://localhost:8080` properly reach girder
+
+```js /opt/hpccloud/girder/girder/conf/girder.local.cfg
+[global]
+server.socket_host = "0.0.0.0"
+server.socket_port = 8080
+server.thread_pool = 100
+
+[...]
+```
+
 ## Running Celery by hand
 
 This can be usefull to follow any runtime error live or if the taskflow did properly load.

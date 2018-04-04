@@ -1,6 +1,6 @@
-import client           from '../../network';
-import * as netActions  from './network';
-import { store, dispatch }     from '..';
+import client from '../../network';
+import * as netActions from './network';
+import { store, dispatch } from '..';
 
 export const ADD_AWS_PROFILE = 'ADD_AWS_PROFILE';
 export const UPDATE_AWS_PROFILES = 'UPDATE_AWS_PROFILES';
@@ -32,9 +32,13 @@ export function fetchAWSProfiles() {
     return { type: 'NOOP' };
   }
   return (dispatch) => {
-    const action = netActions.addNetworkCall('fetch_aws_profiles', 'Retreive AWS profiles');
+    const action = netActions.addNetworkCall(
+      'fetch_aws_profiles',
+      'Retreive AWS profiles'
+    );
     dispatch(pendingNetworkCall(true));
-    client.listAWSProfiles()
+    client
+      .listAWSProfiles()
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateAWSProfiles(resp.data));
@@ -55,20 +59,23 @@ export function removeAWSProfile(index, profile) {
   }
 
   return (dispatch) => {
-    const action = netActions.addNetworkCall('remove_aws_profile', 'Remove cluster');
+    const action = netActions.addNetworkCall(
+      'remove_aws_profile',
+      'Remove cluster'
+    );
 
     dispatch(pendingNetworkCall(true));
-    client.deleteAWSProfile(profile._id)
-      .then(
-        (resp) => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(pendingNetworkCall(false));
-          dispatch(fetchAWSProfiles());
-        },
-        (err) => {
-          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-          dispatch(pendingNetworkCall(false));
-        });
+    client.deleteAWSProfile(profile._id).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(pendingNetworkCall(false));
+        dispatch(fetchAWSProfiles());
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+        dispatch(pendingNetworkCall(false));
+      }
+    );
 
     return action;
   };
@@ -79,19 +86,22 @@ export function updateAWSProfile(index, profile, pushToServer = false) {
     return { type: SAVE_AWS_PROFILE, index, profile };
   }
   return (dispatch) => {
-    const action = netActions.addNetworkCall('save_aws_profile', 'Save cluster');
+    const action = netActions.addNetworkCall(
+      'save_aws_profile',
+      'Save cluster'
+    );
     dispatch(pendingNetworkCall(true));
-    client.createAWSProfile(profile)
-      .then(
-        (resp) => {
-          dispatch(pendingNetworkCall(false));
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(fetchAWSProfiles());
-        },
-        (err) => {
-          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-          dispatch(pendingNetworkCall(false));
-        });
+    client.createAWSProfile(profile).then(
+      (resp) => {
+        dispatch(pendingNetworkCall(false));
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(fetchAWSProfiles());
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+        dispatch(pendingNetworkCall(false));
+      }
+    );
     return action;
   };
 }

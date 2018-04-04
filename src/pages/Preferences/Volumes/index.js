@@ -1,26 +1,25 @@
-// import client           from '../../../network';
-import React            from 'react';
-import { Link }         from 'react-router';
-import VolumeForm       from './VolumeForm';
-import ActiveList       from '../../../panels/ActiveList';
-import Toolbar          from '../../../panels/Toolbar';
-import ButtonBar        from '../../../panels/ButtonBar';
-import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
-import { breadcrumb }   from '..';
-import get              from '../../../utils/get';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-// import getNetworkError  from '../../../utils/getNetworkError';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import theme from 'HPCCloudStyle/Theme.mcss';
 import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
-// import get             from 'mout/src/object/get';
-import { connect }         from 'react-redux';
-import * as Actions        from '../../../redux/actions/volumes';
-import * as AWSActions     from '../../../redux/actions/aws';
+import VolumeForm from './VolumeForm';
+import ActiveList from '../../../panels/ActiveList';
+import Toolbar from '../../../panels/Toolbar';
+import ButtonBar from '../../../panels/ButtonBar';
+import EmptyPlaceholder from '../../../panels/EmptyPlaceholder';
+import { breadcrumb } from '..';
+import get from '../../../utils/get';
+
+import * as Actions from '../../../redux/actions/volumes';
+import * as AWSActions from '../../../redux/actions/aws';
 import * as ClusterActions from '../../../redux/actions/clusters';
-import * as NetActions     from '../../../redux/actions/network';
-import { dispatch }        from '../../../redux';
+import * as NetActions from '../../../redux/actions/network';
+import { dispatch } from '../../../redux';
 
 const volumeBreadCrumb = Object.assign({}, breadcrumb, { active: 3 });
 
@@ -28,7 +27,9 @@ function getActions(disabled, config) {
   if (config.isAttached) {
     return [];
   } else if (config.isSaved) {
-    return [{ name: 'removeItem', label: 'Delete', icon: style.deleteIcon, disabled }];
+    return [
+      { name: 'removeItem', label: 'Delete', icon: style.deleteIcon, disabled },
+    ];
   }
   // neither saved nor attached
   return [
@@ -38,37 +39,23 @@ function getActions(disabled, config) {
 }
 
 /* eslint-disable no-alert */
-const ClusterPrefs = React.createClass({
+/* eslint-disable no-restricted-globals */
+class ClusterPrefs extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      _error: null,
+    };
 
-  displayName: 'Preferences/Volume',
-
-  propTypes: {
-    active: React.PropTypes.number,
-    presetNames: React.PropTypes.array,
-    list: React.PropTypes.array,
-    profiles: React.PropTypes.array,
-    clusters: React.PropTypes.array,
-    error: React.PropTypes.string,
-    buttonsDisabled: React.PropTypes.bool,
-
-    onUpdateItem: React.PropTypes.func,
-    onActiveChange: React.PropTypes.func,
-    onAddItem: React.PropTypes.func,
-    onRemoveItem: React.PropTypes.func,
-    fetchAWS: React.PropTypes.func,
-    fetchVolumes: React.PropTypes.func,
-    fetchClusters: React.PropTypes.func,
-    attachVolume: React.PropTypes.func,
-    invalidateErrors: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return { list: [], profiles: [], clusters: [] };
-  },
-
-  getInitialState() {
-    return { _error: null };
-  },
+    this.changeItem = this.changeItem.bind(this);
+    this.activeChange = this.activeChange.bind(this);
+    this.addItem = this.addItem.bind(this);
+    this.attachVolume = this.attachVolume.bind(this);
+    this.detachVolume = this.detachVolume.bind(this);
+    this.removeItem = this.removeItem.bind(this);
+    this.saveItem = this.saveItem.bind(this);
+    this.formAction = this.formAction.bind(this);
+  }
 
   componentDidMount() {
     setImmediate(() => {
@@ -76,17 +63,17 @@ const ClusterPrefs = React.createClass({
       this.props.fetchClusters();
       this.props.fetchVolumes();
     });
-  },
+  }
 
   changeItem(item) {
     const { active, onUpdateItem } = this.props;
     onUpdateItem(active, item);
-  },
+  }
 
   activeChange(active) {
     this.setState({ _error: null });
     this.props.onActiveChange(active);
-  },
+  }
 
   addItem() {
     if (this.props.error) {
@@ -94,33 +81,39 @@ const ClusterPrefs = React.createClass({
     }
     this.setState({ _error: null });
     this.props.onAddItem(this.props.profiles[0]._id);
-  },
+  }
 
   attachVolume() {
     const { attachVolume, active, list } = this.props;
     attachVolume(list[active]._id, list[active].cluster);
-  },
+  }
 
   detachVolume() {
+    this.setState({ _error: 'Detach volume is not implemented' });
     console.log('unimplemented');
-  },
+  }
 
   removeItem(index) {
     const { list, active, onRemoveItem } = this.props;
     const volumeToDelete = list[active];
-    if (volumeToDelete._id && confirm('Are you sure you want to delete this volume?')) {
+    if (
+      volumeToDelete._id &&
+      confirm('Are you sure you want to delete this volume?')
+    ) {
       onRemoveItem(active, volumeToDelete);
     } else if (!volumeToDelete._id) {
       onRemoveItem(active, volumeToDelete);
     }
     this.setState({ _error: null });
-  },
+  }
 
   saveItem() {
     const { onUpdateItem, active, list } = this.props;
     const contents = list[active];
     if (contents._id) {
-      this.setState({ _error: 'Volume cannot be modified after it\'s been saved' });
+      this.setState({
+        _error: "Volume cannot be modified after it's been saved",
+      });
       return;
     } else if (!contents.name) {
       this.setState({ _error: 'Name cannot be empty' });
@@ -128,11 +121,11 @@ const ClusterPrefs = React.createClass({
     }
     this.setState({ _error: null });
     onUpdateItem(active, list[active], true);
-  },
+  }
 
   formAction(action) {
     this[action]();
-  },
+  }
 
   render() {
     const { active, list, error } = this.props;
@@ -140,38 +133,50 @@ const ClusterPrefs = React.createClass({
 
     let content = null;
     if (list && list.length) {
-      content = (<div className={ style.content }>
-        <VolumeForm
-          data={activeData}
-          profiles={this.props.profiles}
-          clusters={this.props.clusters}
-          onChange={ this.changeItem }
+      content = (
+        <div className={style.content}>
+          <VolumeForm
+            data={activeData}
+            profiles={this.props.profiles}
+            clusters={this.props.clusters}
+            onChange={this.changeItem}
+          />
+          <ButtonBar
+            visible={!!activeData}
+            onAction={this.formAction}
+            error={error || this.state._error}
+            actions={getActions(false, {
+              isAttached: activeData.status === 'in-use',
+              isSaved: get(activeData, '_id'),
+            })}
+          />
+        </div>
+      );
+    } else if (!this.props.profiles.length) {
+      content = (
+        <EmptyPlaceholder
+          phrase={
+            <span>
+              AWS Profile required to create volumes <br />
+              Create some under the{' '}
+              <Link to="/Preferences/AWS">
+                <span>AWS Profiles preferences page</span>
+              </Link>.
+            </span>
+          }
         />
-        <ButtonBar
-          visible={!!activeData}
-          onAction={ this.formAction }
-          error={ error || this.state._error }
-          actions={getActions(false,
-            { isAttached: activeData.status === 'in-use', isSaved: get(activeData, '_id') })}
-        />
-      </div>);
+      );
     } else {
-      if (!this.props.profiles.length) {
-        content = (<EmptyPlaceholder phrase={
-          <span>
-            AWS Profile required to create volumes <br />
-            Create some under the <Link to="/Preferences/AWS">
-            <span>AWS Profiles preferences page</span></Link>.
-          </span> }
-        />);
-      } else {
-        content = (<EmptyPlaceholder phrase={
-          <span>
-            There are no Volumes available <br />
-            You can create some with the <i className={theme.addIcon}></i> above
-          </span> }
-        />);
-      }
+      content = (
+        <EmptyPlaceholder
+          phrase={
+            <span>
+              There are no Volumes available <br />
+              You can create some with the <i className={theme.addIcon} /> above
+            </span>
+          }
+        />
+      );
     }
 
     let actions = [];
@@ -180,33 +185,63 @@ const ClusterPrefs = React.createClass({
     }
 
     return (
-      <div className={ style.rootContainer }>
-        <Toolbar breadcrumb={ volumeBreadCrumb } title="Volume"
-          actions={actions} onAction={this.addItem}
+      <div className={style.rootContainer}>
+        <Toolbar
+          breadcrumb={volumeBreadCrumb}
+          title="Volume"
+          actions={actions}
+          onAction={this.addItem}
           hasTabs
         />
-        <div className={ style.container }>
+        <div className={style.container}>
           <ActiveList
-            className={ style.menu }
+            className={style.menu}
             onActiveChange={this.activeChange}
             active={active}
             list={list}
           />
-          { content }
+          {content}
         </div>
-      </div>);
-  },
-});
+      </div>
+    );
+  }
+}
 
+ClusterPrefs.propTypes = {
+  active: PropTypes.number,
+  list: PropTypes.array,
+  profiles: PropTypes.array,
+  clusters: PropTypes.array,
+  error: PropTypes.string,
+
+  onUpdateItem: PropTypes.func.isRequired,
+  onActiveChange: PropTypes.func.isRequired,
+  onAddItem: PropTypes.func.isRequired,
+  onRemoveItem: PropTypes.func.isRequired,
+  fetchAWS: PropTypes.func.isRequired,
+  fetchVolumes: PropTypes.func.isRequired,
+  fetchClusters: PropTypes.func.isRequired,
+  attachVolume: PropTypes.func.isRequired,
+  invalidateErrors: PropTypes.func.isRequired,
+};
+
+ClusterPrefs.defaultProps = {
+  active: 0,
+  list: [],
+  profiles: [],
+  clusters: [],
+
+  error: undefined,
+};
 
 // Binding --------------------------------------------------------------------
 /* eslint-disable arrow-body-style */
 
 export default connect(
-  state => {
+  (state) => {
     const localState = state.preferences;
-    const clusters = Object.keys(localState.clusters.mapById).map((id, index) =>
-      localState.clusters.mapById[id]
+    const clusters = Object.keys(localState.clusters.mapById).map(
+      (id, index) => localState.clusters.mapById[id]
     );
     return {
       active: localState.volumes.active,
@@ -217,15 +252,19 @@ export default connect(
   },
   () => {
     return {
-      onUpdateItem: (index, volume, server) => dispatch(Actions.updateVolume(index, volume, server)),
+      onUpdateItem: (index, volume, server) =>
+        dispatch(Actions.updateVolume(index, volume, server)),
       onActiveChange: (index) => dispatch(Actions.updateActiveVolume(index)),
       onAddItem: (profileId) => dispatch(Actions.addVolume(profileId)),
-      onRemoveItem: (index, volume) => dispatch(Actions.removeVolume(index, volume)),
+      onRemoveItem: (index, volume) =>
+        dispatch(Actions.removeVolume(index, volume)),
       fetchAWS: () => dispatch(AWSActions.fetchAWSProfiles()),
       fetchClusters: () => dispatch(ClusterActions.fetchClusters()),
       fetchVolumes: () => dispatch(Actions.fetchVolumes()),
-      attachVolume: (volumeId, clusterId) => dispatch(Actions.attachVolume(volumeId, clusterId)),
-      invalidateErrors: () => dispatch(NetActions.invalidateErrors(['save_volume', 'remove_volume'])),
+      attachVolume: (volumeId, clusterId) =>
+        dispatch(Actions.attachVolume(volumeId, clusterId)),
+      invalidateErrors: () =>
+        dispatch(NetActions.invalidateErrors(['save_volume', 'remove_volume'])),
     };
   }
 )(ClusterPrefs);

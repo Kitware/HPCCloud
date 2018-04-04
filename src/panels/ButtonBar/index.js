@@ -1,7 +1,8 @@
-import React    from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import states   from 'HPCCloudStyle/States.mcss';
-import editor   from 'HPCCloudStyle/ItemEditor.mcss';
+import states from 'HPCCloudStyle/States.mcss';
+import editor from 'HPCCloudStyle/ItemEditor.mcss';
 
 // PROPS:
 // `children`: A child element to display to the left of the buttons
@@ -11,29 +12,18 @@ import editor   from 'HPCCloudStyle/ItemEditor.mcss';
 //            icon: css class for icon
 // `onAction`: calls a delegate function which has the same prototype as the action's name
 // `visible`: if the bar is visible or not.
-export default React.createClass({
-  displayName: 'ButtonBar',
-
-  propTypes: {
-    actions: React.PropTypes.array,
-    children: React.PropTypes.object,
-    error: React.PropTypes.string,
-    onAction: React.PropTypes.func,
-    visible: React.PropTypes.bool,
-  },
-
-  getDefaultProps() {
-    return {
-      visible: true,
-    };
-  },
+export default class ButtonBar extends React.Component {
+  constructor(props) {
+    super(props);
+    this.onAction = this.onAction.bind(this);
+  }
 
   onAction(event) {
-    var action = event.currentTarget.dataset.action;
+    const action = event.currentTarget.dataset.action;
     if (this.props.onAction) {
       this.props.onAction(action);
     }
-  },
+  }
 
   render() {
     if (!this.props.visible) {
@@ -41,26 +31,43 @@ export default React.createClass({
     }
 
     return (
-      <div className={ editor.buttonGroup }>
-        <span>
-          { this.props.children }
-        </span>
+      <div className={editor.buttonGroup}>
+        <span>{this.props.children}</span>
         <div className={editor.buttonContainer}>
-          <span className={ (this.props.error ? editor.errorBox : states.isHidden) }>
-            { this.props.error }
+          <span
+            className={this.props.error ? editor.errorBox : states.isHidden}
+          >
+            {this.props.error}
           </span>
-          { this.props.actions.map((action, index) =>
+          {this.props.actions.map((action, index) => (
             <button
-              className={ editor.button }
+              className={editor.button}
               key={`${action.name}_${index}`}
               data-action={action.name}
               onClick={this.onAction}
               disabled={action.disabled}
             >
-              { action.label } <i className={ action.icon } />
+              {action.label} <i className={action.icon} />
             </button>
-          )}
+          ))}
         </div>
-      </div>);
-  },
-});
+      </div>
+    );
+  }
+}
+
+ButtonBar.propTypes = {
+  actions: PropTypes.array,
+  children: PropTypes.object,
+  error: PropTypes.string,
+  onAction: PropTypes.func,
+  visible: PropTypes.bool,
+};
+
+ButtonBar.defaultProps = {
+  visible: true,
+  actions: [],
+  children: undefined,
+  error: '',
+  onAction: undefined,
+};

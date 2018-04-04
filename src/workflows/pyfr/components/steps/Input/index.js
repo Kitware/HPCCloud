@@ -1,4 +1,4 @@
-import React       from 'react';
+import React from 'react';
 import SimputReact from '../../../../generic/components/steps/SimputReact';
 
 // ----------------------------------------------------------------------------
@@ -33,7 +33,6 @@ function simputModelDecorator(model, props) {
 export default (props) => (
   <SimputReact
     {...props}
-
     simputType="pyfr"
     inputFileKeys={[{ key: 'ini', name: 'pyfr.ini', parse: true }]}
     initialDataModel={{
@@ -42,4 +41,5 @@ export default (props) => (
       hideViews: ['backend'],
     }}
     simputModelDecorator={simputModelDecorator}
-  />);
+  />
+);

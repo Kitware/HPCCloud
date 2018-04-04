@@ -1,14 +1,16 @@
-import rootNewProject         from './components/root/NewProject';
-import rootViewSimulation     from '../../generic/components/root/ViewSimulation';
+import rootNewProject from './components/root/NewProject';
+import rootViewSimulation from '../../generic/components/root/ViewSimulation';
 
-import stepIntroduction       from '../common/steps/Introduction';
-import stepInput              from './components/steps/Input';
-import stepSimulationStart    from '../common/steps/Simulation/Start';
-import stepSimulationView     from '../common/steps/Simulation/View';
+import stepIntroduction from '../common/steps/Introduction';
+import stepInput from './components/steps/Input';
+import stepSimulationStart from '../common/steps/Simulation/Start';
+import stepSimulationView from '../common/steps/Simulation/View';
+
+import logo from './logo.png';
 
 export default {
   name: 'NWChem',
-  logo: require('./logo.png'),
+  logo,
   requiredAttachments: {
     project: ['geometry'],
     simulation: [],

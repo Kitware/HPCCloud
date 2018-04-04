@@ -1,4 +1,4 @@
-import breadCrumbStyle  from 'HPCCloudStyle/Theme.mcss';
+import breadCrumbStyle from 'HPCCloudStyle/Theme.mcss';
 
 export const baseURL = '/api/v1';
 
@@ -10,7 +10,11 @@ export const taskflowActions = {
   terminate: { name: 'onTerminate', label: 'Terminate', icon: '' },
   visualize: { name: 'onVisualize', label: 'Visualize', icon: '' },
   rerun: { name: 'onRerun', label: 'Rerun', icon: '' },
-  terminateInstance: { name: 'onTerminateInstance', label: 'Terminate EC2 Instance', icon: '' },
+  terminateInstance: {
+    name: 'onTerminateInstance',
+    label: 'Terminate EC2 Instance',
+    icon: '',
+  },
   moveOffline: { name: 'moveOffline', label: 'Move Files Offline', icon: '' },
 };
 
@@ -23,7 +27,7 @@ export const volumeTypes = {
 };
 
 export function primaryBreadCrumbs(projectId = null, simulationId = null) {
-  var ret = {
+  const ret = {
     paths: ['/'],
     icons: [breadCrumbStyle.breadCrumbRootIcon],
     titles: ['Home'],

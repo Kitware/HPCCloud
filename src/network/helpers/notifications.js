@@ -7,7 +7,6 @@ const notification = new Observable();
 const SIMULATION_CHANGE = 'data.simulation.change';
 const PROJECT_CHANGE = 'data.project.change';
 
-
 export function invalidateSimulation(simulation) {
   notification.emit(SIMULATION_CHANGE, simulation);
 }

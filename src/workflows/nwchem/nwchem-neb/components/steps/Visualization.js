@@ -1,6 +1,7 @@
-import React        from 'react';
-import candela      from 'candela';
-import client       from '../../../../../network';
+import React from 'react';
+import PropTypes from 'prop-types';
+import candela from 'candela';
+import client from '../../../../../network';
 import LoadingPanel from '../../../../../panels/LoadingPanel';
 
 const auToEv = 27.2116;
@@ -12,7 +13,7 @@ const y = 'Energy (kcal/mol)';
 // ----------------------------------------------------------------------------
 
 function extractEnergies(energyData) {
-  var energies = [];
+  let energies = [];
   energyData.split('\n').forEach((line) => {
     const trimmedLine = line.trim();
     if (!trimmedLine.startsWith('#') && trimmedLine.length > 0) {
@@ -24,7 +25,9 @@ function extractEnergies(energyData) {
     }
   });
 
-  const minimumEnergy = Math.min(...energies.map((point) => Number.parseFloat(point[y])));
+  const minimumEnergy = Math.min(
+    ...energies.map((point) => Number.parseFloat(point[y]))
+  );
 
   // Convert energies to kcal and make positive
   energies = energies.map((point) => {
@@ -44,22 +47,23 @@ export default class VisualizationView extends React.Component {
     this.state = { energies: [] };
 
     // Look up and fetch neb.neb_final_epath
-    client.listItems({
-      folderId: props.simulation.metadata.outputFolder._id,
-      name: 'neb.neb_final_epath',
-    })
-    .then((resp) => client.listFiles(resp.data[0]._id))
-    // Finally download the file
-    .then((resp) => client.downloadFile(resp.data[0]._id))
-    .then((resp) => {
-      this.setState({
-        energies: extractEnergies(resp.data),
+    client
+      .listItems({
+        folderId: props.simulation.metadata.outputFolder._id,
+        name: 'neb.neb_final_epath',
+      })
+      .then((resp) => client.listFiles(resp.data[0]._id))
+      // Finally download the file
+      .then((resp) => client.downloadFile(resp.data[0]._id))
+      .then((resp) => {
+        this.setState({
+          energies: extractEnergies(resp.data),
+        });
+      })
+      .catch((error) => {
+        console.error('Unable to neb.neb_final_epath.');
+        // throw error;
       });
-    })
-    .catch((error) => {
-      console.error('Unable to neb.neb_final_epath.');
-      // throw error;
-    });
   }
 
   componentDidUpdate() {
@@ -74,8 +78,8 @@ export default class VisualizationView extends React.Component {
         data: energies,
         x,
         y: [y],
-        width: (this.container.getClientRects()[0].width - 20) || 600,
-        height: (this.container.getClientRects()[0].height - 20) || 400,
+        width: this.container.getClientRects()[0].width - 20 || 600,
+        height: this.container.getClientRects()[0].height - 20 || 400,
         showPoints: true,
       });
 
@@ -91,10 +95,17 @@ export default class VisualizationView extends React.Component {
     if (this.state.energies.length === 0) {
       return <LoadingPanel />;
     }
-    return (<div style={{ width: '100%', height: '100%', padding: 10 }} ref={(c) => (this.container = c)} />);
+    return (
+      <div
+        style={{ width: '100%', height: '100%', padding: 10 }}
+        ref={(c) => {
+          this.container = c;
+        }}
+      />
+    );
   }
 }
 
 VisualizationView.propTypes = {
-  simulation: React.PropTypes.object,
+  simulation: PropTypes.object.isRequired,
 };

@@ -1,4 +1,4 @@
-var query = {};
+let query = {};
 
 const filterKeys = {
   't:': 'type',
@@ -7,7 +7,7 @@ const filterKeys = {
 };
 
 function findActiveKey(token) {
-  var key = null;
+  let key = null;
   Object.keys(filterKeys).forEach((k) => {
     if (token.indexOf(k) === 0) {
       key = k;
@@ -17,10 +17,10 @@ function findActiveKey(token) {
 }
 
 export function updateQuery(queryStr = '') {
-  var tokens = queryStr.split(' '),
-    activeToken = null,
-    previousFilterKey = null,
-    activeFilterKey = null;
+  const tokens = queryStr.split(' ');
+  let activeToken = null;
+  let previousFilterKey = null;
+  let activeFilterKey = null;
 
   // Reset query
   query = {};
@@ -48,11 +48,11 @@ export function updateQuery(queryStr = '') {
 }
 
 export function itemFilter(item, index, array) {
-  var keep = true;
+  let keep = true;
 
   Object.keys(query).forEach((key) => {
     query[key].forEach((token) => {
-      keep = keep && (item[key].toLowerCase().indexOf(token) !== -1);
+      keep = keep && item[key].toLowerCase().indexOf(token) !== -1;
     });
   });
 

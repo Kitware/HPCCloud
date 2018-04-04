@@ -1,13 +1,15 @@
-import rootNewSimulation    from './components/root/NewSimulation';
-import rootViewSimulation   from '../generic/components/root/ViewSimulation';
+import rootNewSimulation from './components/root/NewSimulation';
+import rootViewSimulation from '../generic/components/root/ViewSimulation';
 
-import stepIntroduction     from './components/steps/Introduction';
-import stepStartViz         from './components/steps/Visualization/Start';
-import stepVisualizer       from './components/steps/Visualization/View';
+import stepIntroduction from './components/steps/Introduction';
+import stepStartViz from './components/steps/Visualization/Start';
+import stepVisualizer from './components/steps/Visualization/View';
+
+import logo from './logo.png';
 
 export default {
   name: 'ParaViewWeb',
-  logo: require('./logo.png'),
+  logo,
   components: {
     NewSimulation: rootNewSimulation,
     ViewSimulation: rootViewSimulation,

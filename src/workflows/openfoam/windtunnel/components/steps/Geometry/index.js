@@ -1,25 +1,26 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import vtk from 'vtk.js/Sources/vtk';
 import 'vtk.js/Sources/Common/Core/Points';
 import 'vtk.js/Sources/Common/Core/CellArray';
 import 'vtk.js/Sources/Common/DataModel/PolyData';
 
-import vtkActor                  from 'vtk.js/Sources/Rendering/Core/Actor';
-import vtkMapper                 from 'vtk.js/Sources/Rendering/Core/Mapper';
-import vtkOBJReader              from 'vtk.js/Sources/IO/Misc/OBJReader';
-import vtkOpenGLRenderWindow     from 'vtk.js/Sources/Rendering/OpenGL/RenderWindow';
-import vtkOutlineFilter          from 'vtk.js/Sources/Filters/General/OutlineFilter';
-import vtkRenderer               from 'vtk.js/Sources/Rendering/Core/Renderer';
-import vtkRenderWindow           from 'vtk.js/Sources/Rendering/Core/RenderWindow';
+import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
+import vtkMapper from 'vtk.js/Sources/Rendering/Core/Mapper';
+import vtkOBJReader from 'vtk.js/Sources/IO/Misc/OBJReader';
+import vtkOpenGLRenderWindow from 'vtk.js/Sources/Rendering/OpenGL/RenderWindow';
+import vtkOutlineFilter from 'vtk.js/Sources/Filters/General/OutlineFilter';
+import vtkRenderer from 'vtk.js/Sources/Rendering/Core/Renderer';
+import vtkRenderWindow from 'vtk.js/Sources/Rendering/Core/RenderWindow';
 import vtkRenderWindowInteractor from 'vtk.js/Sources/Rendering/Core/RenderWindowInteractor';
 
+import style from 'HPCCloudStyle/PageWithMenu.mcss';
 
 import { dispatch } from '../../../../../../redux';
 import * as Actions from '../../../../../../redux/actions/projects';
-import client       from '../../../../../../network';
+import client from '../../../../../../network';
 
-import style from 'HPCCloudStyle/PageWithMenu.mcss';
 import localStyle from './Geometry.mcss';
 
 const BOUNDS_MAPPING = [0, 3, 1, 4, 2, 5];
@@ -53,9 +54,15 @@ function generateExternal(state) {
 
   // Wind Speed
   const flowVelocity = [0, 0, 0];
-  flowVelocity['xyz'.indexOf(state.direction[0])] = -state.speed * SIGN[state.direction[1]];
+  flowVelocity['xyz'.indexOf(state.direction[0])] =
+    -state.speed * SIGN[state.direction[1]];
   output.push({
-    path: ['InitialConditions', 0, 'initconst', 'initialConditions.flowVelocity'],
+    path: [
+      'InitialConditions',
+      0,
+      'initconst',
+      'initialConditions.flowVelocity',
+    ],
     value: flowVelocity,
   });
 
@@ -64,29 +71,53 @@ function generateExternal(state) {
   for (let i = 0; i < 3; i++) {
     output.push({
       path: ['WindTunnel', 0, 'wallBounds', `tunnel.bounds.${'xyz'[i]}`],
-      value: [bounds[i * 2], bounds[(i * 2) + 1]],
+      value: [bounds[i * 2], bounds[i * 2 + 1]],
     });
   }
 
   // Wall assignment
   output.push({
-    path: ['WindTunnel', 0, 'wallAssign', `tunnel.walls.${state.orientation[0]}.${SIGN_STR[state.orientation[1]]}`],
+    path: [
+      'WindTunnel',
+      0,
+      'wallAssign',
+      `tunnel.walls.${state.orientation[0]}.${SIGN_STR[state.orientation[1]]}`,
+    ],
     value: ['topWall'],
   });
   output.push({
-    path: ['WindTunnel', 0, 'wallAssign', `tunnel.walls.${state.orientation[0]}.${SIGN_STR_INV[state.orientation[1]]}`],
+    path: [
+      'WindTunnel',
+      0,
+      'wallAssign',
+      `tunnel.walls.${state.orientation[0]}.${
+        SIGN_STR_INV[state.orientation[1]]
+      }`,
+    ],
     value: ['bottomWall'],
   });
   output.push({
-    path: ['WindTunnel', 0, 'wallAssign', `tunnel.walls.${state.direction[0]}.${SIGN_STR[state.direction[1]]}`],
+    path: [
+      'WindTunnel',
+      0,
+      'wallAssign',
+      `tunnel.walls.${state.direction[0]}.${SIGN_STR[state.direction[1]]}`,
+    ],
     value: ['inlet'],
   });
   output.push({
-    path: ['WindTunnel', 0, 'wallAssign', `tunnel.walls.${state.direction[0]}.${SIGN_STR_INV[state.direction[1]]}`],
+    path: [
+      'WindTunnel',
+      0,
+      'wallAssign',
+      `tunnel.walls.${state.direction[0]}.${SIGN_STR_INV[state.direction[1]]}`,
+    ],
     value: ['outlet'],
   });
   // We don't care for the true left/right
-  const sideWallAxis = 'xyz'.replace(state.direction[0], '').replace(state.orientation[0], '');
+  const sideWallAxis = 'xyz'
+    .replace(state.direction[0], '')
+    .replace(state.orientation[0], '');
   output.push({
     path: ['WindTunnel', 0, 'wallAssign', `tunnel.walls.${sideWallAxis}.plus`],
     value: ['leftWall'],
@@ -99,7 +130,8 @@ function generateExternal(state) {
   // Refinement box
   const refineBox = [].concat(state.tunnel);
   const idxToReplace = [
-    ('xyz'.indexOf(state.direction[0]) * 2) + ((state.direction[1] === '+') ? 1 : 0), // Inlet
+    'xyz'.indexOf(state.direction[0]) * 2 +
+      (state.direction[1] === '+' ? 1 : 0), // Inlet
   ];
   idxToReplace.forEach((idx) => {
     refineBox[idx] = state.object[idx];
@@ -187,7 +219,9 @@ export default class GeometryViewer extends React.Component {
     this.vtk.tunnelMapper = vtkMapper.newInstance();
     this.vtk.tunnelActor = vtkActor.newInstance();
     this.vtk.tunnelBounds.setInputData(this.vtk.tunnel);
-    this.vtk.tunnelMapper.setInputConnection(this.vtk.tunnelBounds.getOutputPort());
+    this.vtk.tunnelMapper.setInputConnection(
+      this.vtk.tunnelBounds.getOutputPort()
+    );
     this.vtk.tunnelActor.setMapper(this.vtk.tunnelMapper);
     this.vtk.renderer.addActor(this.vtk.tunnelActor);
 
@@ -210,18 +244,17 @@ export default class GeometryViewer extends React.Component {
     this.updateRenderWindowSize();
 
     const meshFileId = this.props.project.metadata.inputFolder.files.mesh;
-    client.downloadFile(meshFileId, 0, null, 'inline')
-      .then((resp) => {
-        this.vtk.reader.parse(resp.data);
-        this.vtk.reader.update();
-        const mesh = this.vtk.reader.getOutputData();
-        this.vtk.renderer.addActor(this.vtk.actor);
-        this.updateCamera(this.state.direction, this.state.orientation);
-        const bounds = mesh.getBounds();
-        this.setState({ object: [].concat(bounds) }, () => {
-          this.updateTunnelBounds();
-        });
+    client.downloadFile(meshFileId, 0, null, 'inline').then((resp) => {
+      this.vtk.reader.parse(resp.data);
+      this.vtk.reader.update();
+      const mesh = this.vtk.reader.getOutputData();
+      this.vtk.renderer.addActor(this.vtk.actor);
+      this.updateCamera(this.state.direction, this.state.orientation);
+      const bounds = mesh.getBounds();
+      this.setState({ object: [].concat(bounds) }, () => {
+        this.updateTunnelBounds();
       });
+    });
   }
 
   componentWillUnmount() {
@@ -290,11 +323,13 @@ export default class GeometryViewer extends React.Component {
 
     const camera = this.vtk.renderer.getActiveCamera();
     const mappingIndex = 'xyz'.indexOf(direction[0]);
-    const delta = (direction[1] === '+') ? 1 : -1;
+    const delta = direction[1] === '+' ? 1 : -1;
     const focalPoint = camera.getFocalPoint();
-    const position = focalPoint.map((v, i) => ((i === mappingIndex) ? (v + delta) : v));
+    const position = focalPoint.map(
+      (v, i) => (i === mappingIndex ? v + delta : v)
+    );
     const viewUp = [0, 0, 0];
-    viewUp['xyz'.indexOf(orientation[0])] = ((orientation[1] === '+') ? 1 : -1);
+    viewUp['xyz'.indexOf(orientation[0])] = orientation[1] === '+' ? 1 : -1;
     camera.set({ focalPoint, position, viewUp });
     this.vtk.renderer.resetCamera();
     this.vtk.renderWindow.render();
@@ -314,8 +349,8 @@ export default class GeometryViewer extends React.Component {
       if (tunnel[i * 2] > objBounds[i * 2]) {
         tunnel[i * 2] = objBounds[i * 2];
       }
-      if (tunnel[(i * 2) + 1] < objBounds[(i * 2) + 1]) {
-        tunnel[(i * 2) + 1] = objBounds[(i * 2) + 1];
+      if (tunnel[i * 2 + 1] < objBounds[i * 2 + 1]) {
+        tunnel[i * 2 + 1] = objBounds[i * 2 + 1];
       }
     }
 
@@ -334,11 +369,13 @@ export default class GeometryViewer extends React.Component {
     newSim.steps[this.props.step].metadata.assign = assign;
     this.props.saveSimulation(newSim);
 
-    client.updateSimulationStep(this.props.simulation._id, this.props.step, {
-      metadata: { model, assign },
-    }).catch((error) => {
-      console.error('problem saving model (a)', error);
-    });
+    client
+      .updateSimulationStep(this.props.simulation._id, this.props.step, {
+        metadata: { model, assign },
+      })
+      .catch((error) => {
+        console.error('problem saving model (a)', error);
+      });
   }
 
   render() {
@@ -347,8 +384,17 @@ export default class GeometryViewer extends React.Component {
         <div className={localStyle.controlPanel}>
           <div className={localStyle.line}>
             <div className={localStyle.section}>
-              <label className={localStyle.clickLabel} onClick={this.updateCamera}>Wind direction</label>
-              <select className={localStyle.input} value={this.state.direction.join(':')} onChange={this.updateDirection}>
+              <label
+                className={localStyle.clickLabel}
+                onClick={this.updateCamera}
+              >
+                Wind direction
+              </label>
+              <select
+                className={localStyle.input}
+                value={this.state.direction.join(':')}
+                onChange={this.updateDirection}
+              >
                 <option value="x:+">X+</option>
                 <option value="x:-">X-</option>
                 <option value="y:+">Y+</option>
@@ -359,62 +405,129 @@ export default class GeometryViewer extends React.Component {
             </div>
             <div className={localStyle.section}>
               <label className={localStyle.label}>Lift direction</label>
-              <select className={localStyle.input} value={this.state.orientation.join(':')} onChange={this.updateOrientation}>
-                { this.state.direction[0] !== 'x' ? <option value="x:+">X+</option> : null }
-                { this.state.direction[0] !== 'x' ? <option value="x:-">X-</option> : null }
-                { this.state.direction[0] !== 'y' ? <option value="y:+">Y+</option> : null }
-                { this.state.direction[0] !== 'y' ? <option value="y:-">Y-</option> : null }
-                { this.state.direction[0] !== 'z' ? <option value="z:+">Z+</option> : null }
-                { this.state.direction[0] !== 'z' ? <option value="z:-">Z-</option> : null }
+              <select
+                className={localStyle.input}
+                value={this.state.orientation.join(':')}
+                onChange={this.updateOrientation}
+              >
+                {this.state.direction[0] !== 'x' ? (
+                  <option value="x:+">X+</option>
+                ) : null}
+                {this.state.direction[0] !== 'x' ? (
+                  <option value="x:-">X-</option>
+                ) : null}
+                {this.state.direction[0] !== 'y' ? (
+                  <option value="y:+">Y+</option>
+                ) : null}
+                {this.state.direction[0] !== 'y' ? (
+                  <option value="y:-">Y-</option>
+                ) : null}
+                {this.state.direction[0] !== 'z' ? (
+                  <option value="z:+">Z+</option>
+                ) : null}
+                {this.state.direction[0] !== 'z' ? (
+                  <option value="z:-">Z-</option>
+                ) : null}
               </select>
             </div>
             <div className={localStyle.section}>
               <label className={localStyle.label}>Wind speed</label>
-              <input className={localStyle.input} type="number" value={this.state.speed} onChange={this.updateSpeed} />
+              <input
+                className={localStyle.input}
+                type="number"
+                value={this.state.speed}
+                onChange={this.updateSpeed}
+              />
             </div>
           </div>
           <div className={localStyle.line}>
             <div className={localStyle.section}>
               <label className={localStyle.label}>X</label>
               <div className={localStyle.vertical}>
-                <input className={localStyle.input} type="number" name="0" value={this.state.tunnel[0]} onChange={this.updateTunnelBounds} />
-                <input className={localStyle.input} type="number" name="1" value={this.state.tunnel[1]} onChange={this.updateTunnelBounds} />
+                <input
+                  className={localStyle.input}
+                  type="number"
+                  name="0"
+                  value={this.state.tunnel[0]}
+                  onChange={this.updateTunnelBounds}
+                />
+                <input
+                  className={localStyle.input}
+                  type="number"
+                  name="1"
+                  value={this.state.tunnel[1]}
+                  onChange={this.updateTunnelBounds}
+                />
               </div>
             </div>
             <div className={localStyle.section}>
               <label className={localStyle.label}>Y</label>
               <div className={localStyle.vertical}>
-                <input className={localStyle.input} type="number" name="2" value={this.state.tunnel[2]} onChange={this.updateTunnelBounds} />
-                <input className={localStyle.input} type="number" name="3" value={this.state.tunnel[3]} onChange={this.updateTunnelBounds} />
+                <input
+                  className={localStyle.input}
+                  type="number"
+                  name="2"
+                  value={this.state.tunnel[2]}
+                  onChange={this.updateTunnelBounds}
+                />
+                <input
+                  className={localStyle.input}
+                  type="number"
+                  name="3"
+                  value={this.state.tunnel[3]}
+                  onChange={this.updateTunnelBounds}
+                />
               </div>
             </div>
             <div className={localStyle.section}>
               <label className={localStyle.label}>Z</label>
               <div className={localStyle.vertical}>
-                <input className={localStyle.input} type="number" name="4" value={this.state.tunnel[4]} onChange={this.updateTunnelBounds} />
-                <input className={localStyle.input} type="number" name="5" value={this.state.tunnel[5]} onChange={this.updateTunnelBounds} />
+                <input
+                  className={localStyle.input}
+                  type="number"
+                  name="4"
+                  value={this.state.tunnel[4]}
+                  onChange={this.updateTunnelBounds}
+                />
+                <input
+                  className={localStyle.input}
+                  type="number"
+                  name="5"
+                  value={this.state.tunnel[5]}
+                  onChange={this.updateTunnelBounds}
+                />
               </div>
             </div>
           </div>
         </div>
-        <div className={localStyle.view} ref={c => (this.container = c)} />
-      </div>);
+        <div
+          className={localStyle.view}
+          ref={(c) => {
+            this.container = c;
+          }}
+        />
+      </div>
+    );
   }
 }
 
+/* eslint-disable react/no-unused-prop-types */
 GeometryViewer.propTypes = {
-  nextStep: React.PropTypes.string,
-
-  project: React.PropTypes.object,
-  simulation: React.PropTypes.object,
-  step: React.PropTypes.string,
-  saveSimulation: React.PropTypes.func,
-  updateSimulation: React.PropTypes.func,
-  patchSimulation: React.PropTypes.func,
+  project: PropTypes.object,
+  simulation: PropTypes.object,
+  step: PropTypes.string,
+  saveSimulation: PropTypes.func,
+  updateSimulation: PropTypes.func,
+  patchSimulation: PropTypes.func,
 };
+/* eslint-enable */
 
 GeometryViewer.defaultProps = {
   saveSimulation,
   updateSimulation,
   patchSimulation,
+
+  project: undefined,
+  simulation: undefined,
+  step: undefined,
 };

@@ -1,35 +1,41 @@
+os: linux
 sudo: required
+dist: trusty
+group: travis_lts
+
 language: python
 python:
-    - "2.7"
-    - "3.4"
+  - "2.7"
+  - "3.4"
 
 env:
-    - CXX=g++-4.8
+  - CXX=g++-4.8
 
 addons:
-    apt:
-        sources:
-            - ubuntu-toolchain-r-test
-        packages:
-            - g++-4.8
-            - libgif-dev
+  chrome: stable
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+      - libgif-dev
 
 notifications:
-    email:
-        recipients:
-            - sebastien.jourdain@kitware.com
-            - tristan.wright@kitware.com
-            - chris.harris@kitware.com
-        on_success: change
-        on_failure: always
+  email:
+    recipients:
+      - sebastien.jourdain@kitware.com
+      - chris.harris@kitware.com
+    on_success: change
+    on_failure: always
+
 cache:
-    directories:
-        - node_modules
-        - $HOME/.cache
+  directories:
+    - node_modules
+    - $HOME/.cache
 
 compiler:
     - gcc
+
 before_install:
     # Update pip
     - pip install -U pip virtualenv
@@ -39,8 +45,9 @@ before_install:
     - if [ ${TRAVIS_PYTHON_VERSION:0:1} == "3" ]; then export PY3="true"; else export PY2="true"; fi
     - if [ -n "${PY3}" ]; then export MONGO_VERSION=3.0.7; export PY_COVG="OFF"; else export MONGO_VERSION=2.6.11; export PY_COVG="ON"; fi
     - export IGNORE_PLUGINS=celery_jobs,geospatial,google_analytics,hdfs_assetstore,jquery_widgets,metadata_extractor
-    - pip install -r girder/requirements.txt
-    - pip install -r girder/requirements-dev.txt
+    - pushd girder
+    - pip install -r requirements-dev.txt
+    - popd
     - pip install girder/
     - CACHE=$HOME/.cache source ./girder/scripts/install_mongo.sh
     - mkdir /tmp/db
@@ -53,7 +60,7 @@ before_install:
     # Install CMake
     - CACHE=$HOME/.cache CMAKE_VERSION=3.1.0 CMAKE_SHORT_VERSION=3.1 source $HOME/build/girder/scripts/install_cmake.sh
     # Install Node
-    - sudo curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+    - sudo curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
     - sudo apt-get install -y nodejs
 
 install:

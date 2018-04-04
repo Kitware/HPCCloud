@@ -1,6 +1,5 @@
-export default function ({ client, filterQuery, mustContain, busy }) {
+export default function({ client, filterQuery, mustContain, busy }) {
   return {
-
     // POST /taskflows Create the taskflow
     createTaskflow(taskFlowClass) {
       return busy(client._.post('/taskflows', { taskFlowClass }));
@@ -62,7 +61,9 @@ export default function ({ client, filterQuery, mustContain, busy }) {
     },
 
     unshareTaskflow(id, users = [], groups = []) {
-      return busy(client._.patch(`/taskflows/${id}/access/revoke`, { users, groups }));
+      return busy(
+        client._.patch(`/taskflows/${id}/access/revoke`, { users, groups })
+      );
     },
   };
 }

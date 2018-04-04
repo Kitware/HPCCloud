@@ -1,22 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import style from 'HPCCloudStyle/ItemEditor.mcss';
 
-export default React.createClass({
-
-  displayName: 'SchedulerConfig/PBS',
-
-  propTypes: {
-    config: React.PropTypes.object,
-    max: React.PropTypes.object,
-    onChange: React.PropTypes.func,
-    runtime: React.PropTypes.bool,
-  },
+export default class SchedulerConfigPBS extends React.Component {
+  constructor(props) {
+    super(props);
+    this.updateConfig = this.updateConfig.bind(this);
+  }
 
   updateConfig(event) {
     if (this.props.onChange) {
       this.props.onChange(event);
     }
-  },
+  }
 
   render() {
     return (
@@ -27,7 +24,11 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="1"
-            max={ this.props.runtime && this.props.max && this.props.max.pbs ? this.props.max.pbs.numberOfNodes : null }
+            max={
+              this.props.runtime && this.props.max && this.props.max.pbs
+                ? this.props.max.pbs.numberOfNodes
+                : null
+            }
             value={this.props.config.pbs.numberOfNodes}
             data-key="pbs.numberOfNodes"
             onChange={this.updateConfig}
@@ -39,7 +40,11 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="1"
-            max={ this.props.runtime && this.props.max && this.props.max.pbs ? this.props.max.pbs.numberOfCoresPerNode : null }
+            max={
+              this.props.runtime && this.props.max && this.props.max.pbs
+                ? this.props.max.pbs.numberOfCoresPerNode
+                : null
+            }
             value={this.props.config.pbs.numberOfCoresPerNode}
             data-key="pbs.numberOfCoresPerNode"
             onChange={this.updateConfig}
@@ -51,12 +56,31 @@ export default React.createClass({
             className={style.input}
             type="number"
             min="0"
-            max={ this.props.runtime && this.props.max && this.props.max.pbs ? this.props.max.pbs.numberOfGpusPerNode : null }
+            max={
+              this.props.runtime && this.props.max && this.props.max.pbs
+                ? this.props.max.pbs.numberOfGpusPerNode
+                : null
+            }
             value={this.props.config.pbs.numberOfGpusPerNode}
             data-key="pbs.numberOfGpusPerNode"
             onChange={this.updateConfig}
           />
         </section>
-      </div>);
-  },
-});
+      </div>
+    );
+  }
+}
+
+SchedulerConfigPBS.propTypes = {
+  config: PropTypes.object,
+  max: PropTypes.object,
+  onChange: PropTypes.func,
+  runtime: PropTypes.bool,
+};
+
+SchedulerConfigPBS.defaultProps = {
+  config: undefined,
+  max: undefined,
+  onChange: undefined,
+  runtime: undefined,
+};
