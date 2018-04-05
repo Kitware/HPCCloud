@@ -1,16 +1,20 @@
-import React           from 'react';
-import JobSubmission   from '../../../../../generic/components/steps/JobSubmission';
+import React from 'react';
+import JobSubmission from '../../../../../generic/components/steps/JobSubmission';
 
 // ----------------------------------------------------------------------------
 
-const actionList = [{ name: 'prepareJob', label: 'Start Simulation', icon: '' }];
+const actionList = [
+  { name: 'prepareJob', label: 'Start Simulation', icon: '' },
+];
 
 // ----------------------------------------------------------------------------
 
 function clusterFilter(cluster) {
-  return 'config' in cluster
-    && 'openfoam' in cluster.config
-    && (cluster.config.openfoam && cluster.config.openfoam.enable);
+  return (
+    'config' in cluster &&
+    'openfoam' in cluster.config &&
+    (cluster.config.openfoam && cluster.config.openfoam.enable)
+  );
 }
 
 // ----------------------------------------------------------------------------
@@ -38,8 +42,8 @@ function getPayload(props) {
 export default (props) => (
   <JobSubmission
     {...props}
-
     actionList={actionList}
     clusterFilter={clusterFilter}
     getPayload={getPayload}
-  />);
+  />
+);

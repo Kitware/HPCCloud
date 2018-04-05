@@ -1,44 +1,30 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import { connect } from 'react-redux';
+
+import style from 'HPCCloudStyle/ItemEditor.mcss';
+
 import PermissionPanel from './PermissionPanel';
 
 import * as ProjActions from '../../redux/actions/projects';
 import * as AuthActions from '../../redux/actions/user';
 import * as GroupActions from '../../redux/actions/groups';
 
-import { connect }  from 'react-redux';
 import { dispatch } from '../../redux';
 
-import style    from 'HPCCloudStyle/ItemEditor.mcss';
-
-const SharePanel = React.createClass({
-  displayName: 'SharePanel',
-
-  propTypes: {
-    shareToType: React.PropTypes.oneOf(['users', 'groups']).isRequired,
-    shareItem: React.PropTypes.object.isRequired, // project or simulation object
-    currentUser: React.PropTypes.object,
-    targetMap: React.PropTypes.object,
-    // many functions for a component that can work with simulations or projects
-    fetchUsers: React.PropTypes.func,
-    fetchGroups: React.PropTypes.func,
-    shareProject: React.PropTypes.func,
-    shareSimulation: React.PropTypes.func,
-    updateProjectPermission: React.PropTypes.func,
-    updateSimulationPermission: React.PropTypes.func,
-    unShareProject: React.PropTypes.func,
-    unShareSimulation: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return { targetMap: {} };
-  },
-
-  getInitialState() {
-    return {
+class SharePanel extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       shareIds: [],
       unShareIds: [],
     };
-  },
+    this.handleChange = this.handleChange.bind(this);
+    this.shareAction = this.shareAction.bind(this);
+    this.unShareAction = this.unShareAction.bind(this);
+    this.handlePermissionUpdate = this.handlePermissionUpdate.bind(this);
+  }
 
   componentDidMount() {
     if (this.props.shareToType === 'users') {
@@ -46,7 +32,7 @@ const SharePanel = React.createClass({
     } else {
       this.props.fetchGroups();
     }
-  },
+  }
 
   handleChange(e) {
     // DOM event
@@ -60,13 +46,13 @@ const SharePanel = React.createClass({
         }
       }
       this.setState({ [which]: values });
-    // permission panel event
+      // permission panel event
     } else {
       const which = e.which;
       const selected = e.selected;
       this.setState({ [which]: selected });
     }
-  },
+  }
 
   shareAction(e) {
     let shareIds;
@@ -81,7 +67,7 @@ const SharePanel = React.createClass({
       this.props.shareProject(this.props.shareItem, ...shareIds);
     }
     this.setState({ shareIds: [] });
-  },
+  }
 
   unShareAction(e) {
     let unShareIds;
@@ -106,7 +92,7 @@ const SharePanel = React.createClass({
       this.props.unShareProject(this.props.shareItem, ...unShareIds);
     }
     this.setState({ unShareIds: [] });
-  },
+  }
 
   handlePermissionUpdate(memberId, level) {
     let permIds;
@@ -122,66 +108,124 @@ const SharePanel = React.createClass({
       this.props.updateProjectPermission(this.props.shareItem, ...permIds);
     }
     this.setState({ unShareIds: [] });
-  },
+  }
 
   render() {
     const hasContents = Object.keys(this.props.targetMap).length;
     const targetKey = this.props.shareToType === 'users' ? 'login' : 'name';
-    const targetMembers = this.props.shareItem.access[this.props.shareToType].reduce((prev, cur) => prev.concat([cur.id]), []);
-    return (<div>
+    const targetMembers = this.props.shareItem.access[
+      this.props.shareToType
+    ].reduce((prev, cur) => prev.concat([cur.id]), []);
+    return (
+      <div>
         <div className={style.group}>
-          <label className={style.label}>{ this.props.shareToType === 'users' ? 'User Access' : 'Groups Access'}</label>
+          <label className={style.label}>
+            {this.props.shareToType === 'users'
+              ? 'User Access'
+              : 'Groups Access'}
+          </label>
           <section className={style.splitView}>
             <div className={style.splitViewItem}>
-              <select multiple data-which="shareIds" className={style.input}
-                onChange={this.handleChange} value={this.state.shareIds}
+              <select
+                multiple
+                data-which="shareIds"
+                className={style.input}
+                onChange={this.handleChange}
+                value={this.state.shareIds}
               >
-                { Object.keys(this.props.targetMap).filter((fId) => targetMembers.indexOf(fId) === -1)
-                  .map((_id, i) => <option key={`${_id}_${i}`} value={_id}>{ hasContents ? this.props.targetMap[_id][targetKey] : '' }</option>)
-                }
+                {Object.keys(this.props.targetMap)
+                  .filter((fId) => targetMembers.indexOf(fId) === -1)
+                  .map((_id, i) => (
+                    <option key={`${_id}_${i}`} value={_id}>
+                      {hasContents ? this.props.targetMap[_id][targetKey] : ''}
+                    </option>
+                  ))}
               </select>
-              <button onClick={this.shareAction}
+              <button
+                onClick={this.shareAction}
                 disabled={!this.state.shareIds.length}
-                className={style.shareButton}>
+                className={style.shareButton}
+              >
                 Add
               </button>
             </div>
             <div className={style.splitViewItem}>
-              <PermissionPanel className={style.splitViewItem}
+              <PermissionPanel
+                className={style.splitViewItem}
                 shareType={this.props.shareToType}
-                items={targetMembers.map(el => this.props.targetMap[el])}
-                permissions={this.props.shareItem.access[this.props.shareToType]}
+                items={targetMembers.map((el) => this.props.targetMap[el])}
+                permissions={
+                  this.props.shareItem.access[this.props.shareToType]
+                }
                 showAdmin={this.props.currentUser.admin}
                 selected={this.state.unShareIds}
                 onSelect={this.handleChange}
                 onPermissionChange={this.handlePermissionUpdate}
               />
-              <button onClick={this.unShareAction}
+              <button
+                onClick={this.unShareAction}
                 disabled={!this.state.unShareIds.length}
-                className={style.shareButton}>
+                className={style.shareButton}
+              >
                 Remove
               </button>
             </div>
           </section>
         </div>
-      </div>);
-  },
-});
+      </div>
+    );
+  }
+}
 
+SharePanel.propTypes = {
+  shareToType: PropTypes.oneOf(['users', 'groups']).isRequired,
+  shareItem: PropTypes.object.isRequired, // project or simulation object
+  currentUser: PropTypes.object.isRequired,
+  targetMap: PropTypes.object,
+  // many functions for a component that can work with simulations or projects
+  fetchUsers: PropTypes.func.isRequired,
+  fetchGroups: PropTypes.func.isRequired,
+  shareProject: PropTypes.func.isRequired,
+  shareSimulation: PropTypes.func.isRequired,
+  updateProjectPermission: PropTypes.func.isRequired,
+  updateSimulationPermission: PropTypes.func.isRequired,
+  unShareProject: PropTypes.func.isRequired,
+  unShareSimulation: PropTypes.func.isRequired,
+};
+
+SharePanel.defaultProps = {
+  targetMap: {},
+};
 
 export default connect(
   (state, props) => ({
     currentUser: state.auth.user,
-    targetMap: props.shareToType === 'users' ? state.auth.userMap : state.groups.mapById,
+    targetMap:
+      props.shareToType === 'users' ? state.auth.userMap : state.groups.mapById,
   }),
   () => ({
     fetchUsers: () => dispatch(AuthActions.getUsers()),
     fetchGroups: () => dispatch(GroupActions.getGroups()),
-    shareProject: (project, users, groups) => dispatch(ProjActions.shareProject(project, users, groups)),
-    shareSimulation: (simulation, users, groups) => dispatch(ProjActions.shareSimulation(simulation, users, groups)),
-    updateProjectPermission: (project, users, groups, level) => dispatch(ProjActions.updateProjectPermissions(project, users, groups, level)),
-    updateSimulationPermission: (simulation, users, groups, level) => dispatch(ProjActions.updateSimulationPermissions(simulation, users, groups, level)),
-    unShareProject: (project, users, groups) => dispatch(ProjActions.unShareProject(project, users, groups)),
-    unShareSimulation: (simulation, users, groups) => dispatch(ProjActions.unShareSimulation(simulation, users, groups)),
+    shareProject: (project, users, groups) =>
+      dispatch(ProjActions.shareProject(project, users, groups)),
+    shareSimulation: (simulation, users, groups) =>
+      dispatch(ProjActions.shareSimulation(simulation, users, groups)),
+    updateProjectPermission: (project, users, groups, level) =>
+      dispatch(
+        ProjActions.updateProjectPermissions(project, users, groups, level)
+      ),
+    updateSimulationPermission: (simulation, users, groups, level) =>
+      dispatch(
+        ProjActions.updateSimulationPermissions(
+          simulation,
+          users,
+          groups,
+          level
+        )
+      ),
+    unShareProject: (project, users, groups) =>
+      dispatch(ProjActions.unShareProject(project, users, groups)),
+    unShareSimulation: (simulation, users, groups) =>
+      dispatch(ProjActions.unShareSimulation(simulation, users, groups)),
   })
 )(SharePanel);

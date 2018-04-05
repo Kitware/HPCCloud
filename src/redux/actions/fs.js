@@ -1,6 +1,6 @@
-import client           from '../../network';
-import * as netActions  from './network';
-import * as progressActions  from './progress';
+import client from '../../network';
+import * as netActions from './network';
+import * as progressActions from './progress';
 import { store } from '..';
 
 export const UPDATE_FOLDER = 'UPDATE_FOLDER';
@@ -21,53 +21,61 @@ export function updateItems(items) {
 
 export function fetchFolder(id, fetchFolderMeta = true, openedFolders = []) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall(`fetch_folder_${id}`, 'Fetch folder');
+    const action = netActions.addNetworkCall(
+      `fetch_folder_${id}`,
+      'Fetch folder'
+    );
 
     // Update folder
     if (fetchFolderMeta) {
-      client.getFolder(id)
-        .then(
-          (resp) => {
-            const folder = resp.data;
-            dispatch(netActions.successNetworkCall(action.id, resp));
-            dispatch(updateFolder(folder));
-          },
-          (error) => {
-            dispatch(netActions.errorNetworkCall(action.id, error));
-          });
+      client.getFolder(id).then(
+        (resp) => {
+          const folder = resp.data;
+          dispatch(netActions.successNetworkCall(action.id, resp));
+          dispatch(updateFolder(folder));
+        },
+        (error) => {
+          dispatch(netActions.errorNetworkCall(action.id, error));
+        }
+      );
     }
 
     // Update children folders
-    const folderChildrenAction = netActions.addNetworkCall(`fetch_folder_children_${id}`, 'Fetch folder children (folders)');
+    const folderChildrenAction = netActions.addNetworkCall(
+      `fetch_folder_children_${id}`,
+      'Fetch folder children (folders)'
+    );
     dispatch(folderChildrenAction);
-    client.listFolders({ parentId: id, parentType: 'folder' })
-      .then(
-        (resp) => {
-          const children = resp.data;
-          dispatch(netActions.successNetworkCall(folderChildrenAction.id, resp));
-          dispatch({ type: CHILDREN_FOLDERS, children, id });
-          children.forEach((folder) => {
-            dispatch(updateFolder(folder));
-          });
-        },
-        (error) => {
-          dispatch(netActions.errorNetworkCall(folderChildrenAction.id, error));
+    client.listFolders({ parentId: id, parentType: 'folder' }).then(
+      (resp) => {
+        const children = resp.data;
+        dispatch(netActions.successNetworkCall(folderChildrenAction.id, resp));
+        dispatch({ type: CHILDREN_FOLDERS, children, id });
+        children.forEach((folder) => {
+          dispatch(updateFolder(folder));
         });
-
+      },
+      (error) => {
+        dispatch(netActions.errorNetworkCall(folderChildrenAction.id, error));
+      }
+    );
 
     // Update children items
-    const itemChildrenAction = netActions.addNetworkCall(`fetch_item_children_${id}`, 'Fetch folder children (items)');
+    const itemChildrenAction = netActions.addNetworkCall(
+      `fetch_item_children_${id}`,
+      'Fetch folder children (items)'
+    );
     dispatch(itemChildrenAction);
-    client.listItems({ folderId: id })
-      .then(
-        (resp) => {
-          const children = resp.data;
-          dispatch(netActions.successNetworkCall(itemChildrenAction.id, resp));
-          dispatch({ type: CHILDREN_ITEMS, children, id });
-        },
-        (error) => {
-          dispatch(netActions.errorNetworkCall(itemChildrenAction.id, error));
-        });
+    client.listItems({ folderId: id }).then(
+      (resp) => {
+        const children = resp.data;
+        dispatch(netActions.successNetworkCall(itemChildrenAction.id, resp));
+        dispatch({ type: CHILDREN_ITEMS, children, id });
+      },
+      (error) => {
+        dispatch(netActions.errorNetworkCall(itemChildrenAction.id, error));
+      }
+    );
 
     return fetchFolderMeta ? action : { type: 'NO_OP' };
   };
@@ -96,21 +104,33 @@ export function clearFileSelection() {
 export function moveFilesOffline(items) {
   const promises = items.map((id) => client.listFiles(id));
   return (dispatch) => {
-    const action = netActions.addNetworkCall('move_offline', `Moving ${items.length} offline`);
+    const action = netActions.addNetworkCall(
+      'move_offline',
+      `Moving ${items.length} offline`
+    );
     Promise.all(promises) // get files for each item
       .then((files) => {
         // get the size from the list of list of files
-        dispatch(progressActions.setupProgress(files.reduce((prev, cur) => {
-          var curSize = cur.data.reduce((p, c) => p + c.size, 0);
-          return prev + curSize;
-        }, 0)));
-        return client.moveFilesOffline(files.reduce((prev, cur) => prev.concat(cur.data), []));
+        dispatch(
+          progressActions.setupProgress(
+            files.reduce((prev, cur) => {
+              const curSize = cur.data.reduce((p, c) => p + c.size, 0);
+              return prev + curSize;
+            }, 0)
+          )
+        );
+        return client.moveFilesOffline(
+          files.reduce((prev, cur) => prev.concat(cur.data), [])
+        );
       })
       .then((resp) => {
-        if (process.env.NODE_ENV !== 'production') console.log('transfer complete');
+        if (process.env.NODE_ENV !== 'production')
+          console.log('transfer complete');
         // update item meta
         dispatch(netActions.successNetworkCall(action.id, resp));
-        return Promise.all(items.map((id) => client.updateItemMetadata(id, { offline: true })));
+        return Promise.all(
+          items.map((id) => client.updateItemMetadata(id, { offline: true }))
+        );
       })
       .then((newItems) => {
         // update local items

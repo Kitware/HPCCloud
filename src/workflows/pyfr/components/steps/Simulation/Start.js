@@ -1,22 +1,29 @@
-import React           from 'react';
-import RuntimeBackend  from '../../panels/RuntimeBackend';
-import JobSubmission   from '../../../../generic/components/steps/JobSubmission';
+import React from 'react';
+import { connect } from 'react-redux';
 
-import getNetworkError  from '../../../../../utils/getNetworkError';
+import RuntimeBackend from '../../panels/RuntimeBackend';
+import JobSubmission from '../../../../generic/components/steps/JobSubmission';
 
-import { connect }     from 'react-redux';
+import getNetworkError from '../../../../../utils/getNetworkError';
 
 // ----------------------------------------------------------------------------
 
-const actionList = [{ name: 'prepareJob', label: 'Start Simulation', icon: '' }];
+const actionList = [
+  { name: 'prepareJob', label: 'Start Simulation', icon: '' },
+];
 
 // ----------------------------------------------------------------------------
 
 function clusterFilter(cluster) {
-  return 'config' in cluster && 'pyfr' in cluster.config &&
+  return (
+    'config' in cluster &&
+    'pyfr' in cluster.config &&
     (('cuda' in cluster.config.pyfr && cluster.config.pyfr.cuda) ||
-    ('opencl' in cluster.config.pyfr && cluster.config.pyfr.opencl.length > 0) ||
-    ('openmp' in cluster.config.pyfr && cluster.config.pyfr.openmp.length > 0));
+      ('opencl' in cluster.config.pyfr &&
+        cluster.config.pyfr.opencl.length > 0) ||
+      ('openmp' in cluster.config.pyfr &&
+        cluster.config.pyfr.openmp.length > 0))
+  );
 }
 
 // ----------------------------------------------------------------------------
@@ -52,17 +59,15 @@ function pyfrStart(props) {
       actionList={actionList}
       clusterFilter={clusterFilter}
       getPayload={getPayload}
-
       {...props}
-    />);
+    />
+  );
 }
 
 // ----------------------------------------------------------------------------
 
-export default connect(
-  (state) => ({
-    error: getNetworkError(state, ['create_taskflow', 'start_taskflow']),
-    clusters: state.preferences.clusters.mapById,
-    volumes: state.preferences.volumes.mapById,
-  })
-)(pyfrStart);
+export default connect((state) => ({
+  error: getNetworkError(state, ['create_taskflow', 'start_taskflow']),
+  clusters: state.preferences.clusters.mapById,
+  volumes: state.preferences.volumes.mapById,
+}))(pyfrStart);

@@ -1,7 +1,10 @@
-import React    from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
+
+import style from 'HPCCloudStyle/Theme.mcss';
+
 import LinkIcon from '../LinkIcon';
-import { Link } from 'react-router';
-import style    from 'HPCCloudStyle/Theme.mcss';
 
 const DEFAULT_BREADCRUMB_ICONS = [
   style.breadCrumbRootIcon,
@@ -15,58 +18,78 @@ const DEFAULT_BREADCRUMB_ICONS = [
   style.breadCrumbUnknownIcon,
 ];
 
-export default React.createClass({
-  displayName: 'BreadCrumb',
+export default class BreadCrumb extends React.Component {
+  constructor(props) {
+    super(props);
+    this.iconClasses = this.iconClasses.bind(this);
+    this.tabMapper = this.tabMapper.bind(this);
+    this.otherMapper = this.otherMapper.bind(this);
+  }
 
-  propTypes: {
-    active: React.PropTypes.number,
-    className: React.PropTypes.string,
-    icons: React.PropTypes.array,
-    paths: React.PropTypes.array,
-    titles: React.PropTypes.array,
-    hasTabs: React.PropTypes.bool,
-    labels: React.PropTypes.array,
-  },
+  iconClasses(index) {
+    return [
+      this.props.icons[index],
+      index === this.props.active ? style.activeBreadCrumb : null,
+    ];
+  }
 
-  getDefaultProps() {
-    return {
-      active: -1,
-      icons: DEFAULT_BREADCRUMB_ICONS,
-      hasTabs: false,
-    };
-  },
+  tabMapper(path, index) {
+    return (
+      <span key={`${path}_${index}`} className={this.props.className}>
+        <Link
+          to={path}
+          className={this.props.className}
+          title={this.props.titles ? this.props.titles[index] : null}
+        >
+          <i className={this.iconClasses(index).join(' ')} />
+          <span
+            className={
+              index === this.props.active ? style.activeBreadCrumb : null
+            }
+          >
+            &nbsp;{this.props.labels[index]}
+          </span>
+        </Link>
+      </span>
+    );
+  }
+
+  otherMapper(path, index) {
+    return (
+      <LinkIcon
+        key={`${path}_${index}`}
+        to={path}
+        icon={this.props.icons[index]}
+        title={this.props.titles ? this.props.titles[index] : null}
+        className={index === this.props.active ? style.activeBreadCrumb : null}
+      />
+    );
+  }
 
   render() {
-    var mapper;
-    if (!this.props.hasTabs) {
-      mapper = (path, index) =>
-        <LinkIcon key={`${path}_${index}`} to={path}
-          icon={this.props.icons[index]}
-          title={this.props.titles ? this.props.titles[index] : null}
-          className={ index === this.props.active ? style.activeBreadCrumb : null}
-        />;
-    } else {
-      const iconClasses = (index) => [
-        this.props.icons[index],
-        index === this.props.active ? style.activeBreadCrumb : null,
-      ];
-      mapper = (path, index) =>
-        <span key={`${path}_${index}`} className={this.props.className}>
-          <Link to={path} className={this.props.className}
-            title={this.props.titles ? this.props.titles[index] : null}
-          >
-            <i className={ iconClasses(index).join(' ') } />
-            <span className={index === this.props.active ? style.activeBreadCrumb : null}>
-              &nbsp;{ this.props.labels[index] }
-            </span>
-          </Link>
-        </span>;
-    }
-
-
+    const mapper = this.props.hasTabs ? this.tabMapper : this.otherMapper;
     return (
-      <div className={ this.props.className }>
-        { this.props.paths.map(mapper) }
-      </div>);
-  },
-});
+      <div className={this.props.className}>{this.props.paths.map(mapper)}</div>
+    );
+  }
+}
+
+BreadCrumb.propTypes = {
+  active: PropTypes.number,
+  className: PropTypes.string,
+  icons: PropTypes.array,
+  paths: PropTypes.array,
+  titles: PropTypes.array,
+  hasTabs: PropTypes.bool,
+  labels: PropTypes.array,
+};
+
+BreadCrumb.defaultProps = {
+  active: -1,
+  icons: DEFAULT_BREADCRUMB_ICONS,
+  hasTabs: false,
+  className: '',
+  paths: [],
+  titles: [],
+  labels: [],
+};

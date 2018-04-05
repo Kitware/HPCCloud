@@ -1,22 +1,28 @@
-import React           from 'react';
-import JobSubmission   from '../../../../generic/components/steps/JobSubmission';
+import React from 'react';
+import JobSubmission from '../../../../generic/components/steps/JobSubmission';
 
 // ----------------------------------------------------------------------------
 
-const actionList = [{ name: 'prepareJob', label: 'Start Simulation', icon: '' }];
+const actionList = [
+  { name: 'prepareJob', label: 'Start Simulation', icon: '' },
+];
 
 // ----------------------------------------------------------------------------
 
 function clusterFilter(cluster) {
-  return 'config' in cluster
-    && 'nwchem' in cluster.config
-    && (cluster.config.nwchem && cluster.config.nwchem.enable);
+  return (
+    'config' in cluster &&
+    'nwchem' in cluster.config &&
+    (cluster.config.nwchem && cluster.config.nwchem.enable)
+  );
 }
 
 // ----------------------------------------------------------------------------
 
 function getPayload(props) {
-  const nwFile = props.simulation.metadata.inputFolder.files.nw || props.project.metadata.inputFolder.files.nw;
+  const nwFile =
+    props.simulation.metadata.inputFolder.files.nw ||
+    props.project.metadata.inputFolder.files.nw;
 
   return {
     input: {
@@ -45,8 +51,8 @@ function getPayload(props) {
 export default (props) => (
   <JobSubmission
     {...props}
-
     actionList={actionList}
     clusterFilter={clusterFilter}
     getPayload={getPayload}
-  />);
+  />
+);

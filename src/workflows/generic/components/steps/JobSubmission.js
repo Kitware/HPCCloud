@@ -1,13 +1,16 @@
-import React                   from 'react';
-import ButtonBar               from '../../../../panels/ButtonBar';
+import React from 'react';
+import PropTypes from 'prop-types';
+import queryString from 'query-string';
+
+import values from 'mout/src/object/values';
+
+import ButtonBar from '../../../../panels/ButtonBar';
 import defaultServerParameters from '../../../../panels/run/defaults';
-import RunClusterFrom          from '../../../../panels/run';
-import getClusterPayload       from '../../../../utils/ClusterPayload';
+import RunClusterFrom from '../../../../panels/run';
+import getClusterPayload from '../../../../utils/ClusterPayload';
 
-import values    from 'mout/src/object/values';
-
-import { dispatch }    from '../../../../redux';
-import * as Actions    from '../../../../redux/actions/taskflows';
+import { dispatch } from '../../../../redux';
+import * as Actions from '../../../../redux/actions/taskflows';
 import * as NetActions from '../../../../redux/actions/network';
 
 // ----------------------------------------------------------------------------
@@ -22,14 +25,34 @@ function getServerProfiles(state) {
 
 // ----------------------------------------------------------------------------
 
-function onJobSubmition(taskflowName, primaryJob, payload, simulationStep, location) {
-  dispatch(Actions.createTaskflow(taskflowName, primaryJob, payload, simulationStep, location));
+function onJobSubmition(
+  taskflowName,
+  primaryJob,
+  payload,
+  simulationStep,
+  location
+) {
+  dispatch(
+    Actions.createTaskflow(
+      taskflowName,
+      primaryJob,
+      payload,
+      simulationStep,
+      location
+    )
+  );
 }
 
 // ----------------------------------------------------------------------------
 
 function onError(message) {
-  dispatch(NetActions.errorNetworkCall('create_taskflow', { data: { message } }, 'form'));
+  dispatch(
+    NetActions.errorNetworkCall(
+      'create_taskflow',
+      { data: { message } },
+      'form'
+    )
+  );
 }
 
 // ----------------------------------------------------------------------------
@@ -45,11 +68,14 @@ export default class JobSubmission extends React.Component {
     this.prepareJob = this.prepareJob.bind(this);
 
     // Manage internal state
-    this.state = Object.assign({ serverType: 'Traditional' }, defaultServerParameters);
+    this.state = Object.assign(
+      { serverType: 'Traditional' },
+      defaultServerParameters
+    );
   }
 
   dataChange(key, value, which) {
-    var profile = this.state[which];
+    const profile = this.state[which];
     profile[key] = value;
     this.setState({ [which]: profile });
   }
@@ -59,7 +85,14 @@ export default class JobSubmission extends React.Component {
     if (fn) {
       fn(this.props);
     } else {
-      console.error('Could not find action', action, 'from', this.props.actionFunctions, 'or', this);
+      console.error(
+        'Could not find action',
+        action,
+        'from',
+        this.props.actionFunctions,
+        'or',
+        this
+      );
     }
   }
 
@@ -74,9 +107,15 @@ export default class JobSubmission extends React.Component {
     // Generic cluster management
     const clusterSettings = this.state[this.state.serverType];
     Object.assign(payload, clusterSettings.runtime);
-    const clusterNames = values(this.props.clusters).filter(el => el.type === 'ec2').map(el => el.name);
+    const clusterNames = values(this.props.clusters)
+      .filter((el) => el.type === 'ec2')
+      .map((el) => el.name);
     try {
-      const cluster = getClusterPayload(this.state.serverType, clusterSettings, clusterNames);
+      const cluster = getClusterPayload(
+        this.state.serverType,
+        clusterSettings,
+        clusterNames
+      );
       if (!cluster) {
         throw Error(`Unrecognized serverType: ${this.state.serverType}`);
       }
@@ -87,7 +126,7 @@ export default class JobSubmission extends React.Component {
     }
 
     if (this.state.serverType === 'EC2') {
-      const volumeNames = values(this.props.volumes).map(el => el.name);
+      const volumeNames = values(this.props.volumes).map((el) => el.name);
       if (this.state.EC2.volume) {
         payload.volume = { _id: this.state.EC2.volume };
       } else if (this.state.EC2.volumeName && this.state.EC2.volumeSize) {
@@ -95,7 +134,9 @@ export default class JobSubmission extends React.Component {
         const volumeName = this.state.EC2.volumeName.trim();
         try {
           if (volumeNames.indexOf(volumeName) !== -1) {
-            throw Error(`A volume with the name '${volumeName}' already exists`);
+            throw Error(
+              `A volume with the name '${volumeName}' already exists`
+            );
           } else if (volumeSize <= 0) {
             throw Error('Volume size must be greater than zero');
           }
@@ -115,17 +156,27 @@ export default class JobSubmission extends React.Component {
       this.props.primaryJob,
       payload,
       simulationStep,
-      { // new location
+      {
+        // new location
         pathname: this.props.location.pathname,
-        query: Object.assign({}, this.props.location.query, { view: this.props.nextView }),
+        search: queryString.stringify(
+          Object.assign({}, queryString.parse(this.props.location.search), {
+            view: this.props.nextView,
+          })
+        ),
         state: this.props.location.state,
-      });
+      }
+    );
   }
 
   render() {
     // Add add-on UI if provided
     const workflowAddOn = this.props.addOn
-      ? React.createElement(this.props.addOn, { owner: () => this, parentProps: this.props, parentState: this.state })
+      ? React.createElement(this.props.addOn, {
+          owner: () => this,
+          parentProps: this.props,
+          parentState: this.state,
+        })
       : null;
 
     return (
@@ -137,41 +188,42 @@ export default class JobSubmission extends React.Component {
           dataChange={this.dataChange}
           clusterFilter={this.props.clusterFilter}
         />
-        { workflowAddOn }
+        {workflowAddOn}
         <ButtonBar
           visible={this.state[this.state.serverType].profile !== ''}
           onAction={this.buttonAction}
           actions={this.props.actionList}
-          error={ this.props.error }
+          error={this.props.error}
         />
-      </div>);
+      </div>
+    );
   }
 }
 
 /* eslint-disable react/no-unused-prop-types */
 JobSubmission.propTypes = {
-  actionList: React.PropTypes.array,
-  actionFunctions: React.PropTypes.object,
-  clusterFilter: React.PropTypes.func,
-  getPayload: React.PropTypes.func,
-  getTaskflowMetaData: React.PropTypes.func,
-  getSimulationStep: React.PropTypes.func,
-  nextView: React.PropTypes.string,
+  actionList: PropTypes.array,
+  actionFunctions: PropTypes.object,
+  clusterFilter: PropTypes.func,
+  getPayload: PropTypes.func,
+  getTaskflowMetaData: PropTypes.func,
+  getSimulationStep: PropTypes.func,
+  nextView: PropTypes.string,
 
-  addOn: React.PropTypes.func,
-  primaryJob: React.PropTypes.string,
-  location: React.PropTypes.object,
-  project: React.PropTypes.object,
-  simulation: React.PropTypes.object,
-  step: React.PropTypes.string,
-  taskFlowName: React.PropTypes.string,
-  view: React.PropTypes.string,
-  error: React.PropTypes.string,
-  clusters: React.PropTypes.object,
-  volumes: React.PropTypes.object,
+  addOn: PropTypes.func,
+  primaryJob: PropTypes.string,
+  location: PropTypes.object,
+  project: PropTypes.object,
+  simulation: PropTypes.object,
+  step: PropTypes.string,
+  taskFlowName: PropTypes.string,
+  view: PropTypes.string,
+  error: PropTypes.string,
+  clusters: PropTypes.object,
+  volumes: PropTypes.object,
 
-  onJobSubmition: React.PropTypes.func,
-  onError: React.PropTypes.func,
+  onJobSubmition: PropTypes.func,
+  onError: PropTypes.func,
 };
 /* eslint-enable react/no-unused-prop-types */
 
@@ -205,4 +257,16 @@ JobSubmission.defaultProps = {
   }),
   onJobSubmition,
   onError,
+
+  addOn: undefined,
+  primaryJob: undefined,
+  location: undefined,
+  project: undefined,
+  simulation: undefined,
+  step: undefined,
+  taskFlowName: undefined,
+  view: undefined,
+  error: undefined,
+  clusters: undefined,
+  volumes: undefined,
 };

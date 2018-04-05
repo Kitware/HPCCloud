@@ -10,6 +10,11 @@ karmaConfig.webpack = wpConfig;
 
 karmaConfig.files = [
   'node_modules/babel-polyfill/dist/polyfill.js',
+  'dist/simput-pyfr.js',
+  'dist/simput-nwchem.js',
+  'dist/simput-nwchem-neb.js',
+  'dist/simput-openfoam-tutorials.js',
+  'dist/simput-openfoam-windtunnel.js',
   'test/contexts/tests.redux.js'
 ];
 

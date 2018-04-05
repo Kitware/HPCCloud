@@ -1,8 +1,9 @@
-import * as Actions from '../actions/projects';
-import * as Helper  from './ListActiveMapByIdHelper';
 /* eslint-disable import/extensions */
 import { workflowNames } from 'workflows'; // alias
 /* eslint-enable import/extensions */
+
+import * as Actions from '../actions/projects';
+import * as Helper from './ListActiveMapByIdHelper';
 
 export const initialState = {
   list: [],
@@ -47,8 +48,14 @@ export default function projectsReducer(state = initialState, action) {
       // Simulation map is kept somewhere else
       delete simulations[id].mapById;
 
-      if (state.pendingActiveSimulation && simulations[id].list.indexOf(state.pendingActiveSimulation) !== -1) {
-        simulations[id] = Helper.updateActive(simulations[id], state.pendingActiveSimulation);
+      if (
+        state.pendingActiveSimulation &&
+        simulations[id].list.indexOf(state.pendingActiveSimulation) !== -1
+      ) {
+        simulations[id] = Helper.updateActive(
+          simulations[id],
+          state.pendingActiveSimulation
+        );
         const coreState = Helper.updateActive(state, id);
         delete coreState.pendingActiveSimulation;
         return Object.assign({}, coreState, { simulations });

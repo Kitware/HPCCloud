@@ -1,6 +1,6 @@
-import * as netActions  from './network';
-import client           from '../../network';
-import { dispatch }     from '..';
+import * as netActions from './network';
+import client from '../../network';
+import { dispatch } from '..';
 
 export const ADD_VOLUME = 'ADD_VOLUME';
 export const UPDATE_ACTIVE_VOLUME = 'UPDATE_ACTIVE_VOLUME';
@@ -48,10 +48,14 @@ export function removeVolumeAtIndex(index) {
 }
 
 export function fetchVolumes() {
-  return dispatch => {
-    const action = netActions.addNetworkCall('fetch_volumes', 'Retreive EBS Volumes');
+  return (dispatch) => {
+    const action = netActions.addNetworkCall(
+      'fetch_volumes',
+      'Retreive EBS Volumes'
+    );
     dispatch(pendingNetworkCall(true));
-    client.listVolumes()
+    client
+      .listVolumes()
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
         dispatch(updateVolumes(resp.data));
@@ -71,21 +75,21 @@ export function removeVolume(index, volume) {
     return removeVolumeAtIndex(index);
   }
 
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('remove_volume', 'Remove volume');
 
     dispatch(pendingNetworkCall(true));
-    client.deleteVolume(volume._id)
-      .then(
-        resp => {
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(pendingNetworkCall(false));
-          dispatch(removeVolumeAtIndex(index));
-        },
-        err => {
-          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-          dispatch(pendingNetworkCall(false));
-        });
+    client.deleteVolume(volume._id).then(
+      (resp) => {
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(pendingNetworkCall(false));
+        dispatch(removeVolumeAtIndex(index));
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+        dispatch(pendingNetworkCall(false));
+      }
+    );
 
     return action;
   };
@@ -95,31 +99,36 @@ export function updateVolume(index, volume, pushToServer = false) {
   if (!pushToServer) {
     return { type: SAVE_VOLUME, index, volume };
   }
-  return dispatch => {
+  return (dispatch) => {
     const action = netActions.addNetworkCall('save_volume', 'Save volume');
     dispatch(pendingNetworkCall(true));
-    client.createVolume(volume)
-      .then(
-        resp => {
-          dispatch(pendingNetworkCall(false));
-          dispatch(netActions.successNetworkCall(action.id, resp));
-          dispatch(fetchVolumes());
-        },
-        err => {
-          dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
-          dispatch(pendingNetworkCall(false));
-        });
+    client.createVolume(volume).then(
+      (resp) => {
+        dispatch(pendingNetworkCall(false));
+        dispatch(netActions.successNetworkCall(action.id, resp));
+        dispatch(fetchVolumes());
+      },
+      (err) => {
+        dispatch(netActions.errorNetworkCall(action.id, err, 'form'));
+        dispatch(pendingNetworkCall(false));
+      }
+    );
     return action;
   };
 }
 
 export function getVolumeLog(id, offset) {
   return (dispatch) => {
-    const action = netActions.addNetworkCall(`cluster_log_${id}`, 'Check cluster log');
-    client.getVolumeLog(id, offset)
+    const action = netActions.addNetworkCall(
+      `cluster_log_${id}`,
+      'Check cluster log'
+    );
+    client
+      .getVolumeLog(id, offset)
       .then((resp) => {
         dispatch(netActions.successNetworkCall(action.id, resp));
-        if (!offset) { // offset is 0 or undefined
+        if (!offset) {
+          // offset is 0 or undefined
           dispatch(updateVolumeLog(id, resp.data.log));
         } else {
           dispatch(appendToVolumeLog(id, resp.data.log));
@@ -151,7 +160,7 @@ export function getVolumeLog(id, offset) {
 // }
 
 // Auto trigger actions on authentication change...
-client.onAuthChange(authenticated => {
+client.onAuthChange((authenticated) => {
   if (!authenticated) {
     dispatch(updateVolumes([]));
   }

@@ -4,15 +4,15 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-export default function ({ client, filterQuery, mustContain, busy }) {
+export default function({ client, filterQuery, mustContain, busy }) {
   return {
     listProjects() {
       return busy(client._.get('/projects'));
     },
 
     createProject(project) {
-      const expected = ['name', 'type', 'steps', 'metadata'],
-        { missingKeys, promise } = mustContain(project, ...expected);
+      const expected = ['name', 'type', 'steps', 'metadata'];
+      const { missingKeys, promise } = mustContain(project, ...expected);
       return missingKeys ? promise : busy(client._.post('/projects', project));
     },
 
@@ -21,15 +21,18 @@ export default function ({ client, filterQuery, mustContain, busy }) {
     },
 
     updateProject(project) {
-      const expected = ['name', 'description', 'metadata', '_id'],
-        pfiltered = filterQuery(project, ...expected.slice(0, 3)), // Remove '_id'
-        { missingKeys, promise } = mustContain(project, ...expected);
+      const expected = ['name', 'description', 'metadata', '_id'];
+      const pfiltered = filterQuery(project, ...expected.slice(0, 3)); // Remove '_id'
+      const { missingKeys, promise } = mustContain(project, ...expected);
 
-      return missingKeys ?
-        promise :
-        busy(client._.patch(`/projects/${project._id}`, pfiltered, {
-          headers, transformRequest,
-        }));
+      return missingKeys
+        ? promise
+        : busy(
+            client._.patch(`/projects/${project._id}`, pfiltered, {
+              headers,
+              transformRequest,
+            })
+          );
     },
 
     deleteProject(id) {
@@ -41,16 +44,32 @@ export default function ({ client, filterQuery, mustContain, busy }) {
     },
 
     setProjectAccess(_id, users, groups, level = 0, flags = []) {
-      return busy(client._.put(`/projects/${_id}/access`, { users, groups, level: parseInt(level, 10), flags }));
+      return busy(
+        client._.put(`/projects/${_id}/access`, {
+          users,
+          groups,
+          level: parseInt(level, 10),
+          flags,
+        })
+      );
     },
 
     patchProjectAccess(_id, users, groups, level = 0, flags = []) {
-      return busy(client._.patch(`/projects/${_id}/access`, { users, groups, level: parseInt(level, 10), flags }));
+      return busy(
+        client._.patch(`/projects/${_id}/access`, {
+          users,
+          groups,
+          level: parseInt(level, 10),
+          flags,
+        })
+      );
     },
 
     revokeProjectAccess(_id, users, groups) {
       console.log(users, groups);
-      return busy(client._.patch(`/projects/${_id}/access/revoke`, { users, groups }));
+      return busy(
+        client._.patch(`/projects/${_id}/access/revoke`, { users, groups })
+      );
     },
 
     // List all the simulations associated with a project
@@ -61,12 +80,15 @@ export default function ({ client, filterQuery, mustContain, busy }) {
     // post /projects/{id}/simulations
     // Create a simulation associated with a project
     createSimulation(projectId, simualtion) {
-      const expected = ['name', 'description', 'steps', 'active', 'disabled'],
-        sfiltered = filterQuery(simualtion, ...expected);
+      const expected = ['name', 'description', 'steps', 'active', 'disabled'];
+      const sfiltered = filterQuery(simualtion, ...expected);
 
-      return busy(client._.post(`/projects/${projectId}/simulations`, sfiltered, {
-        headers, transformRequest,
-      }));
+      return busy(
+        client._.post(`/projects/${projectId}/simulations`, sfiltered, {
+          headers,
+          transformRequest,
+        })
+      );
     },
   };
 }

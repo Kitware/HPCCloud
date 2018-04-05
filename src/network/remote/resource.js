@@ -1,4 +1,10 @@
-export default function ({ client, filterQuery, mustContain, busy, encodeQueryAsString }) {
+export default function({
+  client,
+  filterQuery,
+  mustContain,
+  busy,
+  encodeQueryAsString,
+}) {
   return {
     downloadResources(resourceList, withMetadata = false) {
       const params = {

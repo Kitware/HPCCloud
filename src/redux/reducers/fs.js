@@ -17,8 +17,15 @@ export default function fsReducer(state = initialState, action) {
   switch (action.type) {
     case Actions.UPDATE_FOLDER: {
       const { id, folder } = action;
-      const newFolderContainer = Object.assign({}, folderInitialState, state.folderMapById[id], { folder });
-      const folderMapById = Object.assign({}, state.folderMapById, { [id]: newFolderContainer });
+      const newFolderContainer = Object.assign(
+        {},
+        folderInitialState,
+        state.folderMapById[id],
+        { folder }
+      );
+      const folderMapById = Object.assign({}, state.folderMapById, {
+        [id]: newFolderContainer,
+      });
       return Object.assign({}, state, { folderMapById });
     }
 
@@ -41,7 +48,12 @@ export default function fsReducer(state = initialState, action) {
       const itemChildren = children.map((item) => item._id);
 
       const folderMapById = Object.assign({}, state.folderMapById);
-      folderMapById[id] = Object.assign({}, folderInitialState, state.folderMapById[id], { itemChildren });
+      folderMapById[id] = Object.assign(
+        {},
+        folderInitialState,
+        state.folderMapById[id],
+        { itemChildren }
+      );
       return Object.assign({}, state, { itemMapById, folderMapById });
     }
 
@@ -49,7 +61,12 @@ export default function fsReducer(state = initialState, action) {
       const { id, children } = action;
       const folderChildren = children.map((item) => item._id);
       const folderMapById = Object.assign({}, state.folderMapById);
-      folderMapById[id] = Object.assign({}, folderInitialState, state.folderMapById[id], { folderChildren });
+      folderMapById[id] = Object.assign(
+        {},
+        folderInitialState,
+        state.folderMapById[id],
+        { folderChildren }
+      );
       return Object.assign({}, state, { folderMapById });
     }
 

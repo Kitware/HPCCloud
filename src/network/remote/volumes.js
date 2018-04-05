@@ -4,9 +4,14 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-export default function ({ client, filterQuery, mustContain, encodeQueryAsString, busy }) {
+export default function({
+  client,
+  filterQuery,
+  mustContain,
+  encodeQueryAsString,
+  busy,
+}) {
   return {
-
     // get /volumes
     //     List available volumes.
     listVolumes(limit = null) {
@@ -19,9 +24,12 @@ export default function ({ client, filterQuery, mustContain, encodeQueryAsString
     // post /volumes
     //     Create a volume
     createVolume(volume) {
-      return busy(client._.post('/volumes', volume, {
-        transformRequest, headers,
-      }));
+      return busy(
+        client._.post('/volumes', volume, {
+          transformRequest,
+          headers,
+        })
+      );
     },
 
     // get /volumes/{id}

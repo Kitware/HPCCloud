@@ -1,5 +1,5 @@
-import client           from '../../network';
-import { dispatch }     from '../';
+import client from '../../network';
+import { dispatch } from '../';
 
 export const ADD_NETWORK_CALL = 'ADD_NETWORK_CALL';
 export const SUCCESS_NETWORK_CALL = 'SUCCESS_NETWORK_CALL';
@@ -37,7 +37,9 @@ export function invalidateErrors(ids, errType = 'application') {
 }
 
 export function errorNetworkCall(id, resp, errType = 'application') {
-  var errorTimeout = setTimeout(() => { dispatch(invalidateError(id)); }, 5000);
+  const errorTimeout = setTimeout(() => {
+    dispatch(invalidateError(id));
+  }, 5000);
   return { type: ERROR_NETWORK_CALL, id, resp, errorTimeout, errType };
 }
 

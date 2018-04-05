@@ -17,14 +17,14 @@ export function updateList(state, itemList, idKey = '_id') {
 }
 
 export function removeItem(state, id) {
-  var mapById = state.mapById;
+  let mapById = state.mapById;
   if (mapById && mapById[id]) {
     mapById = Object.assign({}, state.mapById);
     delete mapById[id];
   }
   if (state.list.indexOf(id) !== -1) {
     const list = state.list.filter((item) => item !== id);
-    const active = (state.active === id) ? null : state.active;
+    const active = state.active === id ? null : state.active;
     if (mapById) {
       return Object.assign({}, state, { list, active, mapById });
     }
@@ -35,7 +35,10 @@ export function removeItem(state, id) {
 
 export function updateItem(state, item, idKey = '_id') {
   const itemId = item[idKey];
-  const list = state.list.indexOf(itemId) === -1 ? [itemId].concat(state.list) : state.list;
+  const list =
+    state.list.indexOf(itemId) === -1
+      ? [itemId].concat(state.list)
+      : state.list;
   const mapById = Object.assign({}, state.mapById, { [itemId]: item });
   return Object.assign({}, state, { list, mapById });
 }

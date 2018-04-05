@@ -1,9 +1,21 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import style from 'HPCCloudStyle/Preferences.mcss';
 
 export const breadcrumb = (user, page) => {
-  const paths = ['/Preferences/User', '/Preferences/Cluster', '/Preferences/AWS', '/Preferences/Status']; // '/Preferences/Network', ];
-  const icons = [style.userIcon, style.clusterIcon, style.ec2Icon, style.statusIcon]; // style.networkIcon, ],;
+  const paths = [
+    '/Preferences/User',
+    '/Preferences/Cluster',
+    '/Preferences/AWS',
+    '/Preferences/Status',
+  ]; // '/Preferences/Network', ];
+  const icons = [
+    style.userIcon,
+    style.clusterIcon,
+    style.ec2Icon,
+    style.statusIcon,
+  ]; // style.networkIcon, ],;
   const titles = ['User preferences', 'Cluster', 'EC2', 'Server status'];
   const labels = ['User', 'Cluster', 'EC2', 'Status'];
   if (user && user.admin) {
@@ -21,15 +33,14 @@ export const breadcrumb = (user, page) => {
   };
 };
 
-export default React.createClass({
+export default function Preferences(props) {
+  return <div>{props.children}</div>;
+}
 
-  displayName: 'Preferences',
+Preferences.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+};
 
-  propTypes: {
-    children: React.PropTypes.oneOfType([React.PropTypes.object, React.PropTypes.array]),
-  },
-
-  render() {
-    return <div>{ this.props.children }</div>;
-  },
-});
+Preferences.defaultProps = {
+  children: null,
+};

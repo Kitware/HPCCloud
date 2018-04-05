@@ -16,13 +16,16 @@ export const initialState = {
 
 export default function networkReducer(state = initialState, action) {
   switch (action.type) {
-
     case Actions.ADD_NETWORK_CALL: {
       const { id, label, ts } = action;
-      const pending = Object.assign({}, state.pending, { [id]: { id, label, ts } });
+      const pending = Object.assign({}, state.pending, {
+        [id]: { id, label, ts },
+      });
       const success = Object.assign({}, state.success);
       const error = Object.assign({}, state.error);
-      const backlog = [].concat(state.backlog, success[id], error[id]).filter((el) => !!el);
+      const backlog = []
+        .concat(state.backlog, success[id], error[id])
+        .filter((el) => !!el);
       delete success[id];
       delete error[id];
 
@@ -35,8 +38,12 @@ export default function networkReducer(state = initialState, action) {
         return state;
       }
       const pending = Object.assign({}, state.pending);
-      const callToMove = Object.assign({}, pending[action.id], { resp: action.resp });
-      const success = Object.assign({}, state.success, { [action.id]: callToMove });
+      const callToMove = Object.assign({}, pending[action.id], {
+        resp: action.resp,
+      });
+      const success = Object.assign({}, state.success, {
+        [action.id]: callToMove,
+      });
       delete pending[action.id];
       return Object.assign({}, state, { pending, success });
     }
@@ -44,7 +51,10 @@ export default function networkReducer(state = initialState, action) {
     case Actions.ERROR_NETWORK_CALL: {
       const { id, resp, errorTimeout, errType } = action;
       const pending = Object.assign({}, state.pending);
-      const callToMove = Object.assign({}, pending[id], { resp, invalid: false });
+      const callToMove = Object.assign({}, pending[id], {
+        resp,
+        invalid: false,
+      });
       const error = Object.assign({}, state.error, { [id]: callToMove });
       const activeErrors = Object.assign({}, state.activeErrors);
       delete pending[id];
@@ -58,7 +68,12 @@ export default function networkReducer(state = initialState, action) {
         clearTimeout(state.errorTimeout);
       }
 
-      return Object.assign({}, state, { pending, error, errorTimeout, activeErrors });
+      return Object.assign({}, state, {
+        pending,
+        error,
+        errorTimeout,
+        activeErrors,
+      });
     }
 
     case Actions.INVALIDATE_ERROR: {
@@ -77,7 +92,11 @@ export default function networkReducer(state = initialState, action) {
       activeErrors[errType] = state.activeErrors[errType];
       activeErrors[errType].splice(activeErrors[errType].indexOf(id), 1);
 
-      return Object.assign({}, state, { error, activeErrors, errorTimeout: null });
+      return Object.assign({}, state, {
+        error,
+        activeErrors,
+        errorTimeout: null,
+      });
     }
 
     case Actions.INVALIDATE_ERRORS: {
@@ -104,25 +123,38 @@ export default function networkReducer(state = initialState, action) {
         clearTimeout(state.errorTimeout);
       }
 
-      return Object.assign({}, state, { error, activeErrors, errorTimeout: null });
+      return Object.assign({}, state, {
+        error,
+        activeErrors,
+        errorTimeout: null,
+      });
     }
 
     case Actions.PREPARE_UPLOAD: {
       const files = action.files;
       const progress = {};
       Object.keys(files).forEach((key, index) => {
-        progress[`${files[key].name}_${files[key].lastModified}`] = { current: 0, total: files[key].size };
+        progress[`${files[key].name}_${files[key].lastModified}`] = {
+          current: 0,
+          total: files[key].size,
+        };
       });
       return Object.assign({}, state, { progress });
     }
 
     case Actions.RESET_UPLOAD_PROGRESS: {
-      return Object.assign({}, state, { progress: {}, progressReset: action.val });
+      return Object.assign({}, state, {
+        progress: {},
+        progressReset: action.val,
+      });
     }
 
     case Actions.ON_UPLOAD_PROGRESS: {
       const progress = Object.assign({}, state.progress);
-      const progressItem = Object.assign({}, progress[action.progressPacket.id]);
+      const progressItem = Object.assign(
+        {},
+        progress[action.progressPacket.id]
+      );
       progressItem.current = action.progressPacket.current;
       progress[action.progressPacket.id] = progressItem;
       return Object.assign({}, state, { progress });

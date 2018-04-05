@@ -1,96 +1,109 @@
-import React        from 'react';
-import Breadcrumb   from '../../panels/Breadcrumb';
-import merge        from 'mout/src/object/merge';
-import style        from 'HPCCloudStyle/Toolbar.mcss';
-import states       from 'HPCCloudStyle/States.mcss';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-export default React.createClass({
-  displayName: 'PreferenceSubBar',
+import queryString from 'query-string';
+import { withRouter } from 'react-router-dom';
 
-  propTypes: {
-    actions: React.PropTypes.array,
-    breadcrumb: React.PropTypes.object,
-    hasTabs: React.PropTypes.bool,
-    filter: React.PropTypes.bool,
-    hidden: React.PropTypes.bool,
-    location: React.PropTypes.object,
-    onAction: React.PropTypes.func,
-    title: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.object]),
-  },
+import style from 'HPCCloudStyle/Toolbar.mcss';
 
-  contextTypes: {
-    router: React.PropTypes.object,
-  },
+import Breadcrumb from '../../panels/Breadcrumb';
 
-  getDefaultProps() {
-    return {
-      filter: false,
-      actions: [],
-      title: '',
-      breadcrumb: {
-        paths: [],
-        icons: [],
-        titles: [],
-      },
-      hasTabs: false,
-      hidden: false,
-    };
-  },
+export class PreferenceSubBar extends React.Component {
+  constructor(props) {
+    super(props);
+    this.onAction = this.onAction.bind(this);
+    this.updateFilter = this.updateFilter.bind(this);
+  }
 
   onAction(event) {
     const action = event.target.dataset.action;
     if (this.props.onAction) {
       this.props.onAction(action);
     }
-  },
+  }
 
   updateFilter(e) {
     const filter = e.target.value;
-
-    this.context.router.replace({
+    this.props.history.replace({
       pathname: this.props.location.pathname,
-      query: merge(this.props.location.query, { filter }),
+      search: `?${queryString.stringify(
+        Object.assign({}, queryString.parse(this.props.location.search), {
+          filter,
+        })
+      )}`,
       state: this.props.location.state,
     });
-  },
+  }
 
   render() {
+    if (this.props.hidden) {
+      return null;
+    }
     return (
-      <nav className={ [style.container, this.props.hidden ? states.isHidden : ''].join(' ') }>
+      <nav className={style.container}>
         <Breadcrumb
-          className={ this.props.hasTabs ? style.toolbarTab : style.breadcrumb }
-          paths={ this.props.breadcrumb.paths }
-          icons={ this.props.breadcrumb.icons }
-          titles={ this.props.breadcrumb.titles }
-          labels={ this.props.breadcrumb.labels }
-          active={ this.props.breadcrumb.active }
+          className={this.props.hasTabs ? style.toolbarTab : style.breadcrumb}
+          paths={this.props.breadcrumb.paths}
+          icons={this.props.breadcrumb.icons}
+          titles={this.props.breadcrumb.titles}
+          labels={this.props.breadcrumb.labels}
+          active={this.props.breadcrumb.active}
           hasTabs={this.props.hasTabs}
         />
 
-        <div className={ style.title }>
-            { this.props.title }
-        </div>
+        <div className={style.title}>{this.props.title}</div>
 
-        <div className={ style.actions }>
-            { this.props.actions.map((action, index) =>
-              <i
-                key={`${action.name}_${index}`}
-                data-action={action.name}
-                onClick={this.onAction}
-                className={ [style.actionButton, action.icon].join(' ') }
-               />
-            )}
-            { this.props.filter ?
-                <input
-                  type="text"
-                  className={ style.filter }
-                  placeholder="filter"
-                  value={ this.props.location.query.filter || '' }
-                  onChange={ this.updateFilter }
-                />
-                : null
-            }
+        <div className={style.actions}>
+          {this.props.actions.map((action, index) => (
+            <i
+              key={`${action.name}_${index}`}
+              data-action={action.name}
+              onClick={this.onAction}
+              className={[style.actionButton, action.icon].join(' ')}
+            />
+          ))}
+          {this.props.filter ? (
+            <input
+              type="text"
+              className={style.filter}
+              placeholder="filter"
+              value={queryString.parse(this.props.location.search).filter || ''}
+              onChange={this.updateFilter}
+            />
+          ) : null}
         </div>
-      </nav>);
+      </nav>
+    );
+  }
+}
+
+PreferenceSubBar.propTypes = {
+  actions: PropTypes.array,
+  breadcrumb: PropTypes.object,
+  hasTabs: PropTypes.bool,
+  filter: PropTypes.bool,
+  hidden: PropTypes.bool,
+  location: PropTypes.object,
+  onAction: PropTypes.func,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+
+  history: PropTypes.object,
+};
+
+PreferenceSubBar.defaultProps = {
+  filter: false,
+  actions: [],
+  title: '',
+  breadcrumb: {
+    paths: [],
+    icons: [],
+    titles: [],
   },
-});
+  hasTabs: false,
+  hidden: false,
+  history: undefined,
+  location: undefined, // FIXME router handler...
+  onAction: undefined,
+};
+
+export default withRouter(PreferenceSubBar);

@@ -1,11 +1,15 @@
-import React            from 'react';
-import ImageIcon        from '../panels/ImageIcon';
-import IconActionList   from '../panels/IconActionList';
+import React from 'react';
 
 import style from 'HPCCloudStyle/Theme.mcss';
+
+import ImageIcon from '../panels/ImageIcon';
+import IconActionList from '../panels/IconActionList';
+
+import wf from '../workflows';
+
 let Workflow;
 if (process.env.NODE_ENV !== 'test') {
-  Workflow = require('../workflows').default;
+  Workflow = wf;
 } else {
   Workflow = { test: { name: 'test', logo: 'my-logo' } };
 }
@@ -14,23 +18,24 @@ if (process.env.NODE_ENV !== 'test') {
 const SHORT_DESCRIPTION_SIZE = 80;
 
 // Girder access levels
-const accessTypes = [
-  'READ',
-  'WRITE',
-  'ADMIN',
-];
+const accessTypes = ['READ', 'WRITE', 'ADMIN'];
 
 // user(obj): full user object,
 // objAccess(obj): access object of the simulation or project
 // atLeastAccess(int|string): check that the user has at least this access level
 export function userHasAccess(user, objAccess, atLeastAccess) {
-  const accessLevel = typeof atLeastAccess === 'number' ? atLeastAccess
-    : accessTypes.indexOf(atLeastAccess.toUpperCase());
+  const accessLevel =
+    typeof atLeastAccess === 'number'
+      ? atLeastAccess
+      : accessTypes.indexOf(atLeastAccess.toUpperCase());
 
   // check groups
   const groups = objAccess.groups;
   for (let i = 0; i < groups.length; i++) {
-    if (user.groups.indexOf(groups[i].id) !== -1 && groups[i].level >= accessLevel) {
+    if (
+      user.groups.indexOf(groups[i].id) !== -1 &&
+      groups[i].level >= accessLevel
+    ) {
       return true;
     }
   }
@@ -93,10 +98,12 @@ export const projectFunctions = {
   },
 
   getActions(project) {
-    return [{
-      icon: style.editIcon,
-      name: `edit:${project._id}`,
-    }];
+    return [
+      {
+        icon: style.editIcon,
+        name: `edit:${project._id}`,
+      },
+    ];
   },
 
   getViewLink(project) {
@@ -106,7 +113,6 @@ export const projectFunctions = {
   getEditLink(project) {
     return `/Edit/Project/${project._id}`;
   },
-
 };
 
 export const ProjectHelper = {
@@ -119,7 +125,12 @@ export const ProjectHelper = {
     projectFunctions.getUpdateDate,
     projectFunctions.getSimulationCount,
   ],
-  actionItem: (item, onAction) => <IconActionList actions={projectFunctions.getActions(item)} onAction={onAction} />,
+  actionItem: (item, onAction) => (
+    <IconActionList
+      actions={projectFunctions.getActions(item)}
+      onAction={onAction}
+    />
+  ),
   viewLink: projectFunctions.getViewLink,
   editLink: projectFunctions.getEditLink,
 };
@@ -133,7 +144,6 @@ const SIMULATIONS_ICONS = {
 };
 
 export const simulationFunctions = {
-
   getIcon(simulation) {
     return { icon: SIMULATIONS_ICONS[simulation.metadata.status] };
   },
@@ -144,7 +154,10 @@ export const simulationFunctions = {
 
   getDescription(simulation, short = false) {
     if (short && simulation.description.length > SHORT_DESCRIPTION_SIZE) {
-      return `${simulation.description.substring(0, SHORT_DESCRIPTION_SIZE)}...`;
+      return `${simulation.description.substring(
+        0,
+        SHORT_DESCRIPTION_SIZE
+      )}...`;
     }
     return simulation.description;
   },
@@ -198,7 +211,12 @@ export const SimulationHelper = {
     simulationFunctions.getUpdateDate,
     simulationFunctions.getStep,
   ],
-  actionItem: (item, onAction) => <IconActionList actions={simulationFunctions.getActions(item)} onAction={onAction} />,
+  actionItem: (item, onAction) => (
+    <IconActionList
+      actions={simulationFunctions.getActions(item)}
+      onAction={onAction}
+    />
+  ),
   viewLink: simulationFunctions.getViewLink,
   editLink: simulationFunctions.getEditLink,
 };
