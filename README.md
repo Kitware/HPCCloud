@@ -2,6 +2,11 @@
 
 [![codecov.io](https://codecov.io/github/Kitware/HPCCloud/coverage.svg?branch=master)](https://codecov.io/github/Kitware/HPCCloud?branch=master)
 [![Build Status](https://travis-ci.org/Kitware/HPCCloud.svg?branch=master)](https://travis-ci.org/Kitware/HPCCloud)
+[![Dependency Status](https://david-dm.org/kitware/hpc-cloud.svg)](https://david-dm.org/kitware/hpc-cloud)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+![npm-download](https://img.shields.io/npm/dm/hpc-cloud.svg)
+![npm-version-requirement](https://img.shields.io/badge/npm-5-brightgreen.svg)
+![node-version-requirement](https://img.shields.io/badge/node-8-brightgreen.svg)
 
 ### Goal
 
