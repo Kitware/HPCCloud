@@ -45,7 +45,8 @@
 <meta property="og:url" content="https://kitware.github.io/HPCCloud/docs/workflows__pages.html">
 <meta property="og:site_name" content="HPCCloud">
 <meta property="og:description" content="Workflow pagesEach workflow has a set of steps, those steps have pages associated with them. For most cases there are at least two pages:   Input, a Simput panel for modifiying or creating the simulat">
-<meta property="og:updated_time" content="2017-05-08T18:02:18.710Z">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-04-05T16:24:58.104Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="HPCCloud">
 <meta name="twitter:description" content="Workflow pagesEach workflow has a set of steps, those steps have pages associated with them. For most cases there are at least two pages:   Input, a Simput panel for modifiying or creating the simulat">
@@ -106,12 +107,12 @@
 <li>Monitor, monitors the job</li>
 </ul>
 <p>These pages can be built off the components in: </p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line">src/workflows/generic/components/steps</div></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">src/workflows/generic/components/steps</span><br></pre></td></tr></table></figure>
 <h2 id="Input" class="article-heading"><a href="#Input" class="headerlink" title="Input"></a>Input<a class="article-anchor" href="#Input" aria-hidden="true"></a></h2><p>Import the component <code>generic/components/steps/SimputReact</code> and pass the following props: </p>
 <ul>
 <li><code>simputType</code>, the name of the simput type</li>
 <li><p><code>initialDataModel</code>, the initial data model for simput. Of format:  </p>
-<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="attr">data</span>: &#123;&#125;,</div><div class="line">  <span class="attr">type</span>: <span class="string">`<span class="subst">$&#123;simput_type_name&#125;</span>`</span>,</div><div class="line">  <span class="attr">hideViews</span>: [], <span class="comment">// strings of the view names you would like to hide</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  data: &#123;&#125;,</span><br><span class="line">  type: <span class="string">`<span class="subst">$&#123;simput_type_name&#125;</span>`</span>,</span><br><span class="line">  hideViews: [], <span class="comment">// strings of the view names you would like to hide</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p><code>simputModelDecorator</code>, a function which takes model and props and extends the data model if desired.</p>
 </li>
@@ -139,7 +140,7 @@
 
               </div>
               <footer class="article-footer">
-                <time class="article-footer-updated" datetime="2017-05-08T18:02:18.710Z" itemprop="dateModified">Last updated: 2017-05-08</time>
+                <time class="article-footer-updated" datetime="2018-04-05T16:24:58.104Z" itemprop="dateModified">Last updated: 2018-04-05</time>
                 <a href="workflows__adding.html" class="article-footer-prev" title="Workflow definition"><i class="fa fa-chevron-left"></i><span>Prev</span></a>
               </footer>
               
@@ -155,7 +156,7 @@
         </div>
       </article>
       <aside id="sidebar" role="navigation">
-  <div class="inner"><strong class="sidebar-title">Basics</strong><a href="index.html" class="sidebar-link">Introduction</a><a href="general__getting-started.html" class="sidebar-link">Getting Started</a><a href="general__troubleshooting.html" class="sidebar-link">Troubleshooting</a><a href="general__glossary.html" class="sidebar-link">Glossary</a><strong class="sidebar-title">Usage</strong><a href="usage__create-account.html" class="sidebar-link">Signing up</a><a href="usage__trad-cluster.html" class="sidebar-link">Adding traditional clusters</a><a href="usage__aws-profiles.html" class="sidebar-link">Adding AWS profiles</a><a href="usage__creating.html" class="sidebar-link">Projects and simulations</a><a href="usage__simput.html" class="sidebar-link">Simput</a><a href="usage__running.html" class="sidebar-link">Running workflows</a><strong class="sidebar-title">Development</strong><a href="development__dev-intro.html" class="sidebar-link">Introduction</a><a href="development__panels.html" class="sidebar-link">Panels</a><a href="development__redux.html" class="sidebar-link">Redux data model</a><a href="development__tools.html" class="sidebar-link">Available tools</a><a href="vagrant__introduction.html" class="sidebar-link">Vagrant - How to...</a><strong class="sidebar-title">Workflows</strong><a href="workflows__introduction.html" class="sidebar-link">Introduction</a><a href="workflows__adding.html" class="sidebar-link">Workflow definition</a><a href="workflows__pages.html" class="sidebar-link current">Workflow pages</a></div>
+  <div class="inner"><strong class="sidebar-title">Basics</strong><a href="index.html" class="sidebar-link">Introduction</a><a href="general__getting-started.html" class="sidebar-link">Getting Started</a><a href="general__troubleshooting.html" class="sidebar-link">Troubleshooting</a><a href="general__glossary.html" class="sidebar-link">Glossary</a><strong class="sidebar-title">Usage</strong><a href="usage__create-account.html" class="sidebar-link">Signing up</a><a href="usage__trad-cluster.html" class="sidebar-link">Adding traditional clusters</a><a href="usage__aws-profiles.html" class="sidebar-link">Adding AWS profiles</a><a href="usage__ebs-volumes.html" class="sidebar-link">Adding EBS volumes</a><a href="usage__creating.html" class="sidebar-link">Projects and simulations</a><a href="usage__simput.html" class="sidebar-link">Simput</a><a href="usage__running.html" class="sidebar-link">Running workflows</a><a href="usage__sharing.html" class="sidebar-link">Groups and project sharing</a><strong class="sidebar-title">Development</strong><a href="development__dev-intro.html" class="sidebar-link">Introduction</a><a href="development__panels.html" class="sidebar-link">Panels</a><a href="development__redux.html" class="sidebar-link">Redux data model</a><a href="development__tools.html" class="sidebar-link">Available tools</a><a href="vagrant__introduction.html" class="sidebar-link">Vagrant - How to...</a><strong class="sidebar-title">Workflows</strong><a href="workflows__introduction.html" class="sidebar-link">Introduction</a><a href="workflows__adding.html" class="sidebar-link">Workflow definition</a><a href="workflows__pages.html" class="sidebar-link current">Workflow pages</a></div>
 </aside>
     </div>
   </div>
@@ -164,7 +165,7 @@
     <footer id="footer" class="wrapper">
   <div class="inner">
     <div id="footer-copyright">
-      &copy; 2017 <a href="http://www.kitware.com" target="_blank">Kitware Inc.</a>
+      &copy; 2018 <a href="http://www.kitware.com" target="_blank">Kitware Inc.</a>
     </div>
     <div id="footer-links">
       <a href="https://github.com/kitware/HPCCloud" class="footer-link" target="_blank"><i class="fa fa-github-alt"></i></a>
@@ -183,7 +184,7 @@
       </li>
     </ul>
     
-      <strong class="mobile-nav-title">Basics</strong><a href="index.html" class="mobile-nav-link">Introduction</a><a href="general__getting-started.html" class="mobile-nav-link">Getting Started</a><a href="general__troubleshooting.html" class="mobile-nav-link">Troubleshooting</a><a href="general__glossary.html" class="mobile-nav-link">Glossary</a><strong class="mobile-nav-title">Usage</strong><a href="usage__create-account.html" class="mobile-nav-link">Signing up</a><a href="usage__trad-cluster.html" class="mobile-nav-link">Adding traditional clusters</a><a href="usage__aws-profiles.html" class="mobile-nav-link">Adding AWS profiles</a><a href="usage__creating.html" class="mobile-nav-link">Projects and simulations</a><a href="usage__simput.html" class="mobile-nav-link">Simput</a><a href="usage__running.html" class="mobile-nav-link">Running workflows</a><strong class="mobile-nav-title">Development</strong><a href="development__dev-intro.html" class="mobile-nav-link">Introduction</a><a href="development__panels.html" class="mobile-nav-link">Panels</a><a href="development__redux.html" class="mobile-nav-link">Redux data model</a><a href="development__tools.html" class="mobile-nav-link">Available tools</a><a href="vagrant__introduction.html" class="mobile-nav-link">Vagrant - How to...</a><strong class="mobile-nav-title">Workflows</strong><a href="workflows__introduction.html" class="mobile-nav-link">Introduction</a><a href="workflows__adding.html" class="mobile-nav-link">Workflow definition</a><a href="workflows__pages.html" class="mobile-nav-link current">Workflow pages</a>
+      <strong class="mobile-nav-title">Basics</strong><a href="index.html" class="mobile-nav-link">Introduction</a><a href="general__getting-started.html" class="mobile-nav-link">Getting Started</a><a href="general__troubleshooting.html" class="mobile-nav-link">Troubleshooting</a><a href="general__glossary.html" class="mobile-nav-link">Glossary</a><strong class="mobile-nav-title">Usage</strong><a href="usage__create-account.html" class="mobile-nav-link">Signing up</a><a href="usage__trad-cluster.html" class="mobile-nav-link">Adding traditional clusters</a><a href="usage__aws-profiles.html" class="mobile-nav-link">Adding AWS profiles</a><a href="usage__ebs-volumes.html" class="mobile-nav-link">Adding EBS volumes</a><a href="usage__creating.html" class="mobile-nav-link">Projects and simulations</a><a href="usage__simput.html" class="mobile-nav-link">Simput</a><a href="usage__running.html" class="mobile-nav-link">Running workflows</a><a href="usage__sharing.html" class="mobile-nav-link">Groups and project sharing</a><strong class="mobile-nav-title">Development</strong><a href="development__dev-intro.html" class="mobile-nav-link">Introduction</a><a href="development__panels.html" class="mobile-nav-link">Panels</a><a href="development__redux.html" class="mobile-nav-link">Redux data model</a><a href="development__tools.html" class="mobile-nav-link">Available tools</a><a href="vagrant__introduction.html" class="mobile-nav-link">Vagrant - How to...</a><strong class="mobile-nav-title">Workflows</strong><a href="workflows__introduction.html" class="mobile-nav-link">Introduction</a><a href="workflows__adding.html" class="mobile-nav-link">Workflow definition</a><a href="workflows__pages.html" class="mobile-nav-link current">Workflow pages</a>
     
   </div>
   <div id="mobile-lang-select-wrap">
