@@ -406,7 +406,7 @@ def _list_solution_files(client, folder_id):
 
         file = files[0]
         exts = file['exts']
-        if len(exts) == 2 and exts[1] == 'pyfrs':
+        if len(exts) > 0 and exts[-1] == 'pyfrs':
             yield file
 
 def create_export_job(task, job_name, files, job_dir, mesh_filename):
