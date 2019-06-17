@@ -54,7 +54,7 @@
     "expect": "1.20.1",
     "codecov.io": "0.1.6",
     "paraviewweb": "3.1.2",
-    "pvw-visualizer": "3.1.1",
+    "pvw-visualizer": "3.1.10",
     "vtk.js": "6.3.14",
     "simput": "1.5.0",
     "candela": "0.19.1",
