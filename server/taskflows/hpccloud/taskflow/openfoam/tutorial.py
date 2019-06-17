@@ -22,7 +22,7 @@ import os
 import subprocess
 import shutil
 
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 from jsonpath_rw import parse
 
 import cumulus.taskflow.cluster

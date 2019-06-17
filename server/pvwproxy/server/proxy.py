@@ -35,7 +35,7 @@ class Proxy(Resource):
         self.route('POST', (), self.add_entry)
         self.route('DELETE', (':key',), self.delete_entry)
         self._proxy_file_path = self.model('setting').get(
-            constants.PluginSettings.PROXY_FILE_PATH, '/tmp/proxy')
+            constants.PluginSettings.PROXY_FILE_PATH, '/pvw/proxy')
 
     addModel('ProxyEntry', {
         'id': 'ProxyEntry',

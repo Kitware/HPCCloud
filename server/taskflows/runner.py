@@ -68,7 +68,7 @@ def main(config):
         with open(config.taskflow_start_params) as fp:
             params = json.load(fp)
 
-    print params
+    print (params)
 
     try:
         print ('Running %s taskflow ...' % config.taskflow_start_params)
