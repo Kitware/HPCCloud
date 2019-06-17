@@ -26,7 +26,7 @@ function getActions(props) {
 
 function onVisualize(props) {
   const location = {
-    pathname: `View/Simulation/${props.simulation._id}/Visualization`,
+    pathname: `/View/Simulation/${props.simulation._id}/Visualization`,
     search: queryString.stringify(
       Object.assign({}, queryString.parse(props.location.search), {
         view: 'default',

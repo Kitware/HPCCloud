@@ -21,7 +21,7 @@ import json
 import os
 import subprocess
 import shutil
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 from jsonpath_rw import parse
 
 import cumulus.taskflow.cluster
@@ -159,12 +159,12 @@ def update_config_file(task, client, *args, **kwargs):
         task.logger.info('Adding backend configuration for %s'
                             % kwargs['backend']['type'] )
         # Filter out options with no value
-        options = {k: v for k, v in kwargs['backend'].iteritems() if v}
+        options = {k: v for k, v in kwargs['backend'].items() if v}
         options.pop('type', None)
         options.pop('name', None)
 
         config_parser.add_section(backend_section)
-        for  key, value in options.iteritems():
+        for  key, value in options.items():
             config_parser.set(backend_section, key, value)
 
         with open(path, 'w') as fp:
@@ -250,7 +250,7 @@ def setup_input(task, *args, **kwargs):
 
             task.logger.info('Uploading converted mesh.')
             size = os.path.getsize(output_path)
-            with open(output_path) as fp:
+            with open(output_path, mode='rb') as fp:
                 girder_file = client.uploadFile(
                     input_folder_id, fp, mesh_filename, size=size,
                     parentType='folder')
@@ -406,7 +406,7 @@ def _list_solution_files(client, folder_id):
 
         file = files[0]
         exts = file['exts']
-        if len(exts) == 2 and exts[1] == 'pyfrs':
+        if len(exts) > 0 and exts[-1] == 'pyfrs':
             yield file
 
 def create_export_job(task, job_name, files, job_dir, mesh_filename):
@@ -526,7 +526,7 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
         sim_job_dir = job['dir']
         jobs = []
         job_index = 1
-        for chunk in [solution_files[i::number_of_jobs] for i in xrange(number_of_jobs)]:
+        for chunk in [solution_files[i::number_of_jobs] for i in range(number_of_jobs)]:
             if chunk:
                 name = 'pyfr_export_%d' % job_index
                 mesh_filename = kwargs['meshFilename']
@@ -553,7 +553,7 @@ def upload_output(task, _, cluster, job, *args, **kwargs):
                 output_folder_id, mesh_file_id, solution_files)
         # Break into chunks a run in parallel
         else:
-            for chunk in [solution_files[i::NUMBER__OF_EXPORT_TASKS] for i in xrange(NUMBER__OF_EXPORT_TASKS)]:
+            for chunk in [solution_files[i::NUMBER__OF_EXPORT_TASKS] for i in range(NUMBER__OF_EXPORT_TASKS)]:
                 export_output.delay(output_folder_id, mesh_file_id, chunk)
 
 

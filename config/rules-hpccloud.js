@@ -42,7 +42,7 @@ module.exports = [
   },
   {
     test: /\.svg$/,
-    loader: 'svg-sprite-loader?runtimeCompat=true',
+    loader: 'svg-sprite-loader',
     exclude: /fonts/,
   },
   {

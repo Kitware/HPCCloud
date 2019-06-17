@@ -91,7 +91,7 @@ class TopBar extends React.Component {
             }
           >
             <Link to="/">
-              <SvgIconWidget icon={logo} height="1.6em" width="70px" />
+              <SvgIconWidget icon={`#${logo.id}`} height="1.6em" width="70px" />
             </Link>
           </div>
 
