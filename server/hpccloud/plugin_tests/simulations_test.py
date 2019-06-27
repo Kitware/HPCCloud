@@ -22,6 +22,7 @@ import zipfile
 import io
 import six
 
+from girder.utility.model_importer import ModelImporter
 from tests import base
 from .base import TestCase
 
@@ -60,7 +61,7 @@ class SimulationTestCase(TestCase):
             'password': 'goodpassword'
         })
         self._user, self._another_user,  self._yet_another_user  = \
-            [self.model('user').createUser(**user) for user in users]
+            [ModelImporter.model('user').createUser(**user) for user in users]
 
         def create_project(name):
             # Create a test project
@@ -119,11 +120,11 @@ class SimulationTestCase(TestCase):
 
         # Assert that a folder has been created for this simulation
         self.assertIsNotNone(
-            self.model('folder').load(r.json['folderId'], force=True))
+            ModelImporter.model('folder').load(r.json['folderId'], force=True))
 
         # Assert that a folder has been created for each step
         for _, step in six.iteritems(r.json['steps']):
-            self.assertIsNotNone(self.model('folder').load(
+            self.assertIsNotNone(ModelImporter.model('folder').load(
                 step['folderId'], force=True))
 
         # Test names
@@ -205,7 +206,7 @@ class SimulationTestCase(TestCase):
 
         # Assert that a folder has been created for this simulation
         self.assertIsNotNone(
-            self.model('folder').load(sim['folderId'], force=True))
+            ModelImporter.model('folder').load(sim['folderId'], force=True))
 
         # Now delete the simulation
         r = self.request('/simulations/%s' % str(sim['_id']), method='DELETE',
@@ -213,11 +214,11 @@ class SimulationTestCase(TestCase):
         self.assertStatusOk(r)
 
         # Confirm the deletion
-        self.assertIsNone(self.model('simulation', 'hpccloud').load(
+        self.assertIsNone(ModelImporter.model('simulation', 'hpccloud').load(
             sim['_id'], force=True))
 
         # Confirm that the folder was also removed
-        self.assertIsNone(self.model('folder').load(
+        self.assertIsNone(ModelImporter.model('folder').load(
             sim['folderId'], force=True))
 
     def test_update(self):
@@ -254,7 +255,7 @@ class SimulationTestCase(TestCase):
         self.assertNotEqual(updated, r.json['updated'])
 
         # Assert that the new name was added to the document
-        self.assertEqual(self.model('simulation', 'hpccloud').load(sim['_id'], force=True)['name'],
+        self.assertEqual(ModelImporter.model('simulation', 'hpccloud').load(sim['_id'], force=True)['name'],
                          new_name)
 
         new_description = 'billy bob'
@@ -268,7 +269,7 @@ class SimulationTestCase(TestCase):
                          type='application/json', body=json_body, user=self._another_user)
         self.assertStatusOk(r)
         # Assert that the new name was added to the document
-        self.assertEqual(self.model('simulation', 'hpccloud').load(sim['_id'], force=True)['description'],
+        self.assertEqual(ModelImporter.model('simulation', 'hpccloud').load(sim['_id'], force=True)['description'],
                          new_description)
 
         # Test patching metadata
@@ -283,7 +284,7 @@ class SimulationTestCase(TestCase):
                          type='application/json', body=json_body, user=self._another_user)
         self.assertStatusOk(r)
         # Assert that the new name was added to the document
-        self.assertEqual(self.model('simulation', 'hpccloud').load(sim['_id'], force=True)['metadata'],
+        self.assertEqual(ModelImporter.model('simulation', 'hpccloud').load(sim['_id'], force=True)['metadata'],
                          body['metadata'])
 
     def test_clone(self):
@@ -314,10 +315,10 @@ class SimulationTestCase(TestCase):
         self.assertStatus(r, 201)
         sim = r.json
 
-        step1_folder = self.model('folder').load(sim['steps']['step1']['folderId'], force=True)
+        step1_folder = ModelImporter.model('folder').load(sim['steps']['step1']['folderId'], force=True)
         # Add some test data to one of the simulation steps
         # Create a test item
-        step1_item = self.model('item').createItem('deleteme', self._another_user,
+        step1_item = ModelImporter.model('item').createItem('deleteme', self._another_user,
                                              step1_folder)
 
         # Create a test file
@@ -327,17 +328,17 @@ class SimulationTestCase(TestCase):
         self.assertEqual(1, len(r.json))
         assetstore = r.json[0]
 
-        step1_file_item = self.model('item').createItem('fileItem', self._another_user,
+        step1_file_item = ModelImporter.model('item').createItem('fileItem', self._another_user,
                                              step1_folder)
-        step1_file = self.model('file').createFile(self._another_user, step1_file_item,
+        step1_file = ModelImporter.model('file').createFile(self._another_user, step1_file_item,
                                              'test', 100, assetstore)
         step1_file['sha512'] = 'dummy'
-        self.model('file').save(step1_file)
+        ModelImporter.model('file').save(step1_file)
 
         # Add some test data to output step
         # Create a test item
-        step3_folder = self.model('folder').load(sim['steps']['step3']['folderId'], force=True)
-        step3_item = self.model('item').createItem('deleteme', self._another_user,
+        step3_folder = ModelImporter.model('folder').load(sim['steps']['step3']['folderId'], force=True)
+        step3_item = ModelImporter.model('item').createItem('deleteme', self._another_user,
                                              step3_folder)
 
         # Create a test file
@@ -347,12 +348,12 @@ class SimulationTestCase(TestCase):
         self.assertEqual(1, len(r.json))
         assetstore = r.json[0]
 
-        step3_file_item = self.model('item').createItem('fileItem', self._another_user,
+        step3_file_item = ModelImporter.model('item').createItem('fileItem', self._another_user,
                                              step3_folder)
-        step3_file = self.model('file').createFile(self._another_user, step3_file_item,
+        step3_file = ModelImporter.model('file').createFile(self._another_user, step3_file_item,
                                              'test', 100, assetstore)
         step3_file['sha512'] = 'dummy'
-        self.model('file').save(step3_file)
+        ModelImporter.model('file').save(step3_file)
 
         # Now share the project and clone
         body = {
@@ -403,13 +404,13 @@ class SimulationTestCase(TestCase):
         self.assertNotEqual(steps['step3']['folderId'], sim['steps']['step3']['folderId'])
 
         # Assert the step3 data was not copied
-        cloned_step3_folder = self.model('folder').load(steps['step3']['folderId'], force=True)
-        items = self.model('folder').childItems(cloned_step3_folder)
+        cloned_step3_folder = ModelImporter.model('folder').load(steps['step3']['folderId'], force=True)
+        items = ModelImporter.model('folder').childItems(cloned_step3_folder)
         self.assertFalse(list(items))
 
         # Assert that step1 data was copied
-        cloned_step1_folder = self.model('folder').load(steps['step1']['folderId'], force=True)
-        items = list(self.model('folder').childItems(cloned_step1_folder))
+        cloned_step1_folder = ModelImporter.model('folder').load(steps['step1']['folderId'], force=True)
+        items = list(ModelImporter.model('folder').childItems(cloned_step1_folder))
 
         self.assertEqual(len(items), 2)
 
@@ -421,7 +422,7 @@ class SimulationTestCase(TestCase):
         self.assertEqual(cloned_step1_file_item['name'], 'fileItem')
 
         # Check we have our file as well
-        files = list(self.model('item').childFiles(cloned_step1_file_item))
+        files = list(ModelImporter.model('item').childFiles(cloned_step1_file_item))
         self.assertEqual(len(files), 1)
 
     def test_patch_access_read(self):
@@ -569,7 +570,7 @@ class SimulationTestCase(TestCase):
         self.assertStatus(r, 200)
 
         # Assert things where updated
-        new_sim = self.model('simulation', 'hpccloud').load(sim['_id'], force=True)
+        new_sim = ModelImporter.model('simulation', 'hpccloud').load(sim['_id'], force=True)
         new_step1 = new_sim['steps']['step1']
         self.assertEqual(new_step1['status'], 'complete')
         self.assertEqual(new_step1['metadata'], body['metadata'])
@@ -602,21 +603,21 @@ class SimulationTestCase(TestCase):
         self.assertStatus(r, 201)
         sim = r.json
 
-        step1_folder = self.model('folder').load(sim['steps']['step1']['folderId'], force=True)
+        step1_folder = ModelImporter.model('folder').load(sim['steps']['step1']['folderId'], force=True)
         # Add some test data to one of the simulation steps
         # Create a test item
-        self.model('item').createItem('deleteme', self._another_user,
+        ModelImporter.model('item').createItem('deleteme', self._another_user,
                                       step1_folder)
 
-        step1_file_item = self.model('item').createItem('step1.txt', self._another_user,
+        step1_file_item = ModelImporter.model('item').createItem('step1.txt', self._another_user,
                                              step1_folder)
 
         self.create_file(self._another_user, step1_file_item, 'step1.txt', 'step1')
 
         # Add some test data to output step
         # Create a test item
-        step3_folder = self.model('folder').load(sim['steps']['step3']['folderId'], force=True)
-        step3_file_item = self.model('item').createItem('step3.txt', self._another_user,
+        step3_folder = ModelImporter.model('folder').load(sim['steps']['step3']['folderId'], force=True)
+        step3_file_item = ModelImporter.model('item').createItem('step3.txt', self._another_user,
                                       step3_folder)
 
         # Create a test file

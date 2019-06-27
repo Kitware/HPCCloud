@@ -22,6 +22,7 @@ import json
 import dbm
 import urllib
 import os
+from girder.utility.model_importer import ModelImporter
 
 
 def setUpModule():
@@ -63,9 +64,9 @@ class ProxyTestCase(base.TestCase):
             'password': 'goodpassword'
         })
         self._cumulus, self._user, self._another_user = \
-            [self.model('user').createUser(**user) for user in users]
+            [ModelImporter.model('user').createUser(**user) for user in users]
 
-        self._group = self.model('group').createGroup('cumulus', self._cumulus)
+        self._group = ModelImporter.model('group').createGroup('cumulus', self._cumulus)
 
     def test_add_entry(self):
         host = 'some.com'

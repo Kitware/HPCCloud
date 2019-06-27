@@ -19,6 +19,7 @@
 
 import json
 
+from girder.utility.model_importer import ModelImporter
 from tests import base
 from .base import TestCase
 
@@ -29,7 +30,7 @@ def setUpModule():
     base.startServer()
 
     global list_simulation_assets
-    from girder.plugins.hpccloud.utility import list_simulation_assets
+    from hpccloud_plugin.utility import list_simulation_assets
 
 
 def tearDownModule():
@@ -62,7 +63,7 @@ class SimulationTestCase(TestCase):
             'password': 'goodpassword'
         })
         self._user, self._another_user,  self._yet_another_user  = \
-            [self.model('user').createUser(**user) for user in users]
+            [ModelImporter.model('user').createUser(**user) for user in users]
 
         def create_project(name):
             # Create a test project
@@ -109,21 +110,21 @@ class SimulationTestCase(TestCase):
         self.assertStatus(r, 201)
         sim = r.json
 
-        step1_folder = self.model('folder').load(sim['steps']['step1']['folderId'], force=True)
+        step1_folder = ModelImporter.model('folder').load(sim['steps']['step1']['folderId'], force=True)
         # Add some test data to one of the simulation steps
         # Create a test item
-        self.model('item').createItem('deleteme', self._another_user,
+        ModelImporter.model('item').createItem('deleteme', self._another_user,
                                       step1_folder)
 
-        step1_file_item = self.model('item').createItem('step1.txt', self._another_user,
+        step1_file_item = ModelImporter.model('item').createItem('step1.txt', self._another_user,
                                              step1_folder)
 
         self.create_file(self._another_user, step1_file_item, 'step1.txt', 'step1')
 
         # Add some test data to output step
         # Create a test item
-        step3_folder = self.model('folder').load(sim['steps']['step3']['folderId'], force=True)
-        step3_file_item = self.model('item').createItem('step3.txt', self._another_user,
+        step3_folder = ModelImporter.model('folder').load(sim['steps']['step3']['folderId'], force=True)
+        step3_file_item = ModelImporter.model('item').createItem('step3.txt', self._another_user,
                                       step3_folder)
 
         # Create a test file

@@ -20,11 +20,13 @@
 
 import dbm
 from . import constants
+from girder.utility.model_importer import ModelImporter
 from girder.api.rest import Resource
 from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.docs import addModel
 from girder.api.rest import RestException, getBodyJson
+from girder.models.setting import Setting
 from lockfile import LockFile
 
 
@@ -34,8 +36,9 @@ class Proxy(Resource):
         self.resourceName = 'proxy'
         self.route('POST', (), self.add_entry)
         self.route('DELETE', (':key',), self.delete_entry)
-        self._proxy_file_path = self.model('setting').get(
-            constants.PluginSettings.PROXY_FILE_PATH, '/pvw/proxy')
+        self._proxy_file_path = Setting().get(
+            constants.PluginSettings.PROXY_FILE_PATH) or '/pvw/proxy'
+
 
     addModel('ProxyEntry', {
         'id': 'ProxyEntry',

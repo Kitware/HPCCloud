@@ -17,12 +17,23 @@
 #  limitations under the License.
 ###############################################################################
 
+from girder.plugin import GirderPlugin
+from girder.utility.model_importer import ModelImporter
+
 from .projects import Projects
 from .simulations import Simulations
 from . import file
 
+from .models.project import Project as ProjectModel
+from .models.simulation import Simulation as SimulationModel
 
-def load(info):
-    info['apiRoot'].projects = Projects()
-    info['apiRoot'].simulations = Simulations()
-    file.load(info['apiRoot'])
+class HPCCloudPlugin(GirderPlugin):
+    DISPLAY_NAME = 'HPCCloud plugin for Girder'
+
+    def load(self, info):
+        ModelImporter.registerModel('project', ProjectModel, 'hpccloud')
+        ModelImporter.registerModel('simulation', SimulationModel, 'hpccloud')
+
+        info['apiRoot'].projects = Projects()
+        info['apiRoot'].simulations = Simulations()
+        file.load(info['apiRoot'])

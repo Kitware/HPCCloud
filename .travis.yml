@@ -1,12 +1,17 @@
 os: linux
 sudo: required
-dist: trusty
+dist: xenial
 group: travis_lts
 
 language: python
 python:
   - "2.7"
   - "3.6"
+
+node_js: 8
+
+services:
+  - mongodb
 
 env:
   - CXX=g++-4.8
@@ -49,19 +54,20 @@ before_install:
     - pip install -r requirements-dev.txt
     - popd
     - pip install girder/
-    - CACHE=$HOME/.cache source ./girder/scripts/install_mongo.sh
+    # - CACHE=$HOME/.cache source ./HPCCloud/test/install_mongo.sh
     - mkdir /tmp/db
     - mongod --dbpath=/tmp/db >/dev/null 2>/dev/null &
     - mongod --version
     # Install plugins
     - popd
-    - ln -s "${HOME}/build/Kitware/HPCCloud/server/hpccloud" "${HOME}/build/girder/plugins/hpccloud"
-    - ln -s "${HOME}/build/Kitware/HPCCloud/server/pvwproxy" "${HOME}/build/girder/plugins/pvwproxy"
+    - pip install --no-cache-dir -e "${HOME}/build/Kitware/HPCCloud/server/hpccloud"
+    - pip install --no-cache-dir -e "${HOME}/build/Kitware/HPCCloud/server/pvwproxy"
     # Install CMake
-    - CACHE=$HOME/.cache CMAKE_VERSION=3.1.0 CMAKE_SHORT_VERSION=3.1 source $HOME/build/girder/scripts/install_cmake.sh
+    # - CACHE=$HOME/.cache CMAKE_VERSION=3.1.0 CMAKE_SHORT_VERSION=3.1 source $HOME/build/girder/scripts/install_cmake.sh
+    - pip install cmake
     # Install Node
-    - sudo curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-    - sudo apt-get install -y nodejs
+    # - sudo curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    # - sudo apt-get install -y nodejs
 
 install:
     - pip install -U -r requirements.txt
