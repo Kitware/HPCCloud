@@ -22,6 +22,7 @@ import datetime
 import jsonschema
 
 from girder.models.model_base import ValidationException, AccessControlledModel
+from girder.utility.model_importer import ModelImporter
 from girder.constants import AccessType
 from girder.api.rest import getCurrentUser
 from . import schema
@@ -85,16 +86,16 @@ class Project(AccessControlledModel):
 
         # We need to create the project folder
         hpccloud_folder = get_hpccloud_folder(user)
-        project_folder = self.model('folder').createFolder(
+        project_folder = ModelImporter.model('folder').createFolder(
             hpccloud_folder, project['name'], parentType='folder',
             creator=user)
 
         # Create the sub directory the whole simulations for this project
-        self.model('folder').createFolder(
+        ModelImporter.model('folder').createFolder(
             project_folder, SIMULATIONS_FOLDER, parentType='folder',
             creator=user)
 
-        self.model('folder').setUserAccess(
+        ModelImporter.model('folder').setUserAccess(
             project_folder, user=user, level=AccessType.ADMIN, save=True)
         project['folderId'] = project_folder['_id']
         project = self.setUserAccess(project, user=user, level=AccessType.ADMIN)
@@ -143,15 +144,15 @@ class Project(AccessControlledModel):
             'projectId': project['_id']
         }
 
-        sim = self.model('simulation', 'hpccloud').findOne(query=query)
+        sim = ModelImporter.model('simulation', 'hpccloud').findOne(query=query)
         if sim is not None:
             raise ValidationException(
                 'Unable to delete project that contains simulations')
 
         # Clean up the project folder
-        project_folder = self.model('folder').load(
+        project_folder = ModelImporter.model('folder').load(
             project['folderId'], user=user)
-        self.model('folder').remove(project_folder)
+        ModelImporter.model('folder').remove(project_folder)
 
         super(Project, self).remove(project)
 
@@ -183,7 +184,7 @@ class Project(AccessControlledModel):
             }
             access_list['groups'].append(access_object)
 
-        project_folder = self.model('folder').load(
+        project_folder = ModelImporter.model('folder').load(
             project['folderId'], user=sharer)
 
         # Share the project folder
@@ -205,9 +206,9 @@ class Project(AccessControlledModel):
             query = {
                 'projectId': project['_id']
             }
-            sims = self.model('simulation', 'hpccloud').find(query=query)
+            sims = ModelImporter.model('simulation', 'hpccloud').find(query=query)
             for sim in sims:
-                self.model('simulation', 'hpccloud').set_access(
+                ModelImporter.model('simulation', 'hpccloud').set_access(
                     sharer, sim, users, groups)
 
         project['updated'] = datetime.datetime.utcnow()
@@ -222,7 +223,7 @@ class Project(AccessControlledModel):
         new_groups = merge_access(access_list['groups'], groups, level, flags)
 
         # share project folder
-        project_folder = self.model('folder').load(
+        project_folder = ModelImporter.model('folder').load(
             project['folderId'], user=sharer)
         share_folder(sharer, project_folder,
                      new_users, new_groups, recurse=True)
@@ -239,9 +240,9 @@ class Project(AccessControlledModel):
             query = {
                 'projectId': project['_id']
             }
-            sims = self.model('simulation', 'hpccloud').find(query=query)
+            sims = ModelImporter.model('simulation', 'hpccloud').find(query=query)
             for sim in sims:
-                self.model('simulation', 'hpccloud').patch_access(
+                ModelImporter.model('simulation', 'hpccloud').patch_access(
                     sharer, sim, users, groups)
 
         return saved_project
@@ -254,7 +255,7 @@ class Project(AccessControlledModel):
                                  if str(g['id']) not in groups]
         access_list['users'] = [u for u in access_list['users']
                                 if str(u['id']) not in users]
-        project_folder = self.model('folder').load(
+        project_folder = ModelImporter.model('folder').load(
             project['folderId'], user=sharer)
 
         # unshare the project folder
@@ -268,9 +269,9 @@ class Project(AccessControlledModel):
         query = {
             'projectId': project['_id']
         }
-        sims = self.model('simulation', 'hpccloud').find(query=query)
+        sims = ModelImporter.model('simulation', 'hpccloud').find(query=query)
         for sim in sims:
-            self.model('simulation', 'hpccloud').revoke_access(
+            ModelImporter.model('simulation', 'hpccloud').revoke_access(
                 sharer, sim, users, groups)
 
         project['updated'] = datetime.datetime.utcnow()
@@ -288,7 +289,7 @@ class Project(AccessControlledModel):
             'projectId': project['_id']
         }
 
-        sims = self.model('simulation', 'hpccloud').find(
+        sims = ModelImporter.model('simulation', 'hpccloud').find(
             query=query, limit=limit, offset=offset)
         return list(self.filterResultsByPermission(
                     cursor=sims, user=user, level=AccessType.READ))

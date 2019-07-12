@@ -21,6 +21,7 @@ import jsonschema
 from girder.utility import ziputil
 
 from girder.constants import AccessType
+from girder.utility.model_importer import ModelImporter
 from girder.api.rest import getCurrentUser, Resource
 from girder.api.rest import RestException
 from girder.api.describe import Description, autoDescribeRoute
@@ -48,7 +49,7 @@ class Simulations(Resource):
         self.route('PATCH', (':id', 'access'), self.patch_access)
         self.route('PATCH', (':id', 'access', 'revoke'), self.revoke_access)
 
-        self._model = self.model('simulation', 'hpccloud')
+        self._model = ModelImporter.model('simulation', 'hpccloud')
 
     @autoDescribeRoute(
         Description('Get a simulation')

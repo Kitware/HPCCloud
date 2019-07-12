@@ -21,6 +21,7 @@ import cherrypy
 
 import jsonschema
 
+from girder.utility.model_importer import ModelImporter
 from girder.api import access
 from girder.api.describe import Description, autoDescribeRoute
 from girder.constants import AccessType
@@ -48,7 +49,7 @@ class Projects(Resource):
         self.route('GET', (':id', 'simulations'), self.simulations)
         self.route('GET', (':id',), self.get)
 
-        self._model = self.model('project', 'hpccloud')
+        self._model = ModelImporter.model('project', 'hpccloud')
 
     addModel('ProjectProperties', schema.project, 'projects')
 
@@ -60,7 +61,7 @@ class Projects(Resource):
     )
     @access.user
     def create(self, project, params):
-        project = self.model('project', 'hpccloud').create(getCurrentUser(),
+        project = ModelImporter.model('project', 'hpccloud').create(getCurrentUser(),
                                                            project)
 
         cherrypy.response.status = 201
@@ -230,7 +231,7 @@ class Projects(Resource):
     def create_simulation(self, project, simulation, params):
         user = getCurrentUser()
 
-        simulation = self.model('simulation', 'hpccloud').create(
+        simulation = ModelImporter.model('simulation', 'hpccloud').create(
             user, project, simulation)
 
         cherrypy.response.status = 201
@@ -248,5 +249,5 @@ class Projects(Resource):
     @access.user
     def simulations(self, project, limit, offset, sort, params):
         user = getCurrentUser()
-        return self.model('project', 'hpccloud').simulations(user, project,
+        return ModelImporter.model('project', 'hpccloud').simulations(user, project,
                                                              limit, offset)

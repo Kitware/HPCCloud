@@ -8,10 +8,11 @@ export default function({
 }) {
   function uploadChunk(uploadId, offset, chunk) {
     return new Promise((resolve, reject) => {
-      const data = new FormData();
-      data.append('uploadId', uploadId);
-      data.append('offset', offset);
-      data.append('chunk', chunk);
+      const data = chunk;
+      const params = {
+        uploadId,
+        offset,
+      };
 
       const xhr = new XMLHttpRequest();
 
@@ -44,7 +45,11 @@ export default function({
         reject(extractResponse('abort'));
       });
 
-      xhr.open('POST', `${client.baseURL}/file/chunk`, true);
+      xhr.open(
+        'POST',
+        `${client.baseURL}/file/chunk${encodeQueryAsString(params)}`,
+        true
+      );
       xhr.responseType = 'text';
       xhr.setRequestHeader('Accept', 'application/json, text/plain, */*');
       xhr.setRequestHeader('Girder-Token', client.token);

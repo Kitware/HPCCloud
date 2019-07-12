@@ -19,6 +19,7 @@
 
 import json
 
+from girder.utility.model_importer import ModelImporter
 from tests import base
 from .base import TestCase
 
@@ -28,7 +29,7 @@ def setUpModule():
     base.enabledPlugins.append('hpccloud')
     base.startServer()
     global get_hpccloud_folder
-    from girder.plugins.hpccloud.utility import get_hpccloud_folder
+    from hpccloud_plugin.utility import get_hpccloud_folder
 
 
 def tearDownModule():
@@ -80,7 +81,7 @@ class ProjectsTestCase(TestCase):
         }
 
         self._user, self._another_user, self._yet_another_user = \
-            [self.model('user').createUser(**user) for user in users]
+            [ModelImporter.model('user').createUser(**user) for user in users]
 
     def test_create(self):
         project_name = 'myProject'
@@ -105,7 +106,7 @@ class ProjectsTestCase(TestCase):
         filters = {
             'name': project_name
         }
-        project_folder = self.model('folder').childFolders(
+        project_folder = ModelImporter.model('folder').childFolders(
             parentType='folder', user=self._user, parent=hpccloud_folder,
             filters=filters, limit=1)
 
@@ -191,7 +192,7 @@ class ProjectsTestCase(TestCase):
         self.assertNotEqual(updated, r.json['updated'])
 
         # Check the data was added
-        project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
+        project_model = ModelImporter.model('project', 'hpccloud').load(project['_id'], force=True)
         self.assertEqual(project_model['metadata'], body['metadata'])
 
         # Now try changing the name
@@ -205,7 +206,7 @@ class ProjectsTestCase(TestCase):
         self.assertStatus(r, 200)
 
         # Check the name was updated
-        project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
+        project_model = ModelImporter.model('project', 'hpccloud').load(project['_id'], force=True)
         self.assertEqual(project_model['name'], body['name'])
 
         # Now try changing the description
@@ -219,7 +220,7 @@ class ProjectsTestCase(TestCase):
         self.assertStatus(r, 200)
 
         # Check the description was updated
-        project_model = self.model('project', 'hpccloud').load(project['_id'], force=True)
+        project_model = ModelImporter.model('project', 'hpccloud').load(project['_id'], force=True)
         self.assertEqual(project_model['description'], body['description'])
 
     def _create_project(self, name, user):
@@ -286,16 +287,16 @@ class ProjectsTestCase(TestCase):
         self.assertStatus(r, 201)
         project = r.json
 
-        project_folder = self.model('folder').load(
+        project_folder = ModelImporter.model('folder').load(
             project['folderId'], user = self._another_user)
 
         # Create a test folder
-        folder = self.model('folder').createFolder(project_folder,
+        folder = ModelImporter.model('folder').createFolder(project_folder,
                                                    'Delete me please',
                                                    creator=self._another_user)
 
         # Create a test item
-        item = self.model('item').createItem('deleteme', self._another_user,
+        item = ModelImporter.model('item').createItem('deleteme', self._another_user,
                                              project_folder)
 
         # Create a test file
@@ -305,12 +306,12 @@ class ProjectsTestCase(TestCase):
         self.assertEqual(1, len(r.json))
         assetstore = r.json[0]
 
-        file_item = self.model('item').createItem('fileItem', self._another_user,
+        file_item = ModelImporter.model('item').createItem('fileItem', self._another_user,
                                              project_folder)
-        file = self.model('file').createFile(self._another_user, file_item,
+        file = ModelImporter.model('file').createFile(self._another_user, file_item,
                                              'test', 100, assetstore)
         file['sha512'] = 'dummy'
-        self.model('file').save(file)
+        ModelImporter.model('file').save(file)
 
         # Now delete the project
         r = self.request('/projects/%s' % str(project['_id']), method='DELETE',
@@ -319,20 +320,20 @@ class ProjectsTestCase(TestCase):
         self.assertStatusOk(r)
 
         # Check that the project was deleted
-        self.assertIsNone(self.model('project', 'hpccloud').load(project['_id'],
+        self.assertIsNone(ModelImporter.model('project', 'hpccloud').load(project['_id'],
                                                                  force=True))
 
         # Check that the folder was deleted
-        self.assertIsNone(self.model('folder').load(folder['_id'], force=True))
+        self.assertIsNone(ModelImporter.model('folder').load(folder['_id'], force=True))
 
         # Check that the item was deleted
-        self.assertIsNone(self.model('item').load(item['_id'], force=True))
+        self.assertIsNone(ModelImporter.model('item').load(item['_id'], force=True))
 
         # Check that the file was deleted
-        self.assertIsNone(self.model('file').load(file['_id'], force=True))
+        self.assertIsNone(ModelImporter.model('file').load(file['_id'], force=True))
 
         # Check that the project folder was remove
-        self.assertIsNone(self.model('folder').load(project['folderId'],
+        self.assertIsNone(ModelImporter.model('folder').load(project['folderId'],
                                                     force=True))
 
         # Try deleting a project containing a simulation
@@ -572,9 +573,9 @@ class ProjectsTestCase(TestCase):
 
     def test_access_group(self):
         project1 = self._create_project('project1', self._user)
-        my_group = self.model('group').createGroup('myGroup', self._user)
+        my_group = ModelImporter.model('group').createGroup('myGroup', self._user)
 
-        self.model('group').addUser(my_group, self._another_user)
+        ModelImporter.model('group').addUser(my_group, self._another_user)
 
         # Now share the project with write access to the group
         body = {

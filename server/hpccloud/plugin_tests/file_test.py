@@ -20,6 +20,7 @@
 import json
 import tempfile
 
+from girder.utility.model_importer import ModelImporter
 from tests import base
 from .base import TestCase
 from girder.constants import AssetstoreType
@@ -29,7 +30,7 @@ def setUpModule():
     base.enabledPlugins.append('hpccloud')
     base.startServer()
     global get_hpccloud_folder
-    from girder.plugins.hpccloud.utility import get_hpccloud_folder
+    from hpccloud_plugin.utility import get_hpccloud_folder
 
 
 def tearDownModule():
@@ -48,7 +49,7 @@ class FileTestCase(TestCase):
             'lastName': 'Last',
             'password': 'goodpassword'
         }
-        self._user = self.model('user').createUser(**user)
+        self._user = ModelImporter.model('user').createUser(**user)
 
     def test_move_files_offline(self):
 
@@ -74,12 +75,12 @@ class FileTestCase(TestCase):
         folder = get_hpccloud_folder(user=self._user)
 
         # create test items
-        item_1 = self.model('item').createItem('item_1', self._user,
+        item_1 = ModelImporter.model('item').createItem('item_1', self._user,
                                                folder)
         file_1 = self.create_file(self._user, item_1, 'test_1',
                                   'contents of file 1', initial_store['_id'])
 
-        item_2 = self.model('item').createItem('item_2', self._user,
+        item_2 = ModelImporter.model('item').createItem('item_2', self._user,
                                                folder)
         file_2 = self.create_file(self._user, item_2, 'test_2',
                                   'contents of file 2', initial_store['_id'])
@@ -93,8 +94,8 @@ class FileTestCase(TestCase):
                          type='application/json', user=self._user)
 
         # refetch files
-        file_1 = self.model('file').load(file_1['_id'], user=self._user)
-        file_2 = self.model('file').load(file_2['_id'], user=self._user)
+        file_1 = ModelImporter.model('file').load(file_1['_id'], user=self._user)
+        file_2 = ModelImporter.model('file').load(file_2['_id'], user=self._user)
 
         self.assertNotEqual(file_1['assetstoreId'], initial_store['_id'])
         self.assertEqual(file_1['assetstoreId'], file_2['assetstoreId'])

@@ -33,7 +33,6 @@
     "react-test-renderer": "16.2.0",
     "wslink": "0.1.7",
     "axios": "0.18.0",
-    "font-awesome": "4.7.0",
     "bootstrap": "3.3.7",
     "karma": "2.0.0",
     "karma-chrome-launcher": "2.2.0",

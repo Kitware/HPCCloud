@@ -23,6 +23,7 @@ import jsonschema
 import six
 
 from girder.models.model_base import AccessControlledModel, ValidationException
+from girder.utility.model_importer import ModelImporter
 from girder.constants import AccessType
 
 from ..utility import to_object_id, get_simulations_folder, share_folder, \
@@ -96,7 +97,7 @@ class Simulation(AccessControlledModel):
 
         simulations_folder = get_simulations_folder(user, project)
 
-        simulation_folder = self.model('folder').createFolder(
+        simulation_folder = ModelImporter.model('folder').createFolder(
             simulations_folder, simulation['name'], parentType='folder',
             creator=user)
 
@@ -106,7 +107,7 @@ class Simulation(AccessControlledModel):
         for name, step in six.iteritems(simulation['steps']):
             step['status'] = 'created'
             if create_step_folders:
-                step_folder = self.model('folder').createFolder(
+                step_folder = ModelImporter.model('folder').createFolder(
                     simulation_folder, name, parentType='folder',
                     creator=user)
                 step['folderId'] = step_folder['_id']
@@ -125,11 +126,11 @@ class Simulation(AccessControlledModel):
         simulation['access']['groups'] += groups
 
         # Share the simulation folder
-        simulation_folder = self.model('folder').load(
+        simulation_folder = ModelImporter.model('folder').load(
             simulation['folderId'], user=user)
         simulation_folder['access']['users'] += users
         simulation_folder['access']['groups'] += groups
-        self.model('folder').setAccessList(
+        ModelImporter.model('folder').setAccessList(
             simulation_folder, simulation_folder['access'], save=True,
             recurse=True, user=user)
 
@@ -144,11 +145,11 @@ class Simulation(AccessControlledModel):
         """
 
         # Load the simulation folder
-        simulation_folder = self.model('folder').load(
+        simulation_folder = ModelImporter.model('folder').load(
             simulation['folderId'], user=user)
 
         self.remove(simulation)
-        self.model('folder').remove(simulation_folder)
+        ModelImporter.model('folder').remove(simulation_folder)
 
     def update_simulation(self, user, simulation, name, metadata=None,
                           description=None, active=None, disabled=None,
@@ -204,7 +205,7 @@ class Simulation(AccessControlledModel):
         :param simulation: The simulation to be clone
         :param name: The cloned simulation name
         """
-        project = self.model('project', 'hpccloud').load(
+        project = ModelImporter.model('project', 'hpccloud').load(
             simulation['projectId'], user=user, level=AccessType.READ)
 
         del simulation['_id']
@@ -212,21 +213,21 @@ class Simulation(AccessControlledModel):
 
         cloned_simulation = self.create(
             user, project, simulation, create_step_folders=False)
-        simulation_folder = self.model('folder').load(
+        simulation_folder = ModelImporter.model('folder').load(
             cloned_simulation['folderId'], user=user, level=AccessType.READ)
 
         for name, step in six.iteritems(cloned_simulation['steps']):
             if step['type'] == 'input':
-                step_folder = self.model('folder').load(
+                step_folder = ModelImporter.model('folder').load(
                     step['folderId'], user=user, level=AccessType.READ)
-                copied_folder = self.model('folder').copyFolder(
+                copied_folder = ModelImporter.model('folder').copyFolder(
                     step_folder, parent=simulation_folder, name=name,
                     parentType='folder', creator=user)
                 step['folderId'] = copied_folder['_id']
                 step['status'] = simulation['steps'][name]['status']
             elif step['type'] == 'output':
                 # Just create a new folder
-                created_folder = self.model('folder').createFolder(
+                created_folder = ModelImporter.model('folder').createFolder(
                     simulation_folder, name, parentType='folder', creator=user)
                 step['folderId'] = created_folder['_id']
                 if 'metatdata' in step:
@@ -265,11 +266,11 @@ class Simulation(AccessControlledModel):
             access_list['groups'].append(access_object)
 
         # Share the simulation folder
-        simulation_folder = self.model('folder').load(
+        simulation_folder = ModelImporter.model('folder').load(
             simulation['folderId'], user=sharer)
 
         # Set access on project if just this simulation is being shared
-        project = self.model('project', 'hpccloud').get(simulation['projectId'])
+        project = ModelImporter.model('project', 'hpccloud').get(simulation['projectId'])
         if False:
             project.patch_access(sharer, project, users, groups, single=True)
 
@@ -285,13 +286,13 @@ class Simulation(AccessControlledModel):
         new_groups = merge_access(access_list['groups'], groups, level, flags)
 
         # Share the simulation folder
-        simulation_folder = self.model('folder').load(
+        simulation_folder = ModelImporter.model('folder').load(
             simulation['folderId'], user=sharer)
         share_folder(sharer, simulation_folder, new_users, new_groups)
 
         # Set access on project if just this simulation is being shared
         # print('gets here!', simulation)
-        project = self.model('project', 'hpccloud').load(
+        project = ModelImporter.model('project', 'hpccloud').load(
             simulation['projectId'], user=sharer)
         new_proj_users = _not_in_filter(new_users,
                                         project['access']['users'])
@@ -299,7 +300,7 @@ class Simulation(AccessControlledModel):
                                          project['access']['groups'])
         # print('gets here', new_proj_users, new_proj_groups)
         if len(new_proj_users) or len(new_proj_groups):
-            self.model('project', 'hpccloud').patch_access(
+            ModelImporter.model('project', 'hpccloud').patch_access(
                 sharer, project, new_proj_users, new_proj_groups, single=True)
 
         return self.setAccessList(simulation, access_list, save=True)
@@ -314,7 +315,7 @@ class Simulation(AccessControlledModel):
                                 if str(u['id']) not in users]
 
         # revoke the simulation folder
-        simulation_folder = self.model('folder').load(
+        simulation_folder = ModelImporter.model('folder').load(
             simulation['folderId'], user=sharer)
         unshare_folder(sharer, simulation_folder, users, groups)
 

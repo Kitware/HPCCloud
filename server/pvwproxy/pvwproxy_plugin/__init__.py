@@ -19,6 +19,7 @@
 
 
 from girder import events
+from girder.plugin import GirderPlugin
 from .proxy import Proxy
 
 from . import constants
@@ -30,7 +31,9 @@ def validate_settings(event):
     if key == constants.PluginSettings.PROXY_FILE_PATH:
         event.preventDefault().stopPropagation()
 
+class PVWProxyPlugin(GirderPlugin):
+    DISPLAY_NAME = 'PVWProxyPlugin plugin for Girder'
 
-def load(info):
-    events.bind('model.setting.validate', 'pvwproxy', validate_settings)
-    info['apiRoot'].proxy = Proxy()
+    def load(self, info):
+        events.bind('model.setting.validate', 'pvwproxy', validate_settings)
+        info['apiRoot'].proxy = Proxy()
