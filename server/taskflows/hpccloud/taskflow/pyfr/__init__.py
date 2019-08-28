@@ -322,7 +322,8 @@ def create_job(task, *args, **kwargs):
     body = {
         'name': 'pyfr_run',
         'commands': [
-            "mpiexec -n %s pyfr run -b %s input/%s input/%s" % (
+            # can add mpiexec -verbose or pyfr -v for crashed process.
+            'mpiexec -n %s pyfr -v run -b %s input/%s input/%s' % (
                 kwargs['numberOfProcs'],
                 backend,
                 kwargs['meshFilename'],
@@ -339,6 +340,27 @@ def create_job(task, *args, **kwargs):
             'numberOfSlots': kwargs['numberOfProcs']
         }
     }
+    # Add a retry, since pyfr on EC2 always fails at least once.
+    if kwargs['cluster']['type'] == 'ec2':
+        run_cmd = body['commands'][0]
+        second_out_filename = '%s-001.pyfrs' % (kwargs['meshFilename'].rsplit('.', 1)[0])
+
+        body['commands'] = [
+            'i="0"',
+            'retries="5"',
+            'while [ $i -lt $retries ]',
+            'do',
+            '  %s' % run_cmd,
+            '  FILE="./%s"' % second_out_filename,
+            '  if [ -s "$FILE" ]; then',
+            '    echo "$FILE exists, finished"',
+            '    i="$retries"',
+            '  else',
+            '    echo "$i $FILE does not exist, retry"',
+            '  fi',
+            '  i=$[$i+1]',
+            'done',
+        ]
 
     client = create_girder_client(
                 task.taskflow.girder_api_url, task.taskflow.girder_token)
