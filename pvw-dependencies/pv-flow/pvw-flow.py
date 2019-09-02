@@ -62,7 +62,9 @@ class _Server(pv_wslink.PVServerProtocol):
 
     @staticmethod
     def add_arguments(parser):
-        parser.add_argument("--data", default=os.getcwd(), help="path to the dataset file to load", dest="dataset")
+        parser.add_argument("--data", default=os.getcwd(), help="path to the base directory", dest="path")
+        parser.add_argument("--load-file", default=None, help="File to load if any based on data-dir base path", dest="file")
+
         parser.add_argument("--virtual-env", default=None, help="Path to virtual environment to use")
         parser.add_argument("--viewport-scale", default=1.0, type=float, help="Viewport scaling factor", dest="viewportScale")
         parser.add_argument("--viewport-max-width", default=2560, type=int, help="Viewport maximum size in width", dest="viewportMaxWidth")
@@ -72,7 +74,7 @@ class _Server(pv_wslink.PVServerProtocol):
 
     @staticmethod
     def configure(args):
-        _Server.dataset              = args.dataset
+        _Server.dataset              = os.path.join(args.path, args.file)
         _Server.authKey              = args.authKey
         _Server.viewportScale        = args.viewportScale
         _Server.viewportMaxWidth     = args.viewportMaxWidth
