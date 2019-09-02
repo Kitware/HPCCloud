@@ -42,6 +42,9 @@ BODY='{"host": "'$IPADDRESS'", "port": '${WEBSOCKET_PORT}', "key": "'$KEY'"}'
 curl --silent --show-error -o /dev/null -X POST -d "$BODY"  --header "Content-Type: application/json" {{ baseUrl }}/proxy
 {% endif -%}
 
+# Replace Visualizer script
+{{ 'VISUALIZER="%s"' % scriptToRun if scriptToRun else '# No swap...' }}
+
 # First run pvbatch
 ${MPIPROG} {{ '-n %s' % numberOfSlots if numberOfSlots else '-n 1'}} ${PV_BATCH} {{'--mesa-llvm' if not gpu else ''}} ${VISUALIZER} --timeout 3600 --host $IPADDRESS --port ${WEBSOCKET_PORT} \
 {{ '--data %s' % dataDir if dataDir else ''}} \
