@@ -250,6 +250,12 @@ def submit_paraview_job(task, cluster, job, *args, **kwargs):
         paraview_install_dir = paraview_install_dir[0].value
         params['paraviewInstallDir'] = paraview_install_dir
 
+    if 'numberOfNodes' in kwargs:
+        params['numberOfNodes'] = kwargs['numberOfNodes']
+
+    if 'numberOfCoresPerNode' in kwargs:
+        params['numberOfCoresPerNode'] = kwargs['numberOfCoresPerNode']
+
     # Does the cluster have GPUs?
     params['gpu'] = has_gpus(cluster) or kwargs.get('numberOfGpusPerNode', 0) > 0
 
