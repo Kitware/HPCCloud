@@ -15,7 +15,7 @@
   "dependencies": {
     "commander": "2.13.0",
     "open": "0.0.5",
-    "shelljs": "0.8.1",
+    "shelljs": "0.8.5",
     "monologue.js": "0.3.5",
     "mout": "1.1.0",
     "react": "16.2.0",
